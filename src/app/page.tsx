@@ -1,65 +1,57 @@
-import Image from "next/image";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="min-h-screen bg-gradient-to-b from-stone-50 to-white">
+      <div className="mx-auto max-w-2xl px-6 py-24">
+        <h1 className="text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl">
+          People Like You
+        </h1>
+        <p className="mt-6 text-lg leading-8 text-stone-600">
+          Dating apps are broken. They optimize for sorting, but the job you're
+          hiring for is <em>falling for someone</em>. We don't match you on
+          traits — we create the conditions where chemistry can emerge.
+        </p>
+
+        <div className="mt-12 space-y-4">
+          <Link
+            href="/onboarding"
+            className="block rounded-xl bg-stone-900 px-6 py-4 text-center text-lg font-medium text-white transition hover:bg-stone-800"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+            Get Started
+          </Link>
+          <Link
+            href="/dashboard"
+            className="block rounded-xl border border-stone-200 px-6 py-4 text-center text-lg font-medium text-stone-700 transition hover:bg-stone-50"
           >
-            Documentation
-          </a>
+            I already have an account
+          </Link>
         </div>
-      </main>
+
+        <div className="mt-16 grid gap-8 sm:grid-cols-3">
+          <div>
+            <h3 className="font-semibold text-stone-900">Discovery</h3>
+            <p className="mt-2 text-sm text-stone-500">
+              We surface how someone could expand your world — not just who
+              looks like your type.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-stone-900">Investment</h3>
+            <p className="mt-2 text-sm text-stone-500">
+              Structured, escalating connection — not mindless swiping. Every
+              lead is precious.
+            </p>
+          </div>
+          <div>
+            <h3 className="font-semibold text-stone-900">Chemistry</h3>
+            <p className="mt-2 text-sm text-stone-500">
+              We help you see each other's unique genius before snap judgments
+              take over.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
