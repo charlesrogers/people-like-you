@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 
 interface SeedProfile {
   name: string;
@@ -83,10 +84,12 @@ export default function Calibrate() {
     }
 
     loadProfile();
+    posthog.capture('calibration_started')
   }, [router]);
 
   async function handleVote(outcome: 0 | 1) {
     if (animating || seeds.length === 0) return;
+    posthog.capture('calibration_vote')
     setAnimating(true);
 
     const seedElo = seedElos[currentIndex];
@@ -127,6 +130,7 @@ export default function Calibrate() {
 
     setTimeout(() => {
       if (currentIndex + 1 >= seeds.length) {
+        posthog.capture('calibration_completed')
         router.push("/dashboard");
       } else {
         setCurrentIndex(currentIndex + 1);

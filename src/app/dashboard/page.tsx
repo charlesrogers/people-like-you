@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import posthog from "posthog-js";
 
 interface Match {
   id: string;
@@ -75,6 +76,7 @@ export default function Dashboard() {
 
         setProfile(profileData.profile);
         setMatches(matchesData.matches || []);
+        posthog.capture('dashboard_loaded', { match_count: (matchesData.matches || []).length })
       } catch {
         // Profile not found
       } finally {
@@ -86,12 +88,14 @@ export default function Dashboard() {
   }, []);
 
   function handleSelectMatch(match: Match) {
+    posthog.capture('match_selected')
     setSelectedMatch(match);
     setPhotoRevealed(false);
     setPhotoRevealedBeforeDecision(false);
   }
 
   function handleRevealPhoto() {
+    posthog.capture('photo_revealed')
     setPhotoRevealed(true);
     setPhotoRevealedBeforeDecision(true);
   }
@@ -115,6 +119,7 @@ export default function Dashboard() {
       return;
     }
 
+    posthog.capture('feedback_submitted', { reason: feedbackReason })
     setFeedbackSending(true);
 
     try {

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import posthog from "posthog-js";
 
 // ---------- Types ----------
 interface BaseQuestion {
@@ -347,6 +348,8 @@ export default function Onboarding() {
   const [answers, setAnswers] = useState<Record<string, string | string[]>>({});
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => { posthog.capture('onboarding_started') }, [])
+
   const section = SECTIONS[sectionIndex];
   const isLast = sectionIndex === SECTIONS.length - 1;
   const progress = ((sectionIndex + 1) / SECTIONS.length) * 100;
@@ -371,6 +374,7 @@ export default function Onboarding() {
         });
         const data = await res.json();
         if (data.id) {
+          posthog.capture('onboarding_completed')
           localStorage.setItem("ply_profile_id", data.id);
           router.push("/calibrate");
         }
@@ -379,6 +383,7 @@ export default function Onboarding() {
       }
       return;
     }
+    posthog.capture('onboarding_section_progressed', { section_index: sectionIndex })
     setSectionIndex(sectionIndex + 1);
     window.scrollTo(0, 0);
   }
