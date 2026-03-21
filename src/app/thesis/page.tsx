@@ -26,6 +26,30 @@ export default function ThesisPage() {
           two people click.
         </p>
 
+        {/* ---- The Matchmaker ---- */}
+        <section className="mt-16 rounded-xl border border-stone-200 bg-stone-50 px-8 py-10">
+          <div className="space-y-5 text-base leading-7 text-stone-600">
+            <p>
+              Think of the best matchmaker you know — that friend who just{" "}
+              <em>gets</em> it. They don&rsquo;t send you a spreadsheet of
+              compatible singles. They tell you a story: &ldquo;Okay, you need
+              to meet this person. She quit law to start a climbing gym,
+              she&rsquo;s hilarious in the exact way you love, and I already
+              know you two are going to talk for four hours straight.&rdquo;
+            </p>
+            <p>
+              That friend works because they actually know you — not your
+              filters, not your checklist, <em>you</em>. The problem is their
+              network tops out at a few hundred people.
+            </p>
+            <p className="font-medium text-stone-800">
+              People Like You is that friend — with an unlimited network and
+              the memory to know what you actually like. Not what you say you
+              like on a profile. What actually makes you light up.
+            </p>
+          </div>
+        </section>
+
         {/* ---- The Problem ---- */}
         <section className="mt-16">
           <h2 className="text-2xl font-semibold text-stone-900">
@@ -222,9 +246,9 @@ export default function ThesisPage() {
           </h2>
           <div className="mt-6 space-y-5 text-base leading-7 text-stone-600">
             <p>
-              Every introduction should feel like your most insightful friend
-              pulling you aside at a party and saying: &ldquo;Okay, I need you
-              to meet someone. Trust me on this one.&rdquo;
+              Every introduction should feel like that friend texting you:
+              &ldquo;Trust me on this one.&rdquo; And then actually being
+              right.
             </p>
             <p>
               We want both people to walk into that first conversation already
