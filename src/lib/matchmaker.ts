@@ -1,100 +1,134 @@
-import Anthropic from "@anthropic-ai/sdk";
-import { Profile } from "./profiles";
+import Anthropic from '@anthropic-ai/sdk'
+import type { CompositeProfile, User } from './types'
 
-const anthropic = new Anthropic();
+const anthropic = new Anthropic()
 
-export async function analyzeProfile(
-  answers: Record<string, string | string[]>
-): Promise<Profile["vectors"]> {
-  const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
-    max_tokens: 1024,
-    messages: [
-      {
-        role: "user",
-        content: `You are a matchmaker analyzing someone's dating profile responses to extract meaningful matching vectors. Analyze these responses and return a JSON object.
-
-Responses:
-- Unconventional path: ${answers.unconventional_path || "not provided"}
-- Fascination: ${answers.fascination || "not provided"}
-- Humor: ${answers.humor || "not provided"}
-- Admired quality: ${answers.admired_quality || "not provided"}
-- Growth edge: ${answers.growth_edge || "not provided"}
-- Friend's pitch: ${answers.friend_pitch || "not provided"}
-- TED talk topic: ${answers.prompt_ted_talk || "not provided"}
-- Controversial opinion: ${answers.prompt_controversial || "not provided"}
-- Secret talent: ${answers.prompt_secret_talent || "not provided"}
-- Interests: ${Array.isArray(answers.interests) ? answers.interests.join(", ") : "not provided"}
-
-Return ONLY a JSON object with these fields:
-{
-  "selfExpansion": ["2-4 words each: the worlds/domains this person could introduce someone to"],
-  "admirationSignals": ["2-4 words each: what makes this person genuinely remarkable, based on evidence in their answers"],
-  "humorSignature": "one sentence describing their humor style",
-  "growthTrajectory": "one sentence about where they're headed",
-  "iSharingMarkers": ["2-4 words each: the types of moments/reactions that would make this person feel 'clicked' with someone"]
-}`,
-      },
-    ],
-  });
-
-  const text =
-    message.content[0].type === "text" ? message.content[0].text : "";
-  const jsonMatch = text.match(/\{[\s\S]*\}/);
-  if (!jsonMatch) {
-    return {
-      selfExpansion: [],
-      admirationSignals: [],
-      humorSignature: "",
-      growthTrajectory: "",
-      iSharingMarkers: [],
-    };
-  }
-  return JSON.parse(jsonMatch[0]);
+// Excitement type determines how the angle is written
+const ANGLE_STYLES: Record<string, string> = {
+  explorer: 'Lead with the most unexpected, novel detail. Emphasize new worlds they could discover together. Frame them as someone who will expand their horizons in ways they never expected.',
+  nester: 'Lead with character, warmth, and values alignment. Emphasize reliability, shared rhythms, and how this person treats the people around them. Frame them as someone who feels like home.',
+  intellectual: 'Lead with what this person is passionate or deeply skilled at. Emphasize depth, curiosity, and unique perspectives. Frame them as someone who will make them think in new ways.',
+  spark: 'Lead with personality, humor, and energy. Pull their funniest or most magnetic quote. Frame them as someone who lights up every room they walk into.',
 }
 
-export async function generateMatchNarrative(
-  profileA: Profile,
-  profileB: Profile
+export async function generateMatchAngle(
+  userA: User,
+  userB: User,
+  compositeA: CompositeProfile,
+  compositeB: CompositeProfile,
+): Promise<{ narrativeForA: string; narrativeForB: string }> {
+  // Generate both angles in parallel
+  const [forA, forB] = await Promise.all([
+    writeAngle(userA, userB, compositeA, compositeB),
+    writeAngle(userB, userA, compositeB, compositeA),
+  ])
+
+  return { narrativeForA: forA, narrativeForB: forB }
+}
+
+async function writeAngle(
+  recipient: User,
+  subject: User,
+  recipientProfile: CompositeProfile,
+  subjectProfile: CompositeProfile,
 ): Promise<string> {
+  const excitementType = recipientProfile.excitement_type || 'explorer'
+  const angleStyle = ANGLE_STYLES[excitementType] || ANGLE_STYLES.explorer
+
   const message = await anthropic.messages.create({
-    model: "claude-sonnet-4-6",
+    model: 'claude-sonnet-4-6',
     max_tokens: 512,
     messages: [
       {
-        role: "user",
-        content: `You are a warm, insightful matchmaker writing a pitch for why two people should meet. Your goal is to spark genuine curiosity, not evaluation. Frame it as an invitation to be interested, not a sales pitch.
+        role: 'user',
+        content: `You are the world's best matchmaker — the friend who just GETS it. You're writing a pitch TO ${recipient.first_name} about why they should be genuinely excited to meet ${subject.first_name}.
 
-Person A (${profileA.firstName}):
-- Their worlds: ${profileA.vectors.selfExpansion.join(", ")}
-- What's remarkable: ${profileA.vectors.admirationSignals.join(", ")}
-- Humor: ${profileA.vectors.humorSignature}
-- Growing toward: ${profileA.vectors.growthTrajectory}
-- Click moments: ${profileA.vectors.iSharingMarkers.join(", ")}
-- Interests: ${profileA.interests.join(", ")}
-- Values most in a partner: ${profileA.topCharacteristics.join(", ")}
-- Prompts: TED talk on "${profileA.answers.prompt_ted_talk || ""}"; Controversial opinion: "${profileA.answers.prompt_controversial || ""}"
+## ${recipient.first_name} (who you're writing TO):
+- Excitement type: ${excitementType}
+- Values: ${recipientProfile.values.join(', ') || 'unknown'}
+- Interests: ${recipientProfile.interest_tags.join(', ') || 'unknown'}
+- Passions: ${recipientProfile.passion_indicators.join(', ') || 'unknown'}
+- What they find remarkable: ${recipientProfile.goals.join(', ') || 'unknown'}
+- Communication: warmth ${recipientProfile.communication_warmth}, directness ${recipientProfile.communication_directness}
 
-Person B (${profileB.firstName}):
-- Their worlds: ${profileB.vectors.selfExpansion.join(", ")}
-- What's remarkable: ${profileB.vectors.admirationSignals.join(", ")}
-- Humor: ${profileB.vectors.humorSignature}
-- Growing toward: ${profileB.vectors.growthTrajectory}
-- Click moments: ${profileB.vectors.iSharingMarkers.join(", ")}
-- Interests: ${profileB.interests.join(", ")}
-- Prompts: TED talk on "${profileB.answers.prompt_ted_talk || ""}"; Controversial opinion: "${profileB.answers.prompt_controversial || ""}"
+## ${subject.first_name} (who you're writing ABOUT):
+- Passions: ${subjectProfile.passion_indicators.join(', ') || 'unknown'}
+- Values: ${subjectProfile.values.join(', ') || 'unknown'}
+- Interests: ${subjectProfile.interest_tags.join(', ') || 'unknown'}
+- Kindness markers: ${subjectProfile.kindness_markers.join(', ') || 'unknown'}
+- Humor style: ${subjectProfile.humor_style || 'unknown'}
+- Storytelling ability: ${subjectProfile.storytelling_ability}/1.0
+- Vulnerability/authenticity: ${subjectProfile.vulnerability_authenticity}/1.0
+- Growth direction: ${subjectProfile.goals.join(', ') || 'unknown'}
+- Their own words: ${subjectProfile.notable_quotes.slice(0, 3).map(q => `"${q}"`).join(' | ') || 'none available'}
 
-Write a 3-4 sentence narrative pitch TO Person A about why they should be curious about Person B. Focus on:
-1. How Person B could expand Person A's world (self-expansion)
-2. What Person A would likely find admirable about Person B
-3. Where they might "click" — shared reaction patterns or complementary energies
+## Your angle style for ${recipient.first_name}:
+${angleStyle}
 
-Do NOT mention physical appearance. Do NOT use generic phrases like "you both love adventure." Be specific to their actual responses. Write in second person ("you"). Keep it warm but not cheesy.`,
+## Rules:
+- Write 3-4 sentences MAX. Every word earns its place.
+- Pick ONE specific, compelling detail from ${subject.first_name}'s profile and connect it to something ${recipient.first_name} would care about.
+- Use ${subject.first_name}'s actual quotes when possible — specificity is everything.
+- Feel like a friend pulling them aside at a party: "Okay, you need to meet someone."
+- NO physical appearance. NO generic compatibility phrases. NO "you both enjoy..."
+- The reader should finish and secretly hope this person says yes to them.
+- Write in second person ("you").`,
       },
     ],
-  });
+  })
 
-  return message.content[0].type === "text"
+  return message.content[0].type === 'text'
     ? message.content[0].text
-    : "Something special is brewing here.";
+    : 'There\'s someone here you need to meet. Trust us on this one.'
+}
+
+// Score compatibility between two composite profiles (0-1)
+export function scoreCompatibility(a: CompositeProfile, b: CompositeProfile): number {
+  let score = 0
+  let factors = 0
+
+  // 1. Values overlap (shared values are strong signal)
+  if (a.values.length && b.values.length) {
+    const shared = a.values.filter(v => b.values.includes(v)).length
+    const total = new Set([...a.values, ...b.values]).size
+    score += (shared / total) * 1.5 // weighted higher
+    factors += 1.5
+  }
+
+  // 2. Complementary Big Five (some distance = self-expansion, but not too much)
+  const a5 = a.big_five_proxy as Record<string, number>
+  const b5 = b.big_five_proxy as Record<string, number>
+  if (a5.openness !== undefined && b5.openness !== undefined) {
+    const traits = ['openness', 'conscientiousness', 'extraversion', 'agreeableness', 'neuroticism']
+    let traitScore = 0
+    for (const t of traits) {
+      const diff = Math.abs((a5[t] || 0.5) - (b5[t] || 0.5))
+      // Sweet spot: 0.1-0.3 difference is ideal for self-expansion
+      if (diff >= 0.1 && diff <= 0.3) traitScore += 1
+      else if (diff < 0.1) traitScore += 0.7 // very similar, still okay
+      else if (diff <= 0.5) traitScore += 0.4 // moderate difference
+      else traitScore += 0.1 // too different
+    }
+    score += (traitScore / traits.length)
+    factors += 1
+  }
+
+  // 3. Interest intersection (novel overlap > obvious overlap)
+  if (a.interest_tags.length && b.interest_tags.length) {
+    const shared = a.interest_tags.filter(t => b.interest_tags.includes(t)).length
+    const novelForA = b.interest_tags.filter(t => !a.interest_tags.includes(t)).length
+    // Value both overlap AND novel expansion
+    const interestScore = (shared * 0.3 + novelForA * 0.7) / Math.max(b.interest_tags.length, 1)
+    score += Math.min(interestScore, 1)
+    factors += 1
+  }
+
+  // 4. Communication style compatibility
+  if (a.communication_warmth !== null && b.communication_warmth !== null) {
+    const warmthDiff = Math.abs(a.communication_warmth - b.communication_warmth)
+    score += (1 - warmthDiff) * 0.5
+    factors += 0.5
+  }
+
+  return factors > 0 ? Math.round((score / factors) * 100) / 100 : 0.5
 }

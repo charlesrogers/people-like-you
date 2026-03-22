@@ -1,9 +1,7 @@
-import { NextResponse } from "next/server";
-import { getAllProfiles } from "@/lib/profiles";
-import { ensureSeeded } from "@/lib/seed-profiles";
+import { NextResponse } from 'next/server'
+import { getAllUsers } from '@/lib/db'
 
 export async function GET() {
-  ensureSeeded();
-  const profiles = getAllProfiles();
-  return NextResponse.json({ profiles });
+  const users = await getAllUsers()
+  return NextResponse.json({ profiles: users })
 }

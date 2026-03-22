@@ -1,23 +1,19 @@
-import { NextRequest, NextResponse } from "next/server";
-import { updateProfileElo } from "@/lib/profiles";
-import { ensureSeeded } from "@/lib/seed-profiles";
+import { NextRequest, NextResponse } from 'next/server'
+import { updateUserElo, getUser } from '@/lib/db'
 
 export async function POST(req: NextRequest) {
-  ensureSeeded();
-  const { profileId, newElo, interactions } = await req.json();
+  const { userId, newElo, interactions } = await req.json()
 
-  if (!profileId || newElo === undefined) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  if (!userId || newElo === undefined) {
+    return NextResponse.json({ error: 'Missing fields' }, { status: 400 })
   }
 
-  updateProfileElo(profileId, newElo, false);
-
-  // Also update interactions count directly
-  const { getProfile } = await import("@/lib/profiles");
-  const profile = getProfile(profileId);
-  if (profile) {
-    profile.eloInteractions = interactions;
+  const user = await getUser(userId)
+  if (!user) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 })
   }
 
-  return NextResponse.json({ ok: true, newElo });
+  await updateUserElo(userId, newElo, true)
+
+  return NextResponse.json({ ok: true, newElo })
 }

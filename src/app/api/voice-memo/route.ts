@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { saveVoiceMemo, updateVoiceMemo } from '@/lib/db'
-import OpenAI from 'openai'
+import { saveVoiceMemo } from '@/lib/db'
+import { processVoiceMemo } from '@/lib/extraction'
 
 export async function POST(req: NextRequest) {
   const formData = await req.formData()
@@ -42,38 +42,10 @@ export async function POST(req: NextRequest) {
     day_number: dayNumber,
   })
 
-  // Kick off transcription async (don't block the response)
-  transcribeAsync(memo.id, fileName).catch(err =>
-    console.error('Async transcription failed for memo', memo.id, err)
+  // Kick off full pipeline async: transcribe → extract → aggregate composite
+  processVoiceMemo(memo.id).catch(err =>
+    console.error('Async extraction pipeline failed for memo', memo.id, err)
   )
 
   return NextResponse.json({ id: memo.id, status: 'uploaded' })
-}
-
-async function transcribeAsync(memoId: string, storagePath: string) {
-  const supabase = createServerClient()
-
-  // Download audio from storage
-  const { data: audioData, error: dlError } = await supabase.storage
-    .from('voice-memos')
-    .download(storagePath)
-
-  if (dlError || !audioData) {
-    console.error('Failed to download audio for transcription:', dlError)
-    return
-  }
-
-  // Convert Blob to File for OpenAI
-  const file = new File([audioData], 'audio.webm', { type: 'audio/webm' })
-
-  // Transcribe with GPT-4o Mini Transcribe
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  const transcription = await openai.audio.transcriptions.create({
-    model: 'gpt-4o-mini-transcribe',
-    file,
-  })
-
-  // Update memo with transcript
-  await updateVoiceMemo(memoId, { transcript: transcription.text })
-  console.log(`Transcribed memo ${memoId}: ${transcription.text.substring(0, 80)}...`)
 }

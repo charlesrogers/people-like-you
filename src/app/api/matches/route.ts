@@ -1,51 +1,66 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getProfile, getCompatibleProfiles } from "@/lib/profiles";
-import { generateMatchNarrative } from "@/lib/matchmaker";
-import { ensureSeeded } from "@/lib/seed-profiles";
+import { NextRequest, NextResponse } from 'next/server'
+import { getUser, getCompatibleUsers, getCompositeProfile, getUserPhotos } from '@/lib/db'
+import { generateMatchAngle, scoreCompatibility } from '@/lib/matchmaker'
 
 export async function GET(req: NextRequest) {
-  const profileId = req.nextUrl.searchParams.get("profileId");
-  if (!profileId) {
-    return NextResponse.json({ error: "Missing profileId" }, { status: 400 });
+  const userId = req.nextUrl.searchParams.get('userId')
+  if (!userId) {
+    return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
   }
 
-  ensureSeeded();
-
-  const profile = getProfile(profileId);
-  if (!profile) {
-    return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+  const user = await getUser(userId)
+  if (!user) {
+    return NextResponse.json({ error: 'User not found' }, { status: 404 })
   }
 
-  const candidates = getCompatibleProfiles(profile);
+  const userComposite = await getCompositeProfile(userId)
+  const candidates = await getCompatibleUsers(user)
 
-  // Generate LLM-powered match narratives for each candidate
+  // Score and rank candidates by compatibility
+  const scored = await Promise.all(
+    candidates.map(async (candidate) => {
+      const candidateComposite = await getCompositeProfile(candidate.id)
+      const photos = await getUserPhotos(candidate.id)
+      const score = candidateComposite && userComposite
+        ? scoreCompatibility(userComposite, candidateComposite)
+        : 0.5
+      return { candidate, candidateComposite, photos, score }
+    })
+  )
+
+  // Sort by score, take top 5
+  scored.sort((a, b) => b.score - a.score)
+  const top = scored.slice(0, 5)
+
+  // Generate angle narratives for top matches
   const matches = await Promise.all(
-    candidates.slice(0, 5).map(async (candidate) => {
-      let narrative: string;
-      try {
-        narrative = await generateMatchNarrative(profile, candidate);
-      } catch {
-        narrative =
-          "We think there's something interesting here. Want to find out?";
+    top.map(async ({ candidate, candidateComposite, photos, score }) => {
+      let narrative = "There's someone here you should meet. Trust us on this one."
+
+      if (userComposite && candidateComposite) {
+        try {
+          const angles = await generateMatchAngle(user, candidate, userComposite, candidateComposite)
+          narrative = angles.narrativeForA
+        } catch (err) {
+          console.error('Failed to generate angle for', candidate.id, err)
+        }
       }
 
-      // Identify expansion points — where their worlds diverge interestingly
-      const expansionPoints = candidate.vectors.selfExpansion.filter(
-        (world) =>
-          !profile.vectors.selfExpansion.some(
-            (pw) => pw.toLowerCase() === world.toLowerCase()
-          )
-      );
+      // Expansion points: interests they have that user doesn't
+      const expansionPoints = candidateComposite?.interest_tags.filter(
+        tag => !userComposite?.interest_tags.includes(tag)
+      )?.slice(0, 5) || []
 
       return {
         id: candidate.id,
-        name: candidate.firstName,
+        name: candidate.first_name,
         narrative,
         expansionPoints,
-        socialLink: candidate.socialLink,
-      };
+        photoUrl: photos[0]?.public_url || null,
+        compatibilityScore: score,
+      }
     })
-  );
+  )
 
-  return NextResponse.json({ matches });
+  return NextResponse.json({ matches })
 }
