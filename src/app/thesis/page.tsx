@@ -30,22 +30,19 @@ export default function ThesisPage() {
         <section className="mt-16 rounded-xl border border-stone-200 bg-stone-50 px-8 py-10">
           <div className="space-y-5 text-base leading-7 text-stone-600">
             <p>
-              Think of the best matchmaker you know — that friend who just{" "}
-              <em>gets</em> it. They don&rsquo;t send you a spreadsheet of
-              compatible singles. They tell you a story: &ldquo;Okay, you need
-              to meet this person. She quit law to start a climbing gym,
-              she&rsquo;s hilarious in the exact way you love, and I already
-              know you two are going to talk for four hours straight.&rdquo;
+              Imagine a matchmaker who knows you better than your best friend
+              does. Not just your type — your humor, what makes you light up,
+              the kind of person you&rsquo;d talk to until 3am without noticing.
             </p>
             <p>
-              That friend works because they actually know you — not your
-              filters, not your checklist, <em>you</em>. The problem is their
-              network tops out at a few hundred people.
+              Now imagine they know every person you&rsquo;d want to date just
+              as well.
             </p>
             <p className="font-medium text-stone-800">
-              People Like You is that friend — with an unlimited network and
-              the memory to know what you actually like. Not what you say you
-              like on a profile. What actually makes you light up.
+              That&rsquo;s what we&rsquo;re building. A matchmaker that finds
+              people you&rsquo;re genuinely compatible with — then introduces
+              you to each other in the way most likely to spark something real.
+              Here&rsquo;s why that matters.
             </p>
           </div>
         </section>
@@ -206,9 +203,10 @@ export default function ThesisPage() {
               completely different direction.
             </p>
             <p>
-              By the time you finish reading, you should feel what you&rsquo;d
-              feel walking into that school dance. Gripped. Curious. Secretly
-              hoping they say yes to you.
+              You get pitched to your dream matches in the best possible light.
+              And the people you see? They&rsquo;re not profiles —
+              they&rsquo;re introductions that make you{" "}
+              <em>feel</em> something before you&rsquo;ve even met.
             </p>
 
             <p className="font-medium text-stone-800">
@@ -256,6 +254,10 @@ export default function ThesisPage() {
               Already hoping it works out — not because an algorithm told them
               they&rsquo;re a 94% match, but because a story made them{" "}
               <em>feel</em> it.
+            </p>
+            <p>
+              No swiping. No small talk with strangers. Just two people who
+              already have a reason to be excited about each other.
             </p>
             <p>
               Compatibility gets the right people in the room. Chemistry makes
