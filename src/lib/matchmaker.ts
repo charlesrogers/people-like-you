@@ -132,3 +132,35 @@ export function scoreCompatibility(a: CompositeProfile, b: CompositeProfile): nu
 
   return factors > 0 ? Math.round((score / factors) * 100) / 100 : 0.5
 }
+
+// Select the best next candidate for a user, excluding previously shown users
+export async function selectNextCandidate(
+  userId: string
+): Promise<{ candidate: User; score: number } | null> {
+  const { getUser, getCompatibleUsers, getCompositeProfile, getPreviouslyShownUserIds } = await import('./db')
+
+  const user = await getUser(userId)
+  if (!user) return null
+
+  const userComposite = await getCompositeProfile(userId)
+  const previouslyShown = await getPreviouslyShownUserIds(userId)
+  const candidates = await getCompatibleUsers(user)
+
+  // Filter out previously shown
+  const fresh = candidates.filter(c => !previouslyShown.includes(c.id))
+  if (fresh.length === 0) return null
+
+  // Score and rank
+  const scored = await Promise.all(
+    fresh.map(async (candidate) => {
+      const candidateComposite = await getCompositeProfile(candidate.id)
+      const score = userComposite && candidateComposite
+        ? scoreCompatibility(userComposite, candidateComposite)
+        : 0.5
+      return { candidate, score }
+    })
+  )
+
+  scored.sort((a, b) => b.score - a.score)
+  return scored[0] || null
+}

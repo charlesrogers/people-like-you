@@ -16,6 +16,7 @@ export interface User {
   elo_interactions: number
   community: string
   is_seed: boolean
+  profile_status: 'active' | 'paused' | 'hidden' | 'deactivated'
   created_at: string
 }
 

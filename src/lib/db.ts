@@ -7,7 +7,7 @@ function db() {
 
 // ─── Users ───
 
-export async function createUser(data: Omit<User, 'id' | 'created_at' | 'onboarding_stage' | 'elo_score' | 'elo_interactions' | 'is_seed'>): Promise<User> {
+export async function createUser(data: Omit<User, 'id' | 'created_at' | 'onboarding_stage' | 'elo_score' | 'elo_interactions' | 'is_seed' | 'profile_status'>): Promise<User> {
   const { data: user, error } = await db()
     .from('users')
     .insert(data)
@@ -63,6 +63,7 @@ export async function getCompatibleUsers(user: User, eloRange = 150): Promise<Us
     .from('users')
     .select()
     .eq('gender', oppositeGender)
+    .eq('profile_status', 'active')
     .neq('id', user.id)
     .gte('elo_score', user.elo_score - eloRange)
     .lte('elo_score', user.elo_score + eloRange)
@@ -80,6 +81,7 @@ export async function getCompatibleUsers(user: User, eloRange = 150): Promise<Us
       .from('users')
       .select()
       .eq('gender', oppositeGender)
+      .eq('profile_status', 'active')
       .neq('id', user.id)
     if (err) throw err
     return all ?? []
@@ -279,6 +281,191 @@ export async function getPromptsByDay(dayNumber: number): Promise<{ id: string; 
     .select('id, text, category')
     .eq('day_number', dayNumber)
     .eq('active', true)
+  if (error) throw error
+  return data ?? []
+}
+
+// ─── Elo Calibration Candidates ───
+
+// ─── Daily Intros ───
+
+export interface DailyIntro {
+  id: string
+  user_id: string
+  match_id: string
+  matched_user_id: string
+  narrative: string
+  status: 'pending' | 'liked' | 'passed' | 'expired'
+  intro_type: 'daily' | 'bonus'
+  scheduled_at: string
+  delivered_at: string | null
+  acted_at: string | null
+  expires_at: string
+  voice_message_required: boolean
+  voice_message_path: string | null
+  created_at: string
+}
+
+export interface UserCadence {
+  id: string
+  user_id: string
+  delivery_hour: number
+  timezone: string
+  is_paused: boolean
+  is_hidden: boolean
+  paused_at: string | null
+  last_action_at: string | null
+  consecutive_inactive_days: number
+  consecutive_passes: number
+  consecutive_unresponded_likes: number
+  total_likes: number
+  total_passes: number
+  next_match_user_id: string | null
+  created_at: string
+  updated_at: string
+}
+
+export async function saveDailyIntro(intro: Omit<DailyIntro, 'id' | 'created_at'>): Promise<DailyIntro> {
+  const { data, error } = await db()
+    .from('daily_intros')
+    .insert(intro)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getDailyIntro(userId: string, status?: string): Promise<DailyIntro | null> {
+  let query = db()
+    .from('daily_intros')
+    .select()
+    .eq('user_id', userId)
+    .order('scheduled_at', { ascending: false })
+    .limit(1)
+
+  if (status) query = query.eq('status', status)
+
+  const { data, error } = await query.single()
+  if (error && error.code !== 'PGRST116') throw error
+  return data
+}
+
+export async function getCurrentDailyIntro(userId: string): Promise<DailyIntro | null> {
+  // Get today's pending or most recent intro
+  const { data, error } = await db()
+    .from('daily_intros')
+    .select()
+    .eq('user_id', userId)
+    .eq('intro_type', 'daily')
+    .order('scheduled_at', { ascending: false })
+    .limit(1)
+    .single()
+  if (error && error.code !== 'PGRST116') throw error
+  return data
+}
+
+export async function getCurrentBonusIntro(userId: string): Promise<DailyIntro | null> {
+  const { data, error } = await db()
+    .from('daily_intros')
+    .select()
+    .eq('user_id', userId)
+    .eq('intro_type', 'bonus')
+    .eq('status', 'pending')
+    .order('scheduled_at', { ascending: false })
+    .limit(1)
+    .single()
+  if (error && error.code !== 'PGRST116') throw error
+  return data
+}
+
+export async function updateDailyIntro(id: string, updates: Partial<DailyIntro>): Promise<DailyIntro> {
+  const { data, error } = await db()
+    .from('daily_intros')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getIntroHistory(userId: string, limit = 20): Promise<DailyIntro[]> {
+  const { data, error } = await db()
+    .from('daily_intros')
+    .select()
+    .eq('user_id', userId)
+    .neq('status', 'pending')
+    .order('scheduled_at', { ascending: false })
+    .limit(limit)
+  if (error) throw error
+  return data ?? []
+}
+
+export async function getPreviouslyShownUserIds(userId: string): Promise<string[]> {
+  const { data, error } = await db()
+    .from('daily_intros')
+    .select('matched_user_id')
+    .eq('user_id', userId)
+  if (error) throw error
+  return (data ?? []).map(d => d.matched_user_id)
+}
+
+export async function expirePendingIntros(userId: string): Promise<number> {
+  const { data, error } = await db()
+    .from('daily_intros')
+    .update({ status: 'expired' })
+    .eq('user_id', userId)
+    .eq('status', 'pending')
+    .select('id')
+  if (error) throw error
+  return data?.length ?? 0
+}
+
+// ─── User Cadence ───
+
+export async function getUserCadence(userId: string): Promise<UserCadence | null> {
+  const { data, error } = await db()
+    .from('user_cadence')
+    .select()
+    .eq('user_id', userId)
+    .single()
+  if (error && error.code !== 'PGRST116') throw error
+  return data
+}
+
+export async function ensureUserCadence(userId: string): Promise<UserCadence> {
+  const existing = await getUserCadence(userId)
+  if (existing) return existing
+
+  const { data, error } = await db()
+    .from('user_cadence')
+    .insert({ user_id: userId })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function updateUserCadence(userId: string, updates: Partial<UserCadence>): Promise<UserCadence> {
+  const { data, error } = await db()
+    .from('user_cadence')
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq('user_id', userId)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getEligibleUsersForDelivery(currentHourUtc: number): Promise<UserCadence[]> {
+  // For MVP, deliver to all non-paused, non-hidden users at their delivery hour
+  // TODO: timezone-aware delivery hour matching
+  const { data, error } = await db()
+    .from('user_cadence')
+    .select()
+    .eq('delivery_hour', currentHourUtc)
+    .eq('is_paused', false)
+    .eq('is_hidden', false)
   if (error) throw error
   return data ?? []
 }

@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getUser, getCompatibleUsers, getCompositeProfile, getUserPhotos } from '@/lib/db'
-import { generateMatchAngle, scoreCompatibility } from '@/lib/matchmaker'
+import {
+  getUser,
+  getUserPhotos,
+  getCurrentDailyIntro,
+  getCurrentBonusIntro,
+  getIntroHistory,
+  getUserCadence,
+  ensureUserCadence,
+  updateDailyIntro,
+} from '@/lib/db'
 
 export async function GET(req: NextRequest) {
   const userId = req.nextUrl.searchParams.get('userId')
@@ -13,54 +21,73 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'User not found' }, { status: 404 })
   }
 
-  const userComposite = await getCompositeProfile(userId)
-  const candidates = await getCompatibleUsers(user)
+  const cadence = await ensureUserCadence(userId)
 
-  // Score and rank candidates by compatibility
-  const scored = await Promise.all(
-    candidates.map(async (candidate) => {
-      const candidateComposite = await getCompositeProfile(candidate.id)
-      const photos = await getUserPhotos(candidate.id)
-      const score = candidateComposite && userComposite
-        ? scoreCompatibility(userComposite, candidateComposite)
-        : 0.5
-      return { candidate, candidateComposite, photos, score }
-    })
-  )
+  // Get current daily intro
+  const dailyIntro = await getCurrentDailyIntro(userId)
+  const bonusIntro = await getCurrentBonusIntro(userId)
 
-  // Sort by score, take top 5
-  scored.sort((a, b) => b.score - a.score)
-  const top = scored.slice(0, 5)
+  // Mark as delivered if first view
+  if (dailyIntro?.status === 'pending' && !dailyIntro.delivered_at) {
+    await updateDailyIntro(dailyIntro.id, { delivered_at: new Date().toISOString() })
+  }
+  if (bonusIntro?.status === 'pending' && !bonusIntro.delivered_at) {
+    await updateDailyIntro(bonusIntro.id, { delivered_at: new Date().toISOString() })
+  }
 
-  // Generate angle narratives for top matches
-  const matches = await Promise.all(
-    top.map(async ({ candidate, candidateComposite, photos, score }) => {
-      let narrative = "There's someone here you should meet. Trust us on this one."
+  // Enrich current intro with photos
+  async function enrichIntro(intro: typeof dailyIntro) {
+    if (!intro) return null
+    const photos = await getUserPhotos(intro.matched_user_id)
+    const matchedUser = await getUser(intro.matched_user_id)
+    return {
+      id: intro.id,
+      matchId: intro.match_id,
+      matchedUserId: intro.matched_user_id,
+      name: matchedUser?.first_name || 'Someone',
+      narrative: intro.narrative,
+      photoUrl: photos[0]?.public_url || null,
+      status: intro.status,
+      introType: intro.intro_type,
+      scheduledAt: intro.scheduled_at,
+      expiresAt: intro.expires_at,
+      voiceMessageRequired: intro.voice_message_required,
+    }
+  }
 
-      if (userComposite && candidateComposite) {
-        try {
-          const angles = await generateMatchAngle(user, candidate, userComposite, candidateComposite)
-          narrative = angles.narrativeForA
-        } catch (err) {
-          console.error('Failed to generate angle for', candidate.id, err)
-        }
-      }
+  const currentIntro = await enrichIntro(dailyIntro)
+  const currentBonus = await enrichIntro(bonusIntro)
 
-      // Expansion points: interests they have that user doesn't
-      const expansionPoints = candidateComposite?.interest_tags.filter(
-        tag => !userComposite?.interest_tags.includes(tag)
-      )?.slice(0, 5) || []
-
+  // History
+  const rawHistory = await getIntroHistory(userId)
+  const history = await Promise.all(
+    rawHistory.map(async (intro) => {
+      const matchedUser = await getUser(intro.matched_user_id)
       return {
-        id: candidate.id,
-        name: candidate.first_name,
-        narrative,
-        expansionPoints,
-        photoUrl: photos[0]?.public_url || null,
-        compatibilityScore: score,
+        id: intro.id,
+        name: matchedUser?.first_name || 'Someone',
+        narrativePreview: intro.narrative.substring(0, 120) + (intro.narrative.length > 120 ? '...' : ''),
+        status: intro.status,
+        actedAt: intro.acted_at,
       }
     })
   )
 
-  return NextResponse.json({ matches })
+  // Calculate next delivery time
+  const now = new Date()
+  const nextDelivery = new Date(now)
+  nextDelivery.setUTCHours(cadence.delivery_hour, 0, 0, 0)
+  if (nextDelivery <= now) nextDelivery.setDate(nextDelivery.getDate() + 1)
+
+  return NextResponse.json({
+    currentIntro,
+    bonusIntro: currentBonus,
+    nextDeliveryAt: nextDelivery.toISOString(),
+    cadenceState: {
+      isPaused: cadence.is_paused,
+      isHidden: cadence.is_hidden,
+      consecutiveInactiveDays: cadence.consecutive_inactive_days,
+    },
+    history,
+  })
 }
