@@ -133,9 +133,21 @@ export default function OnboardingPage() {
           formData.append('dayNumber', '0')
           formData.append('durationSeconds', String(duration))
 
-          await fetch('/api/voice-memo', { method: 'POST', body: formData })
-          console.log(`Uploaded voice memo: ${promptId}`)
+          const memoRes = await fetch('/api/voice-memo', { method: 'POST', body: formData })
+          if (!memoRes.ok) console.error(`Failed to upload memo: ${promptId}`)
+          else console.log(`Uploaded voice memo: ${promptId}`)
         }
+
+        // Kick off transcription + extraction in the background while user does preferences
+        fetch('/api/process-memos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId: data.id }),
+        }).then(r => r.json()).then(d => {
+          console.log(`Background processing: ${d.processed} memos processed`)
+        }).catch(err => {
+          console.error('Background processing failed:', err)
+        })
 
         setStep('preferences')
       } catch (err) {
