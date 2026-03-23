@@ -79,17 +79,17 @@ export default function Home() {
           <div className="absolute -bottom-6 -left-6 text-7xl opacity-20 -rotate-12" aria-hidden="true">✨</div>
 
           <div className="relative z-10">
-            <p className="text-2xl font-bold leading-snug text-[var(--dark)] sm:text-3xl lg:text-4xl">
+            <p className="text-4xl font-extrabold tracking-tight text-[var(--dark)] sm:text-5xl">
               Imagine a matchmaker who knows you better than your best friend.
             </p>
-            <p className="mt-4 text-2xl italic font-light leading-snug text-[var(--dark)]/50 sm:text-3xl lg:text-4xl">
+            <p className="mt-4 text-4xl font-extrabold tracking-tight text-[var(--dark)]/50 italic sm:text-5xl">
               Not just your type — your humor, what makes you light up,
               the kind of person you&rsquo;d talk to until 3am without noticing.
             </p>
-            <p className="mt-6 text-2xl font-bold leading-snug text-[var(--dark)] sm:text-3xl lg:text-4xl">
+            <p className="mt-6 text-4xl font-extrabold tracking-tight text-[var(--dark)] sm:text-5xl">
               But they know every person you&rsquo;d want to date just as well.
             </p>
-            <p className="mt-2 text-2xl font-bold text-[var(--dark)] underline decoration-[3px] underline-offset-4 sm:text-3xl lg:text-4xl">
+            <p className="mt-2 text-4xl font-extrabold tracking-tight text-[var(--dark)] underline decoration-[3px] underline-offset-6 sm:text-5xl">
               That&rsquo;s us.
             </p>
             <div className="mt-8 flex items-center gap-5">
