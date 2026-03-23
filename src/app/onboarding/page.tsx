@@ -13,7 +13,7 @@ type Step = 'signup' | 'basics' | 'voice' | 'preferences' | 'photos' | 'taste' |
 const STEP_LABELS: Record<Step, string> = {
   signup: 'Sign up',
   basics: 'About you',
-  voice: 'Your stories',
+  voice: 'About you',
   preferences: 'Preferences',
   photos: 'Photos',
   taste: 'Your taste',
@@ -471,7 +471,7 @@ export default function OnboardingPage() {
         {/* Step 2: Voice Recordings — one card at a time */}
         {step === 'voice' && (
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">Tell us your stories</h1>
+            <h1 className="text-2xl font-bold text-stone-900">Tell us about yourself</h1>
             <p className="mt-2 text-sm text-stone-500">
               Just talk like you&rsquo;re telling a friend. Record at least 2.
             </p>
@@ -579,7 +579,7 @@ export default function OnboardingPage() {
           <div>
             <h1 className="text-2xl font-bold text-stone-900">A few dealbreakers</h1>
             <p className="mt-2 text-sm text-stone-500">
-              These help us filter out obvious mismatches. Your stories drive the real matching.
+              These help us filter out obvious mismatches. Your answers drive the real matching.
             </p>
 
             <div className="mt-8 space-y-6">

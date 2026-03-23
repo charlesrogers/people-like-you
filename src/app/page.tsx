@@ -122,14 +122,14 @@ export default function Home() {
             <WhimsyCard
               emoji="🎙️"
               bg="bg-white"
-              title="Tell us your stories"
+              title="Tell us about yourself"
               body="Forget checkboxes. Answer voice prompts about your rabbit holes, guilty pleasures, and proudest moments. We extract the real you."
             />
             <WhimsyCard
               emoji="🧠"
               bg="bg-[var(--dark)] text-white"
               title="We find your people"
-              body="Our AI builds your personality composite across 55 questions and 5 dimensions. Then finds people who'll actually make you feel something."
+              body="We build your taste map across 5 dimensions and analyze your best potential matches. Then find people who'll actually make you feel something."
               light
             />
             <WhimsyCard
@@ -156,13 +156,13 @@ export default function Home() {
           <div className="mt-20 space-y-16 sm:space-y-20">
             <Step
               num="01"
-              title="Record your voice"
+              title="Tell us about yourself"
               body="We ask questions like 'What's a rabbit hole you can't stop thinking about?' and 'Tell us about a time you bet on yourself.' You talk. We listen."
             />
             <Step
               num="02"
-              title="We build your profile"
-              body="AI extracts your humor style, values, passions, growth edges, and what makes you genuinely admirable. Across 5 personality dimensions."
+              title="We build your taste map"
+              body="AI extracts your humor style, values, passions, growth edges, and what makes you genuinely admirable. Across 5 dimensions."
             />
             <Step
               num="03"
