@@ -87,9 +87,9 @@ export default function Home() {
               the kind of person you&rsquo;d talk to until 3am without noticing.
             </p>
             <p className="mt-6 text-4xl font-extrabold tracking-tight text-[var(--dark)] sm:text-5xl">
-              But they know every person you&rsquo;d want to date just as well.
+              And <span className="underline decoration-[3px] underline-offset-6">know every person you&rsquo;d want to date</span> just as well.
             </p>
-            <p className="mt-2 text-5xl font-extrabold tracking-tight text-[var(--dark)] underline decoration-[3px] underline-offset-6 sm:text-6xl">
+            <p className="mt-2 text-5xl font-extrabold tracking-tight text-[var(--dark)] sm:text-6xl">
               That&rsquo;s us.
             </p>
             <div className="mt-8 flex items-center gap-5">
