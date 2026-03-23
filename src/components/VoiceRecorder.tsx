@@ -30,6 +30,7 @@ export default function VoiceRecorder({
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const blobRef = useRef<Blob | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
+  const secondsRef = useRef(0)
 
   useEffect(() => {
     return () => {
@@ -71,17 +72,21 @@ export default function VoiceRecorder({
         blobRef.current = blob
         const url = URL.createObjectURL(blob)
         setAudioUrl(url)
-        setState('reviewing')
         stream.getTracks().forEach(t => t.stop())
+        // Auto-submit immediately — no review step
+        setState('submitted')
+        onRecordingComplete(blob, secondsRef.current)
       }
 
       recorder.start(1000)
       setState('recording')
       setSeconds(0)
+      secondsRef.current = 0
 
       timerRef.current = setInterval(() => {
         setSeconds(prev => {
           const next = prev + 1
+          secondsRef.current = next
           if (next >= maxSeconds) {
             recorder.stop()
             if (timerRef.current) clearInterval(timerRef.current)
@@ -122,13 +127,6 @@ export default function VoiceRecorder({
     setState('idle')
   }
 
-  const handleSubmit = () => {
-    if (blobRef.current) {
-      setState('submitted')
-      onRecordingComplete(blobRef.current, seconds)
-    }
-  }
-
   const formatTime = (s: number) => {
     const m = Math.floor(s / 60)
     const sec = s % 60
@@ -140,8 +138,18 @@ export default function VoiceRecorder({
   if (state === 'submitted') {
     return (
       <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
-        <p className="text-sm font-medium text-emerald-700">Recording submitted</p>
-        <p className="mt-1 text-xs text-emerald-600">{promptText}</p>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-medium text-emerald-700">Got it!</p>
+            <p className="mt-1 text-xs text-emerald-600">{promptText}</p>
+          </div>
+          <button
+            onClick={handleReRecord}
+            className="text-xs text-emerald-600 underline decoration-dotted underline-offset-2 hover:text-emerald-800"
+          >
+            Re-record
+          </button>
+        </div>
       </div>
     )
   }
@@ -232,30 +240,9 @@ export default function VoiceRecorder({
         </div>
       )}
 
+      {/* reviewing state is no longer used — auto-submits on stop */}
       {state === 'reviewing' && audioUrl && (
-        <div className="mt-5 space-y-4">
-          <div className="rounded-lg bg-stone-50 p-3">
-            <audio src={audioUrl} controls className="w-full" />
-            <p className="mt-1 text-center text-xs text-stone-400">
-              {formatTime(seconds)} recorded
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <button
-              onClick={handleReRecord}
-              className="rounded-lg border border-stone-200 px-4 py-3 text-sm font-medium text-stone-700 transition hover:bg-stone-50 active:translate-y-px"
-            >
-              Re-record
-            </button>
-            <button
-              onClick={handleSubmit}
-              className="rounded-lg bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
-            >
-              Submit
-            </button>
-          </div>
-        </div>
+        <div className="mt-5 text-center text-xs text-stone-400">Processing...</div>
       )}
     </div>
   )

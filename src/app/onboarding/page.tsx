@@ -467,21 +467,13 @@ export default function OnboardingPage() {
             <div className="mt-6 space-y-4">
               {prompts.map(prompt => (
                 <div key={prompt.id}>
-                  {!recordings.has(prompt.id) && (
-                    <VoiceRecorder
-                      promptId={prompt.id}
-                      promptText={prompt.text}
-                      helpText={prompt.helpText}
-                      exampleAnswer={prompt.exampleAnswer}
-                      onRecordingComplete={(blob, duration) => handleRecordingComplete(prompt.id, blob, duration)}
-                    />
-                  )}
-                  {recordings.has(prompt.id) && (
-                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
-                      <p className="text-sm font-medium text-emerald-700">Recording submitted</p>
-                      <p className="mt-1 text-xs text-emerald-600">{prompt.text}</p>
-                    </div>
-                  )}
+                  <VoiceRecorder
+                    promptId={prompt.id}
+                    promptText={prompt.text}
+                    helpText={prompt.helpText}
+                    exampleAnswer={prompt.exampleAnswer}
+                    onRecordingComplete={(blob, duration) => handleRecordingComplete(prompt.id, blob, duration)}
+                  />
                   {!recordings.has(prompt.id) && (
                     <button
                       onClick={() => handleSkipPrompt(prompt.id)}
