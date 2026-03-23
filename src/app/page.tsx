@@ -82,13 +82,13 @@ export default function Home() {
             <p className="text-2xl font-bold leading-snug text-[var(--dark)] sm:text-3xl lg:text-4xl">
               Imagine a matchmaker who knows you better than your best friend.
             </p>
-            <p className="mt-4 text-lg text-[var(--dark)]/50 leading-relaxed sm:text-xl">
+            <p className="mt-4 max-w-md text-2xl italic font-light leading-snug text-[var(--dark)]/50 sm:text-3xl lg:text-4xl">
               Not just your type — your humor, what makes you light up,
               the kind of person you&rsquo;d talk to until 3am without noticing.
             </p>
-            <p className="mt-6 text-2xl font-extrabold text-[var(--dark)] sm:text-3xl lg:text-4xl">
-              Now imagine they know every person you&rsquo;d want to date
-              just as well. <span className="italic">That&rsquo;s us.</span>
+            <p className="mt-6 text-[1.65rem] font-bold leading-snug text-[var(--dark)] sm:text-[2.1rem] lg:text-[2.75rem]">
+              But they know every person you&rsquo;d want to date just as well.{" "}
+              <span className="underline decoration-[3px] underline-offset-4">That&rsquo;s us.</span>
             </p>
             <div className="mt-8 flex items-center gap-5">
               <Link
