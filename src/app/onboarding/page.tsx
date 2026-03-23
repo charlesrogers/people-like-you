@@ -7,6 +7,7 @@ import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
 import SoftPreferencesRanker from '@/components/SoftPreferencesRanker'
 import { getOnboardingPrompts, getRandomPrompt, type PromptDef } from '@/lib/prompts'
+import { getSeedNarrativesForGender, ATTRIBUTE_TAGS, type SeedNarrative } from '@/lib/seed-narratives'
 
 const US_STATES = [
   'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
@@ -19,16 +20,25 @@ const US_STATES = [
   'Wisconsin','Wyoming','Outside US',
 ]
 
-type Step = 'basics' | 'voice' | 'preferences' | 'photos'
+type Step = 'basics' | 'voice' | 'preferences' | 'photos' | 'taste' | 'reveal'
 
 const STEP_LABELS: Record<Step, string> = {
   basics: 'About you',
-  voice: 'Tell your stories',
-  preferences: 'What you want',
-  photos: 'Show yourself',
+  voice: 'Your stories',
+  preferences: 'Preferences',
+  photos: 'Photos',
+  taste: 'Your taste',
+  reveal: 'Your profile',
 }
 
-const STEPS: Step[] = ['basics', 'voice', 'preferences', 'photos']
+const STEPS: Step[] = ['basics', 'voice', 'preferences', 'photos', 'taste', 'reveal']
+
+const EXCITEMENT_LABELS: Record<string, { label: string; emoji: string; description: string }> = {
+  explorer: { label: 'Explorer', emoji: '🧭', description: 'You light up around novelty, adventure, and the unexpected.' },
+  nester: { label: 'Nester', emoji: '🏡', description: 'You respond to warmth, stability, and shared values.' },
+  intellectual: { label: 'Intellectual', emoji: '🔬', description: "You're drawn to depth, curiosity, and unique perspectives." },
+  spark: { label: 'Spark', emoji: '⚡', description: 'You connect through humor, energy, and magnetic personality.' },
+}
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -62,6 +72,17 @@ export default function OnboardingPage() {
 
   // Step 4: Photos
   const [photoFiles, setPhotoFiles] = useState<File[]>([])
+
+  // Step 5: Taste calibration
+  const [tasteNarratives, setTasteNarratives] = useState<SeedNarrative[]>([])
+  const [tasteIndex, setTasteIndex] = useState(0)
+  const [tasteSelectedAttrs, setTasteSelectedAttrs] = useState<string[]>([])
+
+  // Step 6: Profile reveal
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [composite, setComposite] = useState<any>(null)
+  const [processingDone, setProcessingDone] = useState(false)
+  const [profileFeedback, setProfileFeedback] = useState<Record<string, boolean>>({})
 
   // Track user ID after profile creation
   const [userId, setUserId] = useState<string | null>(null)
@@ -215,21 +236,110 @@ export default function OnboardingPage() {
           console.log(`Uploaded photo ${i + 1}`)
         }
 
-        posthog.capture('onboarding_completed')
-        router.push('/dashboard')
+        // Fire background processing while user does taste calibration
+        fetch('/api/process-memos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId }),
+        }).then(r => r.json()).then(d => {
+          console.log(`Background processing: ${d.processed} memos processed`)
+          setProcessingDone(true)
+        }).catch(err => {
+          console.error('Background processing failed:', err)
+        })
+
+        // Load taste calibration narratives for opposite gender
+        const seekingGender = gender === 'Man' ? 'Woman' : 'Man'
+        setTasteNarratives(getSeedNarrativesForGender(seekingGender, 6))
+        setTasteIndex(0)
+
+        setStep('taste')
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to upload photos')
       } finally {
         setSubmitting(false)
       }
+    } else if (step === 'taste') {
+      // Taste calibration is done, move to reveal
+      setStep('reveal')
+
+      // Poll for composite profile if not ready yet
+      if (!processingDone && userId) {
+        const pollInterval = setInterval(async () => {
+          try {
+            const res = await fetch(`/api/extraction-status?userId=${userId}`)
+            const data = await res.json()
+            if (data.compositeReady) {
+              clearInterval(pollInterval)
+              setProcessingDone(true)
+              const compRes = await fetch(`/api/composite?userId=${userId}`)
+              const compData = await compRes.json()
+              if (compData.composite) setComposite(compData.composite)
+            }
+          } catch { /* keep polling */ }
+        }, 3000)
+        // Clean up after 60s max
+        setTimeout(() => clearInterval(pollInterval), 60000)
+      } else if (userId) {
+        // Already done, fetch composite
+        fetch(`/api/composite?userId=${userId}`)
+          .then(r => r.json())
+          .then(d => { if (d.composite) setComposite(d.composite) })
+          .catch(() => {})
+      }
+    } else if (step === 'reveal') {
+      // Save profile feedback if any
+      if (userId && Object.keys(profileFeedback).length > 0) {
+        fetch('/api/profile-feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ userId, feedback: profileFeedback }),
+        }).catch(() => {})
+      }
+
+      posthog.capture('onboarding_completed')
+      router.push('/dashboard')
     }
   }
+
+  const canProceedTaste = tasteIndex >= tasteNarratives.length
+  const canProceedReveal = true // always can proceed from reveal
 
   const canProceed =
     step === 'basics' ? canProceedBasics :
     step === 'voice' ? canProceedVoice :
     step === 'preferences' ? canProceedPrefs :
-    canProceedPhotos
+    step === 'photos' ? canProceedPhotos :
+    step === 'taste' ? canProceedTaste :
+    canProceedReveal
+
+  // Taste calibration handlers
+  const handleTasteVote = async (vote: boolean) => {
+    const narrative = tasteNarratives[tasteIndex]
+    if (!narrative || !userId) return
+
+    // Save vote
+    fetch('/api/taste-calibration', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId,
+        narrativeId: narrative.id,
+        vote,
+        attributesSelected: vote ? tasteSelectedAttrs : [],
+        narrativeStyle: narrative.style,
+      }),
+    }).catch(() => {})
+
+    setTasteSelectedAttrs([])
+    setTasteIndex(prev => prev + 1)
+  }
+
+  const toggleTasteAttr = (attr: string) => {
+    setTasteSelectedAttrs(prev =>
+      prev.includes(attr) ? prev.filter(a => a !== attr) : [...prev, attr]
+    )
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 to-white">
@@ -552,6 +662,179 @@ export default function OnboardingPage() {
           </div>
         )}
 
+        {/* Step 5: Taste Calibration */}
+        {step === 'taste' && tasteNarratives.length > 0 && tasteIndex < tasteNarratives.length && (
+          <div>
+            <h1 className="text-2xl font-bold text-stone-900">What catches your eye?</h1>
+            <p className="mt-2 text-sm text-stone-500">
+              Read each intro and tell us if you&rsquo;d want to meet this person. This helps us find the right matches for you.
+            </p>
+
+            <p className="mt-3 text-xs text-stone-400">
+              {tasteIndex + 1} of {tasteNarratives.length}
+            </p>
+
+            <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+              <p className="text-xs font-medium uppercase tracking-wider text-stone-400">
+                Someone we think you might like
+              </p>
+              <p className="mt-4 text-base leading-relaxed text-stone-700">
+                {tasteNarratives[tasteIndex].narrative}
+              </p>
+
+              {/* Attribute tags — show after reading */}
+              <div className="mt-5">
+                <p className="text-xs font-medium text-stone-500">If yes — what caught your attention?</p>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {ATTRIBUTE_TAGS.map(attr => (
+                    <button
+                      key={attr.value}
+                      onClick={() => toggleTasteAttr(attr.value)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition active:translate-y-px ${
+                        tasteSelectedAttrs.includes(attr.value)
+                          ? 'border-stone-900 bg-stone-900 text-white'
+                          : 'border-stone-200 text-stone-500 hover:border-stone-300'
+                      }`}
+                    >
+                      {attr.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => handleTasteVote(true)}
+                  className="flex-1 rounded-xl bg-stone-900 py-3 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
+                >
+                  I&rsquo;d want to meet them
+                </button>
+                <button
+                  onClick={() => handleTasteVote(false)}
+                  className="flex-1 rounded-xl border border-stone-200 py-3 text-sm font-medium text-stone-600 transition hover:bg-stone-50 active:translate-y-px"
+                >
+                  Not for me
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 5: Taste calibration done, waiting for continue */}
+        {step === 'taste' && tasteIndex >= tasteNarratives.length && (
+          <div className="text-center">
+            <h1 className="text-2xl font-bold text-stone-900">Got it.</h1>
+            <p className="mt-2 text-sm text-stone-500">
+              We&rsquo;re using your taste to find better matches. Let&rsquo;s see what we learned about you.
+            </p>
+          </div>
+        )}
+
+        {/* Step 6: Profile Reveal */}
+        {step === 'reveal' && (
+          <div>
+            {!composite ? (
+              <div className="text-center py-12">
+                <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-stone-900" />
+                <p className="mt-4 text-sm text-stone-500">Almost ready... building your profile</p>
+              </div>
+            ) : (
+              <div>
+                <h1 className="text-2xl font-bold text-stone-900">Here&rsquo;s what we see in you</h1>
+                <p className="mt-2 text-sm text-stone-500">
+                  Based on your stories, here&rsquo;s how we&rsquo;ll introduce you to people. Does this feel right?
+                </p>
+
+                <div className="mt-6 space-y-5">
+                  {/* Excitement type */}
+                  {composite.excitement_type && EXCITEMENT_LABELS[composite.excitement_type as string] && (
+                    <div className="rounded-xl bg-stone-50 p-5">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <p className="text-xs font-medium uppercase tracking-wider text-stone-400">Your type</p>
+                          <p className="mt-1 text-lg font-semibold text-stone-900">
+                            {EXCITEMENT_LABELS[composite.excitement_type as string].emoji}{' '}
+                            {EXCITEMENT_LABELS[composite.excitement_type as string].label}
+                          </p>
+                          <p className="mt-1 text-xs text-stone-500">
+                            {EXCITEMENT_LABELS[composite.excitement_type as string].description}
+                          </p>
+                        </div>
+                        <button
+                          onClick={() => setProfileFeedback(prev => ({ ...prev, excitement_type: !prev.excitement_type }))}
+                          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                            profileFeedback.excitement_type === false
+                              ? 'bg-amber-100 text-amber-700'
+                              : 'bg-emerald-50 text-emerald-600'
+                          }`}
+                        >
+                          {profileFeedback.excitement_type === false ? 'Not quite' : 'Feels right'}
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Passions */}
+                  {Array.isArray(composite.passion_indicators) && (composite.passion_indicators as string[]).length > 0 && (
+                    <div className="rounded-xl bg-white border border-stone-200 p-5">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-medium uppercase tracking-wider text-stone-400">What lights you up</p>
+                        <button
+                          onClick={() => setProfileFeedback(prev => ({ ...prev, passions: !prev.passions }))}
+                          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                            profileFeedback.passions === false ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-600'
+                          }`}
+                        >
+                          {profileFeedback.passions === false ? 'Not quite' : 'Feels right'}
+                        </button>
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {(composite.passion_indicators as string[]).slice(0, 8).map((p: string) => (
+                          <span key={p} className="rounded-full bg-stone-100 px-3 py-1 text-xs text-stone-600">{p}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Values */}
+                  {Array.isArray(composite.values) && (composite.values as string[]).length > 0 && (
+                    <div className="rounded-xl bg-white border border-stone-200 p-5">
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs font-medium uppercase tracking-wider text-stone-400">Your values</p>
+                        <button
+                          onClick={() => setProfileFeedback(prev => ({ ...prev, values: !prev.values }))}
+                          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
+                            profileFeedback.values === false ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-600'
+                          }`}
+                        >
+                          {profileFeedback.values === false ? 'Not quite' : 'Feels right'}
+                        </button>
+                      </div>
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {(composite.values as string[]).slice(0, 6).map((v: string) => (
+                          <span key={v} className="rounded-full bg-stone-100 px-3 py-1 text-xs text-stone-600">{v}</span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Notable quotes */}
+                  {Array.isArray(composite.notable_quotes) && (composite.notable_quotes as string[]).length > 0 && (
+                    <div className="rounded-xl bg-white border border-stone-200 p-5">
+                      <p className="text-xs font-medium uppercase tracking-wider text-stone-400">In your own words</p>
+                      <div className="mt-3 space-y-2">
+                        {(composite.notable_quotes as string[]).slice(0, 2).map((q: string, i: number) => (
+                          <p key={i} className="text-sm italic text-stone-600">&ldquo;{q}&rdquo;</p>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {/* Error */}
         {error && (
           <div className="mt-6 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-700">{error}</div>
@@ -559,7 +842,7 @@ export default function OnboardingPage() {
 
         {/* Navigation */}
         <div className="mt-10 flex gap-3">
-          {stepIndex > 0 && (
+          {stepIndex > 0 && step !== 'taste' && step !== 'reveal' && (
             <button
               onClick={() => setStep(STEPS[stepIndex - 1])}
               disabled={submitting}
@@ -568,18 +851,21 @@ export default function OnboardingPage() {
               Back
             </button>
           )}
-          <button
-            onClick={handleNext}
-            disabled={!canProceed || submitting}
-            className="flex-1 rounded-lg bg-stone-900 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 disabled:opacity-40 disabled:cursor-not-allowed active:translate-y-px"
-          >
-            {submitting
-              ? 'Saving...'
-              : step === 'photos'
-                ? 'Finish & see matches'
-                : 'Continue'
-            }
-          </button>
+          {/* Hide Continue during active taste card voting — the vote buttons handle progression */}
+          {!(step === 'taste' && tasteIndex < tasteNarratives.length) && (
+            <button
+              onClick={handleNext}
+              disabled={!canProceed || submitting}
+              className="flex-1 rounded-lg bg-stone-900 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 disabled:opacity-40 disabled:cursor-not-allowed active:translate-y-px"
+            >
+              {submitting
+                ? 'Saving...'
+                : step === 'reveal'
+                  ? "I'm ready — show me my matches"
+                  : 'Continue'
+              }
+            </button>
+          )}
         </div>
       </div>
     </div>
