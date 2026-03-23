@@ -81,12 +81,14 @@ export default function Home() {
           <div className="relative z-10">
             <p className="text-2xl font-bold leading-snug text-[var(--dark)] sm:text-3xl lg:text-4xl">
               Imagine a matchmaker who knows you better than your best friend.
-              Not just your type — your humor, what makes you light up, the kind
-              of person you&rsquo;d talk to until 3am without noticing.
             </p>
-            <p className="mt-6 text-lg font-medium text-[var(--dark)]/60 sm:text-xl">
-              Now imagine they know every person you&rsquo;d want to date just
-              as well. That&rsquo;s us.
+            <p className="mt-4 text-lg text-[var(--dark)]/50 leading-relaxed sm:text-xl">
+              Not just your type — your humor, what makes you light up,
+              the kind of person you&rsquo;d talk to until 3am without noticing.
+            </p>
+            <p className="mt-6 text-2xl font-extrabold text-[var(--dark)] sm:text-3xl lg:text-4xl">
+              Now imagine they know every person you&rsquo;d want to date
+              just as well. <span className="italic">That&rsquo;s us.</span>
             </p>
             <div className="mt-8 flex items-center gap-5">
               <Link
