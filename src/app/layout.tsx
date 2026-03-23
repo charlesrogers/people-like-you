@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Jost } from "next/font/google";
 import "./globals.css";
 import { PostHogProvider } from "./providers";
 
-const geist = Geist({
-  variable: "--font-geist",
+const jost = Jost({
+  variable: "--font-jost",
   subsets: ["latin"],
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geist.variable} font-sans antialiased`}>
+      <body className={`${jost.variable} font-sans antialiased`}>
         <PostHogProvider>{children}</PostHogProvider>
       </body>
     </html>

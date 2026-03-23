@@ -1,286 +1,236 @@
 import Link from "next/link";
 
-/* ─── Logo SVG (reusable) ─── */
-
-function Logo({ className = "", light = false }: { className?: string; light?: boolean }) {
-  const fill = light ? "#fafaf9" : "#1c1917";
-  const accent = "#f59e0b";
-  return (
-    <svg viewBox="0 0 120 32" className={className} aria-label="People Like You">
-      <text x="0" y="24" fontFamily="system-ui, sans-serif" fontWeight="700" fontSize="24" fill={fill}>
-        P
-        <tspan fill={accent} fontStyle="italic">L</tspan>
-        Y
-      </text>
-    </svg>
-  );
-}
-
-/* ─── Hero background particles ─── */
-
-function HeroParticles() {
-  return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
-      {/* Gradient orbs */}
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-amber-500/5 blur-3xl animate-float-slow" />
-      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-amber-400/5 blur-3xl animate-float-slower" />
-
-      {/* Floating dots */}
-      <div className="absolute top-[20%] left-[15%] w-2 h-2 rounded-full bg-amber-400/20 animate-float" />
-      <div className="absolute top-[30%] right-[20%] w-1.5 h-1.5 rounded-full bg-amber-400/15 animate-float-slow" />
-      <div className="absolute top-[60%] left-[30%] w-1 h-1 rounded-full bg-stone-400/20 animate-float-slower" />
-      <div className="absolute top-[50%] right-[35%] w-2.5 h-2.5 rounded-full bg-amber-400/10 animate-float" />
-      <div className="absolute top-[70%] left-[60%] w-1.5 h-1.5 rounded-full bg-stone-500/15 animate-float-slow" />
-      <div className="absolute top-[15%] right-[40%] w-1 h-1 rounded-full bg-amber-300/20 animate-float-slower" />
-
-      {/* Connection lines (very faint) */}
-      <svg className="absolute inset-0 w-full h-full opacity-[0.04]" viewBox="0 0 1200 800">
-        <path d="M200 400 C400 200, 600 600, 800 300 S1000 500, 1100 400" stroke="#f59e0b" strokeWidth="1.5" fill="none" />
-        <path d="M100 500 C300 300, 500 700, 700 400 S900 600, 1100 500" stroke="#a8a29e" strokeWidth="1" fill="none" />
-      </svg>
-    </div>
-  );
-}
-
-/* ─── Step illustration icons ─── */
-
-function VoiceIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 80 80" fill="none" className={className}>
-      <circle cx="40" cy="40" r="38" stroke="#d6d3d1" strokeWidth="1.5" />
-      <rect x="32" y="20" width="16" height="28" rx="8" fill="#f59e0b" opacity="0.8" />
-      <path d="M26 42c0 8 6 14 14 14s14-6 14-14" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
-      <line x1="40" y1="56" x2="40" y2="64" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
-      <line x1="34" y1="64" x2="46" y2="64" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function MatchIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 80 80" fill="none" className={className}>
-      <circle cx="40" cy="40" r="38" stroke="#d6d3d1" strokeWidth="1.5" />
-      <circle cx="28" cy="34" r="10" fill="#f59e0b" opacity="0.6" />
-      <circle cx="52" cy="34" r="10" fill="#f59e0b" opacity="0.6" />
-      <path d="M28 50c0-4 4-8 12-8s12 4 12 8" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
-      <path d="M36 28l8 8-8 8" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
-    </svg>
-  );
-}
-
-function NarrativeIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 80 80" fill="none" className={className}>
-      <circle cx="40" cy="40" r="38" stroke="#d6d3d1" strokeWidth="1.5" />
-      <rect x="22" y="20" width="36" height="44" rx="4" fill="#f59e0b" opacity="0.15" stroke="#f59e0b" strokeWidth="1.5" />
-      <line x1="28" y1="30" x2="52" y2="30" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
-      <line x1="28" y1="37" x2="48" y2="37" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
-      <line x1="28" y1="44" x2="44" y2="44" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" opacity="0.3" />
-      <path d="M36 52l4 4 8-10" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
-}
-
-function SparkIcon({ className = "" }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 80 80" fill="none" className={className}>
-      <circle cx="40" cy="40" r="38" stroke="#d6d3d1" strokeWidth="1.5" />
-      <path d="M40 18l3 12 12-3-9 9 9 9-12-3-3 12-3-12-12 3 9-9-9-9 12 3z" fill="#f59e0b" opacity="0.7" />
-      <circle cx="40" cy="40" r="6" fill="#fbbf24" />
-    </svg>
-  );
-}
-
-/* ─── Main Page ─── */
+/* ─────────────────────────────────────────────────────────
+   PEOPLE LIKE YOU — Homepage
+   Bumble-inspired. Neon yellow. Futura vibes. Whimsy.
+   ───────────────────────────────────────────────────────── */
 
 export default function Home() {
   return (
-    <div className="overflow-x-hidden">
-      {/* ────── HERO: Dark section ────── */}
-      <section className="relative min-h-screen bg-stone-950 bg-grain flex flex-col">
-        <HeroParticles />
+    <div className="overflow-x-hidden bg-[var(--cream)]">
+      {/* ══════ NAV ══════ */}
+      <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 sm:px-10 backdrop-blur-md bg-[var(--cream)]/80">
+        <span className="text-xl font-bold tracking-tight">
+          P<span className="italic text-[var(--neon-dim)]">L</span>Y
+        </span>
+        <Link
+          href="/onboarding"
+          className="rounded-full bg-[var(--dark)] px-5 py-2 text-sm font-semibold text-white transition hover:scale-105 active:scale-95"
+        >
+          Join now
+        </Link>
+      </nav>
 
-        {/* Nav */}
-        <nav className="relative z-10 flex items-center justify-between px-6 py-6 sm:px-12">
-          <Logo light className="h-8 w-auto" />
-          <Link
-            href="/onboarding"
-            className="text-sm font-medium text-stone-400 transition hover:text-white"
-          >
-            Join / Login
-          </Link>
-        </nav>
+      {/* ══════ HERO ══════ */}
+      <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 overflow-hidden">
+        {/* Decorative blobs */}
+        <div className="absolute top-16 -left-20 w-72 h-72 bg-[var(--neon)] blob opacity-20 blur-3xl animate-float-gentle" />
+        <div className="absolute bottom-24 -right-16 w-96 h-96 bg-[var(--neon)] blob-2 opacity-15 blur-3xl animate-wiggle" />
+        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-[var(--neon)] blob-3 opacity-10 blur-2xl animate-bounce-soft" />
 
-        {/* Hero content */}
-        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 text-center">
-          <h1 className="animate-fade-in-up text-5xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl">
-            People{" "}
-            <span className="italic text-gradient">Like</span>{" "}
+        {/* Floating emoji/icons for whimsy */}
+        <div className="absolute top-[18%] left-[12%] text-4xl animate-wiggle" aria-hidden="true">💛</div>
+        <div className="absolute top-[25%] right-[15%] text-3xl animate-float-gentle" aria-hidden="true">✨</div>
+        <div className="absolute bottom-[30%] left-[20%] text-3xl animate-bounce-soft" aria-hidden="true">🎙️</div>
+        <div className="absolute bottom-[22%] right-[12%] text-4xl animate-wiggle" style={{ animationDelay: "2s" }} aria-hidden="true">💌</div>
+        <div className="absolute top-[55%] left-[8%] text-2xl animate-float-gentle" style={{ animationDelay: "1s" }} aria-hidden="true">🔮</div>
+
+        {/* Hero text */}
+        <div className="relative z-10 text-center max-w-4xl">
+          <h1 className="animate-fade-in-up text-6xl font-extrabold tracking-tight text-[var(--dark)] sm:text-8xl lg:text-9xl leading-[0.9]">
+            People<br />
+            <span className="italic text-neon-gradient">Like</span>{" "}
             You
           </h1>
 
-          <p className="animate-fade-in-up delay-100 mt-6 max-w-xl text-lg text-stone-400 sm:text-xl">
-            Your perfect matchmaker, finally possible.
+          <p className="animate-fade-in-up delay-100 mt-8 text-xl font-medium text-[var(--dark)]/60 sm:text-2xl max-w-lg mx-auto leading-snug">
+            The matchmaker that knows you better than your friends do.
           </p>
 
-          <p className="animate-fade-in-up delay-200 mt-4 max-w-lg text-sm text-stone-500 leading-relaxed">
-            We learn who you are through your stories — then introduce you to
-            compatible people in a way that sparks real chemistry. No swiping. No
-            small talk with strangers.
-          </p>
-
-          <div className="animate-fade-in-up delay-300 mt-10 flex flex-col items-center gap-4 sm:flex-row">
+          <div className="animate-fade-in-up delay-200 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/onboarding"
-              className="rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-amber-500/25 transition hover:shadow-amber-500/40 hover:scale-[1.02] active:scale-[0.98]"
+              className="rounded-full bg-[var(--neon)] px-10 py-4 text-lg font-bold text-[var(--dark)] shadow-[0_8px_30px_rgba(212,255,0,0.4)] transition hover:shadow-[0_12px_40px_rgba(212,255,0,0.5)] hover:scale-105 active:scale-95"
             >
-              Get Started
+              Get started — it&rsquo;s free
             </Link>
             <Link
               href="/dashboard"
-              className="text-sm font-medium text-stone-500 transition hover:text-stone-300"
+              className="text-sm font-semibold text-[var(--dark)]/40 underline decoration-dotted underline-offset-4 transition hover:text-[var(--dark)]/70"
             >
-              I already have an account &rarr;
+              I already have an account
             </Link>
           </div>
         </div>
 
-        {/* Scroll hint */}
-        <div className="relative z-10 pb-8 text-center">
-          <div className="mx-auto h-10 w-[1px] bg-gradient-to-b from-transparent to-stone-700" />
-        </div>
-      </section>
-
-      {/* ────── THE PITCH: 3 columns ────── */}
-      <section className="bg-white px-6 py-28 sm:py-36">
-        <div className="mx-auto max-w-6xl">
-          <h2 className="text-center text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
-            A matchmaker that actually <span className="text-gradient">knows</span> you
-          </h2>
-          <p className="mx-auto mt-4 max-w-2xl text-center text-base text-stone-500">
-            Not your filters. Not your checklist. You.
-          </p>
-
-          <div className="mt-16 grid gap-8 sm:grid-cols-3">
-            <PitchCard
-              icon={<VoiceIcon className="h-16 w-16" />}
-              title="We know you"
-              body="You tell us your stories — through voice, not checkboxes. Our AI extracts the real you: your humor, what makes you light up, where you're growing."
-            />
-            <PitchCard
-              icon={<MatchIcon className="h-16 w-16" />}
-              title="We know them"
-              body="Every person on PLY goes through the same deep process. So we don't just know you — we know everyone you'd want to meet."
-            />
-            <PitchCard
-              icon={<NarrativeIcon className="h-16 w-16" />}
-              title="We write the intro"
-              body="When we match you, you don't get a name and a photo. You get a personalized story about why this person might change your world."
-            />
+        {/* Scroll indicator */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce-soft">
+          <div className="w-6 h-10 rounded-full border-2 border-[var(--dark)]/20 flex items-start justify-center pt-2">
+            <div className="w-1.5 h-3 rounded-full bg-[var(--dark)]/30" />
           </div>
         </div>
       </section>
 
-      {/* ────── HOW IT WORKS: Alternating ────── */}
-      <section className="bg-stone-50 px-6 py-28 sm:py-36">
+      {/* ══════ WHAT WE DO (3 cards) ══════ */}
+      <section className="px-6 py-24 sm:py-32">
         <div className="mx-auto max-w-6xl">
-          <h2 className="text-center text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
-            How it works
+          <h2 className="text-center text-4xl font-extrabold tracking-tight sm:text-5xl">
+            Dating apps broke the vibe.<br />
+            <span className="text-neon-gradient">We&rsquo;re fixing it.</span>
           </h2>
 
-          <div className="mt-20 space-y-24 sm:space-y-32">
-            <StepRow
-              number="01"
+          <div className="mt-16 grid gap-6 sm:grid-cols-3">
+            <WhimsyCard
+              emoji="🎙️"
+              bg="bg-[var(--neon)]"
               title="Tell us your stories"
-              body="Answer voice prompts that reveal who you really are — your rabbit holes, unpopular opinions, proudest moments, and guilty pleasures. 55 questions across 5 dimensions of personality."
-              icon={<VoiceIcon className="h-24 w-24 sm:h-32 sm:w-32" />}
-              reverse={false}
+              body="Forget checkboxes. Answer voice prompts about your rabbit holes, guilty pleasures, and proudest moments. We extract the real you."
             />
-            <StepRow
-              number="02"
+            <WhimsyCard
+              emoji="🧠"
+              bg="bg-[var(--dark)] text-white"
               title="We find your people"
-              body="Our AI builds your personality composite and finds people you're genuinely compatible with — based on values, humor, growth, and the things that actually predict chemistry."
-              icon={<MatchIcon className="h-24 w-24 sm:h-32 sm:w-32" />}
-              reverse={true}
+              body="Our AI builds your personality composite across 55 questions and 5 dimensions. Then finds people who'll actually make you feel something."
+              light
             />
-            <StepRow
-              number="03"
-              title="Read your introduction"
-              body="Each match comes with a narrative written specifically for you about why this person matters. Their best qualities, told as a story. The photo comes after — so the feeling lands first."
-              icon={<NarrativeIcon className="h-24 w-24 sm:h-32 sm:w-32" />}
-              reverse={false}
-            />
-            <StepRow
-              number="04"
-              title="Meet with a spark"
-              body="Both people walk into the first conversation already feeling something. Already curious. Already a little invested. That's the difference between a match and a connection."
-              icon={<SparkIcon className="h-24 w-24 sm:h-32 sm:w-32" />}
-              reverse={true}
+            <WhimsyCard
+              emoji="💌"
+              bg="bg-[var(--neon)]"
+              title="Read your intro"
+              body="No name-and-photo. You get a personalized story about why this person might change your world. The photo comes after — so the feeling lands first."
             />
           </div>
         </div>
       </section>
 
-      {/* ────── THESIS TEASER: Dark section ────── */}
-      <section className="relative bg-stone-950 bg-grain px-6 py-28 sm:py-36">
-        <div className="relative z-10 mx-auto max-w-3xl text-center">
-          <blockquote className="text-xl font-medium leading-relaxed text-stone-300 sm:text-2xl">
-            &ldquo;Imagine a matchmaker who knows you better than your best
-            friend does. Not just your type — your humor, what makes you light
-            up, the kind of person you&rsquo;d talk to until 3am without
-            noticing. Now imagine they know every person you&rsquo;d want to
-            date just as well.&rdquo;
-          </blockquote>
-          <div className="mt-8">
-            <Link
-              href="/thesis"
-              className="text-sm font-medium text-amber-500 transition hover:text-amber-400"
-            >
-              Not sure yet? Read the full thesis &rarr;
-            </Link>
-          </div>
-        </div>
-      </section>
+      {/* ══════ HOW IT WORKS (visual steps) ══════ */}
+      <section className="bg-[var(--dark)] text-white px-6 py-24 sm:py-32 relative overflow-hidden">
+        {/* Background blobs */}
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[var(--neon)] blob opacity-5 blur-3xl" />
+        <div className="absolute bottom-0 left-0 w-64 h-64 bg-[var(--neon)] blob-2 opacity-5 blur-3xl" />
 
-      {/* ────── FINAL CTA ────── */}
-      <section className="bg-white px-6 py-28 sm:py-36">
-        <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
-            Ready to meet someone who gets it?
+        <div className="relative z-10 mx-auto max-w-5xl">
+          <h2 className="text-center text-4xl font-extrabold tracking-tight sm:text-5xl">
+            How it <span className="italic text-[var(--neon)]">actually</span> works
           </h2>
-          <p className="mt-4 text-base text-stone-500">
-            No swiping. No small talk with strangers. Just two people who
-            already have a reason to be excited about each other.
+
+          <div className="mt-20 space-y-16 sm:space-y-20">
+            <Step
+              num="01"
+              title="Record your voice"
+              body="We ask questions like 'What's a rabbit hole you can't stop thinking about?' and 'Tell us about a time you bet on yourself.' You talk. We listen."
+            />
+            <Step
+              num="02"
+              title="We build your profile"
+              body="AI extracts your humor style, values, passions, growth edges, and what makes you genuinely admirable. Across 5 personality dimensions."
+            />
+            <Step
+              num="03"
+              title="One intro a day"
+              body="We don't give you a deck to swipe through. You get one carefully written introduction per day. A story about someone, tailored to what makes you light up."
+            />
+            <Step
+              num="04"
+              title="Both people show up excited"
+              body="We write a different intro for them about you. When two people meet after being genuinely primed to see each other's best — the conversation is different."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ══════ THE MATCHMAKER PITCH ══════ */}
+      <section className="px-6 py-24 sm:py-32">
+        <div className="mx-auto max-w-4xl rounded-bumble-lg bg-[var(--neon)] p-10 sm:p-16 relative overflow-hidden">
+          {/* Decorative */}
+          <div className="absolute -top-10 -right-10 text-8xl opacity-20 rotate-12" aria-hidden="true">💛</div>
+          <div className="absolute -bottom-6 -left-6 text-7xl opacity-20 -rotate-12" aria-hidden="true">✨</div>
+
+          <div className="relative z-10">
+            <p className="text-2xl font-bold leading-snug text-[var(--dark)] sm:text-3xl lg:text-4xl">
+              Imagine a matchmaker who knows you better than your best friend.
+              Not just your type — your humor, what makes you light up, the kind
+              of person you&rsquo;d talk to until 3am without noticing.
+            </p>
+            <p className="mt-6 text-lg font-medium text-[var(--dark)]/60 sm:text-xl">
+              Now imagine they know every person you&rsquo;d want to date just
+              as well. That&rsquo;s us.
+            </p>
+            <div className="mt-8">
+              <Link
+                href="/thesis"
+                className="inline-block rounded-full bg-[var(--dark)] px-8 py-3 text-base font-bold text-[var(--neon)] transition hover:scale-105 active:scale-95"
+              >
+                Read the full thesis &rarr;
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ══════ WHAT MAKES US DIFFERENT (horizontal scroll) ══════ */}
+      <section className="px-6 py-16 sm:py-24 overflow-hidden">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-center text-3xl font-extrabold tracking-tight sm:text-4xl mb-12">
+            Not another swiping app.
+          </h2>
+          <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
+            <CompareCard
+              label="Them"
+              items={["Swipe through hundreds", "Judge by photos first", "Generic 'hey' messages", "Compatibility scores", "Endless browsing"]}
+              variant="muted"
+            />
+            <CompareCard
+              label="Us"
+              items={["One intro per day", "Story first, photo after", "AI-written narratives about why you'd click", "Chemistry + compatibility", "Two excited people"]}
+              variant="neon"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ══════ FINAL CTA ══════ */}
+      <section className="px-6 py-24 sm:py-32">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-tight">
+            Ready to meet someone who{" "}
+            <span className="italic text-neon-gradient">actually</span>{" "}
+            gets it?
           </p>
           <div className="mt-10">
             <Link
               href="/onboarding"
-              className="inline-block rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-10 py-4 text-lg font-semibold text-white shadow-lg shadow-amber-500/25 transition hover:shadow-amber-500/40 hover:scale-[1.02] active:scale-[0.98]"
+              className="inline-block rounded-full bg-[var(--neon)] px-12 py-5 text-xl font-bold text-[var(--dark)] shadow-[0_8px_30px_rgba(212,255,0,0.4)] transition hover:shadow-[0_12px_40px_rgba(212,255,0,0.5)] hover:scale-105 active:scale-95"
             >
-              Get Started
+              Get started free
             </Link>
           </div>
+          <p className="mt-4 text-sm text-[var(--dark)]/40">
+            No credit card. No swiping. Just better dating.
+          </p>
         </div>
       </section>
 
-      {/* ────── FOOTER ────── */}
-      <footer className="border-t border-stone-200 bg-white px-6 py-10">
+      {/* ══════ FOOTER ══════ */}
+      <footer className="border-t border-[var(--dark)]/10 px-6 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
-          <Logo className="h-6 w-auto" />
-          <div className="flex items-center gap-6 text-sm text-stone-400">
-            <Link href="/thesis" className="hover:text-stone-600 transition">
+          <span className="text-lg font-bold tracking-tight">
+            P<span className="italic text-[var(--neon-dim)]">L</span>Y
+          </span>
+          <div className="flex items-center gap-6 text-sm text-[var(--dark)]/40 font-medium">
+            <Link href="/thesis" className="hover:text-[var(--dark)] transition">
               Thesis
             </Link>
-            <Link href="/onboarding" className="hover:text-stone-600 transition">
+            <Link href="/onboarding" className="hover:text-[var(--dark)] transition">
               Join
             </Link>
-            <Link href="/dashboard" className="hover:text-stone-600 transition">
+            <Link href="/dashboard" className="hover:text-[var(--dark)] transition">
               Dashboard
             </Link>
           </div>
-          <p className="text-xs text-stone-400">
+          <p className="text-xs text-[var(--dark)]/30">
             &copy; 2026 People Like You &middot; Built by{" "}
-            <a href="https://imprevista.com" target="_blank" rel="noopener noreferrer" className="hover:text-stone-600 transition">
+            <a href="https://imprevista.com" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--dark)]/60 transition">
               Imprevista
             </a>
           </p>
@@ -290,57 +240,81 @@ export default function Home() {
   );
 }
 
-/* ─── Pitch card component ─── */
+/* ─── Whimsy Card ─── */
 
-function PitchCard({
-  icon,
+function WhimsyCard({
+  emoji,
+  bg,
   title,
   body,
+  light = false,
 }: {
-  icon: React.ReactNode;
+  emoji: string;
+  bg: string;
   title: string;
   body: string;
+  light?: boolean;
 }) {
   return (
-    <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
-      <div className="mb-5">{icon}</div>
-      <h3 className="text-lg font-semibold text-stone-900">{title}</h3>
-      <p className="mt-2 text-sm leading-relaxed text-stone-500">{body}</p>
+    <div className={`${bg} rounded-bumble p-8 sm:p-10 transition hover:scale-[1.02] hover:rotate-[0.5deg]`}>
+      <div className="text-5xl mb-5">{emoji}</div>
+      <h3 className={`text-xl font-bold ${light ? "text-white" : "text-[var(--dark)]"}`}>
+        {title}
+      </h3>
+      <p className={`mt-3 text-base leading-relaxed ${light ? "text-white/70" : "text-[var(--dark)]/60"}`}>
+        {body}
+      </p>
     </div>
   );
 }
 
-/* ─── Step row component (alternating layout) ─── */
+/* ─── Step ─── */
 
-function StepRow({
-  number,
-  title,
-  body,
-  icon,
-  reverse,
+function Step({ num, title, body }: { num: string; title: string; body: string }) {
+  return (
+    <div className="flex gap-6 sm:gap-10 items-start">
+      <div className="flex-shrink-0 w-14 h-14 rounded-full bg-[var(--neon)] flex items-center justify-center text-[var(--dark)] font-extrabold text-lg">
+        {num}
+      </div>
+      <div>
+        <h3 className="text-2xl font-bold">{title}</h3>
+        <p className="mt-2 text-lg text-white/60 leading-relaxed max-w-xl">{body}</p>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Compare Card ─── */
+
+function CompareCard({
+  label,
+  items,
+  variant,
 }: {
-  number: string;
-  title: string;
-  body: string;
-  icon: React.ReactNode;
-  reverse: boolean;
+  label: string;
+  items: string[];
+  variant: "muted" | "neon";
 }) {
+  const isNeon = variant === "neon";
   return (
     <div
-      className={`flex flex-col items-center gap-10 sm:flex-row sm:gap-16 ${
-        reverse ? "sm:flex-row-reverse" : ""
+      className={`flex-shrink-0 w-72 snap-center rounded-bumble p-8 ${
+        isNeon
+          ? "bg-[var(--neon)] text-[var(--dark)]"
+          : "bg-[var(--dark)]/5 text-[var(--dark)]/50"
       }`}
     >
-      <div className="flex-shrink-0">{icon}</div>
-      <div className={reverse ? "sm:text-right" : ""}>
-        <span className="text-xs font-bold tracking-widest text-amber-500 uppercase">
-          Step {number}
-        </span>
-        <h3 className="mt-2 text-2xl font-bold text-stone-900">{title}</h3>
-        <p className="mt-3 max-w-lg text-base leading-relaxed text-stone-500">
-          {body}
-        </p>
-      </div>
+      <h3 className={`text-lg font-bold mb-4 ${isNeon ? "" : "line-through decoration-2"}`}>
+        {label}
+      </h3>
+      <ul className="space-y-3">
+        {items.map((item, i) => (
+          <li key={i} className="flex items-start gap-2 text-sm leading-snug">
+            <span className="mt-0.5">{isNeon ? "✓" : "✗"}</span>
+            <span className={isNeon ? "font-medium" : ""}>{item}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
