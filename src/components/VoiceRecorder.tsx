@@ -5,22 +5,25 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 interface VoiceRecorderProps {
   promptText: string
   promptId: string
+  helpText?: string
+  exampleAnswer?: string
   onRecordingComplete: (blob: Blob, durationSeconds: number) => void
   maxSeconds?: number
-  minSeconds?: number
 }
 
 export default function VoiceRecorder({
   promptText,
   promptId,
+  helpText,
+  exampleAnswer,
   onRecordingComplete,
   maxSeconds = 90,
-  minSeconds = 30,
 }: VoiceRecorderProps) {
   const [state, setState] = useState<'idle' | 'recording' | 'reviewing' | 'submitted'>('idle')
   const [seconds, setSeconds] = useState(0)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [showExample, setShowExample] = useState(false)
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null)
   const chunksRef = useRef<Blob[]>([])
@@ -28,7 +31,6 @@ export default function VoiceRecorder({
   const blobRef = useRef<Blob | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
 
-  // Clean up on unmount
   useEffect(() => {
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
@@ -73,7 +75,7 @@ export default function VoiceRecorder({
         stream.getTracks().forEach(t => t.stop())
       }
 
-      recorder.start(1000) // Collect data every second
+      recorder.start(1000)
       setState('recording')
       setSeconds(0)
 
@@ -99,6 +101,19 @@ export default function VoiceRecorder({
     if (timerRef.current) clearInterval(timerRef.current)
   }, [])
 
+  const cancelRecording = useCallback(() => {
+    if (mediaRecorderRef.current?.state === 'recording') {
+      mediaRecorderRef.current.stop()
+    }
+    if (timerRef.current) clearInterval(timerRef.current)
+    if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop())
+    // Don't save — just reset
+    chunksRef.current = []
+    blobRef.current = null
+    setSeconds(0)
+    setState('idle')
+  }, [])
+
   const handleReRecord = () => {
     if (audioUrl) URL.revokeObjectURL(audioUrl)
     setAudioUrl(null)
@@ -121,7 +136,6 @@ export default function VoiceRecorder({
   }
 
   const progress = (seconds / maxSeconds) * 100
-  const tooShort = seconds < minSeconds
 
   if (state === 'submitted') {
     return (
@@ -135,6 +149,28 @@ export default function VoiceRecorder({
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm" data-prompt-id={promptId}>
       <p className="text-base font-medium text-stone-800">{promptText}</p>
+
+      {/* Help text */}
+      {helpText && (
+        <p className="mt-2 text-xs text-stone-400">{helpText}</p>
+      )}
+
+      {/* Example answer toggle */}
+      {exampleAnswer && state === 'idle' && (
+        <div className="mt-3">
+          <button
+            onClick={() => setShowExample(!showExample)}
+            className="text-xs font-medium text-stone-500 underline decoration-dotted underline-offset-2 hover:text-stone-700"
+          >
+            {showExample ? 'Hide example' : 'Not sure what to say? See an example'}
+          </button>
+          {showExample && (
+            <div className="mt-2 rounded-lg bg-stone-50 px-4 py-3">
+              <p className="text-xs italic text-stone-500">&ldquo;{exampleAnswer}&rdquo;</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {error && (
         <p className="mt-3 text-sm text-red-600">{error}</p>
@@ -159,7 +195,7 @@ export default function VoiceRecorder({
                 <circle cx="50" cy="50" r="45" fill="none" stroke="#e7e5e4" strokeWidth="4" />
                 <circle
                   cx="50" cy="50" r="45" fill="none"
-                  stroke={tooShort ? '#ef4444' : '#10b981'}
+                  stroke="#10b981"
                   strokeWidth="4"
                   strokeDasharray={`${progress * 2.83} 283`}
                   strokeLinecap="round"
@@ -179,19 +215,20 @@ export default function VoiceRecorder({
             <span className="text-xs text-stone-500">Recording...</span>
           </div>
 
-          {tooShort && (
-            <p className="mt-2 text-center text-xs text-stone-400">
-              Keep going... {minSeconds - seconds}s minimum
-            </p>
-          )}
-
-          <button
-            onClick={stopRecording}
-            disabled={tooShort}
-            className="mt-4 w-full rounded-lg bg-stone-900 px-5 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 disabled:opacity-40 disabled:cursor-not-allowed active:translate-y-px"
-          >
-            {tooShort ? `Keep going (${minSeconds - seconds}s left)` : 'Stop recording'}
-          </button>
+          <div className="mt-4 flex gap-3">
+            <button
+              onClick={cancelRecording}
+              className="flex-1 rounded-lg border border-stone-200 px-4 py-3 text-sm font-medium text-stone-500 transition hover:bg-stone-50 active:translate-y-px"
+            >
+              Start over
+            </button>
+            <button
+              onClick={stopRecording}
+              className="flex-1 rounded-lg bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
+            >
+              Done
+            </button>
+          </div>
         </div>
       )}
 

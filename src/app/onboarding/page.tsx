@@ -6,6 +6,7 @@ import posthog from 'posthog-js'
 import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
 import SoftPreferencesRanker from '@/components/SoftPreferencesRanker'
+import { getOnboardingPrompts, getRandomPrompt, type PromptDef } from '@/lib/prompts'
 
 const US_STATES = [
   'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
@@ -16,15 +17,6 @@ const US_STATES = [
   'Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota',
   'Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia',
   'Wisconsin','Wyoming','Outside US',
-]
-
-const DAY0_PROMPTS = [
-  { id: 'proud_moment', text: 'Tell a story about a time you were proud of yourself.' },
-  { id: 'surprises_people', text: 'Tell a story about yourself that surprises people.' },
-  { id: 'secret_skill', text: "What's a secret skill you have that most people don't know about?" },
-  { id: 'most_yourself', text: 'Describe a moment when you felt most like yourself.' },
-  { id: 'teach_someone', text: "What's something you'd want to teach someone you care about?" },
-  { id: 'talk_for_hours', text: "What could you talk about for hours that most people don't care about?" },
 ]
 
 type Step = 'basics' | 'voice' | 'preferences' | 'photos'
@@ -53,6 +45,7 @@ export default function OnboardingPage() {
   const [state, setState] = useState('')
 
   // Step 2: Voice recordings
+  const [prompts, setPrompts] = useState<PromptDef[]>(() => getOnboardingPrompts(6))
   const [recordings, setRecordings] = useState<Map<string, { blob: Blob; duration: number }>>(new Map())
 
   // Step 3: Hard prefs
@@ -82,6 +75,14 @@ export default function OnboardingPage() {
       next.set(promptId, { blob, duration })
       return next
     })
+  }
+
+  const handleSkipPrompt = (promptId: string) => {
+    const currentIds = prompts.map(p => p.id)
+    const replacement = getRandomPrompt(currentIds)
+    if (replacement) {
+      setPrompts(prev => prev.map(p => p.id === promptId ? replacement : p))
+    }
   }
 
   const canProceedBasics = firstName && email && gender && birthYear
@@ -323,9 +324,18 @@ export default function OnboardingPage() {
           <div>
             <h1 className="text-2xl font-bold text-stone-900">Tell us your stories</h1>
             <p className="mt-2 text-sm text-stone-500">
-              Pick at least 2 prompts and record yourself answering. Be genuine — this is how we find your people.
-              <span className="font-medium text-stone-700"> 30-90 seconds each.</span>
+              Pick at least 2 and record yourself answering. Just talk like you&rsquo;re telling a friend.
             </p>
+
+            {/* Coaching tips */}
+            <div className="mt-3 rounded-lg bg-stone-50 px-4 py-3 text-xs text-stone-500">
+              <p className="font-medium text-stone-600">Tips for great answers:</p>
+              <ul className="mt-1.5 ml-3 list-disc space-y-0.5">
+                <li>Specific stories beat general answers</li>
+                <li>Any length is fine — say what feels natural</li>
+                <li>Don&rsquo;t love a question? Hit &ldquo;Try a different one&rdquo;</li>
+              </ul>
+            </div>
 
             <div className="mt-2 flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
               <span className="font-medium">{recordings.size} of 2+ recorded</span>
@@ -333,13 +343,32 @@ export default function OnboardingPage() {
             </div>
 
             <div className="mt-6 space-y-4">
-              {DAY0_PROMPTS.map(prompt => (
-                <VoiceRecorder
-                  key={prompt.id}
-                  promptId={prompt.id}
-                  promptText={prompt.text}
-                  onRecordingComplete={(blob, duration) => handleRecordingComplete(prompt.id, blob, duration)}
-                />
+              {prompts.map(prompt => (
+                <div key={prompt.id}>
+                  {!recordings.has(prompt.id) && (
+                    <VoiceRecorder
+                      promptId={prompt.id}
+                      promptText={prompt.text}
+                      helpText={prompt.helpText}
+                      exampleAnswer={prompt.exampleAnswer}
+                      onRecordingComplete={(blob, duration) => handleRecordingComplete(prompt.id, blob, duration)}
+                    />
+                  )}
+                  {recordings.has(prompt.id) && (
+                    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
+                      <p className="text-sm font-medium text-emerald-700">Recording submitted</p>
+                      <p className="mt-1 text-xs text-emerald-600">{prompt.text}</p>
+                    </div>
+                  )}
+                  {!recordings.has(prompt.id) && (
+                    <button
+                      onClick={() => handleSkipPrompt(prompt.id)}
+                      className="mt-2 text-xs text-stone-400 underline decoration-dotted underline-offset-2 hover:text-stone-600"
+                    >
+                      Try a different question
+                    </button>
+                  )}
+                </div>
               ))}
             </div>
           </div>
