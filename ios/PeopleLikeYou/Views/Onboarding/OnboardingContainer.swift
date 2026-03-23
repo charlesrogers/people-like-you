@@ -12,7 +12,7 @@ struct OnboardingContainer: View {
         NavigationStack {
             VStack(spacing: 0) {
                 // Progress bar
-                ProgressView(value: Double(currentStep.rawValue + 1), total: 4)
+                ProgressView(value: Double(currentStep.rawValue + 1), total: 6)
                     .tint(.primary)
                     .padding(.horizontal)
                     .padding(.top, 8)
@@ -33,7 +33,19 @@ struct OnboardingContainer: View {
                     case .preferences:
                         PreferencesView { currentStep = .photos }
                     case .photos:
-                        PhotoUploadView { appState.didCompleteOnboarding() }
+                        PhotoUploadView {
+                            // Fire background processing
+                            if let userId = appState.userId {
+                                Task {
+                                    try? await ProfileService.shared.processMemos(userId: userId)
+                                }
+                            }
+                            currentStep = .taste
+                        }
+                    case .taste:
+                        TasteCalibrationView { currentStep = .reveal }
+                    case .reveal:
+                        ProfileRevealView { appState.didCompleteOnboarding() }
                     }
                 }
                 .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
@@ -45,10 +57,12 @@ struct OnboardingContainer: View {
 
     private var stepLabel: String {
         switch currentStep {
-        case .basics: return "Step 1 — About you"
-        case .voice: return "Step 2 — Tell your stories"
-        case .preferences: return "Step 3 — What you want"
-        case .photos: return "Step 4 — Show yourself"
+        case .basics: return "About you"
+        case .voice: return "Your stories"
+        case .preferences: return "Preferences"
+        case .photos: return "Photos"
+        case .taste: return "Your taste"
+        case .reveal: return "Your profile"
         }
     }
 }

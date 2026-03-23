@@ -14,6 +14,8 @@ enum OnboardingStep: Int, CaseIterable {
     case voice = 1
     case preferences = 2
     case photos = 3
+    case taste = 4
+    case reveal = 5
 }
 
 @MainActor
@@ -26,7 +28,6 @@ final class AppState: ObservableObject {
     private let api = APIClient.shared
 
     func checkSession() async {
-        // Try to restore saved session
         guard let tokens = auth.loadTokens() else {
             screen = .auth
             return
@@ -34,14 +35,12 @@ final class AppState: ObservableObject {
 
         api.setAccessToken(tokens.accessToken)
 
-        // Fetch profile to determine where user is in flow
         do {
             let profile = try await ProfileService.shared.getProfile()
             self.user = profile
             self.userId = profile.id
             navigateToStage(profile.onboardingStage)
         } catch {
-            // Token expired — try refresh
             do {
                 let newTokens = try await auth.refresh(refreshToken: tokens.refreshToken)
                 api.setAccessToken(newTokens.accessToken)
@@ -73,7 +72,7 @@ final class AppState: ObservableObject {
     }
 
     func didCompleteOnboarding() {
-        screen = .calibration
+        screen = .dashboard
     }
 
     func didCompleteCalibration() {

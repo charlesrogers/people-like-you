@@ -3,96 +3,72 @@ import SwiftUI
 struct PreferencesView: View {
     let onComplete: () -> Void
 
-    @State private var ageMin = "25"
-    @State private var ageMax = "35"
-    @State private var distance = "anywhere"
-    @State private var kids = "open"
-    @State private var smoking = "no"
-    @State private var energyLevel = "balanced"
-    @State private var communicationStyle = "direct"
+    @State private var ageMin: Double = 21
+    @State private var ageMax: Double = 35
+    @State private var wouldRelocate = ""
+    @State private var faithImportance = ""
+    @State private var kids = ""
+    @State private var maritalHistory = ""
+
+    private var canProceed: Bool {
+        faithImportance.isEmpty == false && kids.isEmpty == false
+    }
 
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Text("What matters to you?")
+                Text("A few dealbreakers")
                     .font(.title2.bold())
 
-                Text("These help us filter — but chemistry is what makes the match.")
+                Text("These help us filter out obvious mismatches. Your stories drive the real matching.")
                     .font(.subheadline)
                     .foregroundStyle(.secondary)
 
-                // Hard preferences
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Dealbreakers")
-                        .font(.headline)
+                // Age range sliders
+                VStack(alignment: .leading, spacing: 12) {
+                    Text("Age range: \(Int(ageMin)) – \(Int(ageMax))")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
 
-                    HStack {
-                        LabeledField(label: "Age min") {
-                            TextField("25", text: $ageMin)
-                                .textFieldStyle(.roundedBorder)
-                                .keyboardType(.numberPad)
+                    VStack(spacing: 8) {
+                        HStack {
+                            Text("Min").font(.caption2).foregroundStyle(.tertiary).frame(width: 30)
+                            Slider(value: $ageMin, in: 18...60, step: 1) { _ in
+                                if ageMin >= ageMax { ageMin = ageMax - 1 }
+                            }
+                            Text("\(Int(ageMin))").font(.subheadline.weight(.medium)).frame(width: 30, alignment: .trailing)
                         }
-                        LabeledField(label: "Age max") {
-                            TextField("35", text: $ageMax)
-                                .textFieldStyle(.roundedBorder)
-                                .keyboardType(.numberPad)
+                        HStack {
+                            Text("Max").font(.caption2).foregroundStyle(.tertiary).frame(width: 30)
+                            Slider(value: $ageMax, in: 18...60, step: 1) { _ in
+                                if ageMax <= ageMin { ageMax = ageMin + 1 }
+                            }
+                            Text("\(Int(ageMax))").font(.subheadline.weight(.medium)).frame(width: 30, alignment: .trailing)
                         }
-                    }
-
-                    LabeledField(label: "Distance") {
-                        Picker("", selection: $distance) {
-                            Text("Same metro").tag("same_metro")
-                            Text("Few hours").tag("few_hours")
-                            Text("Anywhere").tag("anywhere")
-                        }
-                        .pickerStyle(.segmented)
-                    }
-
-                    LabeledField(label: "Kids") {
-                        Picker("", selection: $kids) {
-                            Text("Has").tag("has")
-                            Text("Wants").tag("wants")
-                            Text("Open").tag("open")
-                            Text("No").tag("doesnt_want")
-                        }
-                        .pickerStyle(.segmented)
-                    }
-
-                    LabeledField(label: "Smoking") {
-                        Picker("", selection: $smoking) {
-                            Text("Yes").tag("yes")
-                            Text("No").tag("no")
-                            Text("Sometimes").tag("sometimes")
-                        }
-                        .pickerStyle(.segmented)
                     }
                 }
 
-                Divider()
+                // Would you relocate?
+                ChipPicker(label: "Would you relocate for the right person?", selection: $wouldRelocate, options: [
+                    ("yes", "Yes"), ("maybe", "Maybe"), ("no", "No"),
+                ])
 
-                // Soft preferences
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Vibes")
-                        .font(.headline)
+                // Faith importance
+                ChipPicker(label: "How important is shared faith? *", selection: $faithImportance, options: [
+                    ("essential", "Essential"), ("important", "Important"),
+                    ("nice_to_have", "Nice to have"), ("doesnt_matter", "Doesn't matter"),
+                ])
 
-                    LabeledField(label: "Energy level") {
-                        Picker("", selection: $energyLevel) {
-                            Text("Adventurous").tag("adventurous")
-                            Text("Balanced").tag("balanced")
-                            Text("Homebody").tag("homebody")
-                        }
-                        .pickerStyle(.segmented)
-                    }
+                // Kids
+                ChipPicker(label: "Kids *", selection: $kids, options: [
+                    ("has", "Have kids"), ("wants", "Want kids"),
+                    ("open", "Open to kids"), ("doesnt_want", "Don't want kids"),
+                ])
 
-                    LabeledField(label: "Communication") {
-                        Picker("", selection: $communicationStyle) {
-                            Text("Direct").tag("direct")
-                            Text("Gentle").tag("gentle")
-                            Text("Expressive").tag("expressive")
-                        }
-                        .pickerStyle(.segmented)
-                    }
-                }
+                // Marital history
+                ChipPicker(label: "Marital history", selection: $maritalHistory, options: [
+                    ("never_married", "Never married"), ("divorced", "Divorced"),
+                ])
 
                 Button {
                     AnalyticsService.shared.onboardingSectionProgressed(section: "preferences")
@@ -105,8 +81,42 @@ struct PreferencesView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.primary)
+                .disabled(!canProceed)
+                .opacity(canProceed ? 1 : 0.4)
             }
             .padding()
+        }
+    }
+}
+
+// Reusable chip picker
+struct ChipPicker: View {
+    let label: String
+    @Binding var selection: String
+    let options: [(String, String)]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+
+            FlowLayout(spacing: 8) {
+                ForEach(options, id: \.0) { value, title in
+                    Button {
+                        selection = value
+                    } label: {
+                        Text(title)
+                            .font(.subheadline.weight(.medium))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(selection == value ? Color.primary : Color.clear)
+                            .foregroundStyle(selection == value ? Color(.systemBackground) : .primary)
+                            .clipShape(Capsule())
+                            .overlay(Capsule().stroke(Color.primary.opacity(selection == value ? 0 : 0.15)))
+                    }
+                }
+            }
         }
     }
 }
