@@ -75,8 +75,8 @@ export default function Home() {
       <section className="px-6 py-24 sm:py-32">
         <div className="mx-auto max-w-4xl rounded-bumble-lg bg-white p-10 sm:p-16 relative overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.06)]">
           {/* Decorative */}
-          <div className="absolute -top-10 -right-10 text-8xl opacity-20 rotate-12" aria-hidden="true">💛</div>
-          <div className="absolute -bottom-6 -left-6 text-7xl opacity-20 -rotate-12" aria-hidden="true">✨</div>
+          <div className="absolute top-6 right-6 text-8xl opacity-20 rotate-12" aria-hidden="true">💛</div>
+          <div className="absolute bottom-6 left-6 text-7xl opacity-20 -rotate-12" aria-hidden="true">✨</div>
 
           <div className="relative z-10">
             <p className="text-4xl font-extrabold tracking-tight text-[var(--dark)] sm:text-5xl">
