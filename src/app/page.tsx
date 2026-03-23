@@ -279,7 +279,10 @@ export default function Home() {
             </Link>
           </div>
           <p className="text-xs text-stone-400">
-            &copy; 2026 People Like You
+            &copy; 2026 People Like You &middot; Built by{" "}
+            <a href="https://imprevista.com" target="_blank" rel="noopener noreferrer" className="hover:text-stone-600 transition">
+              Imprevista
+            </a>
           </p>
         </div>
       </footer>
