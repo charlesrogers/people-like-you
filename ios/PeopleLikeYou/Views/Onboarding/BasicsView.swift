@@ -5,7 +5,7 @@ struct BasicsView: View {
     let onComplete: () -> Void
 
     @State private var firstName = ""
-    @State private var email = ""
+    @State private var lastName = ""
     @State private var birthYear = ""
     @State private var state = ""
     @State private var gender = "Man"
@@ -13,20 +13,24 @@ struct BasicsView: View {
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
-                Text("Let's start with the basics")
+                Text("First, tell us about you")
                     .font(.title2.bold())
+
+                Text("This helps us find the right people.")
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
 
                 VStack(spacing: 16) {
                     LabeledField(label: "First name") {
                         TextField("", text: $firstName)
                             .textFieldStyle(.roundedBorder)
+                            .textContentType(.givenName)
                     }
 
-                    LabeledField(label: "Email") {
-                        TextField("", text: $email)
+                    LabeledField(label: "Last name (optional)") {
+                        TextField("", text: $lastName)
                             .textFieldStyle(.roundedBorder)
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
+                            .textContentType(.familyName)
                     }
 
                     LabeledField(label: "I am a") {
@@ -50,7 +54,6 @@ struct BasicsView: View {
                 }
 
                 Button {
-                    // For now, just advance — profile was created at signup
                     onComplete()
                 } label: {
                     Text("Continue")
@@ -65,10 +68,9 @@ struct BasicsView: View {
             .padding()
         }
         .onAppear {
-            // Pre-fill from user if available
             if let user = appState.user {
                 firstName = user.firstName
-                email = user.email
+                lastName = user.lastName ?? ""
                 if let by = user.birthYear { birthYear = String(by) }
                 state = user.state ?? ""
                 gender = user.gender.rawValue

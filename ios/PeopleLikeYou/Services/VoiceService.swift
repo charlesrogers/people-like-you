@@ -1,4 +1,5 @@
 import AVFoundation
+import Combine
 import Foundation
 
 struct VoiceMemoResponse: Codable {
@@ -71,9 +72,11 @@ final class AudioRecorder: ObservableObject {
             duration = 0
             audioData = nil
 
+            let recorder = self.recorder
             timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { [weak self] _ in
-                Task { @MainActor in
-                    self?.duration = self?.recorder?.currentTime ?? 0
+                let time = recorder?.currentTime ?? 0
+                Task { @MainActor [weak self] in
+                    self?.duration = time
                 }
             }
         } catch {

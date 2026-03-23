@@ -5,43 +5,24 @@ struct AuthView: View {
     @State private var isSignUp = true
     @State private var email = ""
     @State private var password = ""
-    @State private var firstName = ""
-    @State private var gender = "Man"
     @State private var loading = false
     @State private var error: String?
 
     var body: some View {
         ScrollView {
             VStack(spacing: 32) {
-                Spacer().frame(height: 60)
+                Spacer().frame(height: 80)
 
-                // Logo
                 VStack(spacing: 8) {
-                    Text("People ")
-                        .font(.system(size: 34, weight: .bold)) +
-                    Text("Like")
-                        .font(.system(size: 34, weight: .bold))
-                        .italic() +
-                    Text(" You")
+                    (Text("People ") + Text("Like").italic() + Text(" You"))
                         .font(.system(size: 34, weight: .bold))
 
-                    Text(isSignUp ? "Create your account" : "Welcome back")
+                    Text(isSignUp ? "Let's find your person." : "Welcome back")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
                 }
 
                 VStack(spacing: 16) {
-                    if isSignUp {
-                        TextField("First name", text: $firstName)
-                            .textFieldStyle(.roundedBorder)
-
-                        Picker("I am a", selection: $gender) {
-                            Text("Man").tag("Man")
-                            Text("Woman").tag("Woman")
-                        }
-                        .pickerStyle(.segmented)
-                    }
-
                     TextField("Email", text: $email)
                         .textFieldStyle(.roundedBorder)
                         .textContentType(.emailAddress)
@@ -56,6 +37,7 @@ struct AuthView: View {
                         Text(error)
                             .font(.caption)
                             .foregroundStyle(.red)
+                            .multilineTextAlignment(.center)
                     }
 
                     Button {
@@ -74,7 +56,7 @@ struct AuthView: View {
                     }
                     .buttonStyle(.borderedProminent)
                     .tint(.primary)
-                    .disabled(loading)
+                    .disabled(loading || email.isEmpty || password.isEmpty)
 
                     Button(isSignUp ? "Already have an account? Log in" : "New here? Sign up") {
                         isSignUp.toggle()
@@ -98,8 +80,7 @@ struct AuthView: View {
             let response: AuthResponse
 
             if isSignUp {
-                guard !firstName.isEmpty else { error = "Please enter your name"; loading = false; return }
-                response = try await auth.signUp(email: email, password: password, firstName: firstName, gender: gender)
+                response = try await auth.signUp(email: email, password: password, firstName: "", gender: "Man")
             } else {
                 response = try await auth.login(email: email, password: password)
             }
@@ -111,6 +92,8 @@ struct AuthView: View {
             } else {
                 error = "Unexpected response"
             }
+        } catch let apiError as APIError {
+            self.error = apiError.localizedDescription
         } catch {
             self.error = error.localizedDescription
         }

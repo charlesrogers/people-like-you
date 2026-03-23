@@ -55,13 +55,13 @@ struct VenueSuggestion: Codable {
 }
 
 struct UserAvailability: Codable {
-    let monday: DaySlots
-    let tuesday: DaySlots
-    let wednesday: DaySlots
-    let thursday: DaySlots
-    let friday: DaySlots
-    let saturday: DaySlots
-    let sunday: DaySlots
+    var monday: DaySlots
+    var tuesday: DaySlots
+    var wednesday: DaySlots
+    var thursday: DaySlots
+    var friday: DaySlots
+    var saturday: DaySlots
+    var sunday: DaySlots
 }
 
 struct DaySlots: Codable {

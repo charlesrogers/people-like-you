@@ -23,11 +23,7 @@ enum APIError: Error, LocalizedError {
 final class APIClient {
     static let shared = APIClient()
 
-    #if DEBUG
-    private let baseURL = "http://localhost:3000/api"
-    #else
     private let baseURL = "https://people-like-you.com/api"
-    #endif
 
     private var accessToken: String?
     private let decoder: JSONDecoder = {
@@ -147,7 +143,7 @@ final class APIClient {
             throw APIError.networkError(error)
         }
 
-        try checkResponse(response)
+        try checkResponse(response, data: data)
 
         do {
             return try decoder.decode(T.self, from: data)
@@ -156,8 +152,19 @@ final class APIClient {
         }
     }
 
-    private func checkResponse(_ response: URLResponse) throws {
+    private func checkResponse(_ response: URLResponse, data: Data? = nil) throws {
         guard let http = response as? HTTPURLResponse else { return }
+
+        // Try to extract error message from JSON body
+        func serverMessage() -> String? {
+            guard let data else { return nil }
+            if let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any],
+               let msg = json["error"] as? String {
+                return msg
+            }
+            return nil
+        }
+
         switch http.statusCode {
         case 200...299:
             return
@@ -166,9 +173,9 @@ final class APIClient {
         case 404:
             throw APIError.notFound
         case 400...499:
-            throw APIError.badRequest("Request failed (\(http.statusCode))")
+            throw APIError.badRequest(serverMessage() ?? "Request failed (\(http.statusCode))")
         default:
-            throw APIError.serverError("Server error (\(http.statusCode))")
+            throw APIError.serverError(serverMessage() ?? "Server error (\(http.statusCode))")
         }
     }
 }
