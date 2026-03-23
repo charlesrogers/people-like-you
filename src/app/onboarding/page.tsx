@@ -50,6 +50,7 @@ export default function OnboardingPage() {
   // Step 2: Voice recordings
   const [prompts, setPrompts] = useState<PromptDef[]>(() => getOnboardingPrompts(6))
   const [recordings, setRecordings] = useState<Map<string, { blob: Blob; duration: number }>>(new Map())
+  const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0)
 
   // Step 3: Hard prefs (dealbreakers only)
   const [ageMin, setAgeMin] = useState(21)
@@ -442,15 +443,14 @@ export default function OnboardingPage() {
 
               <div>
                 <label className="block text-xs font-medium text-stone-500">Birth year *</label>
-                <select
-                  value={birthYear} onChange={e => setBirthYear(e.target.value)}
+                <input
+                  type="text" value={birthYear}
+                  onChange={e => setBirthYear(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                  placeholder="1995"
+                  inputMode="numeric"
+                  maxLength={4}
                   className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
-                >
-                  <option value="">Select year</option>
-                  {Array.from({ length: 50 }, (_, i) => 2008 - i).map(y => (
-                    <option key={y} value={y}>{y}</option>
-                  ))}
-                </select>
+                />
               </div>
 
               <div>
@@ -468,50 +468,109 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 2: Voice Recordings */}
+        {/* Step 2: Voice Recordings — one card at a time */}
         {step === 'voice' && (
           <div>
             <h1 className="text-2xl font-bold text-stone-900">Tell us your stories</h1>
             <p className="mt-2 text-sm text-stone-500">
-              Pick at least 2 and record yourself answering. Just talk like you&rsquo;re telling a friend.
+              Just talk like you&rsquo;re telling a friend. Record at least 2.
             </p>
 
-            {/* Coaching tips */}
-            <div className="mt-3 rounded-lg bg-stone-50 px-4 py-3 text-xs text-stone-500">
-              <p className="font-medium text-stone-600">Tips for great answers:</p>
-              <ul className="mt-1.5 ml-3 list-disc space-y-0.5">
-                <li>Specific stories beat general answers</li>
-                <li>Any length is fine — say what feels natural</li>
-                <li>Don&rsquo;t love a question? Hit &ldquo;Try a different one&rdquo;</li>
-              </ul>
-            </div>
-
-            <div className="mt-2 flex items-center gap-2 rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-700">
-              <span className="font-medium">{recordings.size} of 2+ recorded</span>
-              {recordings.size >= 2 && <span>— nice! Record more for better matches</span>}
-            </div>
-
-            <div className="mt-6 space-y-4">
-              {prompts.map(prompt => (
-                <div key={prompt.id}>
-                  <VoiceRecorder
-                    promptId={prompt.id}
-                    promptText={prompt.text}
-                    helpText={prompt.helpText}
-                    exampleAnswer={prompt.exampleAnswer}
-                    onRecordingComplete={(blob, duration) => handleRecordingComplete(prompt.id, blob, duration)}
+            {/* Progress */}
+            <div className="mt-4 flex items-center gap-3">
+              <div className="flex gap-1.5">
+                {prompts.map((p, i) => (
+                  <div
+                    key={p.id}
+                    className={`h-2 w-8 rounded-full transition-all duration-300 ${
+                      recordings.has(p.id) ? 'bg-emerald-500' :
+                      i === currentVoiceIndex ? 'bg-stone-900' :
+                      'bg-stone-200'
+                    }`}
                   />
-                  {!recordings.has(prompt.id) && (
-                    <button
-                      onClick={() => handleSkipPrompt(prompt.id)}
-                      className="mt-2 text-xs text-stone-400 underline decoration-dotted underline-offset-2 hover:text-stone-600"
-                    >
-                      Try a different question
-                    </button>
-                  )}
-                </div>
+                ))}
+              </div>
+              <span className="text-xs text-stone-400 font-medium">
+                {recordings.size} recorded
+              </span>
+            </div>
+
+            {/* Single card with slide animation */}
+            <div className="mt-6 relative overflow-hidden">
+              <div
+                key={prompts[currentVoiceIndex]?.id}
+                className="animate-slide-in"
+              >
+                {prompts[currentVoiceIndex] && !recordings.has(prompts[currentVoiceIndex].id) && (
+                  <VoiceRecorder
+                    promptId={prompts[currentVoiceIndex].id}
+                    promptText={prompts[currentVoiceIndex].text}
+                    helpText={prompts[currentVoiceIndex].helpText}
+                    exampleAnswer={prompts[currentVoiceIndex].exampleAnswer}
+                    onRecordingComplete={(blob, duration) => {
+                      handleRecordingComplete(prompts[currentVoiceIndex].id, blob, duration)
+                      // Auto-advance to next unrecorded prompt after a beat
+                      setTimeout(() => {
+                        const nextUnrecorded = prompts.findIndex((p, i) => i > currentVoiceIndex && !recordings.has(p.id))
+                        if (nextUnrecorded !== -1) {
+                          setCurrentVoiceIndex(nextUnrecorded)
+                        } else {
+                          // Try wrapping around
+                          const firstUnrecorded = prompts.findIndex(p => !recordings.has(p.id) && p.id !== prompts[currentVoiceIndex].id)
+                          if (firstUnrecorded !== -1) {
+                            setCurrentVoiceIndex(firstUnrecorded)
+                          }
+                        }
+                      }, 600)
+                    }}
+                  />
+                )}
+
+                {prompts[currentVoiceIndex] && recordings.has(prompts[currentVoiceIndex].id) && (
+                  <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+                    <p className="text-lg font-medium text-emerald-700">Got it! ✓</p>
+                    <p className="mt-1 text-sm text-emerald-600">{prompts[currentVoiceIndex].text}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Swap question — prominent */}
+              {prompts[currentVoiceIndex] && !recordings.has(prompts[currentVoiceIndex].id) && (
+                <button
+                  onClick={() => handleSkipPrompt(prompts[currentVoiceIndex].id)}
+                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-stone-200 px-4 py-3 text-sm font-medium text-stone-500 transition hover:border-stone-300 hover:bg-stone-50 active:translate-y-px"
+                >
+                  <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                    <path d="M2 8h12M10 4l4 4-4 4" />
+                  </svg>
+                  Give me a different question
+                </button>
+              )}
+            </div>
+
+            {/* Navigation dots */}
+            <div className="mt-6 flex items-center justify-center gap-2">
+              {prompts.map((p, i) => (
+                <button
+                  key={p.id}
+                  onClick={() => setCurrentVoiceIndex(i)}
+                  className={`h-3 w-3 rounded-full transition-all ${
+                    recordings.has(p.id) ? 'bg-emerald-500' :
+                    i === currentVoiceIndex ? 'bg-stone-900 scale-125' :
+                    'bg-stone-200 hover:bg-stone-300'
+                  }`}
+                />
               ))}
             </div>
+
+            {/* Continue early */}
+            {recordings.size >= 2 && (
+              <p className="mt-4 text-center text-xs text-stone-400">
+                {recordings.size >= 2 && recordings.size < prompts.length && (
+                  <span>You can continue now, or record more for better matches.</span>
+                )}
+              </p>
+            )}
           </div>
         )}
 

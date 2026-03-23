@@ -78,6 +78,15 @@ body {
   animation: bounce-soft 3s ease-in-out infinite;
 }
 
+/* Slide in from right (voice card transition) */
+@keyframes slide-in {
+  from { opacity: 0; transform: translateX(60px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+.animate-slide-in {
+  animation: slide-in 0.4s ease-out both;
+}
+
 /* Fade in */
 @keyframes fade-in-up {
   from { opacity: 0; transform: translateY(24px); }
