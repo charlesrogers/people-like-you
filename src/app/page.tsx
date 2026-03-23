@@ -82,14 +82,14 @@ export default function Home() {
             <p className="text-4xl font-extrabold tracking-tight text-[var(--dark)] sm:text-5xl">
               Imagine a matchmaker who knows you better than your best friend.
             </p>
-            <p className="mt-4 text-4xl font-extrabold tracking-tight text-[var(--dark)]/50 italic sm:text-5xl">
+            <p className="mt-4 text-4xl font-normal tracking-tight text-[var(--dark)]/30 italic sm:text-5xl">
               Not just your type — your humor, what makes you light up,
               the kind of person you&rsquo;d talk to until 3am without noticing.
             </p>
             <p className="mt-6 text-4xl font-extrabold tracking-tight text-[var(--dark)] sm:text-5xl">
               But they know every person you&rsquo;d want to date just as well.
             </p>
-            <p className="mt-2 text-4xl font-extrabold tracking-tight text-[var(--dark)] underline decoration-[3px] underline-offset-6 sm:text-5xl">
+            <p className="mt-2 text-5xl font-extrabold tracking-tight text-[var(--dark)] underline decoration-[3px] underline-offset-6 sm:text-6xl">
               That&rsquo;s us.
             </p>
             <div className="mt-8 flex items-center gap-5">
