@@ -163,21 +163,11 @@ export default function VoiceRecorder({
         <p className="mt-2 text-xs text-stone-400">{helpText}</p>
       )}
 
-      {/* Example answer toggle */}
+      {/* Example — always visible, short and fun */}
       {exampleAnswer && state === 'idle' && (
-        <div className="mt-3">
-          <button
-            onClick={() => setShowExample(!showExample)}
-            className="text-xs font-medium text-stone-500 underline decoration-dotted underline-offset-2 hover:text-stone-700"
-          >
-            {showExample ? 'Hide example' : 'Not sure what to say? See an example'}
-          </button>
-          {showExample && (
-            <div className="mt-2 rounded-lg bg-stone-50 px-4 py-3">
-              <p className="text-xs italic text-stone-500">&ldquo;{exampleAnswer}&rdquo;</p>
-            </div>
-          )}
-        </div>
+        <p className="mt-2 text-xs italic text-stone-400">
+          e.g. &ldquo;{exampleAnswer}&rdquo;
+        </p>
       )}
 
       {error && (
