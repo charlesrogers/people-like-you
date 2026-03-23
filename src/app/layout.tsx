@@ -9,8 +9,20 @@ const geist = Geist({
 });
 
 export const metadata: Metadata = {
-  title: "People Like You",
-  description: "Find people you'd actually want to date",
+  title: "People Like You — Your Perfect Matchmaker",
+  description:
+    "We learn who you are through your stories, then introduce you to compatible people in a way that sparks real chemistry. No swiping. No small talk.",
+  openGraph: {
+    title: "People Like You",
+    description: "Your perfect matchmaker, finally possible.",
+    siteName: "People Like You",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "People Like You",
+    description: "Your perfect matchmaker, finally possible.",
+  },
 };
 
 export default function RootLayout({

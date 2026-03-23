@@ -1,289 +1,342 @@
 import Link from "next/link";
 
-/* ---------- Hero illustration: two figures connected by flowing lines ---------- */
+/* ─── Logo SVG (reusable) ─── */
 
-function HeroIllustration({ className = "" }: { className?: string }) {
+function Logo({ className = "", light = false }: { className?: string; light?: boolean }) {
+  const fill = light ? "#fafaf9" : "#1c1917";
+  const accent = "#f59e0b";
   return (
-    <svg
-      viewBox="0 0 600 280"
-      fill="none"
-      className={className}
-      aria-hidden="true"
-    >
-      <defs>
-        {/* gradient for connection lines */}
-        <linearGradient id="flow" x1="0%" y1="50%" x2="100%" y2="50%">
-          <stop offset="0%" stopColor="#a8a29e" />
-          <stop offset="35%" stopColor="#d6d3d1" />
-          <stop offset="50%" stopColor="#fbbf24" />
-          <stop offset="65%" stopColor="#d6d3d1" />
-          <stop offset="100%" stopColor="#a8a29e" />
-        </linearGradient>
-        <linearGradient id="flow2" x1="0%" y1="50%" x2="100%" y2="50%">
-          <stop offset="0%" stopColor="#a8a29e" stopOpacity="0.5" />
-          <stop offset="50%" stopColor="#f59e0b" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#a8a29e" stopOpacity="0.5" />
-        </linearGradient>
-        {/* figure fills */}
-        <linearGradient id="figL" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#e7e5e4" />
-          <stop offset="100%" stopColor="#d6d3d1" />
-        </linearGradient>
-        <linearGradient id="figR" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#e7e5e4" />
-          <stop offset="100%" stopColor="#d6d3d1" />
-        </linearGradient>
-        {/* glow at center */}
-        <radialGradient id="glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
-        </radialGradient>
-        {/* glow on figures */}
-        <radialGradient id="glowL" cx="80%" cy="50%" r="60%">
-          <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.1" />
-          <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
-        </radialGradient>
-        <radialGradient id="glowR" cx="20%" cy="50%" r="60%">
-          <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.1" />
-          <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-
-      {/* center glow */}
-      <ellipse cx="300" cy="140" rx="120" ry="100" fill="url(#glow)" />
-
-      {/* left figure — abstract silhouette */}
-      <g>
-        <ellipse cx="115" cy="140" rx="70" ry="90" fill="url(#glowL)" />
-        {/* head */}
-        <circle cx="115" cy="90" r="28" fill="url(#figL)" stroke="#a8a29e" strokeWidth="1.5" />
-        {/* body */}
-        <path
-          d="M85 120c0 0-15 20-18 50s2 45 10 55c10 12 26 18 38 18s28-6 38-18c8-10 13-25 10-55s-18-50-18-50"
-          fill="url(#figL)"
-          stroke="#a8a29e"
-          strokeWidth="1.5"
-        />
-        {/* shoulder/arm reaching right */}
-        <path
-          d="M143 135c12-2 28 0 40 8"
-          stroke="#a8a29e"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </g>
-
-      {/* right figure — abstract silhouette */}
-      <g>
-        <ellipse cx="485" cy="140" rx="70" ry="90" fill="url(#glowR)" />
-        {/* head */}
-        <circle cx="485" cy="90" r="28" fill="url(#figR)" stroke="#a8a29e" strokeWidth="1.5" />
-        {/* body */}
-        <path
-          d="M455 120c0 0-15 20-18 50s2 45 10 55c10 12 26 18 38 18s28-6 38-18c8-10 13-25 10-55s-18-50-18-50"
-          fill="url(#figR)"
-          stroke="#a8a29e"
-          strokeWidth="1.5"
-        />
-        {/* shoulder/arm reaching left */}
-        <path
-          d="M457 135c-12-2-28 0-40 8"
-          stroke="#a8a29e"
-          strokeWidth="1.5"
-          strokeLinecap="round"
-        />
-      </g>
-
-      {/* flowing connection lines between figures */}
-      <path
-        d="M183 130 C240 100, 280 170, 300 140 S360 100, 417 130"
-        stroke="url(#flow)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M183 145 C230 175, 270 110, 300 145 S370 175, 417 145"
-        stroke="url(#flow)"
-        strokeWidth="2"
-        strokeLinecap="round"
-        fill="none"
-      />
-      <path
-        d="M183 160 C245 130, 275 185, 300 155 S355 130, 417 160"
-        stroke="url(#flow2)"
-        strokeWidth="1.5"
-        strokeLinecap="round"
-        fill="none"
-      />
-
-      {/* particles / dots along the lines */}
-      <circle cx="220" cy="118" r="3" fill="#d6d3d1" />
-      <circle cx="255" cy="152" r="2.5" fill="#d6d3d1" />
-      <circle cx="280" cy="135" r="3.5" fill="#fbbf24" opacity="0.5" />
-      <circle cx="300" cy="140" r="4" fill="#fbbf24" opacity="0.6" />
-      <circle cx="320" cy="135" r="3.5" fill="#fbbf24" opacity="0.5" />
-      <circle cx="345" cy="152" r="2.5" fill="#d6d3d1" />
-      <circle cx="380" cy="118" r="3" fill="#d6d3d1" />
-
-      {/* smaller accent dots */}
-      <circle cx="240" cy="170" r="2" fill="#a8a29e" opacity="0.3" />
-      <circle cx="300" cy="115" r="2" fill="#fbbf24" opacity="0.3" />
-      <circle cx="360" cy="170" r="2" fill="#a8a29e" opacity="0.3" />
+    <svg viewBox="0 0 120 32" className={className} aria-label="People Like You">
+      <text x="0" y="24" fontFamily="system-ui, sans-serif" fontWeight="700" fontSize="24" fill={fill}>
+        P
+        <tspan fill={accent} fontStyle="italic">L</tspan>
+        Y
+      </text>
     </svg>
   );
 }
 
-/* ---------- Story illustration: open book with radiating lines ---------- */
+/* ─── Hero background particles ─── */
 
-function StoryIllustration({ className = "" }: { className?: string }) {
+function HeroParticles() {
   return (
-    <svg
-      viewBox="0 0 200 100"
-      fill="none"
-      className={className}
-      aria-hidden="true"
-    >
-      <defs>
-        <linearGradient id="bookGrad" x1="50%" y1="0%" x2="50%" y2="100%">
-          <stop offset="0%" stopColor="#e7e5e4" />
-          <stop offset="100%" stopColor="#d6d3d1" />
-        </linearGradient>
-        <linearGradient id="rayGrad" x1="50%" y1="100%" x2="50%" y2="0%">
-          <stop offset="0%" stopColor="#fbbf24" stopOpacity="0.3" />
-          <stop offset="100%" stopColor="#fbbf24" stopOpacity="0" />
-        </linearGradient>
-      </defs>
+    <div className="absolute inset-0 overflow-hidden pointer-events-none" aria-hidden="true">
+      {/* Gradient orbs */}
+      <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-amber-500/5 blur-3xl animate-float-slow" />
+      <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-amber-400/5 blur-3xl animate-float-slower" />
 
-      {/* radiating glow */}
-      <ellipse cx="100" cy="65" rx="80" ry="40" fill="url(#rayGrad)" />
+      {/* Floating dots */}
+      <div className="absolute top-[20%] left-[15%] w-2 h-2 rounded-full bg-amber-400/20 animate-float" />
+      <div className="absolute top-[30%] right-[20%] w-1.5 h-1.5 rounded-full bg-amber-400/15 animate-float-slow" />
+      <div className="absolute top-[60%] left-[30%] w-1 h-1 rounded-full bg-stone-400/20 animate-float-slower" />
+      <div className="absolute top-[50%] right-[35%] w-2.5 h-2.5 rounded-full bg-amber-400/10 animate-float" />
+      <div className="absolute top-[70%] left-[60%] w-1.5 h-1.5 rounded-full bg-stone-500/15 animate-float-slow" />
+      <div className="absolute top-[15%] right-[40%] w-1 h-1 rounded-full bg-amber-300/20 animate-float-slower" />
 
-      {/* rays */}
-      <path d="M100 55 L70 20" stroke="#d6d3d1" strokeWidth="1" strokeLinecap="round" />
-      <path d="M100 55 L85 15" stroke="#d6d3d1" strokeWidth="1" strokeLinecap="round" />
-      <path d="M100 55 L100 10" stroke="#fbbf24" strokeWidth="1" strokeLinecap="round" opacity="0.5" />
-      <path d="M100 55 L115 15" stroke="#d6d3d1" strokeWidth="1" strokeLinecap="round" />
-      <path d="M100 55 L130 20" stroke="#d6d3d1" strokeWidth="1" strokeLinecap="round" />
+      {/* Connection lines (very faint) */}
+      <svg className="absolute inset-0 w-full h-full opacity-[0.04]" viewBox="0 0 1200 800">
+        <path d="M200 400 C400 200, 600 600, 800 300 S1000 500, 1100 400" stroke="#f59e0b" strokeWidth="1.5" fill="none" />
+        <path d="M100 500 C300 300, 500 700, 700 400 S900 600, 1100 500" stroke="#a8a29e" strokeWidth="1" fill="none" />
+      </svg>
+    </div>
+  );
+}
 
-      {/* dots at ray tips */}
-      <circle cx="70" cy="20" r="2.5" fill="#d6d3d1" />
-      <circle cx="85" cy="15" r="2" fill="#a8a29e" />
-      <circle cx="100" cy="10" r="3" fill="#fbbf24" opacity="0.5" />
-      <circle cx="115" cy="15" r="2" fill="#a8a29e" />
-      <circle cx="130" cy="20" r="2.5" fill="#d6d3d1" />
+/* ─── Step illustration icons ─── */
 
-      {/* open book — left page */}
-      <path
-        d="M100 60 C90 58, 55 55, 45 62 L45 85 C55 78, 90 80, 100 82Z"
-        fill="url(#bookGrad)"
-        stroke="#a8a29e"
-        strokeWidth="1.2"
-      />
-      {/* open book — right page */}
-      <path
-        d="M100 60 C110 58, 145 55, 155 62 L155 85 C145 78, 110 80, 100 82Z"
-        fill="url(#bookGrad)"
-        stroke="#a8a29e"
-        strokeWidth="1.2"
-      />
-      {/* spine */}
-      <line x1="100" y1="60" x2="100" y2="82" stroke="#a8a29e" strokeWidth="1.2" />
-
-      {/* text lines on left page */}
-      <line x1="60" y1="70" x2="90" y2="68" stroke="#a8a29e" strokeWidth="0.8" opacity="0.4" strokeLinecap="round" />
-      <line x1="62" y1="75" x2="88" y2="73" stroke="#a8a29e" strokeWidth="0.8" opacity="0.3" strokeLinecap="round" />
-
-      {/* text lines on right page */}
-      <line x1="110" y1="68" x2="140" y2="70" stroke="#a8a29e" strokeWidth="0.8" opacity="0.4" strokeLinecap="round" />
-      <line x1="112" y1="73" x2="138" y2="75" stroke="#a8a29e" strokeWidth="0.8" opacity="0.3" strokeLinecap="round" />
+function VoiceIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 80 80" fill="none" className={className}>
+      <circle cx="40" cy="40" r="38" stroke="#d6d3d1" strokeWidth="1.5" />
+      <rect x="32" y="20" width="16" height="28" rx="8" fill="#f59e0b" opacity="0.8" />
+      <path d="M26 42c0 8 6 14 14 14s14-6 14-14" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+      <line x1="40" y1="56" x2="40" y2="64" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+      <line x1="34" y1="64" x2="46" y2="64" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
+
+function MatchIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 80 80" fill="none" className={className}>
+      <circle cx="40" cy="40" r="38" stroke="#d6d3d1" strokeWidth="1.5" />
+      <circle cx="28" cy="34" r="10" fill="#f59e0b" opacity="0.6" />
+      <circle cx="52" cy="34" r="10" fill="#f59e0b" opacity="0.6" />
+      <path d="M28 50c0-4 4-8 12-8s12 4 12 8" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" />
+      <path d="M36 28l8 8-8 8" stroke="#fbbf24" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
+    </svg>
+  );
+}
+
+function NarrativeIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 80 80" fill="none" className={className}>
+      <circle cx="40" cy="40" r="38" stroke="#d6d3d1" strokeWidth="1.5" />
+      <rect x="22" y="20" width="36" height="44" rx="4" fill="#f59e0b" opacity="0.15" stroke="#f59e0b" strokeWidth="1.5" />
+      <line x1="28" y1="30" x2="52" y2="30" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" opacity="0.6" />
+      <line x1="28" y1="37" x2="48" y2="37" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
+      <line x1="28" y1="44" x2="44" y2="44" stroke="#f59e0b" strokeWidth="1.5" strokeLinecap="round" opacity="0.3" />
+      <path d="M36 52l4 4 8-10" stroke="#f59e0b" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function SparkIcon({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 80 80" fill="none" className={className}>
+      <circle cx="40" cy="40" r="38" stroke="#d6d3d1" strokeWidth="1.5" />
+      <path d="M40 18l3 12 12-3-9 9 9 9-12-3-3 12-3-12-12 3 9-9-9-9 12 3z" fill="#f59e0b" opacity="0.7" />
+      <circle cx="40" cy="40" r="6" fill="#fbbf24" />
+    </svg>
+  );
+}
+
+/* ─── Main Page ─── */
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-stone-50 to-white">
-      {/* nav */}
-      <nav className="flex items-center justify-between px-6 py-5 sm:px-10">
-        <span className="text-sm font-semibold tracking-tight text-stone-400">
-          PLY
-        </span>
-        <Link
-          href="/onboarding"
-          className="text-sm font-medium text-stone-500 transition hover:text-stone-900"
-        >
-          Join / Login
-        </Link>
-      </nav>
+    <div className="overflow-x-hidden">
+      {/* ────── HERO: Dark section ────── */}
+      <section className="relative min-h-screen bg-stone-950 bg-grain flex flex-col">
+        <HeroParticles />
 
-      <div className="mx-auto max-w-2xl px-6 pb-24 pt-12 sm:pt-16">
-        <h1 className="text-4xl font-bold tracking-tight text-stone-900 sm:text-5xl">
-          People <span className="italic">Like</span> You
-        </h1>
+        {/* Nav */}
+        <nav className="relative z-10 flex items-center justify-between px-6 py-6 sm:px-12">
+          <Logo light className="h-8 w-auto" />
+          <Link
+            href="/onboarding"
+            className="text-sm font-medium text-stone-400 transition hover:text-white"
+          >
+            Join / Login
+          </Link>
+        </nav>
 
-        <p className="mt-6 text-lg leading-8 text-stone-500 font-medium">
-          Your perfect matchmaker, finally possible.
-        </p>
+        {/* Hero content */}
+        <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-6 text-center">
+          <h1 className="animate-fade-in-up text-5xl font-bold tracking-tight text-white sm:text-7xl lg:text-8xl">
+            People{" "}
+            <span className="italic text-gradient">Like</span>{" "}
+            You
+          </h1>
 
-        <HeroIllustration className="mx-auto mt-12 w-full max-w-lg" />
-
-        <div className="mt-12 space-y-5 text-base leading-7 text-stone-600">
-          <p>
-            Imagine a matchmaker who knows you better than your best friend
-            does. Not just your type — your humor, what makes you light up,
-            the kind of person you&rsquo;d talk to until 3am without noticing.
+          <p className="animate-fade-in-up delay-100 mt-6 max-w-xl text-lg text-stone-400 sm:text-xl">
+            Your perfect matchmaker, finally possible.
           </p>
-          <p>
-            Now imagine they know every person you&rsquo;d want to date just
-            as well.
+
+          <p className="animate-fade-in-up delay-200 mt-4 max-w-lg text-sm text-stone-500 leading-relaxed">
+            We learn who you are through your stories — then introduce you to
+            compatible people in a way that sparks real chemistry. No swiping. No
+            small talk with strangers.
           </p>
+
+          <div className="animate-fade-in-up delay-300 mt-10 flex flex-col items-center gap-4 sm:flex-row">
+            <Link
+              href="/onboarding"
+              className="rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-8 py-3.5 text-base font-semibold text-white shadow-lg shadow-amber-500/25 transition hover:shadow-amber-500/40 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Get Started
+            </Link>
+            <Link
+              href="/dashboard"
+              className="text-sm font-medium text-stone-500 transition hover:text-stone-300"
+            >
+              I already have an account &rarr;
+            </Link>
+          </div>
         </div>
 
-        <StoryIllustration className="mx-auto my-10 w-44" />
+        {/* Scroll hint */}
+        <div className="relative z-10 pb-8 text-center">
+          <div className="mx-auto h-10 w-[1px] bg-gradient-to-b from-transparent to-stone-700" />
+        </div>
+      </section>
 
-        <div className="space-y-5 text-base leading-7 text-stone-600">
-          <p>
-            That&rsquo;s People Like You. We find people you&rsquo;re genuinely
-            compatible with — then introduce you to each other in the way most
-            likely to spark something real. Your best qualities, told as a story
-            written for the specific person reading it. Their best qualities,
-            told as a story written for you.
+      {/* ────── THE PITCH: 3 columns ────── */}
+      <section className="bg-white px-6 py-28 sm:py-36">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-center text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+            A matchmaker that actually <span className="text-gradient">knows</span> you
+          </h2>
+          <p className="mx-auto mt-4 max-w-2xl text-center text-base text-stone-500">
+            Not your filters. Not your checklist. You.
           </p>
-          <p>
-            You get pitched to your dream matches in the best possible light.
-            And the people you see? They&rsquo;re not profiles — they&rsquo;re
-            introductions that make you feel something before you&rsquo;ve even
-            met.
-          </p>
-          <p className="font-medium text-stone-800">
+
+          <div className="mt-16 grid gap-8 sm:grid-cols-3">
+            <PitchCard
+              icon={<VoiceIcon className="h-16 w-16" />}
+              title="We know you"
+              body="You tell us your stories — through voice, not checkboxes. Our AI extracts the real you: your humor, what makes you light up, where you're growing."
+            />
+            <PitchCard
+              icon={<MatchIcon className="h-16 w-16" />}
+              title="We know them"
+              body="Every person on PLY goes through the same deep process. So we don't just know you — we know everyone you'd want to meet."
+            />
+            <PitchCard
+              icon={<NarrativeIcon className="h-16 w-16" />}
+              title="We write the intro"
+              body="When we match you, you don't get a name and a photo. You get a personalized story about why this person might change your world."
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ────── HOW IT WORKS: Alternating ────── */}
+      <section className="bg-stone-50 px-6 py-28 sm:py-36">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="text-center text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+            How it works
+          </h2>
+
+          <div className="mt-20 space-y-24 sm:space-y-32">
+            <StepRow
+              number="01"
+              title="Tell us your stories"
+              body="Answer voice prompts that reveal who you really are — your rabbit holes, unpopular opinions, proudest moments, and guilty pleasures. 55 questions across 5 dimensions of personality."
+              icon={<VoiceIcon className="h-24 w-24 sm:h-32 sm:w-32" />}
+              reverse={false}
+            />
+            <StepRow
+              number="02"
+              title="We find your people"
+              body="Our AI builds your personality composite and finds people you're genuinely compatible with — based on values, humor, growth, and the things that actually predict chemistry."
+              icon={<MatchIcon className="h-24 w-24 sm:h-32 sm:w-32" />}
+              reverse={true}
+            />
+            <StepRow
+              number="03"
+              title="Read your introduction"
+              body="Each match comes with a narrative written specifically for you about why this person matters. Their best qualities, told as a story. The photo comes after — so the feeling lands first."
+              icon={<NarrativeIcon className="h-24 w-24 sm:h-32 sm:w-32" />}
+              reverse={false}
+            />
+            <StepRow
+              number="04"
+              title="Meet with a spark"
+              body="Both people walk into the first conversation already feeling something. Already curious. Already a little invested. That's the difference between a match and a connection."
+              icon={<SparkIcon className="h-24 w-24 sm:h-32 sm:w-32" />}
+              reverse={true}
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* ────── THESIS TEASER: Dark section ────── */}
+      <section className="relative bg-stone-950 bg-grain px-6 py-28 sm:py-36">
+        <div className="relative z-10 mx-auto max-w-3xl text-center">
+          <blockquote className="text-xl font-medium leading-relaxed text-stone-300 sm:text-2xl">
+            &ldquo;Imagine a matchmaker who knows you better than your best
+            friend does. Not just your type — your humor, what makes you light
+            up, the kind of person you&rsquo;d talk to until 3am without
+            noticing. Now imagine they know every person you&rsquo;d want to
+            date just as well.&rdquo;
+          </blockquote>
+          <div className="mt-8">
+            <Link
+              href="/thesis"
+              className="text-sm font-medium text-amber-500 transition hover:text-amber-400"
+            >
+              Not sure yet? Read the full thesis &rarr;
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ────── FINAL CTA ────── */}
+      <section className="bg-white px-6 py-28 sm:py-36">
+        <div className="mx-auto max-w-2xl text-center">
+          <h2 className="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">
+            Ready to meet someone who gets it?
+          </h2>
+          <p className="mt-4 text-base text-stone-500">
             No swiping. No small talk with strangers. Just two people who
             already have a reason to be excited about each other.
           </p>
+          <div className="mt-10">
+            <Link
+              href="/onboarding"
+              className="inline-block rounded-full bg-gradient-to-r from-amber-500 to-amber-600 px-10 py-4 text-lg font-semibold text-white shadow-lg shadow-amber-500/25 transition hover:shadow-amber-500/40 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              Get Started
+            </Link>
+          </div>
         </div>
+      </section>
 
-        <div className="mt-16 space-y-4">
-          <Link
-            href="/onboarding"
-            className="block rounded-xl bg-stone-900 px-6 py-4 text-center text-lg font-medium text-white transition hover:bg-stone-800"
-          >
-            Get Started
-          </Link>
-          <Link
-            href="/dashboard"
-            className="block rounded-xl border border-stone-200 px-6 py-4 text-center text-lg font-medium text-stone-700 transition hover:bg-stone-50"
-          >
-            I already have an account
-          </Link>
+      {/* ────── FOOTER ────── */}
+      <footer className="border-t border-stone-200 bg-white px-6 py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
+          <Logo className="h-6 w-auto" />
+          <div className="flex items-center gap-6 text-sm text-stone-400">
+            <Link href="/thesis" className="hover:text-stone-600 transition">
+              Thesis
+            </Link>
+            <Link href="/onboarding" className="hover:text-stone-600 transition">
+              Join
+            </Link>
+            <Link href="/dashboard" className="hover:text-stone-600 transition">
+              Dashboard
+            </Link>
+          </div>
+          <p className="text-xs text-stone-400">
+            &copy; 2026 People Like You
+          </p>
         </div>
+      </footer>
+    </div>
+  );
+}
 
-        <div className="mt-10 text-center">
-          <Link
-            href="/thesis"
-            className="text-sm font-medium text-stone-400 transition hover:text-stone-600"
-          >
-            Not sure yet? See the full process &rarr;
-          </Link>
-        </div>
+/* ─── Pitch card component ─── */
+
+function PitchCard({
+  icon,
+  title,
+  body,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+}) {
+  return (
+    <div className="flex flex-col items-center text-center sm:items-start sm:text-left">
+      <div className="mb-5">{icon}</div>
+      <h3 className="text-lg font-semibold text-stone-900">{title}</h3>
+      <p className="mt-2 text-sm leading-relaxed text-stone-500">{body}</p>
+    </div>
+  );
+}
+
+/* ─── Step row component (alternating layout) ─── */
+
+function StepRow({
+  number,
+  title,
+  body,
+  icon,
+  reverse,
+}: {
+  number: string;
+  title: string;
+  body: string;
+  icon: React.ReactNode;
+  reverse: boolean;
+}) {
+  return (
+    <div
+      className={`flex flex-col items-center gap-10 sm:flex-row sm:gap-16 ${
+        reverse ? "sm:flex-row-reverse" : ""
+      }`}
+    >
+      <div className="flex-shrink-0">{icon}</div>
+      <div className={reverse ? "sm:text-right" : ""}>
+        <span className="text-xs font-bold tracking-widest text-amber-500 uppercase">
+          Step {number}
+        </span>
+        <h3 className="mt-2 text-2xl font-bold text-stone-900">{title}</h3>
+        <p className="mt-3 max-w-lg text-base leading-relaxed text-stone-500">
+          {body}
+        </p>
       </div>
     </div>
   );
