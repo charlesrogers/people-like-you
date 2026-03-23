@@ -5,20 +5,8 @@ import { useRouter } from 'next/navigation'
 import posthog from 'posthog-js'
 import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
-import SoftPreferencesRanker from '@/components/SoftPreferencesRanker'
 import { getOnboardingPrompts, getRandomPrompt, type PromptDef } from '@/lib/prompts'
 import { getSeedNarrativesForGender, ATTRIBUTE_TAGS, type SeedNarrative } from '@/lib/seed-narratives'
-
-const US_STATES = [
-  'Alabama','Alaska','Arizona','Arkansas','California','Colorado','Connecticut',
-  'Delaware','Florida','Georgia','Hawaii','Idaho','Illinois','Indiana','Iowa',
-  'Kansas','Kentucky','Louisiana','Maine','Maryland','Massachusetts','Michigan',
-  'Minnesota','Mississippi','Missouri','Montana','Nebraska','Nevada','New Hampshire',
-  'New Jersey','New Mexico','New York','North Carolina','North Dakota','Ohio',
-  'Oklahoma','Oregon','Pennsylvania','Rhode Island','South Carolina','South Dakota',
-  'Tennessee','Texas','Utah','Vermont','Virginia','Washington','West Virginia',
-  'Wisconsin','Wyoming','Outside US',
-]
 
 type Step = 'basics' | 'voice' | 'preferences' | 'photos' | 'taste' | 'reveal'
 
@@ -52,23 +40,19 @@ export default function OnboardingPage() {
   const [email, setEmail] = useState('')
   const [gender, setGender] = useState('')
   const [birthYear, setBirthYear] = useState('')
-  const [state, setState] = useState('')
+  const [zipcode, setZipcode] = useState('')
 
   // Step 2: Voice recordings
   const [prompts, setPrompts] = useState<PromptDef[]>(() => getOnboardingPrompts(6))
   const [recordings, setRecordings] = useState<Map<string, { blob: Blob; duration: number }>>(new Map())
 
-  // Step 3: Hard prefs
-  const [ageMin, setAgeMin] = useState('21')
-  const [ageMax, setAgeMax] = useState('35')
-  const [distance, setDistance] = useState('')
+  // Step 3: Hard prefs (dealbreakers only)
+  const [ageMin, setAgeMin] = useState(21)
+  const [ageMax, setAgeMax] = useState(35)
+  const [wouldRelocate, setWouldRelocate] = useState('')
   const [faithImportance, setFaithImportance] = useState('')
   const [kids, setKids] = useState('')
   const [maritalHistory, setMaritalHistory] = useState('')
-  const [smoking, setSmoking] = useState('')
-
-  // Step 3: Soft prefs
-  const [softPrefs, setSoftPrefs] = useState<Record<string, string | string[]>>({})
 
   // Step 4: Photos
   const [photoFiles, setPhotoFiles] = useState<File[]>([])
@@ -106,9 +90,9 @@ export default function OnboardingPage() {
     }
   }
 
-  const canProceedBasics = firstName && email && gender && birthYear
+  const canProceedBasics = firstName && email && gender && birthYear && zipcode
   const canProceedVoice = recordings.size >= 2
-  const canProceedPrefs = distance && faithImportance && kids
+  const canProceedPrefs = faithImportance && kids
   const canProceedPhotos = photoFiles.length >= 1
 
   const handleNext = async () => {
@@ -133,9 +117,9 @@ export default function OnboardingPage() {
               email,
               gender,
               birth_year: birthYear,
-              state,
+              zipcode,
             },
-            hardPreferences: null, // saved in preferences step
+            hardPreferences: null,
             softPreferences: null,
           }),
         })
@@ -188,21 +172,14 @@ export default function OnboardingPage() {
           body: JSON.stringify({
             basics: { first_name: firstName, email, gender },
             hardPreferences: {
-              age_range_min: parseInt(ageMin),
-              age_range_max: parseInt(ageMax),
-              distance_radius: distance,
+              age_range_min: ageMin,
+              age_range_max: ageMax,
+              distance_radius: wouldRelocate || 'anywhere',
               faith_importance: faithImportance,
               kids,
               marital_history: maritalHistory || null,
-              smoking: smoking || null,
             },
-            softPreferences: {
-              humor_style: Array.isArray(softPrefs.humor_style) ? softPrefs.humor_style : [],
-              energy_level: typeof softPrefs.energy_level === 'string' ? softPrefs.energy_level : null,
-              communication_style: typeof softPrefs.communication_style === 'string' ? softPrefs.communication_style : null,
-              life_stage_priority: typeof softPrefs.life_stage_priority === 'string' ? softPrefs.life_stage_priority : null,
-              date_activity_prefs: Array.isArray(softPrefs.date_activity_prefs) ? softPrefs.date_activity_prefs : [],
-            },
+            softPreferences: null,
           }),
         })
         const data = await res.json()
@@ -428,14 +405,15 @@ export default function OnboardingPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-stone-500">State</label>
-                <select
-                  value={state} onChange={e => setState(e.target.value)}
+                <label className="block text-xs font-medium text-stone-500">Zip code *</label>
+                <input
+                  type="text" value={zipcode}
+                  onChange={e => setZipcode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                  placeholder="84101"
+                  inputMode="numeric"
+                  maxLength={5}
                   className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
-                >
-                  <option value="">Select state</option>
-                  {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
+                />
               </div>
             </div>
           </div>
@@ -488,46 +466,61 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 3: Preferences */}
+        {/* Step 3: Preferences (dealbreakers only) */}
         {step === 'preferences' && (
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">What are you looking for?</h1>
+            <h1 className="text-2xl font-bold text-stone-900">A few dealbreakers</h1>
             <p className="mt-2 text-sm text-stone-500">
-              These help us filter — your stories are what actually drive matching.
+              These help us filter out obvious mismatches. Your stories drive the real matching.
             </p>
 
             <div className="mt-8 space-y-6">
-              <h2 className="text-sm font-semibold text-stone-700 uppercase tracking-wider">Dealbreakers</h2>
-
-              {/* Age range */}
+              {/* Age range — dual slider */}
               <div>
-                <label className="block text-xs font-medium text-stone-500">Age range</label>
-                <div className="mt-2 flex items-center gap-3">
-                  <input
-                    type="number" value={ageMin} onChange={e => setAgeMin(e.target.value)} min="18" max="99"
-                    className="w-20 rounded-lg border border-stone-200 px-3 py-2 text-sm text-center"
-                  />
-                  <span className="text-stone-400">to</span>
-                  <input
-                    type="number" value={ageMax} onChange={e => setAgeMax(e.target.value)} min="18" max="99"
-                    className="w-20 rounded-lg border border-stone-200 px-3 py-2 text-sm text-center"
-                  />
+                <label className="block text-xs font-medium text-stone-500">
+                  Age range: <span className="font-semibold text-stone-700">{ageMin} – {ageMax}</span>
+                </label>
+                <div className="mt-3 space-y-3">
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-stone-400 w-8">Min</span>
+                    <input
+                      type="range" min={18} max={60} value={ageMin}
+                      onChange={e => {
+                        const v = parseInt(e.target.value)
+                        setAgeMin(Math.min(v, ageMax - 1))
+                      }}
+                      className="flex-1 accent-stone-900"
+                    />
+                    <span className="text-sm font-medium text-stone-700 w-8 text-right">{ageMin}</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-stone-400 w-8">Max</span>
+                    <input
+                      type="range" min={18} max={60} value={ageMax}
+                      onChange={e => {
+                        const v = parseInt(e.target.value)
+                        setAgeMax(Math.max(v, ageMin + 1))
+                      }}
+                      className="flex-1 accent-stone-900"
+                    />
+                    <span className="text-sm font-medium text-stone-700 w-8 text-right">{ageMax}</span>
+                  </div>
                 </div>
               </div>
 
-              {/* Distance */}
+              {/* Relocation */}
               <div>
-                <label className="block text-xs font-medium text-stone-500">Distance *</label>
+                <label className="block text-xs font-medium text-stone-500">Would you relocate for the right person?</label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {[
-                    { value: 'same_metro', label: 'Same metro' },
-                    { value: 'few_hours', label: 'Within a few hours' },
-                    { value: 'anywhere', label: 'Anywhere' },
+                    { value: 'yes', label: 'Yes' },
+                    { value: 'maybe', label: 'Maybe' },
+                    { value: 'no', label: 'No' },
                   ].map(opt => (
                     <button
-                      key={opt.value} onClick={() => setDistance(opt.value)}
+                      key={opt.value} onClick={() => setWouldRelocate(opt.value)}
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition active:translate-y-px ${
-                        distance === opt.value
+                        wouldRelocate === opt.value
                           ? 'border-stone-900 bg-stone-900 text-white'
                           : 'border-stone-200 text-stone-600 hover:border-stone-300'
                       }`}
@@ -540,7 +533,7 @@ export default function OnboardingPage() {
 
               {/* Faith importance */}
               <div>
-                <label className="block text-xs font-medium text-stone-500">Faith / religion importance *</label>
+                <label className="block text-xs font-medium text-stone-500">How important is shared faith? *</label>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {[
                     { value: 'essential', label: 'Essential' },
@@ -607,35 +600,6 @@ export default function OnboardingPage() {
                   ))}
                 </div>
               </div>
-
-              {/* Smoking */}
-              <div>
-                <label className="block text-xs font-medium text-stone-500">Smoking</label>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {[
-                    { value: 'no', label: 'No' },
-                    { value: 'sometimes', label: 'Sometimes' },
-                    { value: 'yes', label: 'Yes' },
-                    { value: 'dealbreaker', label: 'Dealbreaker if they do' },
-                  ].map(opt => (
-                    <button
-                      key={opt.value} onClick={() => setSmoking(opt.value)}
-                      className={`rounded-full border px-4 py-2 text-sm font-medium transition active:translate-y-px ${
-                        smoking === opt.value
-                          ? 'border-stone-900 bg-stone-900 text-white'
-                          : 'border-stone-200 text-stone-600 hover:border-stone-300'
-                      }`}
-                    >
-                      {opt.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <hr className="border-stone-100" />
-
-              <h2 className="text-sm font-semibold text-stone-700 uppercase tracking-wider">Your vibe</h2>
-              <SoftPreferencesRanker onPreferencesChange={setSoftPrefs} />
             </div>
           </div>
         )}
