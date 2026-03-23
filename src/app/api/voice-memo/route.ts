@@ -21,8 +21,19 @@ export async function POST(req: NextRequest) {
 
   const supabase = createServerClient()
 
+  // Derive file extension from content type
+  const extMap: Record<string, string> = {
+    'audio/webm': 'webm',
+    'audio/mp4': 'm4a',
+    'audio/m4a': 'm4a',
+    'audio/x-m4a': 'm4a',
+    'audio/mpeg': 'mp3',
+    'audio/ogg': 'ogg',
+  }
+  const ext = extMap[audio.type] || 'webm'
+
   // Upload audio to Supabase Storage
-  const fileName = `${userId}/${promptId}_${Date.now()}.webm`
+  const fileName = `${userId}/${promptId}_${Date.now()}.${ext}`
   const { error: uploadError } = await supabase.storage
     .from('voice-memos')
     .upload(fileName, audio, { contentType: audio.type })
