@@ -45,6 +45,8 @@ export default function Home() {
 
           <p className="animate-fade-in-up delay-100 mt-8 text-xl font-medium text-[var(--dark)]/60 sm:text-2xl max-w-lg mx-auto leading-snug">
             The matchmaker that knows you better than your friends do.
+            <br />
+            <span className="font-extrabold">Never swipe again.</span>
           </p>
 
           <div className="animate-fade-in-up delay-200 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
@@ -135,8 +137,8 @@ export default function Home() {
             <WhimsyCard
               emoji="💌"
               bg="bg-white"
-              title="Read your intro"
-              body="No name-and-photo. You get a personalized story about why this person might change your world. The photo comes after — so the feeling lands first."
+              title="Get introduced!"
+              body="No more spray-and-pray swiping. You get a personalized story about why this person could change your world."
             />
           </div>
         </div>
