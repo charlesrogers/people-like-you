@@ -47,13 +47,34 @@ export default function Home() {
             The matchmaker that knows you better than your friends do.
           </p>
 
-          <div className="animate-fade-in-up delay-200 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="animate-fade-in-up delay-200 mt-10 max-w-xl mx-auto">
+            <p className="text-base font-medium text-[var(--dark)]/50 leading-relaxed sm:text-lg">
+              Imagine a matchmaker who knows you better than your best friend.
+              Not just your type — your humor, what makes you light up, the kind
+              of person you&rsquo;d talk to until 3am without noticing.
+            </p>
+            <p className="mt-4 text-base font-medium text-[var(--dark)]/50 leading-relaxed sm:text-lg">
+              Now imagine they know every person you&rsquo;d want to date just
+              as well. That&rsquo;s us.
+            </p>
+          </div>
+
+          <div className="animate-fade-in-up delay-300 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/onboarding"
               className="rounded-full bg-[var(--dark)] px-10 py-4 text-lg font-bold text-white shadow-[0_8px_30px_rgba(0,0,0,0.15)] transition hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:scale-105 active:scale-95"
             >
-              Get started — it&rsquo;s free
+              Start matching
             </Link>
+            <Link
+              href="/thesis"
+              className="text-sm font-semibold text-[var(--dark)]/40 underline decoration-dotted underline-offset-4 transition hover:text-[var(--dark)]/70"
+            >
+              Learn more
+            </Link>
+          </div>
+
+          <div className="animate-fade-in-up delay-400 mt-3">
             <Link
               href="/dashboard"
               className="text-sm font-semibold text-[var(--dark)]/40 underline decoration-dotted underline-offset-4 transition hover:text-[var(--dark)]/70"
@@ -135,35 +156,6 @@ export default function Home() {
               title="Both people show up excited"
               body="We write a different intro for them about you. When two people meet after being genuinely primed to see each other's best — the conversation is different."
             />
-          </div>
-        </div>
-      </section>
-
-      {/* ══════ THE MATCHMAKER PITCH ══════ */}
-      <section className="px-6 py-24 sm:py-32">
-        <div className="mx-auto max-w-4xl rounded-bumble-lg bg-white p-10 sm:p-16 relative overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.06)]">
-          {/* Decorative */}
-          <div className="absolute -top-10 -right-10 text-8xl opacity-20 rotate-12" aria-hidden="true">💛</div>
-          <div className="absolute -bottom-6 -left-6 text-7xl opacity-20 -rotate-12" aria-hidden="true">✨</div>
-
-          <div className="relative z-10">
-            <p className="text-2xl font-bold leading-snug text-[var(--dark)] sm:text-3xl lg:text-4xl">
-              Imagine a matchmaker who knows you better than your best friend.
-              Not just your type — your humor, what makes you light up, the kind
-              of person you&rsquo;d talk to until 3am without noticing.
-            </p>
-            <p className="mt-6 text-lg font-medium text-[var(--dark)]/60 sm:text-xl">
-              Now imagine they know every person you&rsquo;d want to date just
-              as well. That&rsquo;s us.
-            </p>
-            <div className="mt-8">
-              <Link
-                href="/thesis"
-                className="inline-block rounded-full bg-[var(--dark)] px-8 py-3 text-base font-bold text-[var(--neon)] transition hover:scale-105 active:scale-95"
-              >
-                Read the full thesis &rarr;
-              </Link>
-            </div>
           </div>
         </div>
       </section>
