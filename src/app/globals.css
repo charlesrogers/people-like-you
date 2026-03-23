@@ -1,10 +1,10 @@
 @import "tailwindcss";
 
 :root {
-  --neon: #d4ff00;
-  --neon-dim: #b8e600;
+  --neon: #e3ff44;
+  --neon-dim: #c8e63a;
   --dark: #1a1a1a;
-  --cream: #faf9f5;
+  --cream: #e3ff44;
   --font-sans: var(--font-jost), 'Jost', 'Futura', 'Century Gothic', system-ui, sans-serif;
 }
 
@@ -22,9 +22,9 @@ body {
   font-family: var(--font-sans);
 }
 
-/* Neon gradient text */
+/* Accent gradient text */
 .text-neon-gradient {
-  background: linear-gradient(135deg, #d4ff00, #a3cc00);
+  background: linear-gradient(135deg, #1a1a1a, #555);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

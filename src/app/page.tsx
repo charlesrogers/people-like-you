@@ -23,10 +23,10 @@ export default function Home() {
 
       {/* ══════ HERO ══════ */}
       <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-24 pb-16 overflow-hidden">
-        {/* Decorative blobs */}
-        <div className="absolute top-16 -left-20 w-72 h-72 bg-[var(--neon)] blob opacity-20 blur-3xl animate-float-gentle" />
-        <div className="absolute bottom-24 -right-16 w-96 h-96 bg-[var(--neon)] blob-2 opacity-15 blur-3xl animate-wiggle" />
-        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-[var(--neon)] blob-3 opacity-10 blur-2xl animate-bounce-soft" />
+        {/* Decorative blobs — darker on neon bg */}
+        <div className="absolute top-16 -left-20 w-72 h-72 bg-[var(--dark)] blob opacity-[0.04] blur-3xl animate-float-gentle" />
+        <div className="absolute bottom-24 -right-16 w-96 h-96 bg-[var(--dark)] blob-2 opacity-[0.03] blur-3xl animate-wiggle" />
+        <div className="absolute top-1/3 right-1/4 w-48 h-48 bg-white blob-3 opacity-20 blur-2xl animate-bounce-soft" />
 
         {/* Floating emoji/icons for whimsy */}
         <div className="absolute top-[18%] left-[12%] text-4xl animate-wiggle" aria-hidden="true">💛</div>
@@ -50,7 +50,7 @@ export default function Home() {
           <div className="animate-fade-in-up delay-200 mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/onboarding"
-              className="rounded-full bg-[var(--neon)] px-10 py-4 text-lg font-bold text-[var(--dark)] shadow-[0_8px_30px_rgba(212,255,0,0.4)] transition hover:shadow-[0_12px_40px_rgba(212,255,0,0.5)] hover:scale-105 active:scale-95"
+              className="rounded-full bg-[var(--dark)] px-10 py-4 text-lg font-bold text-white shadow-[0_8px_30px_rgba(0,0,0,0.15)] transition hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:scale-105 active:scale-95"
             >
               Get started — it&rsquo;s free
             </Link>
@@ -82,7 +82,7 @@ export default function Home() {
           <div className="mt-16 grid gap-6 sm:grid-cols-3">
             <WhimsyCard
               emoji="🎙️"
-              bg="bg-[var(--neon)]"
+              bg="bg-white"
               title="Tell us your stories"
               body="Forget checkboxes. Answer voice prompts about your rabbit holes, guilty pleasures, and proudest moments. We extract the real you."
             />
@@ -95,7 +95,7 @@ export default function Home() {
             />
             <WhimsyCard
               emoji="💌"
-              bg="bg-[var(--neon)]"
+              bg="bg-white"
               title="Read your intro"
               body="No name-and-photo. You get a personalized story about why this person might change your world. The photo comes after — so the feeling lands first."
             />
@@ -141,7 +141,7 @@ export default function Home() {
 
       {/* ══════ THE MATCHMAKER PITCH ══════ */}
       <section className="px-6 py-24 sm:py-32">
-        <div className="mx-auto max-w-4xl rounded-bumble-lg bg-[var(--neon)] p-10 sm:p-16 relative overflow-hidden">
+        <div className="mx-auto max-w-4xl rounded-bumble-lg bg-white p-10 sm:p-16 relative overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.06)]">
           {/* Decorative */}
           <div className="absolute -top-10 -right-10 text-8xl opacity-20 rotate-12" aria-hidden="true">💛</div>
           <div className="absolute -bottom-6 -left-6 text-7xl opacity-20 -rotate-12" aria-hidden="true">✨</div>
@@ -200,7 +200,7 @@ export default function Home() {
           <div className="mt-10">
             <Link
               href="/onboarding"
-              className="inline-block rounded-full bg-[var(--neon)] px-12 py-5 text-xl font-bold text-[var(--dark)] shadow-[0_8px_30px_rgba(212,255,0,0.4)] transition hover:shadow-[0_12px_40px_rgba(212,255,0,0.5)] hover:scale-105 active:scale-95"
+              className="inline-block rounded-full bg-[var(--dark)] px-12 py-5 text-xl font-bold text-white shadow-[0_8px_30px_rgba(0,0,0,0.15)] transition hover:shadow-[0_12px_40px_rgba(0,0,0,0.25)] hover:scale-105 active:scale-95"
             >
               Get started free
             </Link>
