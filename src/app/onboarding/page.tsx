@@ -8,9 +8,10 @@ import PhotoUploader from '@/components/PhotoUploader'
 import { getOnboardingPrompts, getRandomPrompt, type PromptDef } from '@/lib/prompts'
 import { getSeedNarrativesForGender, ATTRIBUTE_TAGS, type SeedNarrative } from '@/lib/seed-narratives'
 
-type Step = 'basics' | 'voice' | 'preferences' | 'photos' | 'taste' | 'reveal'
+type Step = 'signup' | 'basics' | 'voice' | 'preferences' | 'photos' | 'taste' | 'reveal'
 
 const STEP_LABELS: Record<Step, string> = {
+  signup: 'Sign up',
   basics: 'About you',
   voice: 'Your stories',
   preferences: 'Preferences',
@@ -19,7 +20,7 @@ const STEP_LABELS: Record<Step, string> = {
   reveal: 'Your profile',
 }
 
-const STEPS: Step[] = ['basics', 'voice', 'preferences', 'photos', 'taste', 'reveal']
+const STEPS: Step[] = ['signup', 'basics', 'voice', 'preferences', 'photos', 'taste', 'reveal']
 
 const EXCITEMENT_LABELS: Record<string, { label: string; emoji: string; description: string }> = {
   explorer: { label: 'Explorer', emoji: '🧭', description: 'You light up around novelty, adventure, and the unexpected.' },
@@ -30,9 +31,13 @@ const EXCITEMENT_LABELS: Record<string, { label: string; emoji: string; descript
 
 export default function OnboardingPage() {
   const router = useRouter()
-  const [step, setStep] = useState<Step>('basics')
+  const [step, setStep] = useState<Step>('signup')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  // Step 0: Signup
+  const [signupEmail, setSignupEmail] = useState('')
+  const [signupPassword, setSignupPassword] = useState('')
 
   // Step 1: Basics
   const [firstName, setFirstName] = useState('')
@@ -90,7 +95,8 @@ export default function OnboardingPage() {
     }
   }
 
-  const canProceedBasics = firstName && email && gender && birthYear && zipcode
+  const canProceedSignup = signupEmail && signupPassword && signupPassword.length >= 6
+  const canProceedBasics = firstName && gender && birthYear && zipcode
   const canProceedVoice = recordings.size >= 2
   const canProceedPrefs = faithImportance && kids
   const canProceedPhotos = photoFiles.length >= 1
@@ -98,8 +104,39 @@ export default function OnboardingPage() {
   const handleNext = async () => {
     setError(null)
 
-    if (step === 'basics') {
-      posthog.capture('onboarding_started')
+    if (step === 'signup') {
+      setSubmitting(true)
+      try {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: signupEmail,
+            password: signupPassword,
+          }),
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Signup failed')
+
+        // Store auth tokens if returned
+        if (data.access_token) {
+          localStorage.setItem('ply_access_token', data.access_token)
+          localStorage.setItem('ply_refresh_token', data.refresh_token)
+        }
+        if (data.id) {
+          setUserId(data.id)
+          localStorage.setItem('ply_profile_id', data.id)
+        }
+
+        setEmail(signupEmail)
+        posthog.capture('onboarding_started')
+        setStep('basics')
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Signup failed')
+      } finally {
+        setSubmitting(false)
+      }
+    } else if (step === 'basics') {
       setStep('voice')
     } else if (step === 'voice') {
       posthog.capture('onboarding_section_progressed', { section: 'voice', recordings: recordings.size })
@@ -283,6 +320,7 @@ export default function OnboardingPage() {
   const canProceedReveal = true // always can proceed from reveal
 
   const canProceed =
+    step === 'signup' ? canProceedSignup :
     step === 'basics' ? canProceedBasics :
     step === 'voice' ? canProceedVoice :
     step === 'preferences' ? canProceedPrefs :
@@ -340,34 +378,45 @@ export default function OnboardingPage() {
       </div>
 
       <div className="mx-auto max-w-xl px-6 py-12">
-        {/* Step 1: Basics */}
-        {step === 'basics' && (
+        {/* Step 0: Signup */}
+        {step === 'signup' && (
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">Let&rsquo;s start with the basics</h1>
-            <p className="mt-2 text-sm text-stone-500">This takes about 30 seconds.</p>
+            <h1 className="text-2xl font-bold text-stone-900">Let&rsquo;s find your person</h1>
+            <p className="mt-2 text-sm text-stone-500">Create your account to get started.</p>
 
             <div className="mt-8 space-y-5">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-stone-500">First name *</label>
-                  <input
-                    type="text" value={firstName} onChange={e => setFirstName(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-medium text-stone-500">Last name</label>
-                  <input
-                    type="text" value={lastName} onChange={e => setLastName(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
-                  />
-                </div>
+              <div>
+                <label className="block text-xs font-medium text-stone-500">Email</label>
+                <input
+                  type="email" value={signupEmail} onChange={e => setSignupEmail(e.target.value)}
+                  placeholder="you@email.com"
+                  className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                />
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-stone-500">Email *</label>
+                <label className="block text-xs font-medium text-stone-500">Password</label>
                 <input
-                  type="email" value={email} onChange={e => setEmail(e.target.value)}
+                  type="password" value={signupPassword} onChange={e => setSignupPassword(e.target.value)}
+                  placeholder="6+ characters"
+                  className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Step 1: Basics */}
+        {step === 'basics' && (
+          <div>
+            <h1 className="text-2xl font-bold text-stone-900">Tell us about you</h1>
+            <p className="mt-2 text-sm text-stone-500">This helps us find the right people.</p>
+
+            <div className="mt-8 space-y-5">
+              <div>
+                <label className="block text-xs font-medium text-stone-500">First name *</label>
+                <input
+                  type="text" value={firstName} onChange={e => setFirstName(e.target.value)}
                   className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
                 />
               </div>
