@@ -110,15 +110,9 @@ export default function Dashboard() {
     setUserId(profileId)
 
     async function load() {
+      // Load profile first (required for everything else)
       try {
-        const [profileRes, extractionRes, matchesRes, compositeRes, memosRes] = await Promise.all([
-          fetch(`/api/profile?id=${profileId}`),
-          fetch(`/api/extraction-status?userId=${profileId}`),
-          fetch(`/api/matches?userId=${profileId}`),
-          fetch(`/api/composite?userId=${profileId}`),
-          fetch(`/api/voice-memos?userId=${profileId}`),
-        ])
-
+        const profileRes = await fetch(`/api/profile?id=${profileId}`)
         const profileData = await profileRes.json()
         if (!profileData.profile) {
           window.location.href = '/onboarding'
@@ -126,6 +120,18 @@ export default function Dashboard() {
         }
         setFirstName(profileData.profile.first_name)
         setUserEmail(profileData.profile.email || '')
+      } catch (err) {
+        console.error('Failed to load profile:', err)
+      }
+
+      // Load everything else in parallel (non-blocking)
+      try {
+        const [extractionRes, matchesRes, compositeRes, memosRes] = await Promise.all([
+          fetch(`/api/extraction-status?userId=${profileId}`),
+          fetch(`/api/matches?userId=${profileId}`),
+          fetch(`/api/composite?userId=${profileId}`),
+          fetch(`/api/voice-memos?userId=${profileId}`),
+        ])
 
         const extractionData = await extractionRes.json()
         setExtraction(extractionData)
@@ -147,8 +153,8 @@ export default function Dashboard() {
           has_intro: !!matchesData.currentIntro,
           is_paused: matchesData.cadenceState?.isPaused,
         })
-      } catch {
-        // silent fail
+      } catch (err) {
+        console.error('Failed to load dashboard data:', err)
       } finally {
         setLoading(false)
       }
