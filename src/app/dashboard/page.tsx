@@ -307,7 +307,7 @@ export default function Dashboard() {
       <div className="sticky top-0 z-40 bg-white border-b border-stone-200">
         <div className="mx-auto max-w-xl flex">
           {([
-            { id: 'today' as const, label: 'Today', icon: '💌' },
+            { id: 'today' as const, label: 'Intros', icon: '💌' },
             { id: 'profile' as const, label: 'My Profile', icon: '👤' },
             { id: 'settings' as const, label: 'Settings', icon: '⚙️' },
           ]).map(tab => (
@@ -443,15 +443,39 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Waiting for first intro */}
+        {/* Waiting for first intro — explain what's happening */}
         {!isPaused && !isHidden && !activeIntro && !activeBonus && history.length === 0 && (
-          <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-            <p className="text-base font-medium text-stone-900">
-              {extraction && !extraction.compositeReady
-                ? "We're still processing your stories. Your first intro is coming soon."
-                : "Your first intro is on its way."
-              }
-            </p>
+          <div className="rounded-2xl bg-white p-8 shadow-sm">
+            {extraction && !extraction.compositeReady ? (
+              <>
+                <p className="text-base font-semibold text-stone-900">We&rsquo;re processing your recordings</p>
+                <p className="mt-2 text-sm text-stone-500">
+                  Our AI is listening to your voice memos and building your personality profile.
+                  This takes a minute or two.
+                </p>
+                <div className="mt-4 flex items-center gap-3">
+                  <div className="h-2 flex-1 rounded-full bg-stone-100 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-stone-900 transition-all"
+                      style={{ width: `${extraction.total > 0 ? (extraction.extracted / extraction.total) * 100 : 0}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-stone-400">{extraction.extracted}/{extraction.total}</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="text-base font-semibold text-stone-900">Your profile is ready</p>
+                <p className="mt-2 text-sm text-stone-500">
+                  We&rsquo;re writing personalized introductions for you right now. Each intro is custom — we match
+                  your personality with someone specific, then write a story about why you&rsquo;d click.
+                </p>
+                <p className="mt-2 text-sm text-stone-500">
+                  While you wait, head to <button onClick={() => setActiveTab('profile')} className="font-semibold text-stone-900 underline underline-offset-2">My Profile</button> to
+                  see what we learned about you and answer more questions to get even better intros.
+                </p>
+              </>
+            )}
             {nextDeliveryAt && (
               <div className="mt-4">
                 <CountdownTimer targetTime={nextDeliveryAt} label="Your first intro arrives in" />
