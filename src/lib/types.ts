@@ -17,6 +17,10 @@ export interface User {
   community: string
   religion: string | null
   observance_level: string | null
+  invite_code: string | null
+  invited_by: string | null
+  invite_count: number
+  queue_priority: number
   is_seed: boolean
   profile_status: 'active' | 'paused' | 'hidden' | 'deactivated'
   created_at: string

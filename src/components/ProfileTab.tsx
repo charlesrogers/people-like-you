@@ -306,6 +306,114 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
           </div>
         )}
       </div>
+
+      {/* Invite friends */}
+      <InviteSection userId={userId} />
+    </div>
+  )
+}
+
+function InviteSection({ userId }: { userId: string }) {
+  const [inviteData, setInviteData] = useState<{
+    code: string; inviteCount: number; queuePriority: number;
+    links: Record<string, string>
+  } | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  useEffect(() => {
+    fetch(`/api/invite?userId=${userId}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.code) setInviteData(data)
+      })
+      .catch(() => {})
+  }, [userId])
+
+  if (!inviteData) return null
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(inviteData.links.default)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+
+    // Track the share
+    fetch('/api/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        invite_code: inviteData.code,
+        event_type: 'link_generated',
+        utm_source: 'direct',
+        utm_medium: 'invite',
+        utm_campaign: 'profile_share',
+        referrer_user_id: userId,
+      }),
+    }).catch(() => {})
+  }
+
+  const handleShare = async (channel: string) => {
+    const link = inviteData.links[channel] || inviteData.links.default
+    const text = `I'm on People Like You — a dating app that actually gets to know you. Join me: ${link}`
+
+    // Track the share
+    fetch('/api/invite', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        invite_code: inviteData.code,
+        event_type: 'link_generated',
+        utm_source: channel,
+        utm_medium: 'invite',
+        utm_campaign: 'queue_jump',
+        referrer_user_id: userId,
+      }),
+    }).catch(() => {})
+
+    if (navigator.share) {
+      try {
+        await navigator.share({ text, url: link })
+      } catch {
+        await navigator.clipboard.writeText(link)
+        setCopied(true)
+        setTimeout(() => setCopied(false), 2000)
+      }
+    } else {
+      await navigator.clipboard.writeText(link)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  return (
+    <div className="rounded-xl bg-white border border-stone-200 p-5">
+      <h3 className="text-sm font-semibold text-stone-900">Invite friends, jump the queue</h3>
+      <p className="mt-1 text-xs text-stone-400">
+        Every invite boosts your priority for new matches.
+        {inviteData.inviteCount > 0 && (
+          <span className="font-semibold text-stone-600"> {inviteData.inviteCount} friend{inviteData.inviteCount > 1 ? 's' : ''} joined!</span>
+        )}
+      </p>
+
+      <div className="mt-3 flex gap-2">
+        <button
+          onClick={() => handleShare('sms')}
+          className="flex-1 rounded-lg bg-stone-900 py-2.5 text-xs font-semibold text-white transition hover:bg-stone-800"
+        >
+          Share via text
+        </button>
+        <button
+          onClick={handleCopy}
+          className="flex-1 rounded-lg border border-stone-200 py-2.5 text-xs font-semibold text-stone-600 transition hover:bg-stone-50"
+        >
+          {copied ? 'Copied!' : 'Copy link'}
+        </button>
+      </div>
+
+      {inviteData.queuePriority > 0 && (
+        <p className="mt-2 text-[10px] text-stone-400">
+          Queue priority: +{inviteData.queuePriority} points
+        </p>
+      )}
     </div>
   )
 }

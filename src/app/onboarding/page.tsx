@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, Suspense } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import posthog from 'posthog-js'
 import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
@@ -39,7 +39,17 @@ const EXCITEMENT_LABELS: Record<string, { label: string; emoji: string; descript
 }
 
 export default function OnboardingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gradient-to-b from-stone-50 to-white" />}>
+      <OnboardingContent />
+    </Suspense>
+  )
+}
+
+function OnboardingContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const refCode = searchParams.get('ref')
   const [step, setStep] = useState<Step>('signup')
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -137,6 +147,7 @@ export default function OnboardingPage() {
           body: JSON.stringify({
             email: signupEmail,
             password: signupPassword,
+            ref: refCode || undefined,
           }),
         })
         const data = await res.json()
