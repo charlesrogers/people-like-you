@@ -5,6 +5,12 @@ import Link from 'next/link'
 import posthog from 'posthog-js'
 import MatchCard from '@/components/MatchCard'
 import CountdownTimer from '@/components/CountdownTimer'
+import DisclosureExchange from '@/components/DisclosureExchange'
+import DateFeedback from '@/components/DateFeedback'
+import ProfileTab from '@/components/ProfileTab'
+import SettingsTab from '@/components/SettingsTab'
+
+type DashboardTab = 'today' | 'profile' | 'settings'
 
 interface Intro {
   id: string
@@ -44,10 +50,16 @@ interface ExtractionStatus {
 type PassStreakAction = 'help_us_help_you' | 'refresh_profile' | 'reset' | null
 
 export default function Dashboard() {
+  const [activeTab, setActiveTab] = useState<DashboardTab>('today')
   const [loading, setLoading] = useState(true)
   const [userId, setUserId] = useState<string | null>(null)
+  const [userEmail, setUserEmail] = useState('')
   const [firstName, setFirstName] = useState('')
   const [extraction, setExtraction] = useState<ExtractionStatus | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [composite, setComposite] = useState<any>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [voiceMemos, setVoiceMemos] = useState<any[]>([])
 
   const [currentIntro, setCurrentIntro] = useState<Intro | null>(null)
   const [bonusIntro, setBonusIntro] = useState<Intro | null>(null)
@@ -58,6 +70,29 @@ export default function Dashboard() {
   const [submitting, setSubmitting] = useState(false)
   const [passStreakAction, setPassStreakAction] = useState<PassStreakAction>(null)
   const [resuming, setResuming] = useState(false)
+
+  // Mutual match + disclosure state
+  interface ExchangeRound {
+    id: string; round_number: number; prompt_text: string;
+    user_a_response: string | null; user_b_response: string | null;
+    user_a_responded_at: string | null; user_b_responded_at: string | null;
+    expires_at: string;
+  }
+  interface ActiveMutualMatchState {
+    id: string
+    matchedUserId: string
+    matchedUserName: string
+    isUserA: boolean
+    exchanges: ExchangeRound[]
+    currentRound: ExchangeRound | null
+    exchangeComplete: boolean
+  }
+  const [activeMutualMatch, setActiveMutualMatch] = useState<ActiveMutualMatchState | null>(null)
+
+  // Pending date feedback
+  const [pendingFeedback, setPendingFeedback] = useState<{
+    scheduledDateId: string; aboutUserId: string; partnerName: string;
+  } | null>(null)
 
   // Feedback modal
   const [showFeedback, setShowFeedback] = useState(false)
@@ -76,10 +111,12 @@ export default function Dashboard() {
 
     async function load() {
       try {
-        const [profileRes, extractionRes, matchesRes] = await Promise.all([
+        const [profileRes, extractionRes, matchesRes, compositeRes, memosRes] = await Promise.all([
           fetch(`/api/profile?id=${profileId}`),
           fetch(`/api/extraction-status?userId=${profileId}`),
           fetch(`/api/matches?userId=${profileId}`),
+          fetch(`/api/composite?userId=${profileId}`),
+          fetch(`/api/voice-memos?userId=${profileId}`),
         ])
 
         const profileData = await profileRes.json()
@@ -88,9 +125,16 @@ export default function Dashboard() {
           return
         }
         setFirstName(profileData.profile.first_name)
+        setUserEmail(profileData.profile.email || '')
 
         const extractionData = await extractionRes.json()
         setExtraction(extractionData)
+
+        const compositeData = await compositeRes.json()
+        if (compositeData.composite) setComposite(compositeData.composite)
+
+        const memosData = await memosRes.json()
+        if (memosData.memos) setVoiceMemos(memosData.memos)
 
         const matchesData = await matchesRes.json()
         setCurrentIntro(matchesData.currentIntro)
@@ -138,6 +182,28 @@ export default function Dashboard() {
       // Show bonus if returned
       if (data.bonusIntro) {
         setBonusIntro(data.bonusIntro)
+      }
+
+      // Check for mutual match
+      if (data.mutualMatch) {
+        const matchedIntro = currentIntro?.matchedUserId === data.mutualMatch.matchedUserId
+          ? currentIntro : bonusIntro
+        // Fetch disclosure state
+        try {
+          const discRes = await fetch(`/api/disclosure?mutualMatchId=${data.mutualMatch.id}`)
+          const discData = await discRes.json()
+          setActiveMutualMatch({
+            id: data.mutualMatch.id,
+            matchedUserId: data.mutualMatch.matchedUserId,
+            matchedUserName: matchedIntro?.name || 'your match',
+            isUserA: true,
+            exchanges: discData.exchanges || [],
+            currentRound: discData.currentRound,
+            exchangeComplete: false,
+          })
+        } catch {
+          // Non-blocking
+        }
       }
     } catch {
       // silent fail
@@ -228,7 +294,8 @@ export default function Dashboard() {
   const doneForToday = !activeIntro && !activeBonus && history.length > 0
 
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-stone-50 pb-20">
+      {/* Header */}
       <header className="border-b border-stone-200 bg-white px-6 py-4">
         <div className="mx-auto flex max-w-xl items-center justify-between">
           <h1 className="text-lg font-semibold text-stone-900">People Like You</h1>
@@ -236,7 +303,68 @@ export default function Dashboard() {
         </div>
       </header>
 
+      {/* Tab navigation */}
+      <div className="sticky top-0 z-40 bg-white border-b border-stone-200">
+        <div className="mx-auto max-w-xl flex">
+          {([
+            { id: 'today' as const, label: 'Today', icon: '💌' },
+            { id: 'profile' as const, label: 'My Profile', icon: '👤' },
+            { id: 'settings' as const, label: 'Settings', icon: '⚙️' },
+          ]).map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex-1 py-3 text-center text-xs font-medium transition ${
+                activeTab === tab.id
+                  ? 'text-stone-900 border-b-2 border-stone-900'
+                  : 'text-stone-400 hover:text-stone-600'
+              }`}
+            >
+              <span className="block text-base">{tab.icon}</span>
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
       <div className="mx-auto max-w-xl px-6 py-8">
+        {/* Profile Tab */}
+        {activeTab === 'profile' && userId && (
+          <ProfileTab
+            userId={userId}
+            composite={composite}
+            memos={voiceMemos}
+            onMemoRecorded={async () => {
+              // Refresh composite and memos after new recording
+              const [compRes, memRes] = await Promise.all([
+                fetch(`/api/composite?userId=${userId}`),
+                fetch(`/api/voice-memos?userId=${userId}`),
+              ])
+              const compData = await compRes.json()
+              const memData = await memRes.json()
+              if (compData.composite) setComposite(compData.composite)
+              if (memData.memos) setVoiceMemos(memData.memos)
+            }}
+          />
+        )}
+
+        {/* Settings Tab */}
+        {activeTab === 'settings' && userId && (
+          <SettingsTab
+            userId={userId}
+            email={userEmail}
+            onSignOut={() => {
+              localStorage.removeItem('ply_profile_id')
+              localStorage.removeItem('ply_access_token')
+              localStorage.removeItem('ply_refresh_token')
+              window.location.href = '/'
+            }}
+          />
+        )}
+
+        {/* Today Tab — existing match content */}
+        {activeTab === 'today' && (<>
+
         {/* Paused/Hidden banner */}
         {(isPaused || isHidden) && (
           <div className="mb-6 rounded-xl border border-stone-200 bg-white p-6 text-center">
@@ -332,6 +460,52 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Active Mutual Match — Disclosure Exchange */}
+        {activeMutualMatch && !isPaused && !isHidden && (
+          <div className="mt-6">
+            <DisclosureExchange
+              mutualMatchId={activeMutualMatch.id}
+              userId={userId!}
+              isUserA={activeMutualMatch.isUserA}
+              partnerName={activeMutualMatch.matchedUserName}
+              exchanges={activeMutualMatch.exchanges}
+              currentRound={activeMutualMatch.currentRound}
+              onSubmit={async () => {
+                // Refresh disclosure state
+                try {
+                  const res = await fetch(`/api/disclosure?mutualMatchId=${activeMutualMatch.id}`)
+                  const data = await res.json()
+                  setActiveMutualMatch(prev => prev ? {
+                    ...prev,
+                    exchanges: data.exchanges || [],
+                    currentRound: data.currentRound,
+                    exchangeComplete: data.exchanges?.filter(
+                      (e: { user_a_responded_at: string | null; user_b_responded_at: string | null; round_number: number }) =>
+                        e.user_a_responded_at && e.user_b_responded_at
+                    ).length >= 3,
+                  } : null)
+                } catch {
+                  // silent
+                }
+              }}
+              exchangeComplete={activeMutualMatch.exchangeComplete}
+            />
+          </div>
+        )}
+
+        {/* Pending Date Feedback */}
+        {pendingFeedback && (
+          <div className="mt-6">
+            <DateFeedback
+              scheduledDateId={pendingFeedback.scheduledDateId}
+              userId={userId!}
+              aboutUserId={pendingFeedback.aboutUserId}
+              partnerName={pendingFeedback.partnerName}
+              onSubmitted={() => setPendingFeedback(null)}
+            />
+          </div>
+        )}
+
         {/* History */}
         {history.length > 0 && (
           <div className="mt-8">
@@ -350,14 +524,13 @@ export default function Dashboard() {
                         ? 'bg-stone-100 text-stone-500'
                         : 'bg-amber-50 text-amber-600'
                   }`}>
-                    {item.status === 'liked' ? 'Liked' : item.status === 'passed' ? 'Passed' : 'Expired'}
+                    {item.status === 'liked' ? 'Curious' : item.status === 'passed' ? 'Not this time' : 'Expired'}
                   </span>
                 </div>
               ))}
             </div>
           </div>
         )}
-      </div>
 
       {/* Feedback modal */}
       {showFeedback && (
@@ -472,6 +645,9 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+        </>)}
+      </div>
     </div>
   )
 }
