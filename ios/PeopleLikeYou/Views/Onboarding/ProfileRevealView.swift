@@ -8,6 +8,8 @@ struct ProfileRevealView: View {
     @State private var isLoading = true
     @State private var struckItems: Set<String> = []
     @State private var pollTimer: Timer?
+    @State private var showMoreQuestions = false
+    @State private var answeredPromptIds: [String] = []
 
     private let dimensionMeta: [(id: String, emoji: String, label: String)] = [
         ("explorer", "\u{1F9ED}", "Explorer"),
@@ -105,16 +107,90 @@ struct ProfileRevealView: View {
 
                     // Struck items summary
                     if !struckItems.isEmpty {
-                        HStack {
-                            Image(systemName: "exclamationmark.triangle")
-                                .foregroundStyle(.orange)
-                            Text("\(struckItems.count) items marked as not fitting \u{2014} we\u{2019}ll adjust.")
-                                .font(.caption)
-                                .foregroundStyle(.orange)
+                        VStack(alignment: .leading, spacing: 8) {
+                            HStack {
+                                Image(systemName: "exclamationmark.triangle")
+                                    .foregroundStyle(.orange)
+                                Text("\(struckItems.count) items marked as not fitting \u{2014} we\u{2019}ll adjust.")
+                                    .font(.caption)
+                                    .foregroundStyle(.orange)
+                            }
+                            Button {
+                                showMoreQuestions = true
+                            } label: {
+                                Text("Show me more questions")
+                                    .font(.caption.weight(.semibold))
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 8)
+                                    .background(.primary)
+                                    .foregroundStyle(Color(.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                            }
                         }
                         .padding(12)
                         .background(Color.orange.opacity(0.08))
                         .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+
+                    // "Have another side?" nudge (if nothing struck + data is rich)
+                    if struckItems.isEmpty && composite.memoCount >= 2 {
+                        let weakest = weakestDimension(composite: composite)
+                        let meta = dimensionMeta.first(where: { $0.id == weakest })
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Have another side of you?")
+                                .font(.subheadline.weight(.medium))
+                            Text("Want to show us your \(meta?.emoji ?? "") \(meta?.label ?? "") side?")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                            HStack(spacing: 12) {
+                                Button {
+                                    showMoreQuestions = true
+                                } label: {
+                                    Text("Show me questions")
+                                        .font(.caption.weight(.medium))
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.15)))
+                                }
+                                Button("I\u{2019}m good") {}
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        }
+                        .padding(14)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                    }
+
+                    // More questions inline
+                    if showMoreQuestions {
+                        let weakest = weakestDimension(composite: composite)
+                        let targeted = getTargetedPrompts(targetTier: weakest, excludeIds: answeredPromptIds)
+                        VStack(alignment: .leading, spacing: 12) {
+                            Text("Pick a few to answer:")
+                                .font(.subheadline.weight(.medium))
+                            ForEach(targeted.targeted + targeted.others, id: \.id) { prompt in
+                                Button {
+                                    // Navigate back to voice recording with this prompt
+                                    // For now, just dismiss — full loop requires navigation refactor
+                                    showMoreQuestions = false
+                                } label: {
+                                    VStack(alignment: .leading, spacing: 2) {
+                                        Text(prompt.text)
+                                            .font(.subheadline)
+                                            .multilineTextAlignment(.leading)
+                                        Text(prompt.helpText)
+                                            .font(.caption)
+                                            .foregroundStyle(.secondary)
+                                            .multilineTextAlignment(.leading)
+                                    }
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .padding(12)
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.primary.opacity(0.1)))
+                                }
+                                .foregroundStyle(.primary)
+                            }
+                        }
                     }
 
                     // Continue
@@ -158,6 +234,11 @@ struct ProfileRevealView: View {
         default:
             return 50
         }
+    }
+
+    private func weakestDimension(composite: CompositeProfile) -> String {
+        let scores = dimensionMeta.map { (id: $0.id, score: dimensionScore(composite: composite, dimension: $0.id)) }
+        return scores.min(by: { $0.score < $1.score })?.id ?? "explorer"
     }
 
     private func startPolling() {

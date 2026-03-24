@@ -15,7 +15,7 @@ struct PhotoUploadView: View {
             Text("Add your photos")
                 .font(.title2.bold())
 
-            Text("At least 1 photo. These are revealed after the narrative — so don't stress, they're not the first impression.")
+            Text("1-3 photos. These are shown to other members during calibration. Pick ones that actually look like you.")
                 .font(.subheadline)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

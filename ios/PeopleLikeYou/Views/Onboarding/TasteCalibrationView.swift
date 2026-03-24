@@ -7,6 +7,8 @@ struct TasteCalibrationView: View {
     @State private var narratives: [SeedNarrative] = []
     @State private var currentIndex = 0
     @State private var selectedAttrs: Set<String> = []
+    @State private var showFeedback = false
+    @State private var feedbackText = ""
 
     var body: some View {
         ScrollView {
@@ -70,31 +72,62 @@ struct TasteCalibrationView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 16))
                     .shadow(color: .black.opacity(0.04), radius: 4)
 
-                    // Vote buttons
-                    HStack(spacing: 12) {
-                        Button {
-                            vote(liked: true)
-                        } label: {
-                            Text("I'd want to meet them")
-                                .font(.subheadline.weight(.semibold))
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .background(.primary)
-                                .foregroundStyle(Color(.systemBackground))
-                                .clipShape(RoundedRectangle(cornerRadius: 12))
-                        }
+                    // Feedback textarea (shown after "Not for me")
+                    if showFeedback {
+                        VStack(alignment: .leading, spacing: 8) {
+                            Text("Anything that turned you off? (optional)")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
 
-                        Button {
-                            vote(liked: false)
-                        } label: {
-                            Text("Not for me")
-                                .font(.subheadline.weight(.semibold))
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.15)))
+                            TextField("", text: $feedbackText, axis: .vertical)
+                                .textFieldStyle(.roundedBorder)
+                                .lineLimit(2...4)
+
+                            Button {
+                                submitVote(liked: false)
+                            } label: {
+                                Text(feedbackText.isEmpty ? "Skip & continue" : "Submit & continue")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 12)
+                                    .background(.primary)
+                                    .foregroundStyle(Color(.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                            }
                         }
+                        .padding(16)
+                        .background(Color(.secondarySystemBackground))
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .transition(.opacity.combined(with: .move(edge: .bottom)))
                     }
-                    .padding(.top, 8)
+
+                    // Vote buttons (hide when feedback is showing)
+                    if !showFeedback {
+                        HStack(spacing: 12) {
+                            Button {
+                                submitVote(liked: true)
+                            } label: {
+                                Text("I'd want to meet them")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .background(.primary)
+                                    .foregroundStyle(Color(.systemBackground))
+                                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                            }
+
+                            Button {
+                                withAnimation { showFeedback = true }
+                            } label: {
+                                Text("Not for me")
+                                    .font(.subheadline.weight(.semibold))
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 14)
+                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.15)))
+                            }
+                        }
+                        .padding(.top, 8)
+                    }
                 } else if !narratives.isEmpty {
                     VStack(spacing: 8) {
                         Text("Got it.")
@@ -128,7 +161,7 @@ struct TasteCalibrationView: View {
         }
     }
 
-    private func vote(liked: Bool) {
+    private func submitVote(liked: Bool) {
         guard currentIndex < narratives.count, let userId = appState.userId else { return }
         let narrative = narratives[currentIndex]
 
@@ -138,11 +171,14 @@ struct TasteCalibrationView: View {
                 narrativeId: narrative.id,
                 vote: liked,
                 attributesSelected: liked ? Array(selectedAttrs) : [],
-                narrativeStyle: narrative.style
+                narrativeStyle: narrative.style,
+                feedbackText: liked ? nil : (feedbackText.isEmpty ? nil : feedbackText)
             )
         }
 
         selectedAttrs = []
+        feedbackText = ""
+        showFeedback = false
         withAnimation(.easeInOut(duration: 0.3)) {
             currentIndex += 1
         }

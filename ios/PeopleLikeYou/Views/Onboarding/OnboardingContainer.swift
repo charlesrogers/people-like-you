@@ -58,7 +58,7 @@ struct OnboardingContainer: View {
     private var stepLabel: String {
         switch currentStep {
         case .basics: return "About you"
-        case .voice: return "Your stories"
+        case .voice: return "About you"
         case .preferences: return "Preferences"
         case .photos: return "Photos"
         case .taste: return "Your taste"

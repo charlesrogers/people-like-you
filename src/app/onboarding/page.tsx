@@ -204,16 +204,8 @@ export default function OnboardingPage() {
           else console.log(`Uploaded voice memo: ${promptId}`)
         }
 
-        // Kick off transcription + extraction in the background while user does preferences
-        fetch('/api/process-memos', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: data.id }),
-        }).then(r => r.json()).then(d => {
-          console.log(`Background processing: ${d.processed} memos processed`)
-        }).catch(err => {
-          console.error('Background processing failed:', err)
-        })
+        // Processing happens after photos step (during taste calibration)
+        // Don't call here — memos may still be uploading
 
         setStep('preferences')
       } catch (err) {
