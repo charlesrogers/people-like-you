@@ -241,41 +241,47 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
         </div>
       </div>
 
-      {/* Answer more questions — always show 3 recommendations */}
-      <div className="rounded-xl bg-white border border-stone-200 p-5">
-        <h3 className="text-sm font-semibold text-stone-900">Round out your profile</h3>
-        <p className="mt-1 text-xs text-stone-400">
-          More answers = more specific intros. Each takes 30-60 seconds.
+      {/* Answer more questions — prominent with inline record buttons */}
+      <div className="rounded-xl bg-stone-900 p-5 text-white">
+        <h3 className="text-base font-bold">🎙️ Round out your profile</h3>
+        <p className="mt-1 text-sm text-stone-400">
+          Each answer makes your intros more specific. 30-60 seconds each.
           {reveal && reveal.weakestDimension && (
-            <> We&rsquo;d love to hear your {
+            <> Show us your {
               reveal.dimensions[reveal.dimensions.length - 1]?.emoji
             } {reveal.dimensions[reveal.dimensions.length - 1]?.label} side.</>
           )}
         </p>
 
         {!recordingPrompt && (
-          <div className="mt-3 space-y-2">
+          <div className="mt-4 space-y-3">
             {initialPrompts.targeted.map(p => (
-              <button
-                key={p.id}
-                onClick={() => setRecordingPrompt(p)}
-                className="block w-full text-left rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-700 transition hover:bg-stone-50"
-              >
-                <span className="font-medium">{p.text}</span>
-                <span className="mt-0.5 block text-xs text-stone-400">{p.helpText}</span>
-              </button>
+              <div key={p.id} className="rounded-xl bg-white/10 p-4">
+                <p className="text-sm font-medium text-white">{p.text}</p>
+                <p className="mt-1 text-xs text-stone-400">{p.helpText}</p>
+                <button
+                  onClick={() => setRecordingPrompt(p)}
+                  className="mt-3 flex items-center gap-2 rounded-full bg-white px-4 py-2 text-xs font-semibold text-stone-900 transition hover:bg-stone-100 active:translate-y-px"
+                >
+                  <span className="h-2.5 w-2.5 rounded-full bg-red-500" />
+                  Record answer
+                </button>
+              </div>
             ))}
             {initialPrompts.others.length > 0 && (
               <>
-                <p className="text-xs text-stone-400 mt-2">Or try something different:</p>
+                <p className="text-xs text-stone-500 mt-1">Or try something different:</p>
                 {initialPrompts.others.slice(0, 2).map(p => (
-                  <button
-                    key={p.id}
-                    onClick={() => setRecordingPrompt(p)}
-                    className="block w-full text-left rounded-lg border border-dashed border-stone-200 px-3 py-2.5 text-sm text-stone-500 transition hover:bg-stone-50"
-                  >
-                    {p.text}
-                  </button>
+                  <div key={p.id} className="rounded-xl border border-white/10 p-4">
+                    <p className="text-sm text-stone-300">{p.text}</p>
+                    <button
+                      onClick={() => setRecordingPrompt(p)}
+                      className="mt-2 flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/20"
+                    >
+                      <span className="h-2 w-2 rounded-full bg-red-500" />
+                      Record
+                    </button>
+                  </div>
                 ))}
               </>
             )}
@@ -283,7 +289,7 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
         )}
 
         {recordingPrompt && (
-          <div className="mt-3">
+          <div className="mt-4 rounded-xl bg-white p-4">
             <VoiceRecorder
               promptId={recordingPrompt.id}
               promptText={recordingPrompt.text}
