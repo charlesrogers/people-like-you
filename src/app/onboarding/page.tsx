@@ -74,6 +74,10 @@ export default function OnboardingPage() {
   const [processingDone, setProcessingDone] = useState(false)
   const [profileFeedback, setProfileFeedback] = useState<Record<string, boolean>>({})
 
+  // Taste feedback
+  const [showTasteFeedback, setShowTasteFeedback] = useState(false)
+  const [tasteFeedbackText, setTasteFeedbackText] = useState('')
+
   // Track user ID after profile creation
   const [userId, setUserId] = useState<string | null>(null)
 
@@ -583,36 +587,43 @@ export default function OnboardingPage() {
             </p>
 
             <div className="mt-8 space-y-6">
-              {/* Age range — dual slider */}
+              {/* Age range — dual thumb on single track */}
               <div>
                 <label className="block text-xs font-medium text-stone-500">
                   Age range: <span className="font-semibold text-stone-700">{ageMin} – {ageMax}</span>
                 </label>
-                <div className="mt-3 space-y-3">
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-stone-400 w-8">Min</span>
-                    <input
-                      type="range" min={18} max={60} value={ageMin}
-                      onChange={e => {
-                        const v = parseInt(e.target.value)
-                        setAgeMin(Math.min(v, ageMax - 1))
-                      }}
-                      className="flex-1 accent-stone-900"
-                    />
-                    <span className="text-sm font-medium text-stone-700 w-8 text-right">{ageMin}</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <span className="text-xs text-stone-400 w-8">Max</span>
-                    <input
-                      type="range" min={18} max={60} value={ageMax}
-                      onChange={e => {
-                        const v = parseInt(e.target.value)
-                        setAgeMax(Math.max(v, ageMin + 1))
-                      }}
-                      className="flex-1 accent-stone-900"
-                    />
-                    <span className="text-sm font-medium text-stone-700 w-8 text-right">{ageMax}</span>
-                  </div>
+                <div className="relative mt-4 h-8">
+                  {/* Track background */}
+                  <div className="absolute top-1/2 left-0 right-0 h-1.5 -translate-y-1/2 rounded-full bg-stone-200" />
+                  {/* Active range highlight */}
+                  <div
+                    className="absolute top-1/2 h-1.5 -translate-y-1/2 rounded-full bg-stone-900"
+                    style={{
+                      left: `${((ageMin - 18) / (60 - 18)) * 100}%`,
+                      right: `${100 - ((ageMax - 18) / (60 - 18)) * 100}%`,
+                    }}
+                  />
+                  {/* Min thumb */}
+                  <input
+                    type="range" min={18} max={60} value={ageMin}
+                    onChange={e => {
+                      const v = parseInt(e.target.value)
+                      setAgeMin(Math.min(v, ageMax - 1))
+                    }}
+                    className="absolute top-0 left-0 w-full h-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stone-900 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer"
+                  />
+                  {/* Max thumb */}
+                  <input
+                    type="range" min={18} max={60} value={ageMax}
+                    onChange={e => {
+                      const v = parseInt(e.target.value)
+                      setAgeMax(Math.max(v, ageMin + 1))
+                    }}
+                    className="absolute top-0 left-0 w-full h-full appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-stone-900 [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-white [&::-webkit-slider-thumb]:shadow-md [&::-webkit-slider-thumb]:cursor-pointer"
+                  />
+                  {/* Labels */}
+                  <div className="absolute -bottom-4 left-0 text-[10px] text-stone-400">18</div>
+                  <div className="absolute -bottom-4 right-0 text-[10px] text-stone-400">60</div>
                 </div>
               </div>
 
@@ -729,26 +740,31 @@ export default function OnboardingPage() {
         {/* Step 5: Taste Calibration */}
         {step === 'taste' && tasteNarratives.length > 0 && tasteIndex < tasteNarratives.length && (
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">What catches your eye?</h1>
+            <h1 className="text-2xl font-bold text-stone-900">Now let&rsquo;s see what excites you</h1>
             <p className="mt-2 text-sm text-stone-500">
-              Read each intro and tell us if you&rsquo;d want to meet this person. This helps us find the right matches for you.
+              We&rsquo;ll show you a few people. Tell us who you&rsquo;d want to meet — this teaches us your taste.
             </p>
 
-            <p className="mt-3 text-xs text-stone-400">
-              {tasteIndex + 1} of {tasteNarratives.length}
-            </p>
+            {/* Progress */}
+            <div className="mt-4 flex gap-1.5">
+              {tasteNarratives.map((_, i) => (
+                <div
+                  key={i}
+                  className={`h-1.5 flex-1 rounded-full transition-all ${
+                    i < tasteIndex ? 'bg-stone-900' : i === tasteIndex ? 'bg-stone-400' : 'bg-stone-200'
+                  }`}
+                />
+              ))}
+            </div>
 
             <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-              <p className="text-xs font-medium uppercase tracking-wider text-stone-400">
-                Someone we think you might like
-              </p>
-              <p className="mt-4 text-base leading-relaxed text-stone-700">
+              <p className="mt-0 text-base leading-relaxed text-stone-700">
                 {tasteNarratives[tasteIndex].narrative}
               </p>
 
-              {/* Attribute tags — show after reading */}
+              {/* Attribute tags — what caught your attention */}
               <div className="mt-5">
-                <p className="text-xs font-medium text-stone-500">If yes — what caught your attention?</p>
+                <p className="text-xs font-medium text-stone-500">What caught your attention? (optional)</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {ATTRIBUTE_TAGS.map(attr => (
                     <button
@@ -771,15 +787,43 @@ export default function OnboardingPage() {
                   onClick={() => handleTasteVote(true)}
                   className="flex-1 rounded-xl bg-stone-900 py-3 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
                 >
-                  I&rsquo;d want to meet them
+                  I&rsquo;d like to meet them
                 </button>
                 <button
-                  onClick={() => handleTasteVote(false)}
+                  onClick={() => {
+                    setShowTasteFeedback(true)
+                  }}
                   className="flex-1 rounded-xl border border-stone-200 py-3 text-sm font-medium text-stone-600 transition hover:bg-stone-50 active:translate-y-px"
                 >
                   Not for me
                 </button>
               </div>
+
+              {/* Feedback panel — shows after "Not for me" */}
+              {showTasteFeedback && (
+                <div className="mt-4 rounded-xl bg-stone-50 p-4 animate-fade-in-up">
+                  <p className="text-xs font-medium text-stone-600">Anything that turned you off? (optional)</p>
+                  <textarea
+                    value={tasteFeedbackText}
+                    onChange={e => setTasteFeedbackText(e.target.value)}
+                    placeholder="Too generic, not my type, nothing specific stood out..."
+                    rows={2}
+                    className="mt-2 w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-stone-400 focus:outline-none resize-none"
+                  />
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      onClick={() => {
+                        handleTasteVote(false)
+                        setShowTasteFeedback(false)
+                        setTasteFeedbackText('')
+                      }}
+                      className="flex-1 rounded-lg bg-stone-900 py-2 text-xs font-medium text-white transition hover:bg-stone-800"
+                    >
+                      {tasteFeedbackText ? 'Submit & continue' : 'Skip & continue'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
         )}
