@@ -105,34 +105,105 @@ The current 3-draft → critic → best-pick pipeline is strong. Keep it.
 - Log the outcome (interested/passed/photo_revealed_before_decision)
 - This creates the dataset for the feedback loop
 
-### Step 4: The Decision Flow — "Pick Your Favorite" (New)
+### Step 4: The Decision Flow — The Daily Three + 🔥 System
 
 **Current flow:** 1 intro per day, show narrative + photo → decide
 
-**New flow: The Daily Three**
+**New flow:**
+
+#### The Daily Three
+
+Every day, you get 3 intro cards. Narrative only — first name + 3-4 sentence pitch. No photos.
+
+Each card has two actions:
+- 🔥 **"Tell me more"** → spends your daily 🔥, reveals the photo
+- 👋 **"Pass"** → card goes to re-pitch pool
+
+#### The 🔥 (Fire) System
+
+**You get 1 🔥 per day.** That's it.
 
 ```
-1. User opens the app → sees 3 intro cards (narrative only, no photos)
-   Each card: first name + 3-4 sentence pitch, different narrative angle
+Daily flow:
+
+1. Open app → see 3 narrative cards
    ↓
-2. User reads all 3 and picks their favorite
-   "Which of these people do you want to learn more about?"
+2. Read them. You have 1 🔥 to spend.
+   Options for each card:
+   - 🔥 "Tell me more" (spend your fire → photo reveals)
+   - 👋 "Pass"
+   - 💾 "Save for later" (moves to your saved queue)
    ↓
-3. Chosen card → photo revealed
+3. If you 🔥 a card → photo revealed
    a) "I'm interested" → match recorded, check for mutual
-   b) "Not for me" → this is an Elo signal (liked the narrative, not the photo)
+   b) "Not for me" → Elo signal (narrative worked, attraction didn't)
    ↓
-4. The 2 unchosen cards → recycled (see Re-Pitch System below)
+4. If mutual match → you unlock a BONUS 🔥 tomorrow (reward)
+   ↓
+5. Un-🔥'd cards that you 👋'd → re-pitch pool
+   Un-🔥'd cards that you 💾'd → saved queue
 ```
 
-**Why 3 at a time:**
+#### The Save Queue
 
-- **Choosing is more engaging than judging.** "Pick the best" feels like a game. "Swipe right or left" feels like work.
-- **Built-in A/B/C test every day.** If we vary the narrative tiers across the 3 cards, the user's choice directly tells us which angle excites them most.
-- **Natural scarcity.** You only get to reveal 1 photo per day. So you actually read the intros carefully instead of skimming.
-- **Lower rejection friction.** You're not saying "no" to 2 people — you're just saying "this one excited me more." The other 2 aren't rejected, they're deferred.
+If you like 2 (or all 3!) intros but only have 1 🔥, you can **save** the others.
 
-**Daily Three composition strategy:**
+Saved intros stack up in your queue. They don't expire. You can 🔥 a saved intro any time you have a fire to spend.
+
+**This is the monetization lever:**
+
+If someone has 5 saved intros and only gets 1 🔥/day, they're going to want more fires. That's the premium product:
+- **Free:** 1 🔥/day + bonus 🔥 for mutual matches
+- **Premium (future):** 2 🔥/day, or buy individual 🔥
+
+The save queue also tells us something: **saved = strong positive signal even without spending a fire.** A saved intro means the narrative landed — the user was genuinely interested but had to choose. This is a high-quality signal for tier_weights.
+
+#### When You Pass All 3
+
+If you 👋 all 3 cards (no 🔥, no 💾), that's a strong signal that the batch didn't land.
+
+**The Rejection Feedback Flow:**
+
+```
+User passes all 3 → app shows:
+
+"None of these grabbed you? Help us do better."
+
+Then shows each card again, one at a time (mini-cards):
+  Card 1: [Name + first line of narrative]
+    → 🎙️ voice feedback button OR quick-tap reasons
+  Card 2: [Name + first line of narrative]
+    → 🎙️ voice feedback button OR quick-tap reasons
+  Card 3: [Name + first line of narrative]
+    → 🎙️ voice feedback button OR quick-tap reasons
+
+Quick-tap reasons (optional, can skip):
+  - "Nothing grabbed me"
+  - "Not my type of person"
+  - "Too similar to yesterday"
+  - "Intro felt generic"
+
+Voice feedback (richest signal):
+  🎙️ "Tell us what you're looking for"
+  → Whisper transcribe → Claude extract → update rejection_themes
+```
+
+This is OPTIONAL — user can skip the whole thing. But if they engage, it's the highest-value data we collect.
+
+**Consecutive all-pass streak:**
+- 3 days of all-pass → app surfaces a gentler prompt: "We're still learning what excites you. Mind telling us what you're looking for?" with voice note option
+- System also shifts next day's tier composition to be maximally different from the last 3 days
+
+#### Why This Design Works
+
+- **Choosing > judging.** Pick your favorite from 3 is a game. Swipe yes/no is work.
+- **Built-in A/B/C test.** We vary tiers across the 3 cards. Your pick tells us which angle lands.
+- **Natural scarcity.** 1 🔥/day means you read carefully. No mindless swiping.
+- **Save queue = engagement + monetization.** Wanting more fires = product-market fit signal.
+- **Rejection feedback loop.** All-pass triggers the richest learning signal we have.
+- **No one gets "rejected."** Unpicked cards go to re-pitch pool. They come back with a better angle.
+
+#### Daily Three Composition Strategy
 
 For the first 5 days (exploration phase):
 - Card A: Self-expansion angle (Tier 1)
@@ -232,14 +303,18 @@ At photo stage (post-narrative):
 
 | Signal | Feeds Into | Mechanism |
 |--------|-----------|-----------|
-| Picked from Daily Three | Excitement type weights (strong +) | Increase tier weight for the strategy used |
-| Not picked from Daily Three | Excitement type weights (soft -) | Small decrease for that tier; candidate → re-pitch pool |
+| 🔥 on a card | Excitement type weights (strong +) | Increase tier weight for the strategy used |
+| 💾 Save (not 🔥) | Excitement type weights (moderate +) | Narrative landed — increase tier weight, but less than 🔥 |
+| 👋 Pass | Excitement type weights (soft -) | Small decrease for that tier; candidate → re-pitch pool |
+| All 3 passed (no 🔥, no 💾) | Batch quality flag | Shift next day's tiers; trigger feedback prompt after 3 streak |
+| Per-card voice feedback (all-pass flow) | Strategy + taste map | Extract specific rejection reasons per person |
 | Re-pitch converts on attempt 2+ | Excitement type weights (strongest signal) | The winning tier gets a big boost; failing tiers get decreases |
-| All 5 re-pitch attempts fail | Candidate ranking | Retire candidate; flag as real incompatibility, not narrative miss |
-| Passed at photo stage | Elo | Gentle Elo adjustment (K=8) for rejected person |
+| All 5 re-pitch attempts fail | Candidate ranking | Retire candidate; flag as real incompatibility |
+| Passed at photo stage (post-🔥) | Elo | Gentle Elo adjustment (K=8) for rejected person |
 | Passed at photo, voice note | Elo + physical preference model | Extract physical preference signals |
 | Interested after photo | Full positive signal | Reinforce everything: strategy, Elo range, candidate type |
-| Voice note on any rejection | Strategy + taste map | Extract preferences, update rejection_themes |
+| Mutual match (both interested) | Engagement reward | Unlock bonus 🔥 for next day |
+| 🔥 from saved queue | Excitement type (delayed strong +) | Same as daily 🔥 but confirms the narrative held up over time |
 
 ---
 
@@ -259,11 +334,16 @@ UserPreferenceModel {
 
   // Strategy-level learning (which specific strategies work)
   strategy_scores: {
-    novel_world: { shown: int, interested: int },
-    complementary_growth: { shown: int, interested: int },
-    humor_resonance: { shown: int, interested: int },
+    novel_world: { shown: int, fired: int, saved: int },
+    complementary_growth: { shown: int, fired: int, saved: int },
+    humor_resonance: { shown: int, fired: int, saved: int },
     // ... all 12
   }
+
+  // 🔥 system state
+  fires_available: int            // usually 1, +1 for mutual match bonus
+  save_queue: IntroCard[]         // saved intros waiting to be 🔥'd
+  all_pass_streak: int            // consecutive days of passing all 3
 
   // Rejection patterns (extracted from voice feedback)
   rejection_themes: string[]       // e.g. ["too outdoorsy", "not ambitious enough"]
@@ -282,32 +362,49 @@ UserPreferenceModel {
 
 After each Daily Three interaction:
 ```
-// The user picked Card B (tier: i_sharing). Cards A (self_expansion) and C (admiration) not picked.
-
-// PICKED card — strong positive signal
 learning_rate = 0.15
-tier_weights[picked_tier] += learning_rate * (1 - tier_weights[picked_tier])
+save_rate = 0.08      // saves are positive but weaker than 🔥
+soft_negative = 0.05  // passes are mild negatives
 
-// NOT PICKED cards — soft negative (they weren't rejected, just not chosen)
-soft_rate = 0.05
-for each unpicked_tier:
-  tier_weights[unpicked_tier] -= soft_rate * tier_weights[unpicked_tier]
+// Example: User 🔥'd Card B (i_sharing), 💾 saved Card A (self_expansion), 👋 passed Card C (admiration)
+
+// 🔥 card — strong positive
+tier_weights[fired_tier] += learning_rate * (1 - tier_weights[fired_tier])
+
+// 💾 saved card — moderate positive (narrative landed, just not the top pick)
+tier_weights[saved_tier] += save_rate * (1 - tier_weights[saved_tier])
+
+// 👋 passed card — soft negative
+tier_weights[passed_tier] -= soft_negative * tier_weights[passed_tier]
 
 normalize(tier_weights)  // sum to 1
 
 // Strategy-level tracking
 for each card in daily_three:
   strategy_scores[card.strategy].shown += 1
-strategy_scores[picked_card.strategy].picked += 1
+if fired: strategy_scores[fired_card.strategy].fired += 1
+if saved: strategy_scores[saved_card.strategy].saved += 1
 
-// Re-pitch conversion (STRONGEST signal — worth 2x a normal pick)
-if picked card was a re-pitch:
+// Re-pitch conversion (STRONGEST signal — worth 2x a normal 🔥)
+if fired card was a re-pitch:
   tier_weights[winning_tier] += learning_rate * 2 * (1 - tier_weights[winning_tier])
   for each previously_failed_tier on this candidate:
     tier_weights[failed_tier] -= learning_rate * tier_weights[failed_tier]
   normalize(tier_weights)
 
-// Voice feedback → extract and append to rejection_themes / attraction_themes
+// All-pass (no 🔥, no 💾) — flag batch miss
+if all_three_passed:
+  all_pass_streak += 1
+  if all_pass_streak >= 3:
+    trigger_voice_feedback_prompt()
+  // Shift next day's tier composition to be maximally different
+
+// 🔥 from saved queue — delayed strong positive (confirms narrative held up)
+if fired_from_save_queue:
+  tier_weights[saved_tier] += learning_rate * (1 - tier_weights[saved_tier])
+  normalize(tier_weights)
+
+// Voice feedback (from all-pass flow) → extract per-card and append to rejection_themes
 ```
 
 ---
@@ -342,36 +439,44 @@ The fundamental question: **Do people's excitement types match their revealed pr
 
 ## Implementation Priority
 
-### Phase 1 (Now)
-- [ ] Daily Three UI: show 3 narrative-only cards, user picks 1
-- [ ] Photo reveal only on the picked card
-- [ ] Track: which card picked, which tier each card used, photo-stage outcome
-- [ ] Re-pitch pool: candidates not picked go back with `narrative_miss` tag + cooldown timer
-- [ ] Re-pitch lifecycle: max 5 attempts, different tier each time, 3-7 day cooldown
-- [ ] Store tier/strategy used per intro in `daily_intros` table
-- [ ] Add voice note option on photo-stage rejection
-- [ ] Extract rejection voice notes with dedicated prompt
+### Phase 1 (Now — core experience)
+- [ ] Daily Three UI: show 3 narrative-only cards (no photos)
+- [ ] 🔥 system: 1 fire per day, spend it to reveal a photo
+- [ ] 💾 Save button: save intros to a queue for later
+- [ ] 👋 Pass button: sends card to re-pitch pool
+- [ ] Save queue UI: browse saved intros, spend 🔥 from queue
+- [ ] Photo reveal flow: 🔥 → photo shown → "Interested" or "Not for me"
+- [ ] All-pass rejection flow: show cards one-by-one with voice feedback option + quick-tap reasons
+- [ ] Track per-intro: tier used, strategy used, action (fired/saved/passed), photo outcome
+- [ ] Store in `daily_intros` table: `tier`, `strategy`, `action`, `fired_at`, `saved_at`, `passed_at`
+- [ ] Re-pitch pool: passed candidates get `narrative_miss` tag + 3-7 day cooldown
+- [ ] Re-pitch lifecycle: max 5 attempts, different tier each time
+- [ ] Voice feedback extraction with dedicated rejection-analysis prompt
+- [ ] Bonus 🔥 on mutual match
 
-### Phase 2 (After first 50 users)
-- [ ] Implement per-user `tier_weights` distribution (stored in user_cadence or new table)
-- [ ] First 5 days: exploration rotation (1 card per tier across the 3 daily)
-- [ ] Update tier_weights after each pick (strong +) and non-pick (soft -)
-- [ ] Re-pitch conversion → 2x weight update
-- [ ] Surface excitement type learning + pick rates in admin panel
-- [ ] Daily Three composition engine: mix new candidates + re-pitches based on pool depth
+### Phase 2 (After first 50 users — learning system)
+- [ ] Per-user `tier_weights` distribution (new `user_preference_model` table)
+- [ ] `all_pass_streak` tracking → trigger voice feedback after 3 consecutive
+- [ ] First 5 days: exploration rotation (each day's 3 cards cover different tiers)
+- [ ] Update tier_weights after each interaction (🔥 = strong +, 💾 = moderate +, 👋 = soft -)
+- [ ] Re-pitch conversion → 2x weight update for winning tier
+- [ ] 🔥 from save queue → delayed strong positive signal
+- [ ] Surface in admin panel: tier pick rates, save rates, all-pass rates, re-pitch conversion rates
 
-### Phase 3 (After first 200 interactions)
+### Phase 3 (After first 200 interactions — optimization)
 - [ ] Thompson sampling for tier assignment across the Daily Three
 - [ ] Voice feedback → preference extraction → rejection_themes/attraction_themes
 - [ ] Feed rejection themes into candidate ranking (soft filter on intro potential)
-- [ ] A/B test: fixed excitement type vs adaptive weights vs Daily Three picks
+- [ ] A/B test: fixed excitement type vs adaptive weights vs behavioral
+- [ ] Premium tier: 2 🔥/day (monetization experiment)
 
-### Phase 4 (After statistical significance)
+### Phase 4 (After statistical significance — research)
 - [ ] Analyze: do re-pitches convert? At which attempt? Which tier wins?
-- [ ] Analyze: predicted excitement type vs revealed (from pick data)
+- [ ] Analyze: predicted excitement type vs revealed (from 🔥 + 💾 data)
+- [ ] Analyze: save queue behavior (do people 🔥 their saves? how long do they wait?)
 - [ ] If excitement types don't predict: replace with pure behavioral weights
 - [ ] If they do predict: improve inference from extraction data
-- [ ] Cross-user learning: "Users who picked this strategy also picked..."
+- [ ] Cross-user learning: "Users who 🔥'd this strategy also 🔥'd..."
 - [ ] Publish findings
 
 ---
