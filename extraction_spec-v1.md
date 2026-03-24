@@ -201,6 +201,41 @@ Track per-question:
 
 Surface all of this in the admin panel.
 
+### Tracking Implementation (Live Now)
+
+**`prompt_metrics` table** (create in Supabase):
+```sql
+CREATE TABLE prompt_metrics (
+  id uuid DEFAULT gen_random_uuid() PRIMARY KEY,
+  prompt_id text NOT NULL,
+  user_id uuid NOT NULL REFERENCES users(id),
+  word_count int NOT NULL,
+  sentence_count int NOT NULL,
+  duration_seconds int NOT NULL DEFAULT 0,
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(prompt_id, user_id)
+);
+```
+
+**What's tracked per response:**
+- `word_count` — total words in transcript
+- `sentence_count` — proxy for response structure
+- `duration_seconds` — raw recording length
+
+**Admin endpoint:** `GET /api/admin/prompt-metrics`
+Returns per-prompt aggregates:
+- `responses` — how many people answered this question
+- `avg_word_count` — average words per response
+- `min/max_word_count` — range
+- `word_count_stddev` — variance (high = good triaging question)
+- `triaging_power` — same as stddev for now; high variance means some people love this question and some don't, which is useful signal
+
+**Interpretation guide:**
+- High avg words + low variance → universally engaging question (promote)
+- High avg words + high variance → great triaging question (some people open up, others don't)
+- Low avg words + low variance → boring question for everyone (deprioritize)
+- Low avg words + high variance → confusing question (rewrite or drop)
+
 ---
 
 ## Part 5: Implementation Priority

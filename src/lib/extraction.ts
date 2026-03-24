@@ -397,10 +397,26 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
     console.log(`Transcribed memo ${memoId}: ${transcript.substring(0, 80)}...`)
   }
 
-  // Step 2: Extract personality signals
-  console.log(`Extracting signals from memo ${memoId}...`)
-  // Look up prompt category from prompts table
+  // Step 2: Track transcript quality metrics
+  const wordCount = transcript.split(/\s+/).filter(Boolean).length
+  const sentenceCount = transcript.split(/[.!?]+/).filter(s => s.trim().length > 0).length
+  console.log(`Memo ${memoId}: ${wordCount} words, ${sentenceCount} sentences, ${memo.duration_seconds || 0}s`)
+
+  // Save prompt-level metrics for question quality tracking
   const supabase = createServerClient()
+  await supabase.from('prompt_metrics').upsert({
+    prompt_id: memo.prompt_id,
+    user_id: memo.user_id,
+    word_count: wordCount,
+    sentence_count: sentenceCount,
+    duration_seconds: memo.duration_seconds || 0,
+    created_at: new Date().toISOString(),
+  }, { onConflict: 'prompt_id,user_id' }).then(({ error }) => {
+    if (error) console.warn('prompt_metrics upsert failed (table may not exist yet):', error.message)
+  })
+
+  // Step 3: Extract personality signals
+  console.log(`Extracting signals from memo ${memoId}...`)
   const { data: prompt } = await supabase
     .from('prompts')
     .select('category')
