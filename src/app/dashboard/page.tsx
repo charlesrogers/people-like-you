@@ -309,7 +309,7 @@ export default function Dashboard() {
           {([
             { id: 'today' as const, label: 'Intros', icon: '💌' },
             { id: 'profile' as const, label: 'My Profile', icon: '👤' },
-            { id: 'settings' as const, label: 'Settings', icon: '⚙️' },
+            { id: 'settings' as const, label: 'Essentials', icon: '⚙️' },
           ]).map(tab => (
             <button
               key={tab.id}

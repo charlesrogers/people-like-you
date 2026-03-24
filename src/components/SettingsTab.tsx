@@ -9,6 +9,7 @@ interface SettingsTabProps {
 }
 
 export default function SettingsTab({ userId, email, onSignOut }: SettingsTabProps) {
+  const [loading, setLoading] = useState(true)
   const [ageMin, setAgeMin] = useState(21)
   const [ageMax, setAgeMax] = useState(35)
   const [wouldRelocate, setWouldRelocate] = useState('')
@@ -18,15 +19,14 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
-  // Load existing preferences
   useEffect(() => {
     fetch(`/api/hard-preferences?userId=${userId}`)
       .then(r => r.json())
       .then(data => {
         if (data.preferences) {
           const p = data.preferences
-          if (p.age_range_min) setAgeMin(p.age_range_min)
-          if (p.age_range_max) setAgeMax(p.age_range_max)
+          if (p.age_range_min != null) setAgeMin(p.age_range_min)
+          if (p.age_range_max != null) setAgeMax(p.age_range_max)
           if (p.distance_radius) setWouldRelocate(p.distance_radius)
           if (p.faith_importance) setFaithImportance(p.faith_importance)
           if (p.kids) setKids(p.kids)
@@ -34,6 +34,7 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
         }
       })
       .catch(() => {})
+      .finally(() => setLoading(false))
   }, [userId])
 
   const handleSave = async () => {
@@ -64,6 +65,14 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
     }
   }
 
+  if (loading) {
+    return (
+      <div className="py-12 text-center">
+        <div className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-stone-300 border-t-stone-900" />
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Account */}
@@ -86,7 +95,6 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
       {/* Hard filters */}
       <div className="rounded-xl bg-white border border-stone-200 p-5">
         <h3 className="text-sm font-semibold text-stone-900">Your dealbreakers</h3>
-        <p className="mt-1 text-xs text-stone-400">Changes save when you tap &ldquo;Save.&rdquo;</p>
 
         <div className="mt-4 space-y-5">
           {/* Age range */}
@@ -116,24 +124,22 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
             </div>
           </div>
 
-          {/* Relocate */}
           <ChipPicker label="Would you relocate?" value={wouldRelocate} onChange={setWouldRelocate} options={[
-            { value: 'yes', label: 'Yes' }, { value: 'maybe', label: 'Maybe' }, { value: 'no', label: 'No' },
+            { value: 'same_metro', label: 'Same area only' },
+            { value: 'few_hours', label: 'Within a few hours' },
+            { value: 'anywhere', label: 'Anywhere' },
           ]} />
 
-          {/* Faith */}
           <ChipPicker label="How important is shared faith?" value={faithImportance} onChange={setFaithImportance} options={[
             { value: 'essential', label: 'Essential' }, { value: 'important', label: 'Important' },
             { value: 'nice_to_have', label: 'Nice to have' }, { value: 'doesnt_matter', label: "Doesn't matter" },
           ]} />
 
-          {/* Kids */}
           <ChipPicker label="Kids" value={kids} onChange={setKids} options={[
             { value: 'has', label: 'Have kids' }, { value: 'wants', label: 'Want kids' },
             { value: 'open', label: 'Open' }, { value: 'doesnt_want', label: "Don't want" },
           ]} />
 
-          {/* Marital history */}
           <ChipPicker label="Marital history" value={maritalHistory} onChange={setMaritalHistory} options={[
             { value: 'never_married', label: 'Never married' }, { value: 'divorced', label: 'Divorced' },
           ]} />
