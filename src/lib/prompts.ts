@@ -121,3 +121,42 @@ export function getRandomPrompt(excludeIds: string[]): PromptDef | null {
   if (candidates.length === 0) return null
   return candidates[Math.floor(Math.random() * candidates.length)]
 }
+
+/**
+ * Get prompts targeted at a specific tier (dimension), excluding already-answered ones.
+ * Returns 3 recommended prompts for the target tier + 3 from other tiers.
+ */
+export function getTargetedPrompts(
+  targetTier: string,
+  excludeIds: string[],
+  count = 3,
+): { targeted: PromptDef[]; others: PromptDef[] } {
+  const available = QUESTION_BANK.filter(p => !excludeIds.includes(p.id))
+
+  // Map dimension names to tier names
+  const tierMap: Record<string, string> = {
+    explorer: 'self_expansion',
+    connector: 'i_sharing',
+    builder: 'admiration',
+    nurturer: 'comfort',
+    wildcard: 'fun',
+    // Also accept tier names directly
+    self_expansion: 'self_expansion',
+    i_sharing: 'i_sharing',
+    admiration: 'admiration',
+    comfort: 'comfort',
+    fun: 'fun',
+  }
+  const tier = tierMap[targetTier] || targetTier
+
+  const inTier = available.filter(p => p.tier === tier)
+  const outOfTier = available.filter(p => p.tier !== tier)
+
+  // Shuffle
+  const shuffled = (arr: PromptDef[]) => arr.sort(() => Math.random() - 0.5)
+
+  return {
+    targeted: shuffled(inTier).slice(0, count),
+    others: shuffled(outOfTier).slice(0, count),
+  }
+}

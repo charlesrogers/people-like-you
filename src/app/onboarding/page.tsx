@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation'
 import posthog from 'posthog-js'
 import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
-import { getOnboardingPrompts, getRandomPrompt, type PromptDef } from '@/lib/prompts'
+import { getOnboardingPrompts, getRandomPrompt, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
+import { computePersonalityReveal } from '@/lib/personality-reveal'
 import { getSeedNarrativesForGender, ATTRIBUTE_TAGS, type SeedNarrative } from '@/lib/seed-narratives'
 
 type Step = 'signup' | 'basics' | 'voice' | 'preferences' | 'photos' | 'taste' | 'reveal'
@@ -21,6 +22,14 @@ const STEP_LABELS: Record<Step, string> = {
 }
 
 const STEPS: Step[] = ['signup', 'basics', 'voice', 'preferences', 'photos', 'taste', 'reveal']
+
+const DIMENSION_META_LOCAL: Record<string, { emoji: string; label: string }> = {
+  explorer: { emoji: '🧭', label: 'Explorer' },
+  connector: { emoji: '💜', label: 'Connector' },
+  builder: { emoji: '⭐', label: 'Builder' },
+  nurturer: { emoji: '🏠', label: 'Nurturer' },
+  wildcard: { emoji: '⚡', label: 'Wildcard' },
+}
 
 const EXCITEMENT_LABELS: Record<string, { label: string; emoji: string; description: string }> = {
   explorer: { label: 'Explorer', emoji: '🧭', description: 'You light up around novelty, adventure, and the unexpected.' },
@@ -77,6 +86,13 @@ export default function OnboardingPage() {
   // Taste feedback
   const [showTasteFeedback, setShowTasteFeedback] = useState(false)
   const [tasteFeedbackText, setTasteFeedbackText] = useState('')
+
+  // Profile reveal
+  const [struckItems, setStruckItems] = useState<string[]>([])
+  const [showMoreQuestions, setShowMoreQuestions] = useState(false)
+
+  // Track answered prompt IDs for "more questions" targeting
+  const answeredPromptIds = [...recordings.keys()]
 
   // Track user ID after profile creation
   const [userId, setUserId] = useState<string | null>(null)
@@ -838,7 +854,7 @@ export default function OnboardingPage() {
           </div>
         )}
 
-        {/* Step 6: Profile Reveal */}
+        {/* Step 6: Profile Reveal — Personality Quiz Style */}
         {step === 'reveal' && (
           <div>
             {!composite ? (
@@ -846,100 +862,230 @@ export default function OnboardingPage() {
                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-stone-900" />
                 <p className="mt-4 text-sm text-stone-500">Almost ready... building your profile</p>
               </div>
-            ) : (
-              <div>
-                <h1 className="text-2xl font-bold text-stone-900">Here&rsquo;s what we see in you</h1>
-                <p className="mt-2 text-sm text-stone-500">
-                  Based on your stories, here&rsquo;s how we&rsquo;ll introduce you to people. Does this feel right?
-                </p>
+            ) : (() => {
+              const reveal = computePersonalityReveal(composite)
+              return (
+                <div>
+                  {/* Headline */}
+                  <h1 className="text-2xl font-bold text-stone-900">{reveal.headline}</h1>
+                  <p className="mt-2 text-sm text-stone-500">
+                    Here&rsquo;s what we learned about you. Tap anything that doesn&rsquo;t fit.
+                  </p>
 
-                <div className="mt-6 space-y-5">
-                  {/* Excitement type */}
-                  {composite.excitement_type && EXCITEMENT_LABELS[composite.excitement_type as string] && (
-                    <div className="rounded-xl bg-stone-50 p-5">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs font-medium uppercase tracking-wider text-stone-400">Your type</p>
-                          <p className="mt-1 text-lg font-semibold text-stone-900">
-                            {EXCITEMENT_LABELS[composite.excitement_type as string].emoji}{' '}
-                            {EXCITEMENT_LABELS[composite.excitement_type as string].label}
-                          </p>
-                          <p className="mt-1 text-xs text-stone-500">
-                            {EXCITEMENT_LABELS[composite.excitement_type as string].description}
-                          </p>
+                  {/* Dimension bars */}
+                  <div className="mt-6 space-y-4">
+                    {reveal.dimensions.map(dim => (
+                      <div key={dim.id} className="rounded-xl bg-white border border-stone-200 p-4">
+                        <div className="flex items-center justify-between">
+                          <span className="text-base font-semibold text-stone-900">
+                            {dim.emoji} {dim.label}
+                          </span>
+                          <span className="text-sm font-bold text-stone-700 tabular-nums">{dim.score}%</span>
                         </div>
-                        <button
-                          onClick={() => setProfileFeedback(prev => ({ ...prev, excitement_type: !prev.excitement_type }))}
-                          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                            profileFeedback.excitement_type === false
-                              ? 'bg-amber-100 text-amber-700'
-                              : 'bg-emerald-50 text-emerald-600'
-                          }`}
-                        >
-                          {profileFeedback.excitement_type === false ? 'Not quite' : 'Feels right'}
-                        </button>
+                        <div className="mt-2 h-2.5 rounded-full bg-stone-100 overflow-hidden">
+                          <div
+                            className="h-full rounded-full bg-stone-900 transition-all duration-700"
+                            style={{ width: `${dim.score}%` }}
+                          />
+                        </div>
+                        <p className="mt-2 text-xs text-stone-400">{dim.description}</p>
                       </div>
-                    </div>
-                  )}
+                    ))}
+                  </div>
 
-                  {/* Passions */}
-                  {Array.isArray(composite.passion_indicators) && (composite.passion_indicators as string[]).length > 0 && (
-                    <div className="rounded-xl bg-white border border-stone-200 p-5">
-                      <div className="flex items-center justify-between">
+                  {/* Extracted traits — strikeable */}
+                  <div className="mt-8 space-y-5">
+                    {/* Passions */}
+                    {Array.isArray(composite.passion_indicators) && (composite.passion_indicators as string[]).length > 0 && (
+                      <div>
                         <p className="text-xs font-medium uppercase tracking-wider text-stone-400">What lights you up</p>
-                        <button
-                          onClick={() => setProfileFeedback(prev => ({ ...prev, passions: !prev.passions }))}
-                          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                            profileFeedback.passions === false ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-600'
-                          }`}
-                        >
-                          {profileFeedback.passions === false ? 'Not quite' : 'Feels right'}
-                        </button>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {(composite.passion_indicators as string[]).slice(0, 8).map((p: string) => (
+                            <button
+                              key={p}
+                              onClick={() => setStruckItems(prev => prev.includes(p) ? prev.filter(x => x !== p) : [...prev, p])}
+                              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                                struckItems.includes(p)
+                                  ? 'bg-red-50 text-red-400 line-through'
+                                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {(composite.passion_indicators as string[]).slice(0, 8).map((p: string) => (
-                          <span key={p} className="rounded-full bg-stone-100 px-3 py-1 text-xs text-stone-600">{p}</span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                    )}
 
-                  {/* Values */}
-                  {Array.isArray(composite.values) && (composite.values as string[]).length > 0 && (
-                    <div className="rounded-xl bg-white border border-stone-200 p-5">
-                      <div className="flex items-center justify-between">
+                    {/* Values */}
+                    {Array.isArray(composite.values) && (composite.values as string[]).length > 0 && (
+                      <div>
                         <p className="text-xs font-medium uppercase tracking-wider text-stone-400">Your values</p>
-                        <button
-                          onClick={() => setProfileFeedback(prev => ({ ...prev, values: !prev.values }))}
-                          className={`rounded-full px-3 py-1 text-xs font-medium transition ${
-                            profileFeedback.values === false ? 'bg-amber-100 text-amber-700' : 'bg-emerald-50 text-emerald-600'
-                          }`}
-                        >
-                          {profileFeedback.values === false ? 'Not quite' : 'Feels right'}
-                        </button>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {(composite.values as string[]).slice(0, 8).map((v: string) => (
+                            <button
+                              key={v}
+                              onClick={() => setStruckItems(prev => prev.includes(v) ? prev.filter(x => x !== v) : [...prev, v])}
+                              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                                struckItems.includes(v)
+                                  ? 'bg-red-50 text-red-400 line-through'
+                                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                              }`}
+                            >
+                              {v}
+                            </button>
+                          ))}
+                        </div>
                       </div>
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {(composite.values as string[]).slice(0, 6).map((v: string) => (
-                          <span key={v} className="rounded-full bg-stone-100 px-3 py-1 text-xs text-stone-600">{v}</span>
-                        ))}
+                    )}
+
+                    {/* Interest tags */}
+                    {Array.isArray(composite.interest_tags) && (composite.interest_tags as string[]).length > 0 && (
+                      <div>
+                        <p className="text-xs font-medium uppercase tracking-wider text-stone-400">Your interests</p>
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {(composite.interest_tags as string[]).slice(0, 10).map((t: string) => (
+                            <button
+                              key={t}
+                              onClick={() => setStruckItems(prev => prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t])}
+                              className={`rounded-full px-3 py-1.5 text-xs font-medium transition ${
+                                struckItems.includes(t)
+                                  ? 'bg-red-50 text-red-400 line-through'
+                                  : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
+                              }`}
+                            >
+                              {t}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Notable quotes */}
+                    {Array.isArray(composite.notable_quotes) && (composite.notable_quotes as string[]).length > 0 && (
+                      <div>
+                        <p className="text-xs font-medium uppercase tracking-wider text-stone-400">In your own words</p>
+                        <div className="mt-2 space-y-2">
+                          {(composite.notable_quotes as string[]).slice(0, 3).map((q: string, i: number) => (
+                            <button
+                              key={i}
+                              onClick={() => setStruckItems(prev => prev.includes(q) ? prev.filter(x => x !== q) : [...prev, q])}
+                              className={`block w-full text-left rounded-lg px-3 py-2 text-sm italic transition ${
+                                struckItems.includes(q)
+                                  ? 'bg-red-50 text-red-400 line-through'
+                                  : 'bg-stone-50 text-stone-600 hover:bg-stone-100'
+                              }`}
+                            >
+                              &ldquo;{q}&rdquo;
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Struck items notice + "answer more" nudge */}
+                  {struckItems.length > 0 && (
+                    <div className="mt-6 rounded-xl bg-amber-50 p-4">
+                      <p className="text-sm font-medium text-amber-800">
+                        Got it — we&rsquo;ll adjust. Want to answer a couple more questions so we get you right?
+                      </p>
+                      <button
+                        onClick={() => {
+                          // Switch to "more questions" mode targeting weakest dimension
+                          setShowMoreQuestions(true)
+                        }}
+                        className="mt-3 rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-800"
+                      >
+                        Show me more questions
+                      </button>
+                    </div>
+                  )}
+
+                  {/* "Have another side?" nudge (if data is rich enough and nothing struck) */}
+                  {struckItems.length === 0 && !reveal.needsMoreData && (
+                    <div className="mt-6 rounded-xl bg-stone-50 p-4">
+                      <p className="text-sm font-medium text-stone-700">Have another side of you?</p>
+                      <p className="mt-1 text-xs text-stone-500">
+                        You&rsquo;re strong on {reveal.primary.emoji} {reveal.primary.label} and {reveal.secondary.emoji} {reveal.secondary.label}.
+                        Want to show us your {DIMENSION_META_LOCAL[reveal.weakestDimension]?.emoji} {DIMENSION_META_LOCAL[reveal.weakestDimension]?.label} side?
+                      </p>
+                      <div className="mt-3 flex gap-2">
+                        <button
+                          onClick={() => setShowMoreQuestions(true)}
+                          className="rounded-lg border border-stone-200 px-4 py-2 text-xs font-medium text-stone-600 transition hover:bg-stone-100"
+                        >
+                          Show me questions
+                        </button>
+                        <button
+                          onClick={() => {/* just proceed — button below handles it */}}
+                          className="text-xs text-stone-400 underline decoration-dotted underline-offset-2"
+                        >
+                          I&rsquo;m good
+                        </button>
                       </div>
                     </div>
                   )}
 
-                  {/* Notable quotes */}
-                  {Array.isArray(composite.notable_quotes) && (composite.notable_quotes as string[]).length > 0 && (
-                    <div className="rounded-xl bg-white border border-stone-200 p-5">
-                      <p className="text-xs font-medium uppercase tracking-wider text-stone-400">In your own words</p>
+                  {/* Soft gate if data is thin */}
+                  {reveal.needsMoreData && struckItems.length === 0 && (
+                    <div className="mt-6 rounded-xl bg-amber-50 p-4">
+                      <p className="text-sm font-medium text-amber-800">
+                        We need about 1 more minute to really get you.
+                      </p>
+                      <p className="mt-1 text-xs text-amber-700">
+                        Answer 2-3 more questions so your intros are specific and compelling.
+                      </p>
+                      <button
+                        onClick={() => setShowMoreQuestions(true)}
+                        className="mt-3 rounded-lg bg-stone-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-stone-800"
+                      >
+                        Let&rsquo;s do it
+                      </button>
+                    </div>
+                  )}
+
+                  {/* More questions inline (when triggered) */}
+                  {showMoreQuestions && (
+                    <div className="mt-6">
+                      <p className="text-sm font-medium text-stone-700">Pick a few to answer:</p>
                       <div className="mt-3 space-y-2">
-                        {(composite.notable_quotes as string[]).slice(0, 2).map((q: string, i: number) => (
-                          <p key={i} className="text-sm italic text-stone-600">&ldquo;{q}&rdquo;</p>
+                        {getTargetedPrompts(reveal.weakestDimension, answeredPromptIds).targeted.map(p => (
+                          <button
+                            key={p.id}
+                            onClick={() => {
+                              // Go back to voice step with this specific prompt
+                              setPrompts([p])
+                              setCurrentVoiceIndex(0)
+                              setShowMoreQuestions(false)
+                              setStep('voice')
+                            }}
+                            className="block w-full text-left rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 transition hover:bg-stone-50"
+                          >
+                            <span className="font-medium">{p.text}</span>
+                            <span className="mt-1 block text-xs text-stone-400">{p.helpText}</span>
+                          </button>
+                        ))}
+                        {getTargetedPrompts(reveal.weakestDimension, answeredPromptIds).others.slice(0, 2).map(p => (
+                          <button
+                            key={p.id}
+                            onClick={() => {
+                              setPrompts([p])
+                              setCurrentVoiceIndex(0)
+                              setShowMoreQuestions(false)
+                              setStep('voice')
+                            }}
+                            className="block w-full text-left rounded-xl border border-dashed border-stone-200 px-4 py-3 text-sm text-stone-500 transition hover:bg-stone-50"
+                          >
+                            <span>{p.text}</span>
+                          </button>
                         ))}
                       </div>
                     </div>
                   )}
                 </div>
-              </div>
-            )}
+              )
+            })()}
           </div>
         )}
 
