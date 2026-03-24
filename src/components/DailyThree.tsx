@@ -13,6 +13,8 @@ export interface IntroCard {
   strategy: string
 }
 
+type PostInterestState = 'mutual' | 'pending' | 'exhausted' | null
+
 interface DailyThreeProps {
   cards: IntroCard[]
   firesAvailable: number
@@ -21,6 +23,12 @@ interface DailyThreeProps {
   onSave: (card: IntroCard) => void
   onPass: (card: IntroCard) => void
   onPhotoDecision: (card: IntroCard, interested: boolean, reason?: string) => void
+  // Post-interest state (set by parent after handleLike response)
+  postInterestState?: PostInterestState
+  mutualMatchData?: { id: string; partnerName: string } | null
+  pendingName?: string
+  onStartDisclosure?: () => void
+  onStartVoiceLoop?: () => void
 }
 
 type CardState = 'browsing' | 'photo_revealed' | 'decided'
@@ -33,6 +41,11 @@ export default function DailyThree({
   onSave,
   onPass,
   onPhotoDecision,
+  postInterestState,
+  mutualMatchData,
+  pendingName,
+  onStartDisclosure,
+  onStartVoiceLoop,
 }: DailyThreeProps) {
   const [firedCard, setFiredCard] = useState<IntroCard | null>(null)
   const [cardState, setCardState] = useState<CardState>('browsing')
@@ -122,20 +135,129 @@ export default function DailyThree({
     )
   }
 
-  // Decided view
+  // Decided view — 3 possible states
   if (cardState === 'decided') {
+    // STATE 1: Mutual match — they already liked you!
+    if (postInterestState === 'mutual' && mutualMatchData) {
+      return (
+        <div className="space-y-4">
+          <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
+            <p className="text-3xl">&#10024;</p>
+            <p className="mt-3 text-lg font-semibold text-stone-900">
+              You&rsquo;re both curious about each other
+            </p>
+            <p className="mt-2 text-sm text-stone-500">
+              {mutualMatchData.partnerName} is interested in getting to know you too.
+              Time to start a conversation.
+            </p>
+            <button
+              onClick={onStartDisclosure}
+              className="mt-5 rounded-xl bg-stone-900 px-8 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
+            >
+              Start getting to know {mutualMatchData.partnerName}
+            </button>
+          </div>
+          {visibleCards.length > 0 && (
+            <p className="text-center text-xs text-stone-400">
+              You still have {visibleCards.length} intro{visibleCards.length > 1 ? 's' : ''} to browse below.
+            </p>
+          )}
+        </div>
+      )
+    }
+
+    // STATE 2: Pending — they haven't seen you yet
+    if (postInterestState === 'pending' || (postInterestState !== 'exhausted' && visibleCards.length > 0)) {
+      return (
+        <div className="space-y-4">
+          <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
+            <p className="text-3xl">&#128140;</p>
+            <p className="mt-3 text-lg font-semibold text-stone-900">
+              We&rsquo;ll let you know
+            </p>
+            <p className="mt-2 text-sm text-stone-500">
+              {pendingName
+                ? `We'll tell you if ${pendingName} is curious too.`
+                : "We'll let you know if they feel the same."}
+            </p>
+          </div>
+          {/* Show remaining cards */}
+          {visibleCards.length > 0 && (
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-stone-700">
+                While you wait, here are more intros:
+              </p>
+              {visibleCards.map(card => {
+                const isSaved = savedIds.has(card.id)
+                return (
+                  <div
+                    key={card.id}
+                    className={`rounded-2xl bg-white p-6 shadow-sm transition ${
+                      isSaved ? 'border-2 border-emerald-200 bg-emerald-50/30' : 'border border-stone-200'
+                    }`}
+                  >
+                    <p className="text-sm leading-relaxed text-stone-700">{card.narrative}</p>
+                    <div className="mt-5 flex gap-2">
+                      {!isSaved && (
+                        <button
+                          onClick={() => handleSave(card)}
+                          className="flex items-center gap-1.5 rounded-full border border-stone-200 px-4 py-2 text-xs font-medium text-stone-600 transition hover:bg-stone-50 active:translate-y-px"
+                        >
+                          &#128190; Save for later
+                        </button>
+                      )}
+                      {isSaved && (
+                        <span className="flex items-center gap-1.5 rounded-full bg-emerald-100 px-4 py-2 text-xs font-medium text-emerald-700">
+                          &#10003; Saved
+                        </span>
+                      )}
+                      <button
+                        onClick={() => handlePass(card)}
+                        className="ml-auto text-xs text-stone-400 transition hover:text-stone-600"
+                      >
+                        &#128075; Pass
+                      </button>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          )}
+        </div>
+      )
+    }
+
+    // STATE 3: Pool exhausted — voice-to-unlock loop
+    if (postInterestState === 'exhausted') {
+      return (
+        <div className="space-y-4">
+          <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
+            <p className="text-3xl">&#127908;</p>
+            <p className="mt-3 text-lg font-semibold text-stone-900">
+              Help us find better matches
+            </p>
+            <p className="mt-2 text-sm text-stone-500">
+              Answer a few more questions and we&rsquo;ll unlock new intros based on your stories.
+            </p>
+            <button
+              onClick={onStartVoiceLoop}
+              className="mt-5 rounded-xl bg-stone-900 px-8 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
+            >
+              Start recording
+            </button>
+          </div>
+        </div>
+      )
+    }
+
+    // Fallback: generic decided state (shouldn't normally reach here)
     return (
       <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-        <p className="text-3xl">✨</p>
+        <p className="text-3xl">&#10024;</p>
         <p className="mt-3 text-lg font-semibold text-stone-900">Got it!</p>
         <p className="mt-1 text-sm text-stone-500">
-          Come back tomorrow for 3 more intros.
+          We&rsquo;ll let you know if they&rsquo;re curious too.
         </p>
-        {visibleCards.length > 0 && (
-          <p className="mt-3 text-xs text-stone-400">
-            You still have {visibleCards.length} card{visibleCards.length > 1 ? 's' : ''} below — save them for later or pass.
-          </p>
-        )}
       </div>
     )
   }

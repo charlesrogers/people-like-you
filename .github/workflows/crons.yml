@@ -1,0 +1,78 @@
+name: PLY Cron Jobs
+
+on:
+  schedule:
+    # Deliver matches — every hour on the hour
+    - cron: '0 * * * *'
+    # Disclosure expiry — every hour at :15
+    - cron: '15 * * * *'
+    # Post-date checkin — every hour at :30
+    - cron: '30 * * * *'
+    # Pre-date nudge — every 6 hours at :45
+    - cron: '45 */6 * * *'
+  workflow_dispatch: # Allow manual triggers for testing
+
+env:
+  CRON_SECRET: ${{ secrets.CRON_SECRET }}
+  BASE_URL: ${{ secrets.VERCEL_BASE_URL }}
+
+jobs:
+  deliver-matches:
+    if: github.event.schedule == '0 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deliver daily matches
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BASE_URL/api/cron/deliver-matches")
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -n -1)
+          echo "Status: $http_code"
+          echo "Response: $body"
+          if [ "$http_code" -ge 400 ]; then exit 1; fi
+
+  disclosure-expiry:
+    if: github.event.schedule == '15 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Expire stale disclosure rounds
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BASE_URL/api/cron/disclosure-expiry")
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -n -1)
+          echo "Status: $http_code"
+          echo "Response: $body"
+          if [ "$http_code" -ge 400 ]; then exit 1; fi
+
+  post-date-checkin:
+    if: github.event.schedule == '30 * * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mark completed dates and trigger check-ins
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BASE_URL/api/cron/post-date-checkin")
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -n -1)
+          echo "Status: $http_code"
+          echo "Response: $body"
+          if [ "$http_code" -ge 400 ]; then exit 1; fi
+
+  pre-date-nudge:
+    if: github.event.schedule == '45 */6 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send pre-date conversation starters
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BASE_URL/api/cron/pre-date-nudge")
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -n -1)
+          echo "Status: $http_code"
+          echo "Response: $body"
+          if [ "$http_code" -ge 400 ]; then exit 1; fi

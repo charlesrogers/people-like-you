@@ -7,6 +7,7 @@ import MatchCard from '@/components/MatchCard'
 import CountdownTimer from '@/components/CountdownTimer'
 import DisclosureExchange from '@/components/DisclosureExchange'
 import DateFeedback from '@/components/DateFeedback'
+import VoicePromptLoop from '@/components/VoicePromptLoop'
 import ProfileTab from '@/components/ProfileTab'
 import InviteTab from '@/components/InviteTab'
 import SettingsTab from '@/components/SettingsTab'
@@ -72,6 +73,11 @@ export default function Dashboard() {
   const [submitting, setSubmitting] = useState(false)
   const [passStreakAction, setPassStreakAction] = useState<PassStreakAction>(null)
   const [resuming, setResuming] = useState(false)
+
+  // Post-interest state for DailyThree
+  const [postInterestState, setPostInterestState] = useState<'mutual' | 'pending' | 'exhausted' | null>(null)
+  const [pendingName, setPendingName] = useState<string | null>(null)
+  const [showVoiceLoop, setShowVoiceLoop] = useState(false)
 
   // Mutual match + disclosure state
   interface ExchangeRound {
@@ -169,16 +175,21 @@ export default function Dashboard() {
     load()
   }, [])
 
-  async function handleLike(introId: string, matchId: string) {
+  async function handleLike(introId: string, matchId: string, matchedUserId?: string) {
     if (!userId) return
     setSubmitting(true)
     posthog.capture('match_interested', { intro_id: introId })
+
+    // Resolve matchedUserId from current/bonus intro if not passed directly
+    const resolvedMatchedUserId = matchedUserId
+      || (currentIntro?.id === introId ? currentIntro.matchedUserId : null)
+      || (bonusIntro?.id === introId ? bonusIntro.matchedUserId : null)
 
     try {
       const res = await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ introId, matchId, userId, action: 'interested' }),
+        body: JSON.stringify({ introId, matchId, matchedUserId: resolvedMatchedUserId, userId, action: 'interested' }),
       })
       const data = await res.json()
 
@@ -196,8 +207,13 @@ export default function Dashboard() {
         setBonusIntro(data.bonusIntro)
       }
 
-      // Check for mutual match
+      // Determine post-interest state
+      const likedName = (currentIntro?.id === introId ? currentIntro?.name : bonusIntro?.name) || 'them'
+
       if (data.mutualMatch) {
+        // STATE 1: Mutual match!
+        setPostInterestState('mutual')
+        setPendingName(likedName)
         const matchedIntro = currentIntro?.matchedUserId === data.mutualMatch.matchedUserId
           ? currentIntro : bonusIntro
         // Fetch disclosure state
@@ -215,6 +231,20 @@ export default function Dashboard() {
           })
         } catch {
           // Non-blocking
+        }
+      } else {
+        // Check remaining visible cards (exclude the one just liked + passed ones)
+        const remainingCards = (currentIntro && currentIntro.id !== introId ? 1 : 0)
+          + (bonusIntro && bonusIntro.id !== introId ? 1 : 0)
+
+        if (remainingCards > 0) {
+          // STATE 2: Pending — still have cards to browse
+          setPostInterestState('pending')
+          setPendingName(likedName)
+        } else {
+          // STATE 3: Exhausted — no more cards
+          setPostInterestState('exhausted')
+          setPendingName(likedName)
         }
       }
     } catch {
@@ -456,6 +486,17 @@ export default function Dashboard() {
               cards={dailyCards}
               firesAvailable={1}
               userId={userId!}
+              postInterestState={postInterestState}
+              mutualMatchData={activeMutualMatch ? {
+                id: activeMutualMatch.id,
+                partnerName: activeMutualMatch.matchedUserName,
+              } : null}
+              pendingName={pendingName || undefined}
+              onStartDisclosure={() => {
+                // Scroll to disclosure exchange (already rendered below)
+                document.getElementById('disclosure-exchange')?.scrollIntoView({ behavior: 'smooth' })
+              }}
+              onStartVoiceLoop={() => setShowVoiceLoop(true)}
               onFire={(card) => {
                 posthog.capture('daily_three_fire', { intro_id: card.id })
               }}
@@ -464,7 +505,6 @@ export default function Dashboard() {
               }}
               onPass={(card) => {
                 posthog.capture('daily_three_pass', { intro_id: card.id })
-                // Submit pass feedback
                 fetch('/api/feedback', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
@@ -479,9 +519,8 @@ export default function Dashboard() {
               }}
               onPhotoDecision={(card, interested, reason) => {
                 if (interested) {
-                  handleLike(card.id, card.matchId)
+                  handleLike(card.id, card.matchId, card.matchedUserId)
                 } else {
-                  // Photo-stage rejection — permanent (Rule 1)
                   setShowFeedback(true)
                   setFeedbackIntroId(card.id)
                   setFeedbackMatchId(card.matchId)
@@ -549,7 +588,7 @@ export default function Dashboard() {
 
         {/* Active Mutual Match — Disclosure Exchange */}
         {activeMutualMatch && !isPaused && !isHidden && (
-          <div className="mt-6">
+          <div className="mt-6" id="disclosure-exchange">
             <DisclosureExchange
               mutualMatchId={activeMutualMatch.id}
               userId={userId!}
@@ -591,6 +630,27 @@ export default function Dashboard() {
               onSubmitted={() => setPendingFeedback(null)}
             />
           </div>
+        )}
+
+        {/* Voice-to-Unlock Loop (State 3: pool exhausted) */}
+        {showVoiceLoop && userId && (
+          <VoicePromptLoop userId={userId} onIntroUnlocked={(intro: { id: string; matchId: string; matchedUserId: string; name: string; narrative: string; photoUrl: string | null }) => {
+            // Add the unlocked intro as a new card
+            setCurrentIntro({
+              id: intro.id,
+              matchId: intro.matchId,
+              matchedUserId: intro.matchedUserId,
+              name: intro.name,
+              narrative: intro.narrative,
+              photoUrl: intro.photoUrl,
+              status: 'pending',
+              introType: 'bonus',
+              expiresAt: new Date(Date.now() + 86400000).toISOString(),
+              voiceMessageRequired: false,
+            })
+            setPostInterestState(null)
+            setShowVoiceLoop(false)
+          }} onDone={() => setShowVoiceLoop(false)} />
         )}
 
         {/* History */}

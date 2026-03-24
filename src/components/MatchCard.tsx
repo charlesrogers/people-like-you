@@ -72,14 +72,14 @@ export default function MatchCard({ intro, onLike, onPass, isSubmitting }: Match
           disabled={isSubmitting}
           className="flex-1 rounded-xl bg-stone-900 py-3.5 text-base font-medium text-white transition hover:bg-stone-800 disabled:opacity-40 active:translate-y-px"
         >
-          {isSubmitting ? 'Finding your bonus...' : "I'm curious"}
+          {isSubmitting ? 'Finding your bonus...' : 'I want to know more'}
         </button>
         <button
           onClick={() => onPass(intro.id, intro.matchId, intro.matchedUserId)}
           disabled={isSubmitting}
           className="flex-1 rounded-xl border border-stone-200 py-3.5 text-base font-medium text-stone-600 transition hover:bg-stone-50 disabled:opacity-40 active:translate-y-px"
         >
-          Not right now
+          Not this time
         </button>
       </div>
     </div>

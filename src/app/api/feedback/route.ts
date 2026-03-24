@@ -11,9 +11,12 @@ import {
   saveMatch,
   getUserPhotos,
   getCompositeProfile,
+  checkForMutualMatch,
+  createDisclosureRound,
 } from '@/lib/db'
 import { updateRatings } from '@/lib/elo'
 import { selectNextCandidate, generateMatchAngle } from '@/lib/matchmaker'
+import { generateDisclosurePrompt } from '@/lib/disclosure-prompts'
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
@@ -122,7 +125,33 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    return NextResponse.json({ ok: true, bonusIntro: null })
+    // Check for mutual match (both users expressed interest)
+    let mutualMatch = null
+    if (matchId && body.matchedUserId) {
+      mutualMatch = await checkForMutualMatch(matchId, userId, body.matchedUserId)
+      if (mutualMatch) {
+        // Generate Round 1 disclosure prompt
+        const profileA = await getCompositeProfile(mutualMatch.user_a_id)
+        const profileB = await getCompositeProfile(mutualMatch.user_b_id)
+        if (profileA && profileB) {
+          try {
+            const promptText = await generateDisclosurePrompt(1, profileA, profileB)
+            await createDisclosureRound(mutualMatch.id, 1, promptText)
+          } catch {
+            // Non-blocking: mutual match still created even if prompt generation fails
+          }
+        }
+      }
+    }
+
+    return NextResponse.json({
+      ok: true,
+      bonusIntro: null,
+      mutualMatch: mutualMatch ? {
+        id: mutualMatch.id,
+        matchedUserId: body.matchedUserId,
+      } : null,
+    })
   }
 
   // Handle PASS
