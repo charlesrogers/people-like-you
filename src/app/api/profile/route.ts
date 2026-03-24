@@ -9,9 +9,49 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
-  // Check for existing user
+  // Check for existing user — update fields if provided
   const existing = await getUserByEmail(basics.email)
   if (existing) {
+    // Update user fields that may have changed
+    const updates: Record<string, unknown> = {}
+    if (basics.first_name) updates.first_name = basics.first_name
+    if (basics.last_name !== undefined) updates.last_name = basics.last_name
+    if (basics.birth_year) updates.birth_year = parseInt(basics.birth_year)
+    if (basics.state) updates.state = basics.state
+    if (basics.zipcode) updates.zipcode = basics.zipcode
+    if (basics.religion !== undefined) updates.religion = basics.religion
+
+    if (Object.keys(updates).length > 0) {
+      await updateUser(existing.id, updates)
+    }
+
+    // Save hard preferences if provided
+    if (hardPreferences) {
+      await saveHardPreferences({
+        user_id: existing.id,
+        age_range_min: hardPreferences.age_range_min || null,
+        age_range_max: hardPreferences.age_range_max || null,
+        distance_radius: hardPreferences.distance_radius || null,
+        faith_importance: hardPreferences.faith_importance || null,
+        kids: hardPreferences.kids || null,
+        marital_history: hardPreferences.marital_history || null,
+        smoking: hardPreferences.smoking || null,
+        community_fields: hardPreferences.community_fields || {},
+      })
+    }
+
+    // Save soft preferences if provided
+    if (softPreferences) {
+      await saveSoftPreferences({
+        user_id: existing.id,
+        humor_style: softPreferences.humor_style || [],
+        energy_level: softPreferences.energy_level || null,
+        communication_style: softPreferences.communication_style || null,
+        life_stage_priority: softPreferences.life_stage_priority || null,
+        date_activity_prefs: softPreferences.date_activity_prefs || [],
+      })
+    }
+
     return NextResponse.json({ id: existing.id, existing: true })
   }
 
@@ -27,7 +67,8 @@ export async function POST(req: NextRequest) {
     height: null,
     education: null,
     community: basics.community || 'general',
-  })
+    religion: basics.religion || null,
+  } as Parameters<typeof createUser>[0])
 
   // Save hard preferences
   if (hardPreferences) {

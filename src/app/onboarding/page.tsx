@@ -66,6 +66,7 @@ export default function OnboardingPage() {
   const [ageMax, setAgeMax] = useState(35)
   const [wouldRelocate, setWouldRelocate] = useState('')
   const [faithImportance, setFaithImportance] = useState('')
+  const [religion, setReligion] = useState('')
   const [kids, setKids] = useState('')
   const [maritalHistory, setMaritalHistory] = useState('')
 
@@ -228,7 +229,7 @@ export default function OnboardingPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            basics: { first_name: firstName, email, gender },
+            basics: { first_name: firstName, email, gender, religion: religion || null },
             hardPreferences: {
               age_range_min: ageMin,
               age_range_max: ageMax,
@@ -680,6 +681,45 @@ export default function OnboardingPage() {
                       key={opt.value} onClick={() => setFaithImportance(opt.value)}
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition active:translate-y-px ${
                         faithImportance === opt.value
+                          ? 'border-stone-900 bg-stone-900 text-white'
+                          : 'border-stone-200 text-stone-600 hover:border-stone-300'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Religion — always shown, framed as background */}
+              <div>
+                <label className="block text-xs font-medium text-stone-500">
+                  What&rsquo;s your background?
+                  {(faithImportance === 'essential' || faithImportance === 'important') && (
+                    <span className="ml-1 text-amber-600">This will help us filter your matches.</span>
+                  )}
+                </label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {[
+                    { value: 'lds', label: 'Latter-day Saint (LDS)' },
+                    { value: 'jehovahs_witness', label: "Jehovah's Witness" },
+                    { value: 'orthodox_jewish', label: 'Orthodox Jewish' },
+                    { value: 'jewish', label: 'Jewish (Conservative/Reform)' },
+                    { value: 'catholic', label: 'Catholic' },
+                    { value: 'protestant', label: 'Protestant / Evangelical' },
+                    { value: 'muslim', label: 'Muslim' },
+                    { value: 'hindu', label: 'Hindu' },
+                    { value: 'buddhist', label: 'Buddhist' },
+                    { value: 'sikh', label: 'Sikh' },
+                    { value: 'spiritual', label: 'Spiritual but not religious' },
+                    { value: 'agnostic', label: 'Agnostic' },
+                    { value: 'atheist', label: 'Atheist / None' },
+                    { value: 'other', label: 'Other' },
+                  ].map(opt => (
+                    <button
+                      key={opt.value} onClick={() => setReligion(opt.value)}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition active:translate-y-px ${
+                        religion === opt.value
                           ? 'border-stone-900 bg-stone-900 text-white'
                           : 'border-stone-200 text-stone-600 hover:border-stone-300'
                       }`}

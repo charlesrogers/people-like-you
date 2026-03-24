@@ -14,12 +14,21 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
   const [ageMax, setAgeMax] = useState(35)
   const [wouldRelocate, setWouldRelocate] = useState('')
   const [faithImportance, setFaithImportance] = useState('')
+  const [religion, setReligion] = useState('')
   const [kids, setKids] = useState('')
   const [maritalHistory, setMaritalHistory] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
+    // Load religion from user profile
+    fetch(`/api/profile?id=${userId}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.profile?.religion) setReligion(data.profile.religion)
+      })
+      .catch(() => {})
+
     fetch(`/api/hard-preferences?userId=${userId}`)
       .then(r => r.json())
       .then(data => {
@@ -44,7 +53,7 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          basics: { email },
+          basics: { email, religion: religion || null },
           hardPreferences: {
             age_range_min: ageMin,
             age_range_max: ageMax,
@@ -134,6 +143,45 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
             { value: 'essential', label: 'Essential' }, { value: 'important', label: 'Important' },
             { value: 'nice_to_have', label: 'Nice to have' }, { value: 'doesnt_matter', label: "Doesn't matter" },
           ]} />
+
+          <div>
+            <label className="text-xs font-medium text-stone-500">
+              What&rsquo;s your background?
+              {(faithImportance === 'essential' || faithImportance === 'important') && (
+                <span className="ml-1 text-amber-600">Used to filter your matches.</span>
+              )}
+            </label>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {[
+                { value: 'lds', label: 'LDS' },
+                { value: 'jehovahs_witness', label: "JW" },
+                { value: 'orthodox_jewish', label: 'Orthodox Jewish' },
+                { value: 'jewish', label: 'Jewish' },
+                { value: 'catholic', label: 'Catholic' },
+                { value: 'protestant', label: 'Protestant' },
+                { value: 'muslim', label: 'Muslim' },
+                { value: 'hindu', label: 'Hindu' },
+                { value: 'buddhist', label: 'Buddhist' },
+                { value: 'sikh', label: 'Sikh' },
+                { value: 'spiritual', label: 'Spiritual' },
+                { value: 'agnostic', label: 'Agnostic' },
+                { value: 'atheist', label: 'None' },
+                { value: 'other', label: 'Other' },
+              ].map(opt => (
+                <button
+                  key={opt.value}
+                  onClick={() => setReligion(opt.value)}
+                  className={`rounded-full border px-3 py-1.5 text-xs font-medium transition ${
+                    religion === opt.value
+                      ? 'border-stone-900 bg-stone-900 text-white'
+                      : 'border-stone-200 text-stone-600 hover:border-stone-300'
+                  }`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
           <ChipPicker label="Kids" value={kids} onChange={setKids} options={[
             { value: 'has', label: 'Have kids' }, { value: 'wants', label: 'Want kids' },
