@@ -299,7 +299,7 @@ export default function Dashboard() {
       <header className="border-b border-stone-200 bg-white px-6 py-4">
         <div className="mx-auto flex max-w-xl items-center justify-between">
           <h1 className="text-lg font-semibold text-stone-900">People Like You</h1>
-          <span className="text-sm text-stone-500">Hi, {firstName}</span>
+          {firstName && <span className="text-sm text-stone-500">Hi, {firstName}</span>}
         </div>
       </header>
 
