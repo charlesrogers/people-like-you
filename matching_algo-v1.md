@@ -105,31 +105,104 @@ The current 3-draft → critic → best-pick pipeline is strong. Keep it.
 - Log the outcome (interested/passed/photo_revealed_before_decision)
 - This creates the dataset for the feedback loop
 
-### Step 4: The Decision Flow (New)
+### Step 4: The Decision Flow — "Pick Your Favorite" (New)
 
-**Current flow:** Show narrative + photo → decide
+**Current flow:** 1 intro per day, show narrative + photo → decide
 
-**New flow:**
+**New flow: The Daily Three**
 
 ```
-1. Show narrative only (name + narrative, no photo)
+1. User opens the app → sees 3 intro cards (narrative only, no photos)
+   Each card: first name + 3-4 sentence pitch, different narrative angle
    ↓
-2. User reads it. Two options:
-   a) "I'm interested — show me more" → reveal photo
-   b) "Not for me" → capture why (see Step 5)
+2. User reads all 3 and picks their favorite
+   "Which of these people do you want to learn more about?"
    ↓
-3. Photo revealed. Two options:
+3. Chosen card → photo revealed
    a) "I'm interested" → match recorded, check for mutual
    b) "Not for me" → this is an Elo signal (liked the narrative, not the photo)
+   ↓
+4. The 2 unchosen cards → recycled (see Re-Pitch System below)
 ```
 
-**Why this matters:**
+**Why 3 at a time:**
 
-The two rejection points give us two different signals:
-- **Rejected at narrative stage** → the introduction didn't land. This is a narrative/strategy problem. Feed back into intro engine.
-- **Rejected at photo stage** → the introduction worked but physical attraction wasn't there. This is an Elo problem. Adjust Elo.
+- **Choosing is more engaging than judging.** "Pick the best" feels like a game. "Swipe right or left" feels like work.
+- **Built-in A/B/C test every day.** If we vary the narrative tiers across the 3 cards, the user's choice directly tells us which angle excites them most.
+- **Natural scarcity.** You only get to reveal 1 photo per day. So you actually read the intros carefully instead of skimming.
+- **Lower rejection friction.** You're not saying "no" to 2 people — you're just saying "this one excited me more." The other 2 aren't rejected, they're deferred.
 
-If we don't separate these, we can't learn.
+**Daily Three composition strategy:**
+
+For the first 5 days (exploration phase):
+- Card A: Self-expansion angle (Tier 1)
+- Card B: I-sharing angle (Tier 2)
+- Card C: Admiration or Comfort angle (Tier 3/4)
+- All 3 should be different people from the eligible pool
+
+After exploration phase (exploitation + exploration):
+- Card A: Best-performing tier for this user (70% exploit)
+- Card B: Second-best tier (20% exploit)
+- Card C: Random/underexplored tier (10% explore)
+- Mix of new candidates and re-pitches
+
+### The Re-Pitch System
+
+A great match can die because the first intro used the wrong angle. The re-pitch system fixes this.
+
+**Rules:**
+- A person can be pitched to you up to **5 times total** (1 original + 4 retries)
+- Each re-pitch MUST use a **different narrative tier** than all previous attempts
+- Re-pitches appear **3-7 days** after the original (not the next day — that'd feel repetitive)
+- Re-pitches are mixed into the Daily Three alongside new candidates
+- The user never knows they're seeing a re-pitch (different angle = feels like a different intro)
+
+**Re-pitch lifecycle:**
+```
+Attempt 1: Self-expansion angle → user picks a different card
+  ↓ (3-7 day cooldown)
+Attempt 2: I-sharing angle → user picks a different card
+  ↓ (3-7 day cooldown)
+Attempt 3: Admiration angle → user picks this one! → photo reveal
+  ↓
+RESULT: The match was good. The first two angles were wrong.
+  → Update Sarah's tier_weights: admiration ↑, self_expansion ↓, i_sharing ↓
+```
+
+Or:
+```
+Attempt 1-5: All tiers tried, never picked → RETIRE permanently
+  → This person genuinely doesn't excite you. Move on.
+  → Signal: possible compatibility miss (not just narrative miss)
+```
+
+**What re-pitches teach us:**
+- Conversion on attempt 2+ proves the MATCH was right but the ANGLE was wrong
+- Which tier finally worked → strongest excitement type signal we can get
+- If all 5 fail → real data point that this pair doesn't work (feeds into future candidate ranking)
+
+**Re-pitch pool management:**
+- Track per-candidate: `{ user_id, candidate_id, attempts: [{tier, date, picked: bool}] }`
+- When composing Daily Three, mix: ~2 new candidates + ~1 re-pitch (varies based on pool depth)
+- If re-pitch pool is empty (everyone's been tried), all 3 are new
+
+### Two Rejection Points = Two Signals
+
+The flow creates two distinct rejection moments:
+
+**Not picked from the Daily Three (narrative stage):**
+- The introduction didn't excite you enough to beat the other 2
+- This is a **narrative/strategy signal** — soft negative
+- Candidate goes to re-pitch pool (if attempts < 5)
+- Tier weight for the used strategy gets a small decrease
+
+**Passed after photo reveal (photo stage):**
+- The introduction worked (you picked it!) but physical attraction wasn't there
+- This is an **Elo signal** — the narrative engine did its job, the Elo gate was too wide
+- Gentle Elo adjustment (K=8) for the rejected person
+- Capture voice feedback: "What about the photo didn't match what you imagined?"
+
+If we don't separate these, we can't learn which system needs improving.
 
 ### Step 5: The Feedback Loop (New)
 
@@ -159,13 +232,14 @@ At photo stage (post-narrative):
 
 | Signal | Feeds Into | Mechanism |
 |--------|-----------|-----------|
-| Rejected at narrative, reason = "nothing grabbed me" | Narrative quality | Lower critic threshold, regenerate more aggressively |
-| Rejected at narrative, reason = "not my type" | Excitement type weights | Decrease weight of the tier/strategy used |
-| Rejected at narrative, voice note | Strategy selection + matching | Extract preferences, update taste map |
-| Rejected at photo, reason = "not attracted" | Elo | Gentle Elo adjustment (K=8) |
-| Rejected at photo, voice note | Elo + physical preference model | Extract physical preference signals |
-| Interested at narrative stage | Excitement type weights | Increase weight of the tier/strategy used |
+| Picked from Daily Three | Excitement type weights (strong +) | Increase tier weight for the strategy used |
+| Not picked from Daily Three | Excitement type weights (soft -) | Small decrease for that tier; candidate → re-pitch pool |
+| Re-pitch converts on attempt 2+ | Excitement type weights (strongest signal) | The winning tier gets a big boost; failing tiers get decreases |
+| All 5 re-pitch attempts fail | Candidate ranking | Retire candidate; flag as real incompatibility, not narrative miss |
+| Passed at photo stage | Elo | Gentle Elo adjustment (K=8) for rejected person |
+| Passed at photo, voice note | Elo + physical preference model | Extract physical preference signals |
 | Interested after photo | Full positive signal | Reinforce everything: strategy, Elo range, candidate type |
+| Voice note on any rejection | Strategy + taste map | Extract preferences, update rejection_themes |
 
 ---
 
@@ -206,21 +280,32 @@ UserPreferenceModel {
 
 **Update rules:**
 
-After each interaction:
+After each Daily Three interaction:
 ```
-// Excitement type update (Bayesian-ish)
-learning_rate = 0.15  // aggressive early, could decay
-if interested:
-  tier_weights[used_tier] += learning_rate * (1 - tier_weights[used_tier])
-  normalize(tier_weights)  // sum to 1
-if passed_at_narrative:
-  tier_weights[used_tier] -= learning_rate * tier_weights[used_tier]
-  normalize(tier_weights)
+// The user picked Card B (tier: i_sharing). Cards A (self_expansion) and C (admiration) not picked.
+
+// PICKED card — strong positive signal
+learning_rate = 0.15
+tier_weights[picked_tier] += learning_rate * (1 - tier_weights[picked_tier])
+
+// NOT PICKED cards — soft negative (they weren't rejected, just not chosen)
+soft_rate = 0.05
+for each unpicked_tier:
+  tier_weights[unpicked_tier] -= soft_rate * tier_weights[unpicked_tier]
+
+normalize(tier_weights)  // sum to 1
 
 // Strategy-level tracking
-strategy_scores[used_strategy].shown += 1
-if interested:
-  strategy_scores[used_strategy].interested += 1
+for each card in daily_three:
+  strategy_scores[card.strategy].shown += 1
+strategy_scores[picked_card.strategy].picked += 1
+
+// Re-pitch conversion (STRONGEST signal — worth 2x a normal pick)
+if picked card was a re-pitch:
+  tier_weights[winning_tier] += learning_rate * 2 * (1 - tier_weights[winning_tier])
+  for each previously_failed_tier on this candidate:
+    tier_weights[failed_tier] -= learning_rate * tier_weights[failed_tier]
+  normalize(tier_weights)
 
 // Voice feedback → extract and append to rejection_themes / attraction_themes
 ```
@@ -242,41 +327,52 @@ The fundamental question: **Do people's excitement types match their revealed pr
 - Surface this data in the admin panel
 
 **Success metrics:**
-- Interest rate by tier (which tiers convert best per user)
-- Interest rate by strategy (which of the 12 strategies convert best)
-- Narrative-stage pass rate (lower = better intros)
-- Photo-stage pass rate (lower = better Elo calibration)
-- Predicted vs revealed excitement type correlation
-- Voice feedback richness (are people giving useful feedback?)
+- **Pick rate by tier** — which tiers get chosen from the Daily Three (per user + aggregate)
+- **Pick rate by strategy** — which of the 12 strategies get chosen most
+- **Re-pitch conversion rate** — what % of re-pitched candidates eventually get picked? At which attempt?
+- **Re-pitch tier delta** — when a re-pitch converts, how different was the winning tier from attempt 1?
+- **Photo-stage pass rate** — lower = better Elo calibration (narrative worked, attraction didn't)
+- **Photo-stage interest rate** — higher = narrative + Elo both calibrated well
+- **Predicted vs revealed excitement type** — does Big Five inference match actual pick patterns?
+- **Daily Three engagement** — do users read all 3 or just pick the first? (time-on-card signal)
+- **Voice feedback rate** — what % of photo-stage rejections include a voice note?
+- **Retirement rate** — what % of candidates exhaust all 5 attempts without being picked?
 
 ---
 
 ## Implementation Priority
 
 ### Phase 1 (Now)
-- [ ] Split the decision flow: narrative-first → "interested in more" → photo reveal
-- [ ] Track rejection stage (narrative vs photo) separately
-- [ ] Add voice note option on rejection
-- [ ] Extract rejection voice notes with dedicated prompt
+- [ ] Daily Three UI: show 3 narrative-only cards, user picks 1
+- [ ] Photo reveal only on the picked card
+- [ ] Track: which card picked, which tier each card used, photo-stage outcome
+- [ ] Re-pitch pool: candidates not picked go back with `narrative_miss` tag + cooldown timer
+- [ ] Re-pitch lifecycle: max 5 attempts, different tier each time, 3-7 day cooldown
 - [ ] Store tier/strategy used per intro in `daily_intros` table
+- [ ] Add voice note option on photo-stage rejection
+- [ ] Extract rejection voice notes with dedicated prompt
 
 ### Phase 2 (After first 50 users)
-- [ ] Implement per-user `tier_weights` distribution
-- [ ] First-5-intros exploration rotation
-- [ ] Update tier_weights after each interaction
-- [ ] Surface excitement type learning in admin panel
+- [ ] Implement per-user `tier_weights` distribution (stored in user_cadence or new table)
+- [ ] First 5 days: exploration rotation (1 card per tier across the 3 daily)
+- [ ] Update tier_weights after each pick (strong +) and non-pick (soft -)
+- [ ] Re-pitch conversion → 2x weight update
+- [ ] Surface excitement type learning + pick rates in admin panel
+- [ ] Daily Three composition engine: mix new candidates + re-pitches based on pool depth
 
 ### Phase 3 (After first 200 interactions)
-- [ ] Thompson sampling for tier selection (explore/exploit)
+- [ ] Thompson sampling for tier assignment across the Daily Three
 - [ ] Voice feedback → preference extraction → rejection_themes/attraction_themes
-- [ ] Feed rejection themes into candidate filtering (soft filter)
-- [ ] A/B test: current fixed excitement type vs adaptive weights
+- [ ] Feed rejection themes into candidate ranking (soft filter on intro potential)
+- [ ] A/B test: fixed excitement type vs adaptive weights vs Daily Three picks
 
 ### Phase 4 (After statistical significance)
-- [ ] Publish findings: do excitement types predict intro response?
-- [ ] If not: replace excitement type system with pure behavioral weights
-- [ ] If yes: improve Big Five → excitement type inference from extraction data
-- [ ] Cross-user learning: "Users who liked this strategy also liked..."
+- [ ] Analyze: do re-pitches convert? At which attempt? Which tier wins?
+- [ ] Analyze: predicted excitement type vs revealed (from pick data)
+- [ ] If excitement types don't predict: replace with pure behavioral weights
+- [ ] If they do predict: improve inference from extraction data
+- [ ] Cross-user learning: "Users who picked this strategy also picked..."
+- [ ] Publish findings
 
 ---
 
