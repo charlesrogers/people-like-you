@@ -10,6 +10,7 @@ import DateFeedback from '@/components/DateFeedback'
 import ProfileTab from '@/components/ProfileTab'
 import InviteTab from '@/components/InviteTab'
 import SettingsTab from '@/components/SettingsTab'
+import DailyThree, { type IntroCard } from '@/components/DailyThree'
 
 type DashboardTab = 'today' | 'profile' | 'invite' | 'settings'
 
@@ -421,32 +422,77 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Hero match */}
-        {!isPaused && !isHidden && activeIntro && (
-          <MatchCard
-            intro={activeIntro}
-            onLike={handleLike}
-            onPass={handlePass}
-            isSubmitting={submitting}
-          />
-        )}
+        {/* Daily Three — new intro experience */}
+        {!isPaused && !isHidden && (activeIntro || activeBonus) && (() => {
+          // Convert available intros to DailyThree card format
+          const dailyCards: IntroCard[] = []
+          if (activeIntro) {
+            dailyCards.push({
+              id: activeIntro.id,
+              matchId: activeIntro.matchId,
+              matchedUserId: activeIntro.matchedUserId,
+              name: activeIntro.name,
+              narrative: activeIntro.narrative,
+              photoUrl: activeIntro.photoUrl,
+              tier: '',
+              strategy: '',
+            })
+          }
+          if (activeBonus) {
+            dailyCards.push({
+              id: activeBonus.id,
+              matchId: activeBonus.matchId,
+              matchedUserId: activeBonus.matchedUserId,
+              name: activeBonus.name,
+              narrative: activeBonus.narrative,
+              photoUrl: activeBonus.photoUrl,
+              tier: '',
+              strategy: '',
+            })
+          }
 
-        {/* Bonus match */}
-        {!isPaused && !isHidden && !activeIntro && activeBonus && (
-          <div>
-            <div className="mb-4 rounded-lg bg-emerald-50 px-4 py-3 text-center">
-              <p className="text-sm font-medium text-emerald-700">
-                Nice! Here&rsquo;s a bonus intro.
-              </p>
-            </div>
-            <MatchCard
-              intro={activeBonus}
-              onLike={handleLike}
-              onPass={handlePass}
-              isSubmitting={submitting}
+          return (
+            <DailyThree
+              cards={dailyCards}
+              firesAvailable={1}
+              userId={userId!}
+              onFire={(card) => {
+                posthog.capture('daily_three_fire', { intro_id: card.id })
+              }}
+              onSave={(card) => {
+                posthog.capture('daily_three_save', { intro_id: card.id })
+              }}
+              onPass={(card) => {
+                posthog.capture('daily_three_pass', { intro_id: card.id })
+                // Submit pass feedback
+                fetch('/api/feedback', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    introId: card.id,
+                    matchId: card.matchId,
+                    userId,
+                    action: 'not_interested',
+                    photoRevealedBeforeDecision: false,
+                  }),
+                }).catch(() => {})
+              }}
+              onPhotoDecision={(card, interested, reason) => {
+                if (interested) {
+                  handleLike(card.id, card.matchId)
+                } else {
+                  // Photo-stage rejection — permanent (Rule 1)
+                  setShowFeedback(true)
+                  setFeedbackIntroId(card.id)
+                  setFeedbackMatchId(card.matchId)
+                  setFeedbackMatchedUserId(card.matchedUserId)
+                }
+              }}
             />
-          </div>
-        )}
+          )
+        })()}
+
+        {/* Legacy MatchCard removed — replaced by DailyThree above */}
 
         {/* Done for today */}
         {!isPaused && !isHidden && doneForToday && !activeIntro && !activeBonus && (
