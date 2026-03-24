@@ -8,9 +8,10 @@ import CountdownTimer from '@/components/CountdownTimer'
 import DisclosureExchange from '@/components/DisclosureExchange'
 import DateFeedback from '@/components/DateFeedback'
 import ProfileTab from '@/components/ProfileTab'
+import InviteTab from '@/components/InviteTab'
 import SettingsTab from '@/components/SettingsTab'
 
-type DashboardTab = 'today' | 'profile' | 'settings'
+type DashboardTab = 'today' | 'profile' | 'invite' | 'settings'
 
 interface Intro {
   id: string
@@ -318,7 +319,8 @@ export default function Dashboard() {
         <div className="mx-auto max-w-xl flex">
           {([
             { id: 'today' as const, label: 'Intros', icon: '💌' },
-            { id: 'profile' as const, label: 'My Profile', icon: '👤' },
+            { id: 'profile' as const, label: 'You', icon: '👤' },
+            { id: 'invite' as const, label: 'Invite', icon: '🔗' },
             { id: 'settings' as const, label: 'Essentials', icon: '⚙️' },
           ]).map(tab => (
             <button
@@ -359,6 +361,11 @@ export default function Dashboard() {
         )}
 
         {/* Settings Tab */}
+        {/* Invite Tab */}
+        {activeTab === 'invite' && userId && (
+          <InviteTab userId={userId} />
+        )}
+
         {activeTab === 'settings' && userId && (
           <SettingsTab
             userId={userId}

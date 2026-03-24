@@ -381,6 +381,19 @@ function inferExcitementType(
   return sorted[0][0] as 'explorer' | 'nester' | 'intellectual' | 'spark'
 }
 
+// --- V2 excitement type inference ---
+
+function inferExcitementTypeFromV2(profile: import('./extraction-v2').PersonalityProfile): 'explorer' | 'nester' | 'intellectual' | 'spark' {
+  const scores = {
+    explorer: profile.explorer.confidence,
+    nester: profile.nurturer.confidence,
+    intellectual: profile.builder.confidence,
+    spark: profile.connector.confidence + profile.wildcard.confidence * 0.5,
+  }
+  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1])
+  return sorted[0][0] as 'explorer' | 'nester' | 'intellectual' | 'spark'
+}
+
 // --- Full Pipeline: transcribe + extract + aggregate ---
 
 export async function processVoiceMemo(memoId: string): Promise<void> {
@@ -415,21 +428,67 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
     if (error) console.warn('prompt_metrics upsert failed (table may not exist yet):', error.message)
   })
 
-  // Step 3: Extract personality signals
-  console.log(`Extracting signals from memo ${memoId}...`)
-  const { data: prompt } = await supabase
-    .from('prompts')
-    .select('category')
-    .eq('id', memo.prompt_id)
-    .single()
-  const category = prompt?.category || 'depth'
+  // Step 3: Run v2 Pass 1 (story extraction) on this memo
+  console.log(`[v2] Pass 1: extracting story from memo ${memoId}...`)
+  const { extractStory } = await import('./extraction-v2')
+  const { QUESTION_BANK } = await import('./prompts')
+  const promptTextMap = new Map(QUESTION_BANK.map(q => [q.id, q.text]))
+  const promptText = promptTextMap.get(memo.prompt_id) || memo.prompt_id
 
-  const extraction = await extractFromTranscript(transcript, category)
-  await updateVoiceMemo(memoId, { extraction })
-  console.log(`Extracted signals from memo ${memoId}`)
+  const storyExtraction = await extractStory(transcript, memo.prompt_id, promptText)
+  // Store Pass 1 output in the extraction field (replaces old format)
+  await updateVoiceMemo(memoId, { extraction: storyExtraction as unknown as MemoExtraction })
+  console.log(`[v2] Pass 1 done for memo ${memoId}: depth=${storyExtraction.response_depth}, ${storyExtraction.notable_quotes.length} quotes`)
 
-  // Step 3: Re-aggregate composite profile
-  console.log(`Aggregating composite profile for user ${memo.user_id}...`)
-  await aggregateCompositeProfile(memo.user_id)
-  console.log(`Composite profile updated for user ${memo.user_id}`)
+  // Step 4: Run v2 Pass 2 (personality profile) across ALL user's memos
+  console.log(`[v2] Pass 2: building personality profile for user ${memo.user_id}...`)
+  const allMemos = await getUserVoiceMemos(memo.user_id)
+  const allStories = allMemos
+    .filter(m => m.extraction && typeof m.extraction === 'object' && 'story_summary' in (m.extraction as unknown as Record<string, unknown>))
+    .map(m => m.extraction as unknown as import('./extraction-v2').StoryExtraction)
+
+  if (allStories.length > 0) {
+    const { buildPersonalityProfile } = await import('./extraction-v2')
+    const profile = await buildPersonalityProfile(allStories)
+    console.log(`[v2] Pass 2 done: primary=${profile.primary_energy?.slice(0, 60)}`)
+
+    // Save as composite profile (map v2 output to composite format)
+    await saveCompositeProfile({
+      user_id: memo.user_id,
+      big_five_proxy: {},
+      humor_style: profile.humor_signature || null,
+      communication_warmth: null,
+      communication_directness: null,
+      energy_enthusiasm: null,
+      storytelling_ability: null,
+      passion_indicators: [
+        ...profile.explorer.data_points,
+        ...profile.connector.data_points,
+      ],
+      kindness_markers: profile.nurturer.data_points,
+      vulnerability_authenticity: null,
+      interest_tags: profile.conversation_fuel,
+      values: profile.builder.data_points,
+      goals: [],
+      excitement_type: inferExcitementTypeFromV2(profile),
+      notable_quotes: profile.all_quotes,
+      memo_count: allStories.length,
+      last_updated: new Date().toISOString(),
+      // Store the full v2 profile in extended fields
+      humor_signature: profile.humor_signature ? { what_makes_them_laugh: [], humor_examples: [profile.humor_signature], laugh_triggers: [] } : null,
+      aesthetic_resonance: null,
+      emotional_processing: null,
+      attachment_proxy: null,
+      values_in_action: profile.builder.data_points,
+      demonstrated_competence: profile.wildcard.data_points,
+      // Store raw v2 profile as JSON for future use
+      primary_energy: profile.primary_energy,
+      hidden_depth: profile.hidden_depth,
+    } as unknown as Parameters<typeof saveCompositeProfile>[0])
+    console.log(`[v2] Composite profile saved for user ${memo.user_id}`)
+  } else {
+    // Fall back to old aggregation if no v2 stories yet
+    console.log(`[v2] No v2 stories found, falling back to old aggregation`)
+    await aggregateCompositeProfile(memo.user_id)
+  }
 }
