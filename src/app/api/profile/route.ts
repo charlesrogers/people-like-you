@@ -20,6 +20,7 @@ export async function POST(req: NextRequest) {
     if (basics.state) updates.state = basics.state
     if (basics.zipcode) updates.zipcode = basics.zipcode
     if (basics.religion !== undefined) updates.religion = basics.religion
+    if (basics.observance_level !== undefined) updates.observance_level = basics.observance_level
 
     if (Object.keys(updates).length > 0) {
       await updateUser(existing.id, updates)
@@ -36,7 +37,8 @@ export async function POST(req: NextRequest) {
         kids: hardPreferences.kids || null,
         marital_history: hardPreferences.marital_history || null,
         smoking: hardPreferences.smoking || null,
-        community_fields: hardPreferences.community_fields || {},
+        observance_match: hardPreferences.observance_match || null,
+      community_fields: hardPreferences.community_fields || {},
       })
     }
 
@@ -68,6 +70,7 @@ export async function POST(req: NextRequest) {
     education: null,
     community: basics.community || 'general',
     religion: basics.religion || null,
+    observance_level: basics.observance_level || null,
   } as Parameters<typeof createUser>[0])
 
   // Save hard preferences
@@ -81,6 +84,7 @@ export async function POST(req: NextRequest) {
       kids: hardPreferences.kids || null,
       marital_history: hardPreferences.marital_history || null,
       smoking: hardPreferences.smoking || null,
+      observance_match: hardPreferences.observance_match || null,
       community_fields: hardPreferences.community_fields || {},
     })
   }

@@ -15,6 +15,8 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
   const [wouldRelocate, setWouldRelocate] = useState('')
   const [faithImportance, setFaithImportance] = useState('')
   const [religion, setReligion] = useState('')
+  const [observanceLevel, setObservanceLevel] = useState('')
+  const [observanceMatch, setObservanceMatch] = useState('')
   const [kids, setKids] = useState('')
   const [maritalHistory, setMaritalHistory] = useState('')
   const [saving, setSaving] = useState(false)
@@ -26,6 +28,7 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
       .then(r => r.json())
       .then(data => {
         if (data.profile?.religion) setReligion(data.profile.religion)
+        if (data.profile?.observance_level) setObservanceLevel(data.profile.observance_level)
       })
       .catch(() => {})
 
@@ -40,6 +43,7 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
           if (p.faith_importance) setFaithImportance(p.faith_importance)
           if (p.kids) setKids(p.kids)
           if (p.marital_history) setMaritalHistory(p.marital_history)
+          if (p.observance_match) setObservanceMatch(p.observance_match)
         }
       })
       .catch(() => {})
@@ -53,7 +57,7 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          basics: { email, religion: religion || null },
+          basics: { email, religion: religion || null, observance_level: observanceLevel || null },
           hardPreferences: {
             age_range_min: ageMin,
             age_range_max: ageMax,
@@ -61,6 +65,7 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
             faith_importance: faithImportance || null,
             kids: kids || null,
             marital_history: maritalHistory || null,
+            observance_match: observanceMatch || null,
           },
           softPreferences: null,
         }),
@@ -182,6 +187,23 @@ export default function SettingsTab({ userId, email, onSignOut }: SettingsTabPro
               ))}
             </div>
           </div>
+
+          {/* Observance — only after religion selected */}
+          {religion && (
+            <ChipPicker label="What does this look like in your daily life?" value={observanceLevel} onChange={setObservanceLevel} options={[
+              { value: 'practicing', label: 'Practicing' },
+              { value: 'cultural', label: 'Cultural' },
+              { value: 'background', label: 'Background' },
+            ]} />
+          )}
+
+          {observanceLevel && (
+            <ChipPicker label="Partner at the same level?" value={observanceMatch} onChange={setObservanceMatch} options={[
+              { value: 'must_match', label: 'Must match' },
+              { value: 'prefer_same', label: 'Prefer same' },
+              { value: 'respect_only', label: "Doesn't matter" },
+            ]} />
+          )}
 
           <ChipPicker label="Kids" value={kids} onChange={setKids} options={[
             { value: 'has', label: 'Have kids' }, { value: 'wants', label: 'Want kids' },

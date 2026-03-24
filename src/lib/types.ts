@@ -16,6 +16,7 @@ export interface User {
   elo_interactions: number
   community: string
   religion: string | null
+  observance_level: string | null
   is_seed: boolean
   profile_status: 'active' | 'paused' | 'hidden' | 'deactivated'
   created_at: string
@@ -31,6 +32,7 @@ export interface HardPreferences {
   kids: 'has' | 'wants' | 'open' | 'doesnt_want' | null
   marital_history: 'never_married' | 'divorced' | null
   smoking: 'yes' | 'no' | 'sometimes' | 'dealbreaker' | null
+  observance_match: 'must_match' | 'prefer_same' | 'respect_only' | null
   community_fields: Record<string, unknown>
 }
 

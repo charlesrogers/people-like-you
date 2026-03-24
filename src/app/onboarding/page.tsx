@@ -67,6 +67,8 @@ export default function OnboardingPage() {
   const [wouldRelocate, setWouldRelocate] = useState('')
   const [faithImportance, setFaithImportance] = useState('')
   const [religion, setReligion] = useState('')
+  const [observanceLevel, setObservanceLevel] = useState('')
+  const [observanceMatch, setObservanceMatch] = useState('')
   const [kids, setKids] = useState('')
   const [maritalHistory, setMaritalHistory] = useState('')
 
@@ -229,7 +231,7 @@ export default function OnboardingPage() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            basics: { first_name: firstName, email, gender, religion: religion || null },
+            basics: { first_name: firstName, email, gender, religion: religion || null, observance_level: observanceLevel || null },
             hardPreferences: {
               age_range_min: ageMin,
               age_range_max: ageMax,
@@ -237,6 +239,7 @@ export default function OnboardingPage() {
               faith_importance: faithImportance,
               kids,
               marital_history: maritalHistory || null,
+              observance_match: observanceMatch || null,
             },
             softPreferences: null,
           }),
@@ -729,6 +732,57 @@ export default function OnboardingPage() {
                   ))}
                 </div>
               </div>
+
+              {/* Observance level — only shows after religion selected */}
+              {religion && (
+                <div>
+                  <label className="block text-xs font-medium text-stone-500">What does this look like in your daily life?</label>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {[
+                      { value: 'practicing', label: 'Practicing', desc: 'Shapes my daily choices' },
+                      { value: 'cultural', label: 'Cultural', desc: 'Part of my identity, flexible day-to-day' },
+                      { value: 'background', label: 'Background', desc: 'Raised in it, not a driving force' },
+                    ].map(opt => (
+                      <button
+                        key={opt.value} onClick={() => setObservanceLevel(opt.value)}
+                        className={`rounded-xl border px-4 py-2.5 text-left transition active:translate-y-px ${
+                          observanceLevel === opt.value
+                            ? 'border-stone-900 bg-stone-900 text-white'
+                            : 'border-stone-200 text-stone-600 hover:border-stone-300'
+                        }`}
+                      >
+                        <span className="block text-sm font-medium">{opt.label}</span>
+                        <span className={`block text-xs mt-0.5 ${observanceLevel === opt.value ? 'text-stone-300' : 'text-stone-400'}`}>{opt.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Observance match preference — only shows after observance selected */}
+              {observanceLevel && (
+                <div>
+                  <label className="block text-xs font-medium text-stone-500">How important is it that your partner is at the same level?</label>
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {[
+                      { value: 'must_match', label: 'Must match my level' },
+                      { value: 'prefer_same', label: 'Prefer same, but flexible' },
+                      { value: 'respect_only', label: "Doesn't matter if they respect it" },
+                    ].map(opt => (
+                      <button
+                        key={opt.value} onClick={() => setObservanceMatch(opt.value)}
+                        className={`rounded-full border px-4 py-2 text-sm font-medium transition active:translate-y-px ${
+                          observanceMatch === opt.value
+                            ? 'border-stone-900 bg-stone-900 text-white'
+                            : 'border-stone-200 text-stone-600 hover:border-stone-300'
+                        }`}
+                      >
+                        {opt.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* Kids */}
               <div>
