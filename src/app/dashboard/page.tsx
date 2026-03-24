@@ -115,6 +115,10 @@ export default function Dashboard() {
         const profileRes = await fetch(`/api/profile?id=${profileId}`)
         const profileData = await profileRes.json()
         if (!profileData.profile) {
+          // Stored profile ID is invalid — clear and redirect
+          localStorage.removeItem('ply_profile_id')
+          localStorage.removeItem('ply_access_token')
+          localStorage.removeItem('ply_refresh_token')
           window.location.href = '/onboarding'
           return
         }

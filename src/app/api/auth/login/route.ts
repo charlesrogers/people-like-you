@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
+import { getUserByEmail } from '@/lib/db'
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json()
@@ -19,8 +20,11 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 401 })
   }
 
+  // Look up the user in our users table to get the correct profile ID
+  const user = await getUserByEmail(email)
+
   return NextResponse.json({
-    id: data.user?.id,
+    id: user?.id || data.user?.id,
     access_token: data.session?.access_token,
     refresh_token: data.session?.refresh_token,
     expires_at: data.session?.expires_at,
