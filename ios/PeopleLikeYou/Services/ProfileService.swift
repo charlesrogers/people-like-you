@@ -12,7 +12,7 @@ struct CreateProfileResponse: Codable {
 struct CreateProfileRequest: Codable {
     let basics: Basics
     let hardPreferences: HardPreferences?
-    let softPreferences: SoftPreferences?
+    let softPreferences: String? // Always null now — soft prefs removed
 
     struct Basics: Codable {
         let email: String
@@ -20,8 +20,10 @@ struct CreateProfileRequest: Codable {
         let last_name: String?
         let gender: String
         let birth_year: Int?
-        let state: String?
+        let zipcode: String?
         let community: String
+        let religion: String?
+        let observance_level: String?
     }
 }
 
@@ -46,5 +48,34 @@ final class ProfileService {
         struct Wrapper: Codable { let composite: CompositeProfile }
         let response: Wrapper = try await api.get("/composite")
         return response.composite
+    }
+
+    func processMemos(userId: String) async throws {
+        struct Request: Codable { let userId: String }
+        struct Response: Codable { let processed: Int; let total: Int }
+        let _: Response = try await api.post("/process-memos", body: Request(userId: userId))
+    }
+
+    func submitTasteCalibration(userId: String, narrativeId: String, vote: Bool, attributesSelected: [String], narrativeStyle: String, feedbackText: String? = nil) async throws {
+        struct Request: Codable {
+            let userId: String
+            let narrativeId: String
+            let vote: Bool
+            let attributesSelected: [String]
+            let narrativeStyle: String
+            let feedbackText: String?
+        }
+        struct Response: Codable { let ok: Bool }
+        let _: Response = try await api.post("/taste-calibration", body: Request(
+            userId: userId, narrativeId: narrativeId, vote: vote,
+            attributesSelected: attributesSelected, narrativeStyle: narrativeStyle,
+            feedbackText: feedbackText
+        ))
+    }
+
+    func submitProfileFeedback(userId: String, feedback: [String: Bool], struckItems: [String]) async throws {
+        struct Request: Codable { let userId: String; let feedback: [String: Bool]; let struckItems: [String] }
+        struct Response: Codable { let ok: Bool }
+        let _: Response = try await api.post("/profile-feedback", body: Request(userId: userId, feedback: feedback, struckItems: struckItems))
     }
 }

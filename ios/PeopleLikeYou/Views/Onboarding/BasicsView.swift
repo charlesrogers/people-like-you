@@ -7,7 +7,7 @@ struct BasicsView: View {
     @State private var firstName = ""
     @State private var lastName = ""
     @State private var birthYear = ""
-    @State private var state = ""
+    @State private var zipcode = ""
     @State private var gender = "Man"
 
     var body: some View {
@@ -42,14 +42,21 @@ struct BasicsView: View {
                     }
 
                     LabeledField(label: "Birth year") {
-                        TextField("1990", text: $birthYear)
+                        TextField("1995", text: $birthYear)
                             .textFieldStyle(.roundedBorder)
                             .keyboardType(.numberPad)
+                            .onChange(of: birthYear) { _, newValue in
+                                birthYear = String(newValue.filter(\.isNumber).prefix(4))
+                            }
                     }
 
-                    LabeledField(label: "State") {
-                        TextField("e.g. California", text: $state)
+                    LabeledField(label: "Zip code") {
+                        TextField("84101", text: $zipcode)
                             .textFieldStyle(.roundedBorder)
+                            .keyboardType(.numberPad)
+                            .onChange(of: zipcode) { _, newValue in
+                                zipcode = String(newValue.filter(\.isNumber).prefix(5))
+                            }
                     }
                 }
 
@@ -63,7 +70,7 @@ struct BasicsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.primary)
-                .disabled(firstName.isEmpty)
+                .disabled(firstName.isEmpty || zipcode.count < 5)
             }
             .padding()
         }
@@ -72,7 +79,7 @@ struct BasicsView: View {
                 firstName = user.firstName
                 lastName = user.lastName ?? ""
                 if let by = user.birthYear { birthYear = String(by) }
-                state = user.state ?? ""
+                zipcode = user.zipcode ?? ""
                 gender = user.gender.rawValue
             }
         }

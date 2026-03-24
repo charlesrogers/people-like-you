@@ -4,8 +4,8 @@ struct SeedNarrative: Identifiable {
     let id: String
     let gender: String // "Man" or "Woman"
     let name: String
-    let narrative: String
     let style: String // explorer, nester, intellectual, spark
+    let narrative: String
     let attributes: [String]
 }
 

@@ -9,7 +9,6 @@ struct VoiceRecordingView: View {
     @State private var currentPromptIndex = 0
     @State private var completedCount = 0
     @State private var uploading = false
-    @State private var showExample = false
 
     var body: some View {
         VStack(spacing: 0) {
@@ -21,21 +20,12 @@ struct VoiceRecordingView: View {
                     } else {
                         let prompt = prompts[currentPromptIndex]
 
-                        // Tier badge
-                        Text(prompt.tier.label)
-                            .font(.caption2.weight(.semibold))
-                            .padding(.horizontal, 10)
-                            .padding(.vertical, 4)
-                            .background(tierColor(prompt.tier).opacity(0.15))
-                            .foregroundStyle(tierColor(prompt.tier))
-                            .clipShape(Capsule())
-                            .padding(.top, 24)
-
                         // Question
                         Text(prompt.text)
                             .font(.title3.weight(.medium))
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
+                            .padding(.top, 24)
 
                         // Help text
                         Text(prompt.helpText)
@@ -44,25 +34,22 @@ struct VoiceRecordingView: View {
                             .multilineTextAlignment(.center)
                             .padding(.horizontal, 24)
 
-                        // Example toggle
-                        Button {
-                            withAnimation { showExample.toggle() }
-                        } label: {
-                            HStack(spacing: 4) {
-                                Image(systemName: showExample ? "eye.slash" : "eye")
-                                Text(showExample ? "Hide example" : "See an example")
-                            }
+                        // Example — always visible, punchy one-liner
+                        Text("e.g. \u{201C}\(prompt.exampleAnswer)\u{201D}")
                             .font(.caption)
-                            .foregroundStyle(.secondary)
-                        }
+                            .foregroundStyle(.tertiary)
+                            .italic()
+                            .multilineTextAlignment(.center)
+                            .padding(.horizontal, 24)
 
-                        if showExample {
-                            Text("\"\(prompt.exampleAnswer)\"")
-                                .font(.caption)
-                                .foregroundStyle(.secondary)
-                                .italic()
-                                .padding(.horizontal, 24)
-                                .transition(.opacity)
+                        // Coaching tips
+                        if completedCount == 0 {
+                            VStack(spacing: 4) {
+                                Text("Just talk naturally. Any length is fine.")
+                                    .font(.caption2)
+                                    .foregroundStyle(.tertiary)
+                            }
+                            .padding(.top, 4)
                         }
                     }
                 }
@@ -78,12 +65,15 @@ struct VoiceRecordingView: View {
                         .foregroundStyle(.red)
                 }
 
-                // Record button
+                // Record / Stop button
                 Button {
                     if recorder.isRecording {
                         recorder.stopRecording()
+                        // Auto-submit on stop
+                        if let data = recorder.audioData {
+                            Task { await uploadAndAdvance(data: data) }
+                        }
                     } else {
-                        showExample = false
                         recorder.startRecording()
                     }
                 } label: {
@@ -95,6 +85,9 @@ struct VoiceRecordingView: View {
                                 RoundedRectangle(cornerRadius: 4)
                                     .fill(.white)
                                     .frame(width: 24, height: 24)
+                            } else if uploading {
+                                ProgressView()
+                                    .tint(.white)
                             } else {
                                 Circle()
                                     .fill(.white)
@@ -103,45 +96,41 @@ struct VoiceRecordingView: View {
                         }
                         .shadow(color: .black.opacity(0.1), radius: 8, y: 4)
                 }
+                .disabled(uploading)
 
-                // Post-recording actions
-                if let data = recorder.audioData, !recorder.isRecording {
-                    HStack(spacing: 16) {
-                        Button("Re-record") {
-                            recorder.audioData = nil
-                        }
-                        .foregroundStyle(.secondary)
-
-                        Button {
-                            Task { await uploadAndAdvance(data: data) }
-                        } label: {
-                            if uploading {
-                                ProgressView()
-                            } else {
-                                Text(currentPromptIndex < prompts.count - 1 ? "Next" : "Done")
-                                    .fontWeight(.semibold)
-                            }
-                        }
-                        .buttonStyle(.borderedProminent)
-                        .tint(.primary)
-                        .disabled(uploading)
+                // Status text
+                if uploading {
+                    Text("Got it!")
+                        .font(.caption)
+                        .foregroundStyle(.green)
+                } else if recorder.isRecording {
+                    // Cancel button during recording
+                    Button("Start over") {
+                        recorder.stopRecording()
+                        recorder.audioData = nil
                     }
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                } else {
+                    Text(recorder.audioData != nil ? "Tap to record another" : "Tap to record")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
 
                 // Skip this prompt
-                if recorder.audioData == nil && !recorder.isRecording && !prompts.isEmpty {
-                    Button("Skip — give me a different one") {
+                if recorder.audioData == nil && !recorder.isRecording && !uploading && !prompts.isEmpty {
+                    Button("Try a different question") {
                         skipPrompt()
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 }
 
-                // Progress dots + continue
+                // Progress dots
                 HStack(spacing: 6) {
                     ForEach(0..<(prompts.count), id: \.self) { i in
                         Circle()
-                            .fill(i < completedCount ? Color.primary : (i == currentPromptIndex ? Color.secondary : Color(.systemGray4)))
+                            .fill(i < completedCount ? Color.green : (i == currentPromptIndex ? Color.primary : Color(.systemGray4)))
                             .frame(width: 8, height: 8)
                     }
                 }
@@ -170,7 +159,6 @@ struct VoiceRecordingView: View {
         if let replacement = remaining.randomElement() {
             prompts[currentPromptIndex] = replacement
         }
-        showExample = false
     }
 
     private func uploadAndAdvance(data: Data) async {
@@ -186,14 +174,11 @@ struct VoiceRecordingView: View {
             )
             completedCount += 1
             recorder.audioData = nil
-            showExample = false
 
             if currentPromptIndex < prompts.count - 1 {
                 currentPromptIndex += 1
-            } else {
-                AnalyticsService.shared.onboardingSectionProgressed(section: "voice", recordings: completedCount)
-                onComplete()
             }
+            // Don't auto-complete — let user choose to continue or record more
         } catch {
             print("Upload failed: \(error)")
         }
@@ -204,15 +189,5 @@ struct VoiceRecordingView: View {
         let m = Int(t) / 60
         let s = Int(t) % 60
         return String(format: "%d:%02d", m, s)
-    }
-
-    private func tierColor(_ tier: PromptTier) -> Color {
-        switch tier {
-        case .selfExpansion: return .blue
-        case .iSharing: return .purple
-        case .admiration: return .orange
-        case .comfort: return .green
-        case .fun: return .pink
-        }
     }
 }

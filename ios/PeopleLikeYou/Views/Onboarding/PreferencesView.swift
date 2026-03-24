@@ -7,6 +7,9 @@ struct PreferencesView: View {
     @State private var ageMax: Double = 35
     @State private var wouldRelocate = ""
     @State private var faithImportance = ""
+    @State private var religion = ""
+    @State private var observanceLevel = ""
+    @State private var observanceMatch = ""
     @State private var kids = ""
     @State private var maritalHistory = ""
 
@@ -26,7 +29,7 @@ struct PreferencesView: View {
 
                 // Age range sliders
                 VStack(alignment: .leading, spacing: 12) {
-                    Text("Age range: \(Int(ageMin)) – \(Int(ageMax))")
+                    Text("Age range: \(Int(ageMin)) \u{2013} \(Int(ageMax))")
                         .font(.caption)
                         .foregroundStyle(.secondary)
 
@@ -59,6 +62,92 @@ struct PreferencesView: View {
                     ("nice_to_have", "Nice to have"), ("doesnt_matter", "Doesn't matter"),
                 ])
 
+                // Religion — always shown
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("What's your background?")
+                        .font(.subheadline.weight(.medium))
+                        .foregroundStyle(.secondary)
+
+                    if faithImportance == "essential" || faithImportance == "important" {
+                        Text("This will help us filter your matches.")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                    }
+
+                    FlowLayout(spacing: 8) {
+                        ForEach([
+                            ("lds", "Latter-day Saint (LDS)"),
+                            ("jehovahs_witness", "Jehovah's Witness"),
+                            ("orthodox_jewish", "Orthodox Jewish"),
+                            ("jewish", "Jewish (Conservative/Reform)"),
+                            ("catholic", "Catholic"),
+                            ("protestant", "Protestant / Evangelical"),
+                            ("muslim", "Muslim"),
+                            ("hindu", "Hindu"),
+                            ("buddhist", "Buddhist"),
+                            ("sikh", "Sikh"),
+                            ("spiritual", "Spiritual but not religious"),
+                            ("agnostic", "Agnostic"),
+                            ("atheist", "Atheist / None"),
+                            ("other", "Other"),
+                        ], id: \.0) { value, label in
+                            Button {
+                                religion = value
+                            } label: {
+                                Text(label)
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(religion == value ? Color.primary : Color.clear)
+                                    .foregroundStyle(religion == value ? Color(.systemBackground) : .primary)
+                                    .clipShape(Capsule())
+                                    .overlay(Capsule().stroke(Color.primary.opacity(religion == value ? 0 : 0.15)))
+                            }
+                        }
+                    }
+                }
+
+                // Observance level — only after religion selected
+                if !religion.isEmpty {
+                    VStack(alignment: .leading, spacing: 8) {
+                        Text("What does this look like in your daily life?")
+                            .font(.subheadline.weight(.medium))
+                            .foregroundStyle(.secondary)
+
+                        ForEach([
+                            ("practicing", "Practicing", "Shapes my daily choices"),
+                            ("cultural", "Cultural", "Part of my identity, flexible day-to-day"),
+                            ("background", "Background", "Raised in it, not a driving force"),
+                        ], id: \.0) { value, label, desc in
+                            Button {
+                                observanceLevel = value
+                            } label: {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text(label).font(.subheadline.weight(.semibold))
+                                    Text(desc).font(.caption).foregroundStyle(observanceLevel == value ? .white.opacity(0.7) : .secondary)
+                                }
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 10)
+                                .background(observanceLevel == value ? Color.primary : Color.clear)
+                                .foregroundStyle(observanceLevel == value ? Color(.systemBackground) : .primary)
+                                .clipShape(RoundedRectangle(cornerRadius: 12))
+                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(observanceLevel == value ? 0 : 0.15)))
+                            }
+                        }
+                    }
+                }
+
+                // Observance match — only after observance selected
+                if !observanceLevel.isEmpty {
+                    ChipPicker(label: "How important is it that your partner is at the same level?", selection: $observanceMatch, options: [
+                        ("must_match", "Must match my level"),
+                        ("prefer_same", "Prefer same, but flexible"),
+                        ("respect_only", "Doesn't matter if they respect it"),
+                    ])
+                }
+
                 // Kids
                 ChipPicker(label: "Kids *", selection: $kids, options: [
                     ("has", "Have kids"), ("wants", "Want kids"),
@@ -89,7 +178,6 @@ struct PreferencesView: View {
     }
 }
 
-// Reusable chip picker
 struct ChipPicker: View {
     let label: String
     @Binding var selection: String
@@ -98,7 +186,7 @@ struct ChipPicker: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
             Text(label)
-                .font(.caption)
+                .font(.subheadline.weight(.medium))
                 .foregroundStyle(.secondary)
 
             FlowLayout(spacing: 8) {

@@ -9,6 +9,7 @@ struct User: Codable, Identifiable {
     let seeking: Seeking
     let birthYear: Int?
     let state: String?
+    let zipcode: String?
     let height: String?
     let education: String?
     let onboardingStage: String
@@ -17,10 +18,12 @@ struct User: Codable, Identifiable {
     let community: String
     let isSeed: Bool
     let profileStatus: String?
+    let religion: String?
+    let observanceLevel: String?
     let createdAt: String
 
     enum CodingKeys: String, CodingKey {
-        case id, email, gender, seeking, state, height, education, community
+        case id, email, gender, seeking, state, zipcode, height, education, community, religion
         case firstName = "first_name"
         case lastName = "last_name"
         case birthYear = "birth_year"
@@ -29,6 +32,7 @@ struct User: Codable, Identifiable {
         case eloInteractions = "elo_interactions"
         case isSeed = "is_seed"
         case profileStatus = "profile_status"
+        case observanceLevel = "observance_level"
         case createdAt = "created_at"
     }
 }
@@ -50,7 +54,7 @@ struct HardPreferences: Codable {
     var faithImportance: String?
     var kids: String?
     var maritalHistory: String?
-    var smoking: String?
+    var observanceMatch: String?
     var communityFields: [String: String]?
 
     enum CodingKeys: String, CodingKey {
@@ -60,23 +64,7 @@ struct HardPreferences: Codable {
         case faithImportance = "faith_importance"
         case kids
         case maritalHistory = "marital_history"
-        case smoking
+        case observanceMatch = "observance_match"
         case communityFields = "community_fields"
-    }
-}
-
-struct SoftPreferences: Codable {
-    var humorStyle: [String]
-    var energyLevel: String?
-    var communicationStyle: String?
-    var lifeStagePriority: String?
-    var dateActivityPrefs: [String]
-
-    enum CodingKeys: String, CodingKey {
-        case humorStyle = "humor_style"
-        case energyLevel = "energy_level"
-        case communicationStyle = "communication_style"
-        case lifeStagePriority = "life_stage_priority"
-        case dateActivityPrefs = "date_activity_prefs"
     }
 }

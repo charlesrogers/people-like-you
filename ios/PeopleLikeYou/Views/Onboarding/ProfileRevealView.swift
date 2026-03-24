@@ -4,16 +4,17 @@ struct ProfileRevealView: View {
     let onComplete: () -> Void
     @EnvironmentObject var appState: AppState
 
-    @State private var composite: [String: Any]?
+    @State private var composite: CompositeProfile?
     @State private var isLoading = true
-    @State private var feedback: [String: Bool] = [:]
+    @State private var struckItems: Set<String> = []
     @State private var pollTimer: Timer?
 
-    private let excitementLabels: [String: (emoji: String, label: String, description: String)] = [
-        "explorer": ("🧭", "Explorer", "You light up around novelty, adventure, and the unexpected."),
-        "nester": ("🏡", "Nester", "You respond to warmth, stability, and shared values."),
-        "intellectual": ("🔬", "Intellectual", "You're drawn to depth, curiosity, and unique perspectives."),
-        "spark": ("⚡", "Spark", "You connect through humor, energy, and magnetic personality."),
+    private let dimensionMeta: [(id: String, emoji: String, label: String)] = [
+        ("explorer", "\u{1F9ED}", "Explorer"),
+        ("connector", "\u{1F49C}", "Connector"),
+        ("builder", "\u{2B50}", "Builder"),
+        ("nurturer", "\u{1F3E0}", "Nurturer"),
+        ("wildcard", "\u{26A1}", "Wildcard"),
     ]
 
     var body: some View {
@@ -28,66 +29,61 @@ struct ProfileRevealView: View {
                     }
                     .frame(maxWidth: .infinity)
                     .padding(.top, 60)
-                } else if let composite = composite {
-                    Text("Here's what we see in you")
+                } else if let composite {
+                    Text("Here\u{2019}s what we learned about you")
                         .font(.title2.bold())
 
-                    Text("Based on your stories, here's how we'll introduce you to people. Does this feel right?")
+                    Text("Tap anything that doesn\u{2019}t fit.")
                         .font(.subheadline)
                         .foregroundStyle(.secondary)
 
-                    // Excitement type
-                    if let typeStr = composite["excitement_type"] as? String,
-                       let typeInfo = excitementLabels[typeStr] {
-                        RevealCard(
-                            title: "Your type",
-                            feedbackKey: "excitement_type",
-                            feedback: $feedback
-                        ) {
-                            VStack(alignment: .leading, spacing: 4) {
-                                Text("\(typeInfo.emoji) \(typeInfo.label)")
-                                    .font(.title3.weight(.semibold))
-                                Text(typeInfo.description)
-                                    .font(.caption)
-                                    .foregroundStyle(.secondary)
+                    // Dimension bars (5 dimensions)
+                    VStack(spacing: 12) {
+                        ForEach(dimensionMeta, id: \.id) { dim in
+                            let score = dimensionScore(composite: composite, dimension: dim.id)
+                            VStack(alignment: .leading, spacing: 6) {
+                                HStack {
+                                    Text("\(dim.emoji) \(dim.label)")
+                                        .font(.subheadline.weight(.semibold))
+                                    Spacer()
+                                    Text("\(score)%")
+                                        .font(.subheadline.weight(.bold))
+                                        .monospacedDigit()
+                                }
+                                GeometryReader { geo in
+                                    ZStack(alignment: .leading) {
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Color(.systemGray5))
+                                            .frame(height: 10)
+                                        RoundedRectangle(cornerRadius: 4)
+                                            .fill(Color.primary)
+                                            .frame(width: geo.size.width * CGFloat(score) / 100, height: 10)
+                                    }
+                                }
+                                .frame(height: 10)
                             }
+                            .padding(14)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.1)))
                         }
                     }
 
-                    // Passions
-                    if let passions = composite["passion_indicators"] as? [String], !passions.isEmpty {
-                        RevealCard(title: "What lights you up", feedbackKey: "passions", feedback: $feedback) {
-                            FlowLayout(spacing: 6) {
-                                ForEach(passions.prefix(8), id: \.self) { p in
-                                    Text(p)
-                                        .font(.caption)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 4)
-                                        .background(Color(.secondarySystemBackground))
-                                        .clipShape(Capsule())
-                                }
-                            }
-                        }
+                    // Passions — strikeable
+                    if !composite.passionIndicators.isEmpty {
+                        StrikeableSection(title: "What lights you up", items: Array(composite.passionIndicators.prefix(8)), struckItems: $struckItems)
                     }
 
-                    // Values
-                    if let values = composite["values"] as? [String], !values.isEmpty {
-                        RevealCard(title: "Your values", feedbackKey: "values", feedback: $feedback) {
-                            FlowLayout(spacing: 6) {
-                                ForEach(values.prefix(6), id: \.self) { v in
-                                    Text(v)
-                                        .font(.caption)
-                                        .padding(.horizontal, 10)
-                                        .padding(.vertical, 4)
-                                        .background(Color(.secondarySystemBackground))
-                                        .clipShape(Capsule())
-                                }
-                            }
-                        }
+                    // Values — strikeable
+                    if !composite.values.isEmpty {
+                        StrikeableSection(title: "Your values", items: Array(composite.values.prefix(8)), struckItems: $struckItems)
+                    }
+
+                    // Interest tags — strikeable
+                    if !composite.interestTags.isEmpty {
+                        StrikeableSection(title: "Your interests", items: Array(composite.interestTags.prefix(10)), struckItems: $struckItems)
                     }
 
                     // Notable quotes
-                    if let quotes = composite["notable_quotes"] as? [String], !quotes.isEmpty {
+                    if !composite.notableQuotes.isEmpty {
                         VStack(alignment: .leading, spacing: 8) {
                             Text("In your own words")
                                 .font(.caption)
@@ -95,8 +91,8 @@ struct ProfileRevealView: View {
                                 .tracking(0.5)
                                 .foregroundStyle(.tertiary)
 
-                            ForEach(quotes.prefix(2), id: \.self) { q in
-                                Text(""\(q)"")
+                            ForEach(Array(composite.notableQuotes.prefix(3)), id: \.self) { q in
+                                Text("\u{201C}\(q)\u{201D}")
                                     .font(.subheadline)
                                     .italic()
                                     .foregroundStyle(.secondary)
@@ -107,12 +103,26 @@ struct ProfileRevealView: View {
                         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.1)))
                     }
 
-                    // Continue button
+                    // Struck items summary
+                    if !struckItems.isEmpty {
+                        HStack {
+                            Image(systemName: "exclamationmark.triangle")
+                                .foregroundStyle(.orange)
+                            Text("\(struckItems.count) items marked as not fitting \u{2014} we\u{2019}ll adjust.")
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                        }
+                        .padding(12)
+                        .background(Color.orange.opacity(0.08))
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                    }
+
+                    // Continue
                     Button {
                         saveFeedback()
                         onComplete()
                     } label: {
-                        Text("I'm ready — show me my matches")
+                        Text("I\u{2019}m ready \u{2014} show me my matches")
                             .font(.subheadline.weight(.semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
@@ -129,19 +139,36 @@ struct ProfileRevealView: View {
         .onDisappear { pollTimer?.invalidate() }
     }
 
-    private func startPolling() {
-        guard let userId = appState.userId else { return }
+    // Compute dimension score from composite profile
+    private func dimensionScore(composite: CompositeProfile, dimension: String) -> Int {
+        let big5 = composite.bigFiveProxy ?? [:]
+        switch dimension {
+        case "explorer":
+            return Int(((big5["openness"] ?? 0.5) * 0.6 + (composite.energyEnthusiasm ?? 0.5) * 0.4) * 100)
+        case "connector":
+            return Int(((big5["extraversion"] ?? 0.5) * 0.5 + (composite.communicationWarmth ?? 0.5) * 0.5) * 100)
+        case "builder":
+            let competence = composite.passionIndicators.isEmpty ? 0.5 : min(Double(composite.passionIndicators.count) / 6.0, 1.0)
+            return Int(((big5["conscientiousness"] ?? 0.5) * 0.5 + competence * 0.5) * 100)
+        case "nurturer":
+            return Int(((big5["agreeableness"] ?? 0.5) * 0.6 + (composite.vulnerabilityAuthenticity ?? 0.5) * 0.4) * 100)
+        case "wildcard":
+            let humor = composite.humorStyle != nil ? 0.7 : 0.3
+            return Int(((composite.storytellingAbility ?? 0.5) * 0.5 + humor * 0.5) * 100)
+        default:
+            return 50
+        }
+    }
 
+    private func startPolling() {
         pollTimer = Timer.scheduledTimer(withTimeInterval: 3, repeats: true) { _ in
             Task { @MainActor in
                 do {
-                    let status = try await APIClient.shared.get("/api/extraction-status?userId=\(userId)")
-                    if let ready = status["compositeReady"] as? Bool, ready {
+                    let status = try await ProfileService.shared.getExtractionStatus()
+                    if status.compositeReady {
                         pollTimer?.invalidate()
-                        let compData = try await APIClient.shared.get("/api/composite?userId=\(userId)")
-                        if let comp = compData["composite"] as? [String: Any] {
-                            withAnimation { composite = comp; isLoading = false }
-                        }
+                        let comp = try await ProfileService.shared.getComposite()
+                        withAnimation { composite = comp; isLoading = false }
                     }
                 } catch { }
             }
@@ -150,47 +177,50 @@ struct ProfileRevealView: View {
     }
 
     private func saveFeedback() {
-        guard let userId = appState.userId, !feedback.isEmpty else { return }
+        guard let userId = appState.userId else { return }
         Task {
-            try? await APIClient.shared.post("/api/profile-feedback", body: [
-                "userId": userId,
-                "feedback": feedback,
-            ] as [String: Any])
+            try? await ProfileService.shared.submitProfileFeedback(
+                userId: userId,
+                feedback: [:],
+                struckItems: Array(struckItems)
+            )
         }
     }
 }
 
-struct RevealCard<Content: View>: View {
+struct StrikeableSection: View {
     let title: String
-    let feedbackKey: String
-    @Binding var feedback: [String: Bool]
-    @ViewBuilder let content: () -> Content
+    let items: [String]
+    @Binding var struckItems: Set<String>
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack {
-                Text(title)
-                    .font(.caption)
-                    .textCase(.uppercase)
-                    .tracking(0.5)
-                    .foregroundStyle(.tertiary)
-                Spacer()
-                Button {
-                    feedback[feedbackKey] = !(feedback[feedbackKey] ?? true)
-                } label: {
-                    Text(feedback[feedbackKey] == false ? "Not quite" : "Feels right")
-                        .font(.caption2.weight(.medium))
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 4)
-                        .background(feedback[feedbackKey] == false ? Color.orange.opacity(0.15) : Color.green.opacity(0.1))
-                        .foregroundStyle(feedback[feedbackKey] == false ? .orange : .green)
-                        .clipShape(Capsule())
+            Text(title)
+                .font(.caption)
+                .textCase(.uppercase)
+                .tracking(0.5)
+                .foregroundStyle(.tertiary)
+
+            FlowLayout(spacing: 6) {
+                ForEach(items, id: \.self) { item in
+                    Button {
+                        if struckItems.contains(item) {
+                            struckItems.remove(item)
+                        } else {
+                            struckItems.insert(item)
+                        }
+                    } label: {
+                        Text(item)
+                            .font(.caption)
+                            .strikethrough(struckItems.contains(item))
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 5)
+                            .background(struckItems.contains(item) ? Color.red.opacity(0.08) : Color(.secondarySystemBackground))
+                            .foregroundStyle(struckItems.contains(item) ? .red.opacity(0.6) : .primary)
+                            .clipShape(Capsule())
+                    }
                 }
             }
-            content()
         }
-        .padding(16)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.1)))
     }
 }
