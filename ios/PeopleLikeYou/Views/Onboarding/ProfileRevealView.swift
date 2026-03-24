@@ -218,19 +218,33 @@ struct ProfileRevealView: View {
     // Compute dimension score from composite profile
     private func dimensionScore(composite: CompositeProfile, dimension: String) -> Int {
         let big5 = composite.bigFiveProxy ?? [:]
+        let openness: Double = big5["openness"] ?? 0.5
+        let extraversion: Double = big5["extraversion"] ?? 0.5
+        let conscientiousness: Double = big5["conscientiousness"] ?? 0.5
+        let agreeableness: Double = big5["agreeableness"] ?? 0.5
+        let energy: Double = composite.energyEnthusiasm ?? 0.5
+        let warmth: Double = composite.communicationWarmth ?? 0.5
+        let vuln: Double = composite.vulnerabilityAuthenticity ?? 0.5
+        let story: Double = composite.storytellingAbility ?? 0.5
+
         switch dimension {
         case "explorer":
-            return Int(((big5["openness"] ?? 0.5) * 0.6 + (composite.energyEnthusiasm ?? 0.5) * 0.4) * 100)
+            let raw = openness * 0.6 + energy * 0.4
+            return Int(raw * 100)
         case "connector":
-            return Int(((big5["extraversion"] ?? 0.5) * 0.5 + (composite.communicationWarmth ?? 0.5) * 0.5) * 100)
+            let raw = extraversion * 0.5 + warmth * 0.5
+            return Int(raw * 100)
         case "builder":
             let competence = composite.passionIndicators.isEmpty ? 0.5 : min(Double(composite.passionIndicators.count) / 6.0, 1.0)
-            return Int(((big5["conscientiousness"] ?? 0.5) * 0.5 + competence * 0.5) * 100)
+            let raw = conscientiousness * 0.5 + competence * 0.5
+            return Int(raw * 100)
         case "nurturer":
-            return Int(((big5["agreeableness"] ?? 0.5) * 0.6 + (composite.vulnerabilityAuthenticity ?? 0.5) * 0.4) * 100)
+            let raw = agreeableness * 0.6 + vuln * 0.4
+            return Int(raw * 100)
         case "wildcard":
-            let humor = composite.humorStyle != nil ? 0.7 : 0.3
-            return Int(((composite.storytellingAbility ?? 0.5) * 0.5 + humor * 0.5) * 100)
+            let humor: Double = composite.humorStyle != nil ? 0.7 : 0.3
+            let raw = story * 0.5 + humor * 0.5
+            return Int(raw * 100)
         default:
             return 50
         }
