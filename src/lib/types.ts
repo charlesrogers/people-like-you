@@ -9,6 +9,7 @@ export interface User {
   seeking: 'Men' | 'Women'
   birth_year: number | null
   state: string | null
+  zipcode: string | null
   height: string | null
   education: string | null
   onboarding_stage: string
@@ -197,10 +198,14 @@ export interface Prompt {
 export type MutualMatchStatus =
   | 'active'
   | 'exchange_in_progress'
+  | 'chatting'
+  | 'deciding'
+  | 'planning'
   | 'date_scheduled'
   | 'date_completed'
   | 'relationship'
   | 'expired'
+  | 'declined'
 
 export interface MutualMatch {
   id: string
@@ -211,6 +216,16 @@ export interface MutualMatch {
   current_round: number
   created_at: string
   expired_at: string | null
+  chat_started_at: string | null
+  chat_expires_at: string | null
+  user_a_msg_count: number
+  user_b_msg_count: number
+  planned_venue_name: string | null
+  planned_venue_address: string | null
+  planned_venue_place_id: string | null
+  planned_at: string | null
+  user_a_phone: string | null
+  user_b_phone: string | null
 }
 
 export interface DisclosureExchange {
@@ -441,4 +456,48 @@ export interface DateSuggestion {
   venueDescription: string | null
   distanceFromA: string | null
   distanceFromB: string | null
+}
+
+// --- Constrained Chat Types ---
+
+export interface ChatMessage {
+  id: string
+  mutual_match_id: string
+  sender_id: string
+  content: string
+  voice_url: string | null
+  transcript: string | null
+  message_number: number
+  created_at: string
+}
+
+export interface MeetDecision {
+  id: string
+  mutual_match_id: string
+  user_id: string
+  decision: 'yes' | 'no'
+  created_at: string
+}
+
+export interface DatePlanningPrefs {
+  id: string
+  mutual_match_id: string
+  user_id: string
+  available_slots: Array<{ date: string; slot: 'morning' | 'afternoon' | 'evening' }>
+  location_preferences: {
+    latitude?: number
+    longitude?: number
+    max_travel_minutes?: number
+    neighborhood_description?: string
+  }
+  submitted_at: string
+}
+
+export interface PlannedDateInfo {
+  venue_name: string
+  venue_address: string
+  venue_place_id: string | null
+  planned_at: string
+  partner_phone: string
+  partner_name: string
 }
