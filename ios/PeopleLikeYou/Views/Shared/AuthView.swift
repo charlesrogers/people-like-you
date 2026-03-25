@@ -312,12 +312,14 @@ struct AuthView: View {
     private enum EmojiAnimation { case wiggle, float, bounce }
 
     private func floatingEmoji(_ emoji: String, x: Double, y: Double, animation: EmojiAnimation) -> some View {
-        Text(emoji)
-            .font(.system(size: 32))
-            .position(
-                x: UIScreen.main.bounds.width * x,
-                y: UIScreen.main.bounds.height * y
-            )
-            .opacity(0.8)
+        GeometryReader { geo in
+            Text(emoji)
+                .font(.system(size: 32))
+                .position(
+                    x: geo.size.width * x,
+                    y: geo.size.height * y
+                )
+                .opacity(0.8)
+        }
     }
 }
