@@ -7,10 +7,6 @@ private let darkBg = Color(red: 26/255, green: 26/255, blue: 26/255) // #1a1a1a
 struct AuthView: View {
     @EnvironmentObject var appState: AppState
     @State private var showAuth = false
-    @State private var phone = ""
-    @State private var otpSent = false
-    @State private var otpCode = ""
-    @State private var useEmail = false
     @State private var email = ""
     @State private var password = ""
     @State private var isSignUp = true
@@ -25,11 +21,36 @@ struct AuthView: View {
         }
     }
 
-    // MARK: - Welcome Splash (matches web homepage)
+    // MARK: - Welcome Splash
 
     private var welcomeSplash: some View {
         ZStack {
             neonYellow.ignoresSafeArea()
+
+            // Emojis — simple Text overlays, no GeometryReader
+            VStack {
+                HStack {
+                    Text("\u{1F49B}").font(.largeTitle).padding(.leading, 30)
+                    Spacer()
+                    Text("\u{2728}").font(.title).padding(.trailing, 40)
+                }
+                .padding(.top, 60)
+
+                Spacer()
+
+                HStack {
+                    Text("\u{1F399}\u{FE0F}").font(.title).padding(.leading, 50)
+                    Spacer()
+                    Text("\u{1F48C}").font(.largeTitle).padding(.trailing, 30)
+                }
+
+                HStack {
+                    Text("\u{1F52E}").font(.title2).padding(.leading, 24)
+                    Spacer()
+                }
+                .padding(.bottom, 120)
+            }
+            .opacity(0.6)
 
             VStack(spacing: 0) {
                 Spacer()
@@ -70,7 +91,10 @@ struct AuthView: View {
                 // CTA
                 VStack(spacing: 12) {
                     Button {
-                        withAnimation(.spring(response: 0.35)) { showAuth = true }
+                        withAnimation(.spring(response: 0.35)) {
+                            showAuth = true
+                            isSignUp = true
+                        }
                     } label: {
                         Text("Get started \u{2014} it\u{2019}s free")
                             .font(.headline)
@@ -85,7 +109,6 @@ struct AuthView: View {
                         withAnimation(.spring(response: 0.35)) {
                             showAuth = true
                             isSignUp = false
-                            useEmail = true
                         }
                     } label: {
                         Text("I already have an account")
@@ -99,7 +122,7 @@ struct AuthView: View {
         }
     }
 
-    // MARK: - Auth Fields
+    // MARK: - Auth Fields (email only for now)
 
     private var authFields: some View {
         ScrollView {
@@ -124,56 +147,19 @@ struct AuthView: View {
                 .background(darkBg)
                 .clipShape(RoundedRectangle(cornerRadius: 12))
 
-                Text(otpSent ? "Enter the code we sent you." : (useEmail ? (isSignUp ? "Create your account" : "Welcome back") : "Enter your phone number"))
+                Text(isSignUp ? "Create your account" : "Welcome back")
                     .font(.title3.weight(.semibold))
 
                 VStack(spacing: 16) {
-                    if !useEmail {
-                        // Phone flow
-                        if !otpSent {
-                            HStack(spacing: 8) {
-                                Text("+1")
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 10)
-                                    .background(Color(.secondarySystemBackground))
-                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    TextField("Email", text: $email)
+                        .textFieldStyle(.roundedBorder)
+                        .textContentType(.emailAddress)
+                        .keyboardType(.emailAddress)
+                        .autocapitalization(.none)
 
-                                TextField("(555) 123-4567", text: $phone)
-                                    .textFieldStyle(.roundedBorder)
-                                    .keyboardType(.phonePad)
-                                    .textContentType(.telephoneNumber)
-                            }
-                        } else {
-                            TextField("123456", text: $otpCode)
-                                .textFieldStyle(.roundedBorder)
-                                .keyboardType(.numberPad)
-                                .multilineTextAlignment(.center)
-                                .font(.system(.title2, design: .monospaced))
-                                .onChange(of: otpCode) { _, newValue in
-                                    otpCode = String(newValue.filter(\.isNumber).prefix(6))
-                                }
-
-                            Button("Use a different number") {
-                                otpSent = false
-                                otpCode = ""
-                            }
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                        }
-                    } else {
-                        // Email fallback
-                        TextField("Email", text: $email)
-                            .textFieldStyle(.roundedBorder)
-                            .textContentType(.emailAddress)
-                            .keyboardType(.emailAddress)
-                            .autocapitalization(.none)
-
-                        SecureField("Password", text: $password)
-                            .textFieldStyle(.roundedBorder)
-                            .textContentType(isSignUp ? .newPassword : .password)
-                    }
+                    SecureField("Password", text: $password)
+                        .textFieldStyle(.roundedBorder)
+                        .textContentType(isSignUp ? .newPassword : .password)
 
                     if let error {
                         Text(error)
@@ -182,7 +168,7 @@ struct AuthView: View {
                             .multilineTextAlignment(.center)
                     }
 
-                    // Primary button — dark bg, white text (not .borderedProminent)
+                    // Primary button
                     Button {
                         Task { await submit() }
                     } label: {
@@ -194,44 +180,32 @@ struct AuthView: View {
                                 .background(darkBg)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                         } else {
-                            Text(buttonLabel)
+                            Text(isSignUp ? "Get Started" : "Log In")
                                 .font(.headline)
                                 .foregroundStyle(.white)
                                 .frame(maxWidth: .infinity)
                                 .frame(height: 48)
-                                .background(canSubmit ? darkBg : darkBg.opacity(0.3))
+                                .background(!email.isEmpty && !password.isEmpty ? darkBg : darkBg.opacity(0.3))
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
                         }
                     }
-                    .disabled(loading || !canSubmit)
+                    .disabled(loading || email.isEmpty || password.isEmpty)
 
-                    // Toggle phone / email
-                    Button(useEmail ? "Use phone number instead" : "Use email instead") {
-                        useEmail.toggle()
-                        otpSent = false
-                        otpCode = ""
+                    Button(isSignUp ? "Already have an account? Log in" : "New here? Sign up") {
+                        isSignUp.toggle()
                         error = nil
                     }
                     .font(.caption)
                     .foregroundStyle(.secondary)
 
-                    if useEmail {
-                        Button(isSignUp ? "Already have an account? Log in" : "New here? Sign up") {
-                            isSignUp.toggle()
-                            error = nil
-                        }
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                    }
-
                     // Back to welcome
                     Button {
                         withAnimation(.spring(response: 0.35)) { showAuth = false }
                     } label: {
-                        Image(systemName: "chevron.left")
-                            .font(.caption)
-                        Text("Back")
-                            .font(.caption)
+                        HStack(spacing: 4) {
+                            Image(systemName: "chevron.left").font(.caption)
+                            Text("Back").font(.caption)
+                        }
                     }
                     .foregroundStyle(.secondary)
                     .padding(.top, 8)
@@ -242,18 +216,7 @@ struct AuthView: View {
         }
     }
 
-    // MARK: - Helpers
-
-    private var buttonLabel: String {
-        if useEmail { return isSignUp ? "Get Started" : "Log In" }
-        return otpSent ? "Verify" : "Send Code"
-    }
-
-    private var canSubmit: Bool {
-        if useEmail { return !email.isEmpty && !password.isEmpty }
-        if otpSent { return otpCode.count == 6 }
-        return phone.filter(\.isNumber).count >= 10
-    }
+    // MARK: - Submit
 
     private func submit() async {
         loading = true
@@ -261,25 +224,20 @@ struct AuthView: View {
 
         do {
             let auth = AuthService.shared
+            let response: AuthResponse
 
-            if useEmail {
-                let response: AuthResponse
-                if isSignUp {
-                    response = try await auth.signUp(email: email, password: password, firstName: "", gender: "Man")
-                } else {
-                    response = try await auth.login(email: email, password: password)
-                }
-                handleAuthResponse(response)
-            } else if !otpSent {
-                let response = try await auth.requestOTP(phone: phone)
-                if let err = response.error {
-                    error = err
-                } else {
-                    otpSent = true
-                }
+            if isSignUp {
+                response = try await auth.signUp(email: email, password: password, firstName: "", gender: "Man")
             } else {
-                let response = try await auth.verifyOTP(phone: phone, code: otpCode)
-                handleAuthResponse(response)
+                response = try await auth.login(email: email, password: password)
+            }
+
+            if let err = response.error, response.accessToken == nil {
+                error = err
+            } else if let id = response.id, let access = response.accessToken, let refresh = response.refreshToken {
+                appState.didSignIn(userId: id, accessToken: access, refreshToken: refresh)
+            } else {
+                error = "Unexpected response"
             }
         } catch let apiError as APIError {
             self.error = apiError.localizedDescription
@@ -289,15 +247,4 @@ struct AuthView: View {
 
         loading = false
     }
-
-    private func handleAuthResponse(_ response: AuthResponse) {
-        if let err = response.error, response.accessToken == nil {
-            error = err
-        } else if let id = response.id, let access = response.accessToken, let refresh = response.refreshToken {
-            appState.didSignIn(userId: id, accessToken: access, refreshToken: refresh)
-        } else {
-            error = "Unexpected response"
-        }
-    }
-
 }
