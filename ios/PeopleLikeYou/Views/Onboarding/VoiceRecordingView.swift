@@ -88,7 +88,7 @@ struct VoiceRecordingView: View {
                     }
                 } label: {
                     Circle()
-                        .fill(recorder.isRecording ? .red : Color.primary)
+                        .fill(recorder.isRecording ? .red : plyDark)
                         .frame(width: 72, height: 72)
                         .overlay {
                             if recorder.isRecording {
@@ -169,7 +169,7 @@ struct VoiceRecordingView: View {
                 HStack(spacing: 6) {
                     ForEach(0..<(prompts.count), id: \.self) { i in
                         Circle()
-                            .fill(i < completedCount ? Color.green : (i == currentPromptIndex ? Color.primary : Color(.systemGray4)))
+                            .fill(i < completedCount ? Color.green : (i == currentPromptIndex ? plyDark : Color(.systemGray4)))
                             .frame(width: 8, height: 8)
                     }
                 }

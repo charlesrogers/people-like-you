@@ -59,14 +59,14 @@ struct ProfileRevealView: View {
                                             .fill(Color(.systemGray5))
                                             .frame(height: 10)
                                         RoundedRectangle(cornerRadius: 4)
-                                            .fill(Color.primary)
+                                            .fill(plyDark)
                                             .frame(width: geo.size.width * CGFloat(score) / 100, height: 10)
                                     }
                                 }
                                 .frame(height: 10)
                             }
                             .padding(14)
-                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.1)))
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(plyDark.opacity(0.1)))
                         }
                     }
 
@@ -103,7 +103,7 @@ struct ProfileRevealView: View {
                         }
                         .padding(16)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.1)))
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(plyDark.opacity(0.1)))
                     }
 
                     // Struck items summary
@@ -123,7 +123,7 @@ struct ProfileRevealView: View {
                                     .font(.caption.weight(.semibold))
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 8)
-                                    .background(.primary)
+                                    .background(plyDark)
                                     .foregroundStyle(Color(.systemBackground))
                                     .clipShape(RoundedRectangle(cornerRadius: 8))
                             }
@@ -151,7 +151,7 @@ struct ProfileRevealView: View {
                                         .font(.caption.weight(.medium))
                                         .padding(.horizontal, 12)
                                         .padding(.vertical, 6)
-                                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(Color.primary.opacity(0.15)))
+                                        .overlay(RoundedRectangle(cornerRadius: 8).stroke(plyDark.opacity(0.15)))
                                 }
                                 Button("I\u{2019}m good") {}
                                     .font(.caption)
@@ -186,9 +186,9 @@ struct ProfileRevealView: View {
                                     }
                                     .frame(maxWidth: .infinity, alignment: .leading)
                                     .padding(12)
-                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(Color.primary.opacity(0.1)))
+                                    .overlay(RoundedRectangle(cornerRadius: 10).stroke(plyDark.opacity(0.1)))
                                 }
-                                .foregroundStyle(.primary)
+                                .foregroundStyle(plyDark)
                             }
                         }
                     }
@@ -202,7 +202,7 @@ struct ProfileRevealView: View {
                             .font(.subheadline.weight(.semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
-                            .background(.primary)
+                            .background(plyDark)
                             .foregroundStyle(Color(.systemBackground))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                     }

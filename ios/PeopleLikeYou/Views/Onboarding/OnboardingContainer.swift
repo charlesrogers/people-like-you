@@ -14,7 +14,7 @@ struct OnboardingContainer: View {
             VStack(spacing: 0) {
                 // Progress bar
                 ProgressView(value: Double(currentStep.rawValue + 1), total: 6)
-                    .tint(.primary)
+                    .tint(plyDark)
                     .padding(.horizontal)
                     .padding(.top, 8)
 

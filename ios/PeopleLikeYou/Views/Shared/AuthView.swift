@@ -1,7 +1,6 @@
 import SwiftUI
 
-private let neonYellow = Color(red: 227/255, green: 255/255, blue: 68/255)
-private let darkBg = Color(red: 26/255, green: 26/255, blue: 26/255)
+// Uses plyNeon, plyDark from PLYStyles.swift
 
 private struct FloatingEmoji: View {
     let emoji: String
@@ -47,7 +46,7 @@ struct AuthView: View {
 
     private var welcomeSplash: some View {
         ZStack {
-            neonYellow.ignoresSafeArea()
+            plyNeon.ignoresSafeArea()
 
             // Big emojis spread across entire screen
             ZStack {
@@ -89,7 +88,7 @@ struct AuthView: View {
                     Text("People")
                         .font(.system(size: 66, weight: .heavy))
                         .tracking(-2)
-                        .foregroundStyle(darkBg)
+                        .foregroundStyle(plyDark)
 
                     HStack(spacing: 6) {
                         Text("Like")
@@ -97,25 +96,25 @@ struct AuthView: View {
                             .tracking(-2)
                             .italic()
                             .foregroundStyle(.white)
-                            .shadow(color: darkBg.opacity(0.15), radius: 8, x: 2, y: 4)
-                            .shadow(color: darkBg.opacity(0.08), radius: 20, x: 4, y: 8)
+                            .shadow(color: plyDark.opacity(0.15), radius: 8, x: 2, y: 4)
+                            .shadow(color: plyDark.opacity(0.08), radius: 20, x: 4, y: 8)
                         Text("You")
                             .font(.system(size: 66, weight: .heavy))
                             .tracking(-2)
-                            .foregroundStyle(darkBg)
+                            .foregroundStyle(plyDark)
                     }
                 }
 
                 VStack(spacing: 6) {
                     Text("The matchmaker that knows you")
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(darkBg.opacity(0.5))
+                        .foregroundStyle(plyDark.opacity(0.5))
                     Text("better than your friends do.")
                         .font(.system(size: 18, weight: .medium))
-                        .foregroundStyle(darkBg.opacity(0.5))
+                        .foregroundStyle(plyDark.opacity(0.5))
                     Text("Never swipe again.")
                         .font(.system(size: 19, weight: .heavy))
-                        .foregroundStyle(darkBg)
+                        .foregroundStyle(plyDark)
                         .padding(.top, 8)
                 }
                 .padding(.top, 28)
@@ -134,7 +133,7 @@ struct AuthView: View {
                             .font(.system(size: 18, weight: .bold))
                             .frame(maxWidth: .infinity)
                             .frame(height: 58)
-                            .background(darkBg)
+                            .background(plyDark)
                             .foregroundStyle(.white)
                             .clipShape(Capsule())
                             .shadow(color: .black.opacity(0.18), radius: 20, y: 10)
@@ -148,7 +147,7 @@ struct AuthView: View {
                     } label: {
                         Text("I already have an account")
                             .font(.system(size: 14, weight: .semibold))
-                            .foregroundStyle(darkBg.opacity(0.4))
+                            .foregroundStyle(plyDark.opacity(0.4))
                             .underline()
                     }
                 }
@@ -162,7 +161,7 @@ struct AuthView: View {
 
     private var authFields: some View {
         ZStack {
-            neonYellow.ignoresSafeArea()
+            plyNeon.ignoresSafeArea()
 
             VStack(spacing: 0) {
                 // Nav bar
@@ -176,7 +175,7 @@ struct AuthView: View {
                             Text("Back")
                                 .font(.system(size: 14, weight: .semibold))
                         }
-                        .foregroundStyle(darkBg.opacity(0.5))
+                        .foregroundStyle(plyDark.opacity(0.5))
                     }
                     Spacer()
                 }
@@ -195,7 +194,7 @@ struct AuthView: View {
                                 Text("Create your account")
                                     .font(.system(size: 34, weight: .heavy))
                                     .tracking(-1)
-                                    .foregroundStyle(darkBg)
+                                    .foregroundStyle(plyDark)
                                     .multilineTextAlignment(.center)
                             }
                         } else {
@@ -207,14 +206,14 @@ struct AuthView: View {
                                 Text("Welcome back")
                                     .font(.system(size: 34, weight: .heavy))
                                     .tracking(-1)
-                                    .foregroundStyle(darkBg)
+                                    .foregroundStyle(plyDark)
                             }
                         }
 
                         // Subtitle
                         Text(isSignUp ? "Share your stories. Meet your person. \u{1F48C}" : "Pick up where you left off.")
                             .font(.system(size: 16, weight: .medium))
-                            .foregroundStyle(darkBg.opacity(0.5))
+                            .foregroundStyle(plyDark.opacity(0.5))
                             .padding(.top, 6)
 
                         // Form card
@@ -222,16 +221,18 @@ struct AuthView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Email")
                                     .font(.system(size: 12, weight: .bold))
-                                    .foregroundStyle(darkBg.opacity(0.5))
+                                    .foregroundStyle(plyDark.opacity(0.5))
                                     .textCase(.uppercase)
                                     .tracking(0.5)
                                 TextField("you@email.com", text: $email)
                                     .font(.system(size: 16))
+                                    .foregroundStyle(plyDark)
+                                    .tint(plyDark)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 14)
                                     .background(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                                    .shadow(color: darkBg.opacity(0.06), radius: 4, y: 2)
+                                    .shadow(color: plyDark.opacity(0.06), radius: 4, y: 2)
                                     .textContentType(.emailAddress)
                                     .keyboardType(.emailAddress)
                                     .autocapitalization(.none)
@@ -240,16 +241,18 @@ struct AuthView: View {
                             VStack(alignment: .leading, spacing: 6) {
                                 Text("Password")
                                     .font(.system(size: 12, weight: .bold))
-                                    .foregroundStyle(darkBg.opacity(0.5))
+                                    .foregroundStyle(plyDark.opacity(0.5))
                                     .textCase(.uppercase)
                                     .tracking(0.5)
                                 SecureField("6+ characters", text: $password)
                                     .font(.system(size: 16))
+                                    .foregroundStyle(plyDark)
+                                    .tint(plyDark)
                                     .padding(.horizontal, 16)
                                     .padding(.vertical, 14)
                                     .background(.white)
                                     .clipShape(RoundedRectangle(cornerRadius: 12))
-                                    .shadow(color: darkBg.opacity(0.06), radius: 4, y: 2)
+                                    .shadow(color: plyDark.opacity(0.06), radius: 4, y: 2)
                                     .textContentType(isSignUp ? .newPassword : .password)
                             }
                         }
@@ -281,7 +284,7 @@ struct AuthView: View {
                             .foregroundStyle(.white)
                             .frame(maxWidth: .infinity)
                             .frame(height: 54)
-                            .background(!email.isEmpty && !password.isEmpty ? darkBg : darkBg.opacity(0.2))
+                            .background(!email.isEmpty && !password.isEmpty ? plyDark : plyDark.opacity(0.2))
                             .clipShape(RoundedRectangle(cornerRadius: 14))
                             .shadow(color: .black.opacity(0.12), radius: 12, y: 6)
                         }
@@ -297,7 +300,7 @@ struct AuthView: View {
                             }
                         }
                         .font(.system(size: 14, weight: .medium))
-                        .foregroundStyle(darkBg.opacity(0.4))
+                        .foregroundStyle(plyDark.opacity(0.4))
                         .padding(.top, 20)
                         .padding(.bottom, 40)
                     }

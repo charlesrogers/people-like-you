@@ -62,23 +62,9 @@ struct PhotoUploadView: View {
 
             Spacer()
 
-            Button {
+            PLYPrimaryButton("Continue", disabled: photos.isEmpty, loading: uploading) {
                 Task { await uploadAll() }
-            } label: {
-                if uploading {
-                    ProgressView()
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 48)
-                } else {
-                    Text("Finish Setup")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 48)
-                }
             }
-            .buttonStyle(.borderedProminent)
-            .tint(.primary)
-            .disabled(photos.isEmpty || uploading)
             .padding(.horizontal)
             .padding(.bottom)
         }

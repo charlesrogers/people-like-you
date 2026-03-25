@@ -69,17 +69,9 @@ struct BasicsView: View {
                     }
                 }
 
-                Button {
+                PLYPrimaryButton("Continue", disabled: firstName.isEmpty || birthYear.count < 4 || zipcode.count < 5) {
                     onComplete()
-                } label: {
-                    Text("Continue")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 48)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.primary)
-                .disabled(firstName.isEmpty || birthYear.count < 4 || zipcode.count < 5)
             }
             .padding()
         }

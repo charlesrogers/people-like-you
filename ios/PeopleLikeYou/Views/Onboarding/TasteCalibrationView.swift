@@ -57,10 +57,10 @@ struct TasteCalibrationView: View {
                                             .fontWeight(.medium)
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 6)
-                                            .background(selectedAttrs.contains(value) ? Color.primary : Color.clear)
+                                            .background(selectedAttrs.contains(value) ? plyDark : Color.clear)
                                             .foregroundStyle(selectedAttrs.contains(value) ? Color(.systemBackground) : .primary)
                                             .clipShape(Capsule())
-                                            .overlay(Capsule().stroke(Color.primary.opacity(0.2)))
+                                            .overlay(Capsule().stroke(plyDark.opacity(0.2)))
                                     }
                                 }
                             }
@@ -90,7 +90,7 @@ struct TasteCalibrationView: View {
                                     .font(.subheadline.weight(.semibold))
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 12)
-                                    .background(.primary)
+                                    .background(plyDark)
                                     .foregroundStyle(Color(.systemBackground))
                                     .clipShape(RoundedRectangle(cornerRadius: 10))
                             }
@@ -111,7 +111,7 @@ struct TasteCalibrationView: View {
                                     .font(.subheadline.weight(.semibold))
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 14)
-                                    .background(.primary)
+                                    .background(plyDark)
                                     .foregroundStyle(Color(.systemBackground))
                                     .clipShape(RoundedRectangle(cornerRadius: 12))
                             }
@@ -123,7 +123,7 @@ struct TasteCalibrationView: View {
                                     .font(.subheadline.weight(.semibold))
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 14)
-                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(0.15)))
+                                    .overlay(RoundedRectangle(cornerRadius: 12).stroke(plyDark.opacity(0.15)))
                             }
                         }
                         .padding(.top, 8)
@@ -146,7 +146,7 @@ struct TasteCalibrationView: View {
                             .font(.subheadline.weight(.semibold))
                             .frame(maxWidth: .infinity)
                             .padding(.vertical, 14)
-                            .background(.primary)
+                            .background(plyDark)
                             .foregroundStyle(Color(.systemBackground))
                             .clipShape(RoundedRectangle(cornerRadius: 12))
                     }

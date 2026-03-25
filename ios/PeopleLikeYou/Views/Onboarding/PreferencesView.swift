@@ -99,10 +99,10 @@ struct PreferencesView: View {
                                     .fontWeight(.medium)
                                     .padding(.horizontal, 10)
                                     .padding(.vertical, 6)
-                                    .background(religion == value ? Color.primary : Color.clear)
+                                    .background(religion == value ? plyDark : Color.clear)
                                     .foregroundStyle(religion == value ? Color(.systemBackground) : .primary)
                                     .clipShape(Capsule())
-                                    .overlay(Capsule().stroke(Color.primary.opacity(religion == value ? 0 : 0.15)))
+                                    .overlay(Capsule().stroke(plyDark.opacity(religion == value ? 0 : 0.15)))
                             }
                         }
                     }
@@ -130,10 +130,10 @@ struct PreferencesView: View {
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .padding(.horizontal, 14)
                                 .padding(.vertical, 10)
-                                .background(observanceLevel == value ? Color.primary : Color.clear)
+                                .background(observanceLevel == value ? plyDark : Color.clear)
                                 .foregroundStyle(observanceLevel == value ? Color(.systemBackground) : .primary)
                                 .clipShape(RoundedRectangle(cornerRadius: 12))
-                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.primary.opacity(observanceLevel == value ? 0 : 0.15)))
+                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(plyDark.opacity(observanceLevel == value ? 0 : 0.15)))
                             }
                         }
                     }
@@ -160,18 +160,10 @@ struct PreferencesView: View {
                 ])
 
                 Button {
+                PLYPrimaryButton("Continue", disabled: !canProceed) {
                     AnalyticsService.shared.onboardingSectionProgressed(section: "preferences")
                     onComplete()
-                } label: {
-                    Text("Continue")
-                        .font(.headline)
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 48)
                 }
-                .buttonStyle(.borderedProminent)
-                .tint(.primary)
-                .disabled(!canProceed)
-                .opacity(canProceed ? 1 : 0.4)
             }
             .padding()
         }
@@ -198,10 +190,10 @@ struct ChipPicker: View {
                             .font(.subheadline.weight(.medium))
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)
-                            .background(selection == value ? Color.primary : Color.clear)
+                            .background(selection == value ? plyDark : Color.clear)
                             .foregroundStyle(selection == value ? Color(.systemBackground) : .primary)
                             .clipShape(Capsule())
-                            .overlay(Capsule().stroke(Color.primary.opacity(selection == value ? 0 : 0.15)))
+                            .overlay(Capsule().stroke(plyDark.opacity(selection == value ? 0 : 0.15)))
                     }
                 }
             }
