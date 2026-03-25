@@ -19,9 +19,15 @@ struct RootView: View {
         Group {
             switch appState.screen {
             case .loading:
-                ProgressView()
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .background(Color(.systemBackground))
+                ZStack {
+                    Color(red: 227/255, green: 255/255, blue: 68/255)
+                        .ignoresSafeArea()
+                    HStack(spacing: 0) {
+                        Text("P").font(.system(size: 32, weight: .heavy)).foregroundStyle(Color(red: 26/255, green: 26/255, blue: 26/255))
+                        Text("L").font(.system(size: 32, weight: .heavy)).italic().foregroundStyle(Color(red: 26/255, green: 26/255, blue: 26/255).opacity(0.5))
+                        Text("Y").font(.system(size: 32, weight: .heavy)).foregroundStyle(Color(red: 26/255, green: 26/255, blue: 26/255))
+                    }
+                }
 
             case .auth:
                 AuthView()

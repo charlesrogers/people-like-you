@@ -31,13 +31,6 @@ struct AuthView: View {
         ZStack {
             neonYellow.ignoresSafeArea()
 
-            // Floating emojis
-            floatingEmoji("\u{1F49B}", x: 0.12, y: 0.18, animation: .wiggle)
-            floatingEmoji("\u{2728}", x: 0.85, y: 0.25, animation: .float)
-            floatingEmoji("\u{1F399}\u{FE0F}", x: 0.20, y: 0.70, animation: .bounce)
-            floatingEmoji("\u{1F48C}", x: 0.88, y: 0.72, animation: .wiggle)
-            floatingEmoji("\u{1F52E}", x: 0.08, y: 0.55, animation: .float)
-
             VStack(spacing: 0) {
                 Spacer()
 
@@ -307,19 +300,4 @@ struct AuthView: View {
         }
     }
 
-    // MARK: - Floating emoji helper
-
-    private enum EmojiAnimation { case wiggle, float, bounce }
-
-    private func floatingEmoji(_ emoji: String, x: Double, y: Double, animation: EmojiAnimation) -> some View {
-        GeometryReader { geo in
-            Text(emoji)
-                .font(.system(size: 32))
-                .position(
-                    x: geo.size.width * x,
-                    y: geo.size.height * y
-                )
-                .opacity(0.8)
-        }
-    }
 }
