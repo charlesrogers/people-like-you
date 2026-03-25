@@ -159,12 +159,10 @@ struct PreferencesView: View {
                     ("never_married", "Never married"), ("divorced", "Divorced"),
                 ])
 
-                Button {
                 PLYPrimaryButton("Continue", disabled: !canProceed) {
                     AnalyticsService.shared.onboardingSectionProgressed(section: "preferences")
                     onComplete()
                 }
-            }
             .padding()
         }
     }
@@ -191,7 +189,7 @@ struct ChipPicker: View {
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)
                             .background(selection == value ? plyDark : Color.clear)
-                            .foregroundStyle(selection == value ? Color(.systemBackground) : .primary)
+                            .foregroundStyle(selection == value ? Color(.systemBackground) : plyDark)
                             .clipShape(Capsule())
                             .overlay(Capsule().stroke(plyDark.opacity(selection == value ? 0 : 0.15)))
                     }
