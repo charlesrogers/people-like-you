@@ -95,15 +95,38 @@ Sarah's excitement weights after 10 intros:
 
 These weights directly modify narrative strategy selection. Over time, the system converges on what actually excites each person — not what we predicted from their Big Five.
 
-### Step 3: Narrative Generation (Unchanged but Instrumented)
+### Step 3: Narrative Generation — "The Trailer"
 
-The current 3-draft → critic → best-pick pipeline is strong. Keep it.
+Each intro is a trailer, not a blurb. Structure: **Hook → Story → Proof → Close.**
 
-**Add instrumentation:**
-- Log which strategy was used for each intro
+**3 Hook Types (tested via Daily Three):**
+- **Quote** — lead with their actual words (tests: does raw authenticity hook?)
+- **Contradiction** — two things that shouldn't go together (tests: does complexity hook?)
+- **Scene** — paint what being around them is like (tests: does imagination hook?)
+
+Each Daily Three card uses a different hook type. The user's 🔥 tells us which hook type worked. Over time: Archetype × Hook matrix fills in.
+
+**Intro Tone Rules (hard constraints, never violate):**
+1. **Never braggy.** If a story makes the person sound like they're announcing their own virtue, don't use it that way. Show actions, don't celebrate them.
+2. **Never personify the app.** No "you need to meet" or "okay so there's this person." No narrator voice.
+3. **Contradiction > single note.** Tension between two sides of someone is always more interesting than developing one theme.
+4. **Close with vivid image or joke, never sentiment.** If the last sentence could go on a Hallmark card, rewrite it. No rhetorical questions.
+5. **Don't explain the meaning.** Show behavior, stop. Don't add "and that tells you everything."
+6. **Frame accomplishments as creation, not ego.** "Built something that didn't exist before" >> "is really good at building things."
+7. **No superlatives.** Not "the greatest" or "the most amazing" — just show it.
+8. **Specifics > patterns.** "Tim Ho Wan and then four more Chinese restaurants" >> "loves food."
+9. **The intro is about the SUBJECT, not the reader.** Don't reference the reader's interests or say "you'd love." They know what they like.
+
+**3-draft parallel generation per hook type:**
+- 3 creative variations generated per card
+- Critic scores each on: hook_power, intrigue, specificity, mystery
+- Best draft wins; if below threshold, regenerate with feedback
+
+**Instrumentation:**
+- Log hook_type used for each intro
 - Log the critic scores
-- Log the outcome (interested/passed/photo_revealed_before_decision)
-- This creates the dataset for the feedback loop
+- Log the outcome (🔥/💾/👋, photo-stage decision)
+- This creates the dataset for the hook type ranking model
 
 ### Step 4: The Decision Flow — The Daily Three + 🔥 System
 
