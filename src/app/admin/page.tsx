@@ -71,7 +71,35 @@ interface AdminMatch {
   }>;
 }
 
-type Tab = "overview" | "users" | "matches" | "matrix";
+interface TestsData {
+  lifeStage: {
+    totalProfiles: number;
+    hasLifeStage: number;
+    scoreable: number;
+    chapters: Record<string, number>;
+    funnel: {
+      scored: { intros: number; likeRate: number; mutualMatches: number };
+      skipped: { intros: number; likeRate: number; mutualMatches: number };
+    };
+  };
+  hookType: {
+    totalIntros: number;
+    byType: Array<{
+      hookType: string;
+      total: number;
+      liked: number;
+      passed: number;
+      expired: number;
+      pending: number;
+      likeRate: number;
+      passRate: number;
+    }>;
+    populated: boolean;
+  };
+  userCount: number;
+}
+
+type Tab = "overview" | "users" | "matches" | "matrix" | "tests";
 
 // ─── Auth gate ───
 
@@ -156,6 +184,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
   const [stats, setStats] = useState<StatsData | null>(null);
   const [profiles, setProfiles] = useState<AdminUser[]>([]);
   const [matches, setMatches] = useState<AdminMatch[]>([]);
+  const [testsData, setTestsData] = useState<TestsData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -193,11 +222,21 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
     }
   }, [tab, matches.length, secret]);
 
+  // Lazy-load tests data
+  useEffect(() => {
+    if (tab === "tests" && !testsData) {
+      adminFetch("/api/admin/tests", secret).then(async (r) => {
+        if (r.ok) setTestsData(await r.json());
+      });
+    }
+  }, [tab, testsData, secret]);
+
   const tabs: { id: Tab; label: string }[] = [
     { id: "overview", label: "Overview" },
     { id: "users", label: "Users" },
     { id: "matches", label: "Matches" },
     { id: "matrix", label: "Matrix" },
+    { id: "tests", label: "Tests" },
   ];
 
   return (
@@ -237,6 +276,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
         )}
         {tab === "matches" && <MatchesTab matches={matches} stats={stats} />}
         {tab === "matrix" && <MatrixTab profiles={profiles} />}
+        {tab === "tests" && <TestsTab data={testsData} />}
         {loading && !stats && (
           <p className="text-center text-stone-400 py-12">Loading...</p>
         )}
@@ -940,6 +980,259 @@ function MatrixTab({ profiles }: { profiles: AdminUser[] }) {
               ))}
           </tbody>
         </table>
+      </div>
+    </div>
+  );
+}
+
+// ─── Tests Tab ───
+
+const POWER_TABLE = [
+  { users: 10, learn: "Qualitative only — read every intro, collect feedback", days: "—" },
+  { users: 30, learn: "Identify clearly worst hook type (if 0 likes in a week, kill it)", days: "7" },
+  { users: 100, learn: "Reliable hook type ranking. Borderline per-archetype breakdown", days: "3–7" },
+  { users: 300, learn: "Per-archetype x hook type matrix fills in. Start Thompson sampling", days: "3" },
+  { users: 1000, learn: "Full optimization. A/B test new hook types. Per-user personalization", days: "1" },
+];
+
+function TestsTab({ data }: { data: TestsData | null }) {
+  if (!data) {
+    return <p className="text-center text-stone-400 py-12">Loading test data...</p>;
+  }
+
+  const currentTier = POWER_TABLE.findIndex((row, i) => {
+    const next = POWER_TABLE[i + 1];
+    return !next || data.userCount < next.users;
+  });
+
+  return (
+    <div className="space-y-8">
+      {/* Statistical Power Reference */}
+      <div className="rounded-xl border border-stone-200 bg-white p-6">
+        <h2 className="text-sm font-semibold text-stone-900 mb-1">Statistical Power Reference</h2>
+        <p className="text-xs text-stone-500 mb-4">
+          Current real users: <span className="font-semibold text-stone-700">{data.userCount}</span>
+        </p>
+        <table className="w-full text-xs">
+          <thead>
+            <tr className="border-b border-stone-200">
+              <th className="py-2 text-left font-medium text-stone-500 w-20">Users</th>
+              <th className="py-2 text-left font-medium text-stone-500">What we can learn</th>
+              <th className="py-2 text-right font-medium text-stone-500 w-16">Days</th>
+            </tr>
+          </thead>
+          <tbody>
+            {POWER_TABLE.map((row, i) => (
+              <tr
+                key={row.users}
+                className={`border-b border-stone-100 ${i === currentTier ? "bg-amber-50" : ""}`}
+              >
+                <td className={`py-2 font-medium ${i === currentTier ? "text-amber-700" : "text-stone-700"}`}>
+                  {row.users.toLocaleString()}
+                </td>
+                <td className={`py-2 ${i === currentTier ? "text-amber-800" : "text-stone-600"}`}>
+                  {row.learn}
+                </td>
+                <td className={`py-2 text-right ${i === currentTier ? "text-amber-700" : "text-stone-500"}`}>
+                  {row.days}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Test 1: Life-Stage Soft Scoring */}
+      <div className="rounded-xl border border-stone-200 bg-white p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-sm font-semibold text-stone-900">Test 1: Life-Stage Soft Scoring</h3>
+            <p className="text-xs text-stone-500 mt-0.5">Started 2026-03-24 · Weight 0.35 (~8% of total score)</p>
+          </div>
+          <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">Active</span>
+        </div>
+
+        {/* Extraction Health */}
+        <h4 className="text-xs font-semibold text-stone-700 mb-3">Extraction Health</h4>
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 mb-6">
+          <MetricCard label="Total Profiles" value={data.lifeStage.totalProfiles} />
+          <MetricCard label="Has Life Stage" value={data.lifeStage.hasLifeStage}
+            sub={`${data.lifeStage.totalProfiles > 0 ? Math.round((data.lifeStage.hasLifeStage / data.lifeStage.totalProfiles) * 100) : 0}% coverage`} />
+          <MetricCard label="Scoreable" value={data.lifeStage.scoreable}
+            sub="confidence > 0.3" />
+          <MetricCard label="Coverage"
+            value={`${data.lifeStage.totalProfiles > 0 ? Math.round((data.lifeStage.scoreable / data.lifeStage.totalProfiles) * 100) : 0}%`}
+            sub={data.lifeStage.totalProfiles > 0 && (data.lifeStage.scoreable / data.lifeStage.totalProfiles) < 0.3 ? "Below 30% threshold" : "OK"} />
+        </div>
+
+        {/* Chapter Distribution */}
+        <h4 className="text-xs font-semibold text-stone-700 mb-3">Chapter Distribution</h4>
+        <div className="space-y-2 mb-6">
+          {Object.entries(data.lifeStage.chapters).map(([chapter, count]) => {
+            const max = Math.max(...Object.values(data.lifeStage.chapters), 1);
+            return (
+              <div key={chapter} className="flex items-center gap-3">
+                <span className="w-24 text-xs font-medium text-stone-500 text-right capitalize">{chapter}</span>
+                <div className="flex-1 h-5 bg-stone-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-stone-600 rounded-full transition-all" style={{ width: `${(count / max) * 100}%` }} />
+                </div>
+                <span className="w-10 text-xs text-stone-500 text-right">{count}</span>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Funnel: Scored vs Skipped */}
+        <h4 className="text-xs font-semibold text-stone-700 mb-3">Funnel: Life-Stage Scored vs Skipped</h4>
+        <div className="overflow-x-auto mb-6">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-stone-200">
+                <th className="py-2 text-left font-medium text-stone-500">Group</th>
+                <th className="py-2 text-right font-medium text-stone-500">Intros</th>
+                <th className="py-2 text-right font-medium text-stone-500">Like Rate</th>
+                <th className="py-2 text-right font-medium text-stone-500">Mutual Matches</th>
+              </tr>
+            </thead>
+            <tbody>
+              {[
+                { label: "Scored (both have life stage)", ...data.lifeStage.funnel.scored },
+                { label: "Skipped (missing life stage)", ...data.lifeStage.funnel.skipped },
+              ].map((row) => (
+                <tr key={row.label} className="border-b border-stone-100">
+                  <td className="py-2 font-medium text-stone-700">{row.label}</td>
+                  <td className="py-2 text-right text-stone-600">{row.intros}</td>
+                  <td className="py-2 text-right text-stone-600">{row.likeRate}%</td>
+                  <td className="py-2 text-right text-stone-600">{row.mutualMatches}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Decision Framework */}
+        <h4 className="text-xs font-semibold text-stone-700 mb-3">Decision Framework</h4>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-stone-200">
+                <th className="py-2 text-left font-medium text-stone-500">Signal</th>
+                <th className="py-2 text-left font-medium text-stone-500">Action</th>
+              </tr>
+            </thead>
+            <tbody className="text-stone-600">
+              <tr className="border-b border-stone-100">
+                <td className="py-2">Extraction &lt;30% coverage after 2 weeks</td>
+                <td className="py-2">Add/modify onboarding questions to elicit life-stage talk</td>
+              </tr>
+              <tr className="border-b border-stone-100">
+                <td className="py-2">&gt;20% age-chapter misclassification</td>
+                <td className="py-2">Revise extraction prompt</td>
+              </tr>
+              <tr className="border-b border-stone-100">
+                <td className="py-2">Chat engagement: A-high &gt; A-low by 15%+</td>
+                <td className="py-2 text-green-700 font-medium">Strong signal — increase weight to 0.75</td>
+              </tr>
+              <tr className="border-b border-stone-100">
+                <td className="py-2">No difference after 50+ matches per group</td>
+                <td className="py-2 text-red-600 font-medium">Remove from scoring, keep for narrative use only</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Test 2: Hook Type Performance */}
+      <div className="rounded-xl border border-stone-200 bg-white p-6">
+        <div className="flex items-center justify-between mb-6">
+          <div>
+            <h3 className="text-sm font-semibold text-stone-900">Test 2: Hook Type A/B</h3>
+            <p className="text-xs text-stone-500 mt-0.5">Started 2026-03-25 · quote / contradiction / scene</p>
+          </div>
+          <span className="rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-700">Active</span>
+        </div>
+
+        {!data.hookType.populated ? (
+          <div className="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-xs text-amber-800">
+            Hook types are not yet being recorded in daily_intros. Wire <code className="bg-amber-100 px-1 rounded">generateDailyThree()</code> into the delivery pipeline to start collecting data.
+          </div>
+        ) : (
+          <>
+            <h4 className="text-xs font-semibold text-stone-700 mb-3">Like Rate by Hook Type</h4>
+            <div className="space-y-2 mb-6">
+              {data.hookType.byType.map((ht) => (
+                <div key={ht.hookType} className="flex items-center gap-3">
+                  <span className="w-28 text-xs font-medium text-stone-500 text-right capitalize">{ht.hookType}</span>
+                  <div className="flex-1 h-6 bg-stone-100 rounded-full overflow-hidden">
+                    <div className="h-full bg-stone-700 rounded-full transition-all" style={{ width: `${ht.likeRate}%` }} />
+                  </div>
+                  <span className="w-24 text-xs text-stone-500">{ht.likeRate}% ({ht.liked}/{ht.total})</span>
+                </div>
+              ))}
+            </div>
+
+            <h4 className="text-xs font-semibold text-stone-700 mb-3">Breakdown</h4>
+            <div className="overflow-x-auto mb-6">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="border-b border-stone-200">
+                    <th className="py-2 text-left font-medium text-stone-500">Hook Type</th>
+                    <th className="py-2 text-right font-medium text-stone-500">Total</th>
+                    <th className="py-2 text-right font-medium text-stone-500">Liked</th>
+                    <th className="py-2 text-right font-medium text-stone-500">Passed</th>
+                    <th className="py-2 text-right font-medium text-stone-500">Expired</th>
+                    <th className="py-2 text-right font-medium text-stone-500">Like Rate</th>
+                    <th className="py-2 text-right font-medium text-stone-500">Pass Rate</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {data.hookType.byType.map((ht) => (
+                    <tr key={ht.hookType} className="border-b border-stone-100">
+                      <td className="py-2 font-medium text-stone-700 capitalize">{ht.hookType}</td>
+                      <td className="py-2 text-right text-stone-600">{ht.total}</td>
+                      <td className="py-2 text-right text-stone-600">{ht.liked}</td>
+                      <td className="py-2 text-right text-stone-600">{ht.passed}</td>
+                      <td className="py-2 text-right text-stone-600">{ht.expired}</td>
+                      <td className="py-2 text-right text-stone-600">{ht.likeRate}%</td>
+                      <td className="py-2 text-right text-stone-600">{ht.passRate}%</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+
+        {/* Decision Framework */}
+        <h4 className="text-xs font-semibold text-stone-700 mb-3 mt-6">Decision Framework</h4>
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="border-b border-stone-200">
+                <th className="py-2 text-left font-medium text-stone-500">Signal</th>
+                <th className="py-2 text-left font-medium text-stone-500">Action</th>
+              </tr>
+            </thead>
+            <tbody className="text-stone-600">
+              <tr className="border-b border-stone-100">
+                <td className="py-2">One type &lt;50% of best type&apos;s like rate at N=30</td>
+                <td className="py-2 text-red-600 font-medium">Drop worst type</td>
+              </tr>
+              <tr className="border-b border-stone-100">
+                <td className="py-2">Clear ranking at N=100</td>
+                <td className="py-2">Weight generation toward top type</td>
+              </tr>
+              <tr className="border-b border-stone-100">
+                <td className="py-2">Per-archetype signal at N=300</td>
+                <td className="py-2 text-green-700 font-medium">Map archetype to preferred hook type</td>
+              </tr>
+              <tr className="border-b border-stone-100">
+                <td className="py-2">No difference at N=100</td>
+                <td className="py-2">Merge types, test a new dimension</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );

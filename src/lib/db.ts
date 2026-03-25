@@ -391,6 +391,7 @@ export interface DailyIntro {
   expires_at: string
   voice_message_required: boolean
   voice_message_path: string | null
+  hook_type?: 'quote' | 'contradiction' | 'scene' | null
   created_at: string
 }
 

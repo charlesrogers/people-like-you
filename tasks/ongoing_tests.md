@@ -103,3 +103,38 @@ LEFT JOIN daily_intros di ON di.match_id = m.id
 WHERE m.life_stage_score IS NOT NULL AND m.created_at > '2026-03-25'
 GROUP BY 1 ORDER BY 1;
 ```
+
+## Test 2: Hook Type A/B (quote / contradiction / scene)
+
+**Started:** 2026-03-25
+**North star:** Like rate on daily intros
+**Leading indicator:** Per-hook-type like rate divergence
+
+### Test Design: Natural Assignment
+
+Each intro is generated with one of three hook types (quote, contradiction, scene). Assignment happens at intro generation time via `generateDailyThree()`. Compare performance across types.
+
+**Hypothesis:** Different hook types resonate differently. Identifying the best-performing type (or best type per archetype) will increase overall like rate.
+
+### What to Watch
+
+- Like rate per hook type (need hook_type populated in daily_intros first)
+- Pass rate per hook type
+- At N=100+, per-archetype breakdown (5 archetypes x 3 hooks = 15 cells)
+
+### Decision Framework
+
+| Signal | Action |
+|--------|--------|
+| One type <50% of best type's like rate at N=30 | Drop worst type |
+| Clear ranking at N=100 | Weight generation toward top type |
+| Per-archetype signal at N=300 | Map archetype to preferred hook type |
+| No difference at N=100 | Merge types, test a new dimension |
+
+### Prerequisite
+
+Wire `generateDailyThree()` from `src/lib/intro-engine-v2.ts` into the delivery pipeline so hook_type is stored in daily_intros.
+
+### Decision Point
+
+Review after 100 intros per hook type have been delivered and acted on.
