@@ -64,6 +64,15 @@ final class ProfileService {
             let attributesSelected: [String]
             let narrativeStyle: String
             let feedbackText: String?
+
+            enum CodingKeys: String, CodingKey {
+                case userId = "userId"
+                case narrativeId = "narrativeId"
+                case vote
+                case attributesSelected = "attributesSelected"
+                case narrativeStyle = "narrativeStyle"
+                case feedbackText = "feedbackText"
+            }
         }
         struct Response: Codable { let ok: Bool }
         let _: Response = try await api.post("/taste-calibration", body: Request(
@@ -74,7 +83,17 @@ final class ProfileService {
     }
 
     func submitProfileFeedback(userId: String, feedback: [String: Bool], struckItems: [String]) async throws {
-        struct Request: Codable { let userId: String; let feedback: [String: Bool]; let struckItems: [String] }
+        struct Request: Codable {
+            let userId: String
+            let feedback: [String: Bool]
+            let struckItems: [String]
+
+            enum CodingKeys: String, CodingKey {
+                case userId = "userId"
+                case feedback
+                case struckItems = "struckItems"
+            }
+        }
         struct Response: Codable { let ok: Bool }
         let _: Response = try await api.post("/profile-feedback", body: Request(userId: userId, feedback: feedback, struckItems: struckItems))
     }

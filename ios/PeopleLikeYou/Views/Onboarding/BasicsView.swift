@@ -79,7 +79,7 @@ struct BasicsView: View {
                 }
                 .buttonStyle(.borderedProminent)
                 .tint(.primary)
-                .disabled(firstName.isEmpty || zipcode.count < 5)
+                .disabled(firstName.isEmpty || birthYear.count < 4 || zipcode.count < 5)
             }
             .padding()
         }
