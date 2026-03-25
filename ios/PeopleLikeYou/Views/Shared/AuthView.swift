@@ -185,27 +185,34 @@ struct AuthView: View {
 
                 ScrollView(showsIndicators: false) {
                     VStack(spacing: 0) {
-                        // PLY logo small
-                        HStack(spacing: 0) {
-                            Text("P").font(.system(size: 18, weight: .heavy)).foregroundStyle(neonYellow)
-                            Text("L").font(.system(size: 18, weight: .heavy)).italic().foregroundStyle(.white)
-                            Text("Y").font(.system(size: 18, weight: .heavy)).foregroundStyle(neonYellow)
-                        }
-                        .padding(.horizontal, 10)
-                        .padding(.vertical, 5)
-                        .background(darkBg)
-                        .clipShape(RoundedRectangle(cornerRadius: 8))
-                        .padding(.top, 20)
+                        // H1 with emoji flair
+                        if isSignUp {
+                            VStack(spacing: 8) {
+                                Text("\u{2728}")
+                                    .font(.system(size: 44))
+                                    .padding(.top, 24)
 
-                        // H1 — big, bold, matches the brand
-                        Text(isSignUp ? "Build your profile" : "Welcome back")
-                            .font(.system(size: 36, weight: .heavy))
-                            .tracking(-1)
-                            .foregroundStyle(darkBg)
-                            .padding(.top, 20)
+                                Text("Create your account")
+                                    .font(.system(size: 34, weight: .heavy))
+                                    .tracking(-1)
+                                    .foregroundStyle(darkBg)
+                                    .multilineTextAlignment(.center)
+                            }
+                        } else {
+                            VStack(spacing: 8) {
+                                Text("\u{1F44B}")
+                                    .font(.system(size: 44))
+                                    .padding(.top, 24)
+
+                                Text("Welcome back")
+                                    .font(.system(size: 34, weight: .heavy))
+                                    .tracking(-1)
+                                    .foregroundStyle(darkBg)
+                            }
+                        }
 
                         // Subtitle
-                        Text(isSignUp ? "Share your stories, meet your person." : "Pick up where you left off.")
+                        Text(isSignUp ? "Share your stories. Meet your person. \u{1F48C}" : "Pick up where you left off.")
                             .font(.system(size: 16, weight: .medium))
                             .foregroundStyle(darkBg.opacity(0.5))
                             .padding(.top, 6)
@@ -267,7 +274,7 @@ struct AuthView: View {
                                 if loading {
                                     ProgressView().tint(.white)
                                 } else {
-                                    Text(isSignUp ? "Let\u{2019}s go" : "Log in")
+                                    Text(isSignUp ? "Let\u{2019}s go \u{1F680}" : "Log in")
                                         .font(.system(size: 18, weight: .bold))
                                 }
                             }
