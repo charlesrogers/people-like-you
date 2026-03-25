@@ -3,7 +3,7 @@ import { getUserVoiceMemos } from '@/lib/db'
 import { processVoiceMemo } from '@/lib/extraction'
 
 // Allow up to 60 seconds for transcription + extraction
-export const maxDuration = 60
+export const maxDuration = 300
 
 export async function POST(req: NextRequest) {
   const { userId } = await req.json()
@@ -29,8 +29,8 @@ export async function POST(req: NextRequest) {
       await processVoiceMemo(memo.id)
       processed++
       console.log(`Processed memo ${memo.id} (${processed}/${unprocessed.length})`)
-    } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err)
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : (typeof err === 'object' && err !== null && 'message' in err) ? String((err as Record<string, unknown>).message) : JSON.stringify(err)
       console.error(`Failed to process memo ${memo.id}:`, msg)
       errors.push(`${memo.prompt_id}: ${msg}`)
     }
