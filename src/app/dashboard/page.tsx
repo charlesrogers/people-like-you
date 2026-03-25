@@ -6,14 +6,20 @@ import posthog from 'posthog-js'
 import MatchCard from '@/components/MatchCard'
 import CountdownTimer from '@/components/CountdownTimer'
 import DisclosureExchange from '@/components/DisclosureExchange'
+import ChatWindow from '@/components/ChatWindow'
+import MeetDecision from '@/components/MeetDecision'
+import DatePlanning from '@/components/DatePlanning'
+import DateConfirmed from '@/components/DateConfirmed'
 import DateFeedback from '@/components/DateFeedback'
+import type { PlannedDateInfo } from '@/lib/types'
 import VoicePromptLoop from '@/components/VoicePromptLoop'
 import ProfileTab from '@/components/ProfileTab'
 import InviteTab from '@/components/InviteTab'
 import SettingsTab from '@/components/SettingsTab'
 import DailyThree, { type IntroCard } from '@/components/DailyThree'
+import type { CompositeProfile } from '@/lib/types'
 
-type DashboardTab = 'today' | 'profile' | 'invite' | 'settings'
+type DashboardTab = 'today' | 'chats' | 'profile' | 'invite' | 'settings'
 
 interface Intro {
   id: string
@@ -66,6 +72,7 @@ export default function Dashboard() {
 
   const [currentIntro, setCurrentIntro] = useState<Intro | null>(null)
   const [bonusIntro, setBonusIntro] = useState<Intro | null>(null)
+  const [matchComposites, setMatchComposites] = useState<Record<string, CompositeProfile>>({})
   const [nextDeliveryAt, setNextDeliveryAt] = useState<string | null>(null)
   const [cadenceState, setCadenceState] = useState<CadenceState | null>(null)
   const [history, setHistory] = useState<HistoryItem[]>([])
@@ -96,6 +103,10 @@ export default function Dashboard() {
     exchangeComplete: boolean
   }
   const [activeMutualMatch, setActiveMutualMatch] = useState<ActiveMutualMatchState | null>(null)
+
+  // Chat flow state
+  const [chatPhase, setChatPhase] = useState<'chatting' | 'deciding' | 'planning' | 'confirmed' | 'declined' | null>(null)
+  const [confirmedDate, setConfirmedDate] = useState<PlannedDateInfo | null>(null)
 
   // Pending date feedback
   const [pendingFeedback, setPendingFeedback] = useState<{
@@ -161,6 +172,59 @@ export default function Dashboard() {
         setCadenceState(matchesData.cadenceState)
         setHistory(matchesData.history || [])
 
+        // Fetch composite profiles for matched users (for radar chart)
+        const matchedUserIds = [
+          matchesData.currentIntro?.matchedUserId,
+          matchesData.bonusIntro?.matchedUserId,
+        ].filter(Boolean) as string[]
+        if (matchedUserIds.length > 0) {
+          Promise.all(
+            matchedUserIds.map(async (id) => {
+              const res = await fetch(`/api/composite?userId=${id}`)
+              const data = await res.json()
+              return { id, composite: data.composite }
+            })
+          ).then(results => {
+            const composites: Record<string, CompositeProfile> = {}
+            results.forEach(r => { if (r.composite) composites[r.id] = r.composite })
+            setMatchComposites(prev => ({ ...prev, ...composites }))
+          }).catch(() => {})
+        }
+
+        // Restore active chat state if one exists
+        if (matchesData.activeChatState) {
+          const acs = matchesData.activeChatState
+          setActiveMutualMatch({
+            id: acs.id,
+            matchedUserId: acs.matchedUserId,
+            matchedUserName: acs.matchedUserName,
+            isUserA: acs.isUserA,
+            exchanges: [],
+            currentRound: null,
+            exchangeComplete: false,
+          })
+          const statusToPhase: Record<string, typeof chatPhase> = {
+            chatting: 'chatting',
+            deciding: 'deciding',
+            planning: 'planning',
+            date_scheduled: 'confirmed',
+          }
+          setChatPhase(statusToPhase[acs.status] || 'chatting')
+
+          // If date is confirmed, fetch the date details
+          if (acs.status === 'date_scheduled') {
+            try {
+              const dateRes = await fetch(`/api/date-planning?mutualMatchId=${acs.id}&userId=${profileId}`)
+              const dateData = await dateRes.json()
+              if (dateData.phase === 'confirmed' && dateData.date) {
+                setConfirmedDate(dateData.date)
+              }
+            } catch {
+              // non-blocking
+            }
+          }
+        }
+
         posthog.capture('dashboard_loaded', {
           has_intro: !!matchesData.currentIntro,
           is_paused: matchesData.cadenceState?.isPaused,
@@ -216,22 +280,18 @@ export default function Dashboard() {
         setPendingName(likedName)
         const matchedIntro = currentIntro?.matchedUserId === data.mutualMatch.matchedUserId
           ? currentIntro : bonusIntro
-        // Fetch disclosure state
-        try {
-          const discRes = await fetch(`/api/disclosure?mutualMatchId=${data.mutualMatch.id}`)
-          const discData = await discRes.json()
-          setActiveMutualMatch({
-            id: data.mutualMatch.id,
-            matchedUserId: data.mutualMatch.matchedUserId,
-            matchedUserName: matchedIntro?.name || 'your match',
-            isUserA: true,
-            exchanges: discData.exchanges || [],
-            currentRound: discData.currentRound,
-            exchangeComplete: false,
-          })
-        } catch {
-          // Non-blocking
-        }
+        // Set up chat flow for new mutual match
+        setActiveMutualMatch({
+          id: data.mutualMatch.id,
+          matchedUserId: data.mutualMatch.matchedUserId,
+          matchedUserName: matchedIntro?.name || 'your match',
+          isUserA: true,
+          exchanges: [],
+          currentRound: null,
+          exchangeComplete: false,
+        })
+        setChatPhase('chatting')
+        setActiveTab('chats')
       } else {
         // Check remaining visible cards (exclude the one just liked + passed ones)
         const remainingCards = (currentIntro && currentIntro.id !== introId ? 1 : 0)
@@ -350,6 +410,7 @@ export default function Dashboard() {
         <div className="mx-auto max-w-xl flex">
           {([
             { id: 'today' as const, label: 'Intros', icon: '💌' },
+            { id: 'chats' as const, label: 'Chats', icon: '💬' },
             { id: 'profile' as const, label: 'You', icon: '👤' },
             { id: 'invite' as const, label: 'Invite', icon: '🔗' },
             { id: 'settings' as const, label: 'Essentials', icon: '⚙️' },
@@ -357,7 +418,7 @@ export default function Dashboard() {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 py-3 text-center text-xs font-medium transition ${
+              className={`flex-1 py-3 text-center text-xs font-medium transition relative ${
                 activeTab === tab.id
                   ? 'text-stone-900 border-b-2 border-stone-900'
                   : 'text-stone-400 hover:text-stone-600'
@@ -365,6 +426,9 @@ export default function Dashboard() {
             >
               <span className="block text-base">{tab.icon}</span>
               {tab.label}
+              {tab.id === 'chats' && activeMutualMatch && chatPhase === 'chatting' && activeTab !== 'chats' && (
+                <span className="absolute top-2 right-1/4 h-2 w-2 rounded-full bg-primary" />
+              )}
             </button>
           ))}
         </div>
@@ -408,6 +472,112 @@ export default function Dashboard() {
               window.location.href = '/'
             }}
           />
+        )}
+
+        {/* Chats Tab */}
+        {activeTab === 'chats' && userId && (
+          <div>
+            {activeMutualMatch ? (
+              <div id="match-flow">
+                {/* Phase: Chatting */}
+                {(chatPhase === 'chatting' || (!chatPhase && activeMutualMatch.exchanges.length === 0)) && (
+                  <ChatWindow
+                    mutualMatchId={activeMutualMatch.id}
+                    userId={userId}
+                    isUserA={activeMutualMatch.isUserA}
+                    partnerName={activeMutualMatch.matchedUserName}
+                    onPhaseChange={(status) => {
+                      if (status === 'deciding') setChatPhase('deciding')
+                      else if (status === 'expired') {
+                        setActiveMutualMatch(null)
+                        setChatPhase(null)
+                      }
+                    }}
+                  />
+                )}
+
+                {/* Phase: Deciding */}
+                {chatPhase === 'deciding' && (
+                  <MeetDecision
+                    mutualMatchId={activeMutualMatch.id}
+                    userId={userId}
+                    partnerName={activeMutualMatch.matchedUserName}
+                    onPhaseChange={(status) => {
+                      if (status === 'planning') setChatPhase('planning')
+                      else if (status === 'declined') setChatPhase('declined')
+                    }}
+                  />
+                )}
+
+                {/* Phase: Planning */}
+                {chatPhase === 'planning' && (
+                  <DatePlanning
+                    mutualMatchId={activeMutualMatch.id}
+                    userId={userId}
+                    partnerName={activeMutualMatch.matchedUserName}
+                    onDateConfirmed={(date) => {
+                      setConfirmedDate(date)
+                      setChatPhase('confirmed')
+                    }}
+                  />
+                )}
+
+                {/* Phase: Confirmed */}
+                {chatPhase === 'confirmed' && confirmedDate && (
+                  <DateConfirmed date={confirmedDate} />
+                )}
+
+                {/* Phase: Declined */}
+                {chatPhase === 'declined' && (
+                  <div className="rounded-xl border bg-card shadow-sm shadow-black/[0.04] p-8 text-center">
+                    <p className="text-[15px] font-semibold">
+                      This one didn&apos;t work out
+                    </p>
+                    <p className="text-[12px] text-muted-foreground mt-2">
+                      No worries &mdash; your next intro is coming.
+                    </p>
+                  </div>
+                )}
+
+                {/* Legacy: Disclosure Exchange (for any existing matches still in exchange flow) */}
+                {!chatPhase && activeMutualMatch.exchanges.length > 0 && (
+                  <DisclosureExchange
+                    mutualMatchId={activeMutualMatch.id}
+                    userId={userId}
+                    isUserA={activeMutualMatch.isUserA}
+                    partnerName={activeMutualMatch.matchedUserName}
+                    exchanges={activeMutualMatch.exchanges}
+                    currentRound={activeMutualMatch.currentRound}
+                    onSubmit={async () => {
+                      try {
+                        const res = await fetch(`/api/disclosure?mutualMatchId=${activeMutualMatch.id}`)
+                        const data = await res.json()
+                        setActiveMutualMatch(prev => prev ? {
+                          ...prev,
+                          exchanges: data.exchanges || [],
+                          currentRound: data.currentRound,
+                          exchangeComplete: data.exchanges?.filter(
+                            (e: { user_a_responded_at: string | null; user_b_responded_at: string | null; round_number: number }) =>
+                              e.user_a_responded_at && e.user_b_responded_at
+                          ).length >= 3,
+                        } : null)
+                      } catch {
+                        // silent
+                      }
+                    }}
+                    exchangeComplete={activeMutualMatch.exchangeComplete}
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="rounded-xl border bg-card shadow-sm shadow-black/[0.04] p-8 text-center">
+                <p className="text-[15px] font-semibold">No active chats</p>
+                <p className="text-[12px] text-muted-foreground mt-2">
+                  When you and someone both say yes, your chat will appear here.
+                </p>
+              </div>
+            )}
+          </div>
         )}
 
         {/* Today Tab — existing match content */}
@@ -484,8 +654,11 @@ export default function Dashboard() {
           return (
             <DailyThree
               cards={dailyCards}
-              firesAvailable={1}
+              firesAvailable={3}
               userId={userId!}
+              userComposite={composite}
+              matchComposites={matchComposites}
+              lockedCount={20}
               postInterestState={postInterestState}
               mutualMatchData={activeMutualMatch ? {
                 id: activeMutualMatch.id,
@@ -493,8 +666,7 @@ export default function Dashboard() {
               } : null}
               pendingName={pendingName || undefined}
               onStartDisclosure={() => {
-                // Scroll to disclosure exchange (already rendered below)
-                document.getElementById('disclosure-exchange')?.scrollIntoView({ behavior: 'smooth' })
+                setActiveTab('chats')
               }}
               onStartVoiceLoop={() => setShowVoiceLoop(true)}
               onFire={(card) => {
@@ -586,36 +758,20 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Active Mutual Match — Disclosure Exchange */}
-        {activeMutualMatch && !isPaused && !isHidden && (
-          <div className="mt-6" id="disclosure-exchange">
-            <DisclosureExchange
-              mutualMatchId={activeMutualMatch.id}
-              userId={userId!}
-              isUserA={activeMutualMatch.isUserA}
-              partnerName={activeMutualMatch.matchedUserName}
-              exchanges={activeMutualMatch.exchanges}
-              currentRound={activeMutualMatch.currentRound}
-              onSubmit={async () => {
-                // Refresh disclosure state
-                try {
-                  const res = await fetch(`/api/disclosure?mutualMatchId=${activeMutualMatch.id}`)
-                  const data = await res.json()
-                  setActiveMutualMatch(prev => prev ? {
-                    ...prev,
-                    exchanges: data.exchanges || [],
-                    currentRound: data.currentRound,
-                    exchangeComplete: data.exchanges?.filter(
-                      (e: { user_a_responded_at: string | null; user_b_responded_at: string | null; round_number: number }) =>
-                        e.user_a_responded_at && e.user_b_responded_at
-                    ).length >= 3,
-                  } : null)
-                } catch {
-                  // silent
-                }
-              }}
-              exchangeComplete={activeMutualMatch.exchangeComplete}
-            />
+        {/* Active chat notification banner in Intros tab */}
+        {activeMutualMatch && chatPhase === 'chatting' && !isPaused && !isHidden && (
+          <div className="mt-6">
+            <button
+              onClick={() => setActiveTab('chats')}
+              className="w-full rounded-xl border border-primary/20 bg-primary/5 p-4 text-center hover:bg-primary/10 transition-colors"
+            >
+              <p className="text-[13px] font-medium text-primary">
+                You have an active chat with {activeMutualMatch.matchedUserName}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                Tap to open
+              </p>
+            </button>
           </div>
         )}
 

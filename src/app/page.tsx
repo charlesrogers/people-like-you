@@ -125,7 +125,7 @@ export default function Home() {
               emoji="🎙️"
               bg="bg-white"
               title="Tell us about yourself"
-              body="Forget checkboxes. Answer voice prompts about your rabbit holes, guilty pleasures, and proudest moments. We extract the real you."
+              body="Forget checkboxes. Answer voice prompts about your rabbit holes, guilty pleasures, and proudest moments. Your matchmaker extracts the real you."
             />
             <WhimsyCard
               emoji="🧠"
@@ -164,12 +164,12 @@ export default function Home() {
             <Step
               num="02"
               title="We build your taste map"
-              body="AI extracts your humor style, values, passions, growth edges, and what makes you genuinely admirable. Across 5 dimensions."
+              body="Your matchmaker extracts your humor style, values, passions, growth edges, and what makes you genuinely admirable. Across 5 dimensions."
             />
             <Step
               num="03"
-              title="One intro a day"
-              body="We don't give you a deck to swipe through. You get one carefully written introduction per day. A story about someone, tailored to what makes you light up."
+              title="Introductions, not profiles"
+              body="No deck to swipe through. You get a carefully written introduction about someone — a story tailored to what makes you light up."
             />
             <Step
               num="04"
@@ -180,23 +180,41 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══════ WHAT MAKES US DIFFERENT (horizontal scroll) ══════ */}
-      <section className="px-6 py-16 sm:py-24 overflow-hidden">
-        <div className="mx-auto max-w-6xl">
+      {/* ══════ WHAT MAKES US DIFFERENT (table) ══════ */}
+      <section className="px-6 py-16 sm:py-24">
+        <div className="mx-auto max-w-3xl">
           <h2 className="text-center text-3xl font-extrabold tracking-tight sm:text-4xl mb-12">
-            Not another swiping app.
+            Not another swipe-fest.
           </h2>
-          <div className="flex gap-5 overflow-x-auto pb-4 snap-x snap-mandatory scrollbar-hide -mx-6 px-6">
-            <CompareCard
-              label="Them"
-              items={["Swipe through hundreds", "Judge by photos first", "Generic 'hey' messages", "Compatibility scores", "Endless browsing"]}
-              variant="muted"
-            />
-            <CompareCard
-              label="Us"
-              items={["One intro per day", "Story first, photo after", "AI-written narratives about why you'd click", "Chemistry + compatibility", "Two excited people"]}
-              variant="neon"
-            />
+          <div className="rounded-bumble-lg overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.06)]">
+            <table className="w-full text-left">
+              <thead>
+                <tr>
+                  <th className="bg-[var(--dark)]/5 px-6 py-4 text-sm font-bold text-[var(--dark)]/50 w-1/2"></th>
+                  <th className="bg-[var(--dark)]/5 px-6 py-4 text-sm font-bold text-[var(--dark)]/50 line-through decoration-2">Them</th>
+                  <th className="bg-[var(--neon)] px-6 py-4 text-sm font-bold text-[var(--dark)]">Us</th>
+                </tr>
+              </thead>
+              <tbody className="text-sm">
+                {[
+                  ["Discovery", "Swipe through hundreds", "Picks tailored to your tastes"],
+                  ["First impression", "Judge by photos first", "Get to know who they really are"],
+                  ["Messaging", "Generic 'hey' messages", "Matchmaker-written intros about why you'd click"],
+                  ["Matching", "Compatibility scores", "Chemistry + compatibility"],
+                  ["The goal", "Endless browsing", "Curated introductions so you can jump right into connecting"],
+                ].map(([category, them, us], i) => (
+                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[var(--dark)]/[0.02]"}>
+                    <td className="px-6 py-4 font-semibold text-[var(--dark)]/70">{category}</td>
+                    <td className="px-6 py-4 text-[var(--dark)]/40">
+                      <span className="mr-2 text-[var(--dark)]/30">&#10005;</span>{them}
+                    </td>
+                    <td className="px-6 py-4 font-medium text-[var(--dark)]">
+                      <span className="mr-2 text-[var(--dark)]">&#10003;</span>{us}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
@@ -296,37 +314,3 @@ function Step({ num, title, body }: { num: string; title: string; body: string }
   );
 }
 
-/* ─── Compare Card ─── */
-
-function CompareCard({
-  label,
-  items,
-  variant,
-}: {
-  label: string;
-  items: string[];
-  variant: "muted" | "neon";
-}) {
-  const isNeon = variant === "neon";
-  return (
-    <div
-      className={`flex-shrink-0 w-72 snap-center rounded-bumble p-8 ${
-        isNeon
-          ? "bg-[var(--neon)] text-[var(--dark)]"
-          : "bg-[var(--dark)]/5 text-[var(--dark)]/50"
-      }`}
-    >
-      <h3 className={`text-lg font-bold mb-4 ${isNeon ? "" : "line-through decoration-2"}`}>
-        {label}
-      </h3>
-      <ul className="space-y-3">
-        {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-2 text-sm leading-snug">
-            <span className="mt-0.5">{isNeon ? "✓" : "✗"}</span>
-            <span className={isNeon ? "font-medium" : ""}>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}

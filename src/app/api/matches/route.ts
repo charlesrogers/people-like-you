@@ -8,6 +8,7 @@ import {
   getUserCadence,
   ensureUserCadence,
   updateDailyIntro,
+  getActiveMutualMatches,
 } from '@/lib/db'
 
 export async function GET(req: NextRequest) {
@@ -79,6 +80,25 @@ export async function GET(req: NextRequest) {
   nextDelivery.setUTCHours(cadence.delivery_hour, 0, 0, 0)
   if (nextDelivery <= now) nextDelivery.setDate(nextDelivery.getDate() + 1)
 
+  // Check for active mutual match (chatting, deciding, planning, date_scheduled)
+  const activeMutualMatches = await getActiveMutualMatches(userId)
+  const chatStatuses = ['chatting', 'deciding', 'planning', 'date_scheduled']
+  const activeChatMatch = activeMutualMatches.find(mm => chatStatuses.includes(mm.status))
+
+  let activeChatState = null
+  if (activeChatMatch) {
+    const isUserA = activeChatMatch.user_a_id === userId
+    const partnerId = isUserA ? activeChatMatch.user_b_id : activeChatMatch.user_a_id
+    const partner = await getUser(partnerId)
+    activeChatState = {
+      id: activeChatMatch.id,
+      matchedUserId: partnerId,
+      matchedUserName: partner?.first_name || 'Your match',
+      isUserA,
+      status: activeChatMatch.status,
+    }
+  }
+
   return NextResponse.json({
     currentIntro,
     bonusIntro: currentBonus,
@@ -89,5 +109,6 @@ export async function GET(req: NextRequest) {
       consecutiveInactiveDays: cadence.consecutive_inactive_days,
     },
     history,
+    activeChatState,
   })
 }
