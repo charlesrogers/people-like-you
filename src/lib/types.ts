@@ -195,6 +195,7 @@ export interface Match {
   narrative_a_used_quote?: boolean
   narrative_b_used_quote?: boolean
   compatibility_score?: number | null
+  life_stage_score?: number | null
   // Phase 3: A/B testing (optional)
   narrative_experiment_id?: string | null
   narrative_variant?: 'a' | 'b' | null

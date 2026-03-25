@@ -4,7 +4,6 @@ import {
   updateUserElo,
   saveMatchFeedback,
   updateDailyIntro,
-  getUserCadence,
   updateUserCadence,
   ensureUserCadence,
   saveDailyIntro,
@@ -12,11 +11,10 @@ import {
   getUserPhotos,
   getCompositeProfile,
   checkForMutualMatch,
-  createDisclosureRound,
+  updateMutualMatch,
 } from '@/lib/db'
 import { updateRatings } from '@/lib/elo'
 import { selectNextCandidate, generateMatchAngle } from '@/lib/matchmaker'
-import { generateDisclosurePrompt } from '@/lib/disclosure-prompts'
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
@@ -59,7 +57,7 @@ export async function POST(req: NextRequest) {
     // Generate bonus match
     const result = await selectNextCandidate(userId)
     if (result) {
-      const { candidate, score } = result
+      const { candidate, score, lifeStageScore } = result
       const user = await getUser(userId)
       if (user) {
         const userComposite = await getCompositeProfile(userId)
@@ -83,6 +81,7 @@ export async function POST(req: NextRequest) {
           expansion_points: candidateComposite?.interest_tags
             .filter(t => !userComposite?.interest_tags.includes(t))
             .slice(0, 5) || [],
+          life_stage_score: lifeStageScore ?? null,
         })
 
         const expiresAt = new Date()
@@ -130,17 +129,14 @@ export async function POST(req: NextRequest) {
     if (matchId && body.matchedUserId) {
       mutualMatch = await checkForMutualMatch(matchId, userId, body.matchedUserId)
       if (mutualMatch) {
-        // Generate Round 1 disclosure prompt
-        const profileA = await getCompositeProfile(mutualMatch.user_a_id)
-        const profileB = await getCompositeProfile(mutualMatch.user_b_id)
-        if (profileA && profileB) {
-          try {
-            const promptText = await generateDisclosurePrompt(1, profileA, profileB)
-            await createDisclosureRound(mutualMatch.id, 1, promptText)
-          } catch {
-            // Non-blocking: mutual match still created even if prompt generation fails
-          }
-        }
+        // Set up constrained chat (replaces disclosure exchange)
+        const chatExpiresAt = new Date()
+        chatExpiresAt.setHours(chatExpiresAt.getHours() + 72)
+        await updateMutualMatch(mutualMatch.id, {
+          status: 'chatting',
+          chat_started_at: new Date().toISOString(),
+          chat_expires_at: chatExpiresAt.toISOString(),
+        } as Partial<typeof mutualMatch>)
       }
     }
 

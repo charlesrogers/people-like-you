@@ -55,7 +55,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, intro: null, message: "We're finding people for you. Check back soon." })
   }
 
-  const { candidate, score } = result
+  const { candidate, score, lifeStageScore } = result
   const user = await getUser(userId)
   if (!user) return NextResponse.json({ error: 'User not found' }, { status: 404 })
 
@@ -80,6 +80,7 @@ export async function POST(req: NextRequest) {
     expansion_points: candidateComposite?.interest_tags
       .filter(t => !userComposite?.interest_tags.includes(t))
       .slice(0, 5) || [],
+    life_stage_score: lifeStageScore ?? null,
   })
 
   const now = new Date()

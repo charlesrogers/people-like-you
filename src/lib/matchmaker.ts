@@ -484,7 +484,7 @@ function getPreferenceAlignmentMultiplier(
 
 export async function selectNextCandidate(
   userId: string
-): Promise<{ candidate: User; score: number } | null> {
+): Promise<{ candidate: User; score: number; lifeStageScore: number | null } | null> {
   const { getUser, getCompatibleUsers, getCompositeProfile, getPreviouslyShownUserIds, getHardPreferences, getHardPreferencesForUsers } = await import('./db')
 
   const user = await getUser(userId)
@@ -508,7 +508,11 @@ export async function selectNextCandidate(
       const score = userComposite && candidateComposite
         ? scoreCompatibility(userComposite, candidateComposite, user, candidate, userPrefs, candPrefs)
         : 0.5
-      return { candidate, score }
+      // Compute life-stage sub-score for logging on match record (Test 1)
+      const lifeStageScore = userComposite && candidateComposite
+        ? scoreLifeStageAlignment(userComposite, candidateComposite, user, candidate)
+        : null
+      return { candidate, score, lifeStageScore }
     })
   )
 

@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
         continue
       }
 
-      const { candidate, score } = result
+      const { candidate, score, lifeStageScore } = result
       const user = await getUser(cadence.user_id)
       if (!user) continue
 
@@ -97,6 +97,7 @@ export async function GET(req: NextRequest) {
         expansion_points: candidateComposite?.interest_tags
           .filter(t => !userComposite?.interest_tags.includes(t))
           .slice(0, 5) || [],
+        life_stage_score: lifeStageScore ?? null,
       })
 
       // Calculate expires_at (next delivery time = tomorrow same hour)

@@ -53,9 +53,9 @@ export async function POST(req: NextRequest) {
   if (justUnlocked && promptsAnsweredToday > 0) {
     // Generate a new match on the spot
     try {
-      const result = await selectNextCandidate(userId)
-      if (result) {
-        const { candidate } = result
+      const candidateResult = await selectNextCandidate(userId)
+      if (candidateResult) {
+        const { candidate, lifeStageScore } = candidateResult
         const userComposite = await getCompositeProfile(userId)
         const candidateComposite = await getCompositeProfile(candidate.id)
 
@@ -81,6 +81,7 @@ export async function POST(req: NextRequest) {
           expansion_points: candidateComposite?.interest_tags
             .filter(t => !userComposite?.interest_tags.includes(t))
             .slice(0, 5) || [],
+          life_stage_score: lifeStageScore ?? null,
         })
 
         const expiresAt = new Date()
