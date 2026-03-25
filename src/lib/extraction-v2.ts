@@ -81,6 +81,16 @@ export interface PersonalityProfile {
   // All notable quotes across stories
   all_quotes: string[]
 
+  // Life stage signals
+  life_stage?: {
+    rootedness: number
+    life_pace: number
+    life_chapter: 'launching' | 'building' | 'established' | 'reinventing' | null
+    trajectory_momentum: number
+    trajectory_directions: string[]
+    confidence: number
+  } | null
+
   // Versioning
   pass1_version: string
   pass2_version: string
@@ -222,6 +232,18 @@ From the RESEARCH on romantic chemistry, we know these 5 dimensions matter for m
 
 5. WILDCARD: What's unexpected about this person? What doesn't fit the pattern? What would make someone go "wait, really?"
 
+6. LIFE STAGE: Where is this person in their life — and where are they headed?
+   - rootedness (0.0-1.0): Do they talk like someone planted (home, community, "my neighborhood") or in motion ("wherever I end up", recent moves)?
+   - life_pace (0.0-1.0): Is their life fast/intense (packed schedule, multiple projects, ambitious goals) or slow/deliberate (slow mornings, "learned to say no")?
+   - life_chapter: One of:
+     * "launching" — early career, figuring things out, first apartment energy. ONLY for people who haven't had a prior established chapter.
+     * "building" — actively constructing career/family/home, mid-climb
+     * "established" — settled in career and life, depth over breadth
+     * "reinventing" — post-major-transition: divorce, career change, kids left home, starting over AFTER a prior chapter. KEY: if someone talks about "new beginnings" but references a prior life (ex-spouse, previous career, grown kids), this is REINVENTING, not LAUNCHING.
+   - trajectory_momentum (0.0-1.0): "I just started..." = high. "I've been doing this 15 years and love it" = low.
+   - trajectory_directions: 0-3 specific directions from their stories (e.g., "pivoting to teaching", "trying to start a family", "building a business")
+   - confidence (0.0-1.0): How much evidence exists? If their stories don't touch on life stage at all, confidence: 0.
+
 For each dimension, return:
 - data_points: 0-3 SPECIFIC, CONCRETE observations. NOT abstract traits.
   BAD: "Values authenticity" / "Is curious" / "Political philosophy and governance"
@@ -254,7 +276,15 @@ Return ONLY a JSON object with this structure:
   "hidden_depth": "...",
   "humor_signature": "..." or null,
   "conversation_fuel": [...],
-  "all_quotes": [...]
+  "all_quotes": [...],
+  "life_stage": {
+    "rootedness": 0.0-1.0,
+    "life_pace": 0.0-1.0,
+    "life_chapter": "launching" | "building" | "established" | "reinventing" | null,
+    "trajectory_momentum": 0.0-1.0,
+    "trajectory_directions": ["specific directions from their stories"],
+    "confidence": 0.0-1.0
+  }
 }`,
       },
     ],
@@ -289,6 +319,7 @@ function emptyProfile(): PersonalityProfile {
     humor_signature: null,
     conversation_fuel: [],
     all_quotes: [],
+    life_stage: null,
     pass1_version: EXTRACTION_CONFIG.pass1.version,
     pass2_version: EXTRACTION_CONFIG.pass2.version,
     generated_at: new Date().toISOString(),

@@ -484,6 +484,8 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
       // Store raw v2 profile as JSON for future use
       primary_energy: profile.primary_energy,
       hidden_depth: profile.hidden_depth,
+      // Life-stage signals (Rule 9)
+      life_stage: profile.life_stage ?? null,
     } as unknown as Parameters<typeof saveCompositeProfile>[0])
     console.log(`[v2] Composite profile saved for user ${memo.user_id}`)
   } else {

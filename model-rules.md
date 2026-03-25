@@ -118,6 +118,36 @@ If a user doesn't open the app for 2 weeks, their re-pitch cooldowns still expir
 
 Even if a person is re-pitched, the narrative must be regenerated with a different strategy. The user should never read the same sentences about the same person.
 
+## Rule 9: Life-stage matching is layered — hard filters + soft scoring
+
+### Layer 1: Hard preference filters (bidirectional)
+
+Hard preferences GATE candidates before scoring. Both users' prefs must be satisfied.
+
+| Filter       | Hard-gate rule                                                        | Pass-through          |
+|--------------|-----------------------------------------------------------------------|-----------------------|
+| Age range    | Candidate age outside my min/max OR my age outside their min/max      | Either is null        |
+| Kids         | `wants` vs `doesnt_want`, `has` vs `doesnt_want`                     | Anything with `open` or null |
+| Faith        | `faith_importance=essential` + `observance_match=must_match` + religions differ | All other levels |
+| Smoking      | Either party has `smoking=dealbreaker` and other smokes               | All other combos      |
+
+### Layer 2: Extracted life-stage soft scoring
+
+Life-stage signals are extracted from voice memos and scored at HALF WEIGHT (0.35) as a test.
+They nudge rankings but cannot block a great personality match.
+
+Life chapters: `launching`, `building`, `established`, `reinventing`
+
+### CRITICAL SAFEGUARD: Reinventing vs Launching confusion
+
+The LLM may confuse "reinventing" (post-divorce, career change, kids left home) with "launching" (early career, first apartment) because both use "new beginnings" language. To prevent this:
+
+1. The extraction prompt MUST include age/context awareness: "If someone talks about starting over AFTER a prior chapter (divorce, career change, empty nest), that is REINVENTING, not LAUNCHING. Launching is for people who haven't had a prior established chapter yet."
+2. Life-stage scoring uses AGE as a sanity check: if extracted chapter is `launching` but user's birth_year puts them over 35, flag confidence as LOW (< 0.3) so scoring skips them rather than miscategorizing.
+3. The chapter compatibility matrix rates `reinventing` + `reinventing` and `reinventing` + `established` as compatible (0.6+), preventing reinventors from being pushed toward launchers.
+
+**Why:** A 45-year-old reinventing after divorce gets tagged "launching" -> matched with 25-year-olds -> systematically wrong matches that the scoring quietly down-ranks the right ones. This failure mode is invisible because there's no error, just bad rankings.
+
 ---
 
 ## Adding new rules

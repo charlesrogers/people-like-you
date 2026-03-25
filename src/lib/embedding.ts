@@ -204,9 +204,25 @@ export function compositeToFeatureVector(profile: CompositeProfile): FeatureVect
   // dims 95-99: padding (remain 0)
 
   // ------------------------------------------------------------------
-  // Demographics (dims 100-111) — reserved, fill with 0.5
+  // Demographics (dims 100-111) — Life Stage signals (Rule 9)
   // ------------------------------------------------------------------
-  for (let i = 100; i < 112; i++) vec[i] = 0.5
+  if (profile.life_stage && profile.life_stage.confidence > 0.3) {
+    vec[100] = profile.life_stage.rootedness
+    vec[101] = profile.life_stage.life_pace
+    vec[102] = profile.life_stage.trajectory_momentum
+    // life_chapter one-hot (103-106)
+    const chapters = ['launching', 'building', 'established', 'reinventing']
+    const chapIdx = chapters.indexOf(profile.life_stage.life_chapter ?? '')
+    if (chapIdx >= 0) vec[103 + chapIdx] = 1
+    // trajectory_directions hashed (107)
+    if (profile.life_stage.trajectory_directions.length > 0) {
+      const trajVec = hashStringsToVector(profile.life_stage.trajectory_directions, 1)
+      vec[107] = trajVec[0]
+    }
+    // 108-111: padding (remain 0)
+  } else {
+    for (let i = 100; i < 112; i++) vec[i] = 0.5
+  }
 
   // ------------------------------------------------------------------
   // Behavioral (dims 112-127) — reserved, fill with 0

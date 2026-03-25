@@ -2,7 +2,7 @@ import { createServerClient } from './supabase'
 import type {
   User, HardPreferences, SoftPreferences, Photo, VoiceMemo, CompositeProfile, Match,
   MutualMatch, DisclosureExchange, UserAvailability, ScheduledDate, DateFeedback,
-  TrustScore, TrustTier, ExitSurvey, FriendVouch
+  TrustScore, TrustTier, ExitSurvey, FriendVouch, ChatMessage, MeetDecision, DatePlanningPrefs
 } from './types'
 
 function db() {
@@ -74,13 +74,16 @@ export async function getCompatibleUsers(user: User, eloRange = 150): Promise<Us
 
   if (error) throw error
 
+  // Apply hard preference filters (Rule 9, Layer 1)
+  const filtered = await applyHardFilters(user, data ?? [])
+
   // If too few results, widen range
-  if ((data?.length ?? 0) < 3 && eloRange < 300) {
+  if (filtered.length < 3 && eloRange < 300) {
     return getCompatibleUsers(user, 300)
   }
 
-  // Last resort: all opposite gender
-  if ((data?.length ?? 0) === 0) {
+  // Last resort: all opposite gender (still apply hard filters)
+  if (filtered.length === 0) {
     const { data: all, error: err } = await db()
       .from('users')
       .select()
@@ -88,10 +91,79 @@ export async function getCompatibleUsers(user: User, eloRange = 150): Promise<Us
       .eq('profile_status', 'active')
       .neq('id', user.id)
     if (err) throw err
-    return all ?? []
+    return applyHardFilters(user, all ?? [])
   }
 
-  return data ?? []
+  return filtered
+}
+
+// --- Hard Preference Filters (Rule 9, Layer 1) ---
+// Bidirectional: both users' hard preferences must be satisfied.
+
+async function applyHardFilters(user: User, candidates: User[]): Promise<User[]> {
+  if (candidates.length === 0) return []
+
+  const userPrefs = await getHardPreferences(user.id)
+  const candidatePrefsMap = await getHardPreferencesForUsers(candidates.map(c => c.id))
+  const currentYear = new Date().getFullYear()
+
+  return candidates.filter(candidate => {
+    const candPrefs = candidatePrefsMap.get(candidate.id) ?? null
+
+    // Age filter (bidirectional)
+    if (user.birth_year && candidate.birth_year) {
+      const userAge = currentYear - user.birth_year
+      const candAge = currentYear - candidate.birth_year
+      if (userPrefs?.age_range_min != null && candAge < userPrefs.age_range_min) return false
+      if (userPrefs?.age_range_max != null && candAge > userPrefs.age_range_max) return false
+      if (candPrefs?.age_range_min != null && userAge < candPrefs.age_range_min) return false
+      if (candPrefs?.age_range_max != null && userAge > candPrefs.age_range_max) return false
+    }
+
+    // Kids incompatibility (bidirectional)
+    if (userPrefs?.kids && candPrefs?.kids) {
+      const incompatible = areKidsIncompatible(userPrefs.kids, candPrefs.kids)
+      if (incompatible) return false
+    }
+
+    // Faith filter (only when essential + must_match)
+    if (isEssentialFaithMismatch(user, userPrefs, candidate, candPrefs)) return false
+    if (isEssentialFaithMismatch(candidate, candPrefs, user, userPrefs)) return false
+
+    // Smoking dealbreaker (bidirectional)
+    if (isSmokingDealbreaker(userPrefs?.smoking, candPrefs?.smoking)) return false
+
+    return true
+  })
+}
+
+function areKidsIncompatible(a: string, b: string): boolean {
+  const conflicts: [string, string][] = [
+    ['wants', 'doesnt_want'],
+    ['doesnt_want', 'wants'],
+    ['has', 'doesnt_want'],
+    ['doesnt_want', 'has'],
+  ]
+  return conflicts.some(([x, y]) => a === x && b === y)
+}
+
+function isEssentialFaithMismatch(
+  userA: User, prefsA: HardPreferences | null,
+  userB: User, _prefsB: HardPreferences | null,
+): boolean {
+  if (prefsA?.faith_importance !== 'essential') return false
+  if (prefsA?.observance_match !== 'must_match') return false
+  // Religion must match
+  if (userA.religion && userB.religion && userA.religion !== userB.religion) return true
+  // Observance level must match
+  if (userA.observance_level && userB.observance_level && userA.observance_level !== userB.observance_level) return true
+  return false
+}
+
+function isSmokingDealbreaker(aSmoking: string | null | undefined, bSmoking: string | null | undefined): boolean {
+  if (aSmoking === 'dealbreaker' && (bSmoking === 'yes' || bSmoking === 'sometimes')) return true
+  if (bSmoking === 'dealbreaker' && (aSmoking === 'yes' || aSmoking === 'sometimes')) return true
+  return false
 }
 
 export async function updateUserElo(id: string, newElo: number, incrementInteractions = false): Promise<void> {
@@ -124,6 +196,18 @@ export async function getHardPreferences(userId: string): Promise<HardPreference
     .single()
   if (error && error.code !== 'PGRST116') throw error
   return data
+}
+
+export async function getHardPreferencesForUsers(userIds: string[]): Promise<Map<string, HardPreferences>> {
+  if (userIds.length === 0) return new Map()
+  const { data, error } = await db()
+    .from('hard_preferences')
+    .select()
+    .in('user_id', userIds)
+  if (error) throw error
+  const map = new Map<string, HardPreferences>()
+  for (const row of (data ?? []) as HardPreferences[]) map.set(row.user_id, row)
+  return map
 }
 
 // ─── Soft Preferences ───
@@ -927,4 +1011,102 @@ export async function updateFriendVouch(id: string, updates: Partial<FriendVouch
     .single()
   if (error) throw error
   return data
+}
+
+// ─── Constrained Chat ───
+
+export async function getChatMessages(mutualMatchId: string): Promise<ChatMessage[]> {
+  const { data, error } = await db()
+    .from('chat_messages')
+    .select()
+    .eq('mutual_match_id', mutualMatchId)
+    .order('created_at')
+  if (error) throw error
+  return data ?? []
+}
+
+export async function sendChatMessage(message: Omit<ChatMessage, 'id' | 'created_at'>): Promise<ChatMessage> {
+  const { data, error } = await db()
+    .from('chat_messages')
+    .insert(message)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getChatMessageCount(mutualMatchId: string, senderId: string): Promise<number> {
+  const { count, error } = await db()
+    .from('chat_messages')
+    .select('*', { count: 'exact', head: true })
+    .eq('mutual_match_id', mutualMatchId)
+    .eq('sender_id', senderId)
+  if (error) throw error
+  return count ?? 0
+}
+
+// ─── Meet Decisions ───
+
+export async function saveMeetDecision(decision: Omit<MeetDecision, 'id' | 'created_at'>): Promise<MeetDecision> {
+  const { data, error } = await db()
+    .from('meet_decisions')
+    .insert(decision)
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getMeetDecision(mutualMatchId: string, userId: string): Promise<MeetDecision | null> {
+  const { data, error } = await db()
+    .from('meet_decisions')
+    .select()
+    .eq('mutual_match_id', mutualMatchId)
+    .eq('user_id', userId)
+    .single()
+  if (error && error.code !== 'PGRST116') throw error
+  return data
+}
+
+export async function getMeetDecisions(mutualMatchId: string): Promise<MeetDecision[]> {
+  const { data, error } = await db()
+    .from('meet_decisions')
+    .select()
+    .eq('mutual_match_id', mutualMatchId)
+  if (error) throw error
+  return data ?? []
+}
+
+// ─── Date Planning Preferences ───
+
+export async function saveDatePlanningPrefs(prefs: Omit<DatePlanningPrefs, 'id' | 'submitted_at'>): Promise<DatePlanningPrefs> {
+  const { data, error } = await db()
+    .from('date_planning_prefs')
+    .upsert(prefs, { onConflict: 'mutual_match_id,user_id' })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+export async function getDatePlanningPrefs(mutualMatchId: string): Promise<DatePlanningPrefs[]> {
+  const { data, error } = await db()
+    .from('date_planning_prefs')
+    .select()
+    .eq('mutual_match_id', mutualMatchId)
+  if (error) throw error
+  return data ?? []
+}
+
+// ─── Expired Chats (for cron) ───
+
+export async function getExpiredChats(): Promise<MutualMatch[]> {
+  const now = new Date().toISOString()
+  const { data, error } = await db()
+    .from('mutual_matches')
+    .select()
+    .eq('status', 'chatting')
+    .lt('chat_expires_at', now)
+  if (error) throw error
+  return data ?? []
 }

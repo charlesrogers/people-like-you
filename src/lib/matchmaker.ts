@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk'
-import type { CompositeProfile, User, NarrativeStrategy, NarrativeDraft } from './types'
+import type { CompositeProfile, User, NarrativeStrategy, NarrativeDraft, HardPreferences } from './types'
 import { selectStrategy } from './narrative-strategy'
 import { scoreDrafts } from './narrative-critic'
 import { scoreWithEmbedding } from './embedding'
@@ -309,18 +309,33 @@ export function computeCompatibilityBreakdown(a: CompositeProfile, b: CompositeP
 /**
  * Score compatibility — uses embedding-based scoring when available,
  * falls back to hand-tuned scorer.
+ * Optional User params enable life-stage age sanity check + kids/faith soft bonuses.
  */
-export function scoreCompatibility(a: CompositeProfile, b: CompositeProfile): number {
+export function scoreCompatibility(
+  a: CompositeProfile, b: CompositeProfile,
+  userA?: User, userB?: User,
+  userAPrefs?: HardPreferences | null, userBPrefs?: HardPreferences | null,
+): number {
   // Try embedding-based scoring first (Phase 5)
   if (a.embedding && b.embedding) {
     return scoreWithEmbedding(a, b)
   }
 
   // Fall back to hand-tuned scorer
-  return scoreCompatibilityHandTuned(a, b)
+  let score = scoreCompatibilityHandTuned(a, b, userA, userB)
+
+  // Kids/faith soft bonuses (Rule 9) — small multipliers for aligned preferences
+  if (userAPrefs && userBPrefs) {
+    score *= getPreferenceAlignmentMultiplier(userAPrefs, userBPrefs, userA, userB)
+  }
+
+  return Math.round(score * 100) / 100
 }
 
-function scoreCompatibilityHandTuned(a: CompositeProfile, b: CompositeProfile): number {
+function scoreCompatibilityHandTuned(
+  a: CompositeProfile, b: CompositeProfile,
+  userA?: User, userB?: User,
+): number {
   let score = 0
   let factors = 0
 
@@ -365,7 +380,104 @@ function scoreCompatibilityHandTuned(a: CompositeProfile, b: CompositeProfile): 
     factors += 0.5
   }
 
+  // 5. Life-stage alignment (TEST: half weight — 0.35)
+  // See ongoing_tests.md Test 1, model-rules.md Rule 9
+  if (userA && userB) {
+    const lifeStageScore = scoreLifeStageAlignment(a, b, userA, userB)
+    if (lifeStageScore !== null) {
+      score += lifeStageScore * 0.35
+      factors += 0.35
+    }
+  }
+
   return factors > 0 ? Math.round((score / factors) * 100) / 100 : 0.5
+}
+
+// --- Life-Stage Scoring (Rule 9, Layer 2) ---
+
+const CHAPTER_COMPAT: Record<string, Record<string, number>> = {
+  launching:    { launching: 1.0, building: 0.8, established: 0.4, reinventing: 0.6 },
+  building:     { launching: 0.8, building: 1.0, established: 0.7, reinventing: 0.5 },
+  established:  { launching: 0.4, building: 0.7, established: 1.0, reinventing: 0.6 },
+  reinventing:  { launching: 0.6, building: 0.5, established: 0.6, reinventing: 1.0 },
+}
+
+function getChapterCompatibility(a: string | null, b: string | null): number {
+  if (!a || !b) return 0.5
+  return CHAPTER_COMPAT[a]?.[b] ?? 0.5
+}
+
+function scoreLifeStageAlignment(
+  a: CompositeProfile, b: CompositeProfile,
+  userA: User, userB: User,
+): number | null {
+  if (!a.life_stage || !b.life_stage) return null
+  if (a.life_stage.confidence <= 0.3 || b.life_stage.confidence <= 0.3) return null
+
+  // Age sanity check (Rule 9 safeguard): if chapter is "launching" but user is 35+, skip
+  const currentYear = new Date().getFullYear()
+  for (const [profile, user] of [[a, userA], [b, userB]] as [CompositeProfile, User][]) {
+    if (
+      profile.life_stage?.life_chapter === 'launching' &&
+      user.birth_year &&
+      (currentYear - user.birth_year) >= 35
+    ) {
+      return null
+    }
+  }
+
+  let score = 0
+
+  // Rootedness proximity (30%)
+  const rootednessDiff = Math.abs(a.life_stage.rootedness - b.life_stage.rootedness)
+  score += (1 - rootednessDiff) * 0.3
+
+  // Life pace proximity (30%)
+  const paceDiff = Math.abs(a.life_stage.life_pace - b.life_stage.life_pace)
+  score += (1 - paceDiff) * 0.3
+
+  // Life chapter compatibility (20%)
+  score += getChapterCompatibility(a.life_stage.life_chapter, b.life_stage.life_chapter) * 0.2
+
+  // Trajectory momentum proximity (20%) — penalized less
+  const momentumDiff = Math.abs(a.life_stage.trajectory_momentum - b.life_stage.trajectory_momentum)
+  score += (1 - momentumDiff * 0.5) * 0.2
+
+  return score
+}
+
+// --- Preference Alignment Soft Bonuses (Rule 9) ---
+
+function getPreferenceAlignmentMultiplier(
+  prefsA: HardPreferences, prefsB: HardPreferences,
+  userA?: User, userB?: User,
+): number {
+  let multiplier = 1.0
+
+  // Kids alignment bonus
+  if (prefsA.kids && prefsB.kids) {
+    if (prefsA.kids === prefsB.kids) multiplier *= 1.05
+    else if (prefsA.kids === 'open' || prefsB.kids === 'open') multiplier *= 1.02
+  }
+
+  // Faith alignment bonus
+  if (userA && userB && prefsA.faith_importance && prefsB.faith_importance) {
+    if (
+      prefsA.faith_importance === prefsB.faith_importance &&
+      userA.religion && userB.religion && userA.religion === userB.religion
+    ) {
+      multiplier *= 1.05
+    }
+    if (
+      (prefsA.observance_match === 'prefer_same' || prefsB.observance_match === 'prefer_same') &&
+      userA.observance_level && userB.observance_level &&
+      userA.observance_level === userB.observance_level
+    ) {
+      multiplier *= 1.03
+    }
+  }
+
+  return multiplier
 }
 
 // ─── Candidate Selection ───
@@ -373,7 +485,7 @@ function scoreCompatibilityHandTuned(a: CompositeProfile, b: CompositeProfile): 
 export async function selectNextCandidate(
   userId: string
 ): Promise<{ candidate: User; score: number } | null> {
-  const { getUser, getCompatibleUsers, getCompositeProfile, getPreviouslyShownUserIds } = await import('./db')
+  const { getUser, getCompatibleUsers, getCompositeProfile, getPreviouslyShownUserIds, getHardPreferences, getHardPreferencesForUsers } = await import('./db')
 
   const user = await getUser(userId)
   if (!user) return null
@@ -385,11 +497,16 @@ export async function selectNextCandidate(
   const fresh = candidates.filter(c => !previouslyShown.includes(c.id))
   if (fresh.length === 0) return null
 
+  // Fetch hard preferences for soft bonus scoring
+  const userPrefs = await getHardPreferences(userId)
+  const candidatePrefsMap = await getHardPreferencesForUsers(fresh.map(c => c.id))
+
   const scored = await Promise.all(
     fresh.map(async (candidate) => {
       const candidateComposite = await getCompositeProfile(candidate.id)
+      const candPrefs = candidatePrefsMap.get(candidate.id)
       const score = userComposite && candidateComposite
-        ? scoreCompatibility(userComposite, candidateComposite)
+        ? scoreCompatibility(userComposite, candidateComposite, user, candidate, userPrefs, candPrefs)
         : 0.5
       return { candidate, score }
     })
