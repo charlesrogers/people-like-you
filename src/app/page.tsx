@@ -231,9 +231,9 @@ export default function Home() {
       <section className="px-6 py-24 sm:py-32">
         <div className="mx-auto max-w-2xl text-center">
           <p className="text-5xl sm:text-6xl font-extrabold tracking-tight leading-tight">
-            Ready to meet someone who{" "}
-            <span className="italic text-neon-gradient">actually</span>{" "}
-            gets it?
+            Stop swiping.{" "}
+            <span className="italic text-neon-gradient">Start</span>{" "}
+            connecting.
           </p>
           <div className="mt-10">
             <Link
