@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import posthog from 'posthog-js'
 import VoiceRecorder from '@/components/VoiceRecorder'
@@ -70,9 +70,9 @@ function OnboardingContent() {
   const [birthYear, setBirthYear] = useState('')
   const [zipcode, setZipcode] = useState('')
 
-  // Step 2: Voice recordings
+  // Step 2: Voice recordings — stores server-confirmed memo IDs (not blobs)
   const [prompts, setPrompts] = useState<PromptDef[]>(() => getOnboardingPrompts(6))
-  const [recordings, setRecordings] = useState<Map<string, { blob: Blob; duration: number }>>(new Map())
+  const [recordings, setRecordings] = useState<Map<string, { memoId: string; duration: number }>>(new Map())
   const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0)
 
   // Step 3: Hard prefs (dealbreakers only)
@@ -113,14 +113,50 @@ function OnboardingContent() {
 
   // Track user ID after profile creation
   const [userId, setUserId] = useState<string | null>(null)
+  const [processingError, setProcessingError] = useState<string | null>(null)
+
+  // Restore state after page refresh — recordings are already on the server
+  useEffect(() => {
+    const savedId = localStorage.getItem('ply_profile_id')
+    if (savedId && !userId) {
+      setUserId(savedId)
+      fetch(`/api/voice-memo?userId=${savedId}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.memos?.length > 0) {
+            const restored = new Map<string, { memoId: string; duration: number }>(
+              data.memos.map((m: { id: string; prompt_id: string; duration_seconds: number }) => [
+                m.prompt_id, { memoId: m.id, duration: m.duration_seconds }
+              ])
+            )
+            setRecordings(restored)
+          }
+        })
+        .catch(() => {})
+    }
+  }, [])
 
   const stepIndex = STEPS.indexOf(step)
   const progress = ((stepIndex + 1) / STEPS.length) * 100
 
-  const handleRecordingComplete = (promptId: string, blob: Blob, duration: number) => {
+  const handleRecordingComplete = async (promptId: string, blob: Blob, duration: number) => {
+    if (!userId) throw new Error('Session expired. Please refresh and try again.')
+
+    const formData = new FormData()
+    const ext = blob.type.includes('mp4') || blob.type.includes('m4a') ? 'm4a' : 'webm'
+    formData.append('audio', blob, `${promptId}.${ext}`)
+    formData.append('userId', userId)
+    formData.append('promptId', promptId)
+    formData.append('dayNumber', '0')
+    formData.append('durationSeconds', String(duration))
+
+    const res = await fetch('/api/voice-memo', { method: 'POST', body: formData })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Failed to save recording')
+
     setRecordings(prev => {
       const next = new Map(prev)
-      next.set(promptId, { blob, duration })
+      next.set(promptId, { memoId: data.id, duration })
       return next
     })
   }
@@ -242,23 +278,7 @@ function OnboardingContent() {
         setUserId(data.id)
         localStorage.setItem('ply_profile_id', data.id)
 
-        // Upload voice memos
-        for (const [promptId, { blob, duration }] of recordings) {
-          const formData = new FormData()
-          formData.append('audio', blob, `${promptId}.webm`)
-          formData.append('userId', data.id)
-          formData.append('promptId', promptId)
-          formData.append('dayNumber', '0')
-          formData.append('durationSeconds', String(duration))
-
-          const memoRes = await fetch('/api/voice-memo', { method: 'POST', body: formData })
-          if (!memoRes.ok) console.error(`Failed to upload memo: ${promptId}`)
-          else console.log(`Uploaded voice memo: ${promptId}`)
-        }
-
-        // Processing happens after photos step (during taste calibration)
-        // Don't call here — memos may still be uploading
-
+        // Recordings already uploaded immediately on record — just advance
         setStep('preferences')
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Something went wrong')
@@ -322,20 +342,24 @@ function OnboardingContent() {
         // Go straight to reveal — kick off processing and poll for completion
         setStep('reveal')
 
-        // Process memos (transcribe + extract + composite) — don't fire-and-forget
+        // Process memos (transcribe + extract + composite)
         fetch('/api/process-memos', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId }),
         }).then(r => r.json()).then(d => {
-          console.log(`Processing complete: ${d.processed} memos processed`)
+          console.log(`Processing: ${d.processed} done, ${d.failed || 0} failed`)
+          if (d.failed > 0) {
+            setProcessingError(`${d.failed} recording(s) couldn't be processed yet. Your recordings are saved — we'll retry automatically.`)
+          }
           setProcessingDone(true)
-          // Fetch composite now that processing is done
           return fetch(`/api/composite?userId=${userId}`)
         }).then(r => r?.json()).then(d => {
           if (d?.composite) setComposite(d.composite)
         }).catch(err => {
           console.error('Processing failed:', err)
+          setProcessingError('Processing is taking longer than expected. Your recordings are safe — check back in a few minutes.')
+          setProcessingDone(true)
         })
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to upload photos')
@@ -596,15 +620,14 @@ function OnboardingContent() {
                     helpText={prompts[currentVoiceIndex].helpText}
                     exampleAnswer={prompts[currentVoiceIndex].exampleAnswer}
                     onSkip={() => handleSkipPrompt(prompts[currentVoiceIndex].id)}
-                    onRecordingComplete={(blob, duration) => {
-                      handleRecordingComplete(prompts[currentVoiceIndex].id, blob, duration)
+                    onRecordingComplete={async (blob, duration) => {
+                      await handleRecordingComplete(prompts[currentVoiceIndex].id, blob, duration)
                       // Auto-advance to next unrecorded prompt after a beat
                       setTimeout(() => {
                         const nextUnrecorded = prompts.findIndex((p, i) => i > currentVoiceIndex && !recordings.has(p.id))
                         if (nextUnrecorded !== -1) {
                           setCurrentVoiceIndex(nextUnrecorded)
                         } else {
-                          // Try wrapping around
                           const firstUnrecorded = prompts.findIndex(p => !recordings.has(p.id) && p.id !== prompts[currentVoiceIndex].id)
                           if (firstUnrecorded !== -1) {
                             setCurrentVoiceIndex(firstUnrecorded)
@@ -908,6 +931,9 @@ function OnboardingContent() {
               <div className="text-center py-12">
                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-stone-900" />
                 <p className="mt-4 text-sm text-stone-500">Almost ready... building your profile</p>
+                {processingError && (
+                  <p className="mt-3 text-xs text-amber-600">{processingError}</p>
+                )}
               </div>
             ) : (() => {
               const reveal = computePersonalityReveal(composite)

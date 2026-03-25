@@ -200,8 +200,7 @@ export default function DisclosureExchange({
                   <VoiceRecorder
                     promptText={currentRound.prompt_text}
                     promptId={`disclosure-${currentRound.round_number}`}
-                    onRecordingComplete={(blob) => {
-                      // In production, upload blob and set voicePath
+                    onRecordingComplete={async (blob) => {
                       void blob
                       setVoicePath('pending-upload')
                       setResponse('[voice response recorded]')

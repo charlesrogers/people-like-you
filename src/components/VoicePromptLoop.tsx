@@ -36,7 +36,6 @@ export default function VoicePromptLoop({ userId, onIntroUnlocked, onDone }: Pro
   const [progress, setProgress] = useState<Progress | null>(null)
   const [promptsAnswered, setPromptsAnswered] = useState(0)
   const [loading, setLoading] = useState(true)
-  const [uploading, setUploading] = useState(false)
   const [justRecorded, setJustRecorded] = useState(false)
   const [noMorePrompts, setNoMorePrompts] = useState(false)
 
@@ -72,34 +71,27 @@ export default function VoicePromptLoop({ userId, onIntroUnlocked, onDone }: Pro
 
   async function handleRecordingComplete(blob: Blob, durationSeconds: number) {
     if (!currentPrompt) return
-    setUploading(true)
 
-    try {
-      const formData = new FormData()
-      formData.append('audio', blob, 'recording.webm')
-      formData.append('userId', userId)
-      formData.append('promptId', currentPrompt.id)
-      formData.append('dayNumber', '0')
-      formData.append('durationSeconds', String(Math.round(durationSeconds)))
+    // Upload to server — VoiceRecorder shows its own "Saving..." spinner
+    const formData = new FormData()
+    const ext = blob.type.includes('mp4') || blob.type.includes('m4a') ? 'm4a' : 'webm'
+    formData.append('audio', blob, `recording.${ext}`)
+    formData.append('userId', userId)
+    formData.append('promptId', currentPrompt.id)
+    formData.append('dayNumber', '0')
+    formData.append('durationSeconds', String(Math.round(durationSeconds)))
 
-      const res = await fetch('/api/voice-memo', {
-        method: 'POST',
-        body: formData,
-      })
-
-      if (res.ok) {
-        setJustRecorded(true)
-        // Brief pause to show confirmation, then fetch next state
-        setTimeout(async () => {
-          setJustRecorded(false)
-          await fetchNextState()
-        }, 1500)
-      }
-    } catch {
-      // silent
-    } finally {
-      setUploading(false)
+    const res = await fetch('/api/voice-memo', { method: 'POST', body: formData })
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      throw new Error(data.error || 'Failed to save recording')
     }
+
+    setJustRecorded(true)
+    setTimeout(async () => {
+      setJustRecorded(false)
+      await fetchNextState()
+    }, 1500)
   }
 
   if (loading && promptsAnswered === 0) {
@@ -191,9 +183,6 @@ export default function VoicePromptLoop({ userId, onIntroUnlocked, onDone }: Pro
           />
         </div>
 
-        {uploading && (
-          <p className="mt-3 text-center text-xs text-stone-400">Uploading...</p>
-        )}
       </div>
 
       {/* Exit option */}

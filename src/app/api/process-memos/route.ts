@@ -2,17 +2,19 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getUserVoiceMemos } from '@/lib/db'
 import { processVoiceMemo } from '@/lib/extraction'
 
-// Allow up to 60 seconds for transcription + extraction
 export const maxDuration = 300
 
 export async function POST(req: NextRequest) {
-  const { userId } = await req.json()
+  const { userId, retryFailed } = await req.json()
   if (!userId) {
     return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
   }
 
   const memos = await getUserVoiceMemos(userId)
-  const unprocessed = memos.filter(m => !m.transcript)
+  const unprocessed = memos.filter(m =>
+    m.processing_status === 'pending' ||
+    (retryFailed && m.processing_status === 'failed')
+  )
 
   if (unprocessed.length === 0) {
     return NextResponse.json({ processed: 0, total: memos.length })
@@ -23,7 +25,6 @@ export async function POST(req: NextRequest) {
   let processed = 0
   const errors: string[] = []
 
-  // Process all memos — sequentially to avoid rate limits
   for (const memo of unprocessed) {
     try {
       await processVoiceMemo(memo.id)

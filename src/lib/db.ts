@@ -260,7 +260,7 @@ export async function deletePhoto(id: string): Promise<void> {
 
 // ─── Voice Memos ───
 
-export async function saveVoiceMemo(memo: Omit<VoiceMemo, 'id' | 'created_at'>): Promise<VoiceMemo> {
+export async function saveVoiceMemo(memo: Omit<VoiceMemo, 'id' | 'created_at' | 'processing_status' | 'processing_error' | 'retry_count'>): Promise<VoiceMemo> {
   const { data, error } = await db()
     .from('voice_memos')
     .insert(memo)

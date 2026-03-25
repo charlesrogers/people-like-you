@@ -13,7 +13,7 @@ import type {
 
 const anthropic = new Anthropic()
 
-// --- Transcription (GPT-4o Mini Transcribe) ---
+// --- Transcription with retry + model fallback ---
 
 export async function transcribeAudio(storagePath: string): Promise<string> {
   const supabase = createServerClient()
@@ -37,12 +37,33 @@ export async function transcribeAudio(storagePath: string): Promise<string> {
   const file = new File([audioData], `audio.${ext}`, { type: mime })
 
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
-  const transcription = await openai.audio.transcriptions.create({
-    model: 'gpt-4o-mini-transcribe',
-    file,
-  })
 
-  return transcription.text
+  // Try primary model twice, then fallback model twice
+  const models: Array<'gpt-4o-mini-transcribe' | 'whisper-1'> = ['gpt-4o-mini-transcribe', 'whisper-1']
+  let lastError: Error | null = null
+
+  for (const model of models) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const transcription = await openai.audio.transcriptions.create({ model, file })
+        const text = transcription.text?.trim()
+
+        if (!text || text.length < 5) {
+          console.warn(`transcribeAudio: ${model} attempt ${attempt + 1} returned empty/short (${text?.length || 0} chars)`)
+          continue
+        }
+
+        console.log(`transcribeAudio: ${model} attempt ${attempt + 1} succeeded (${text.length} chars)`)
+        return text
+      } catch (err) {
+        lastError = err instanceof Error ? err : new Error(String(err))
+        console.warn(`transcribeAudio: ${model} attempt ${attempt + 1} failed:`, lastError.message)
+        if (attempt === 0) await new Promise(r => setTimeout(r, 1000))
+      }
+    }
+  }
+
+  throw new Error(`Transcription failed after all attempts: ${lastError?.message || 'empty transcript'}`)
 }
 
 // --- Per-Memo Extraction (Claude Haiku 4.5) ---
@@ -401,12 +422,13 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
   const memo = await getVoiceMemo(memoId)
   if (!memo) throw new Error(`Memo ${memoId} not found`)
 
+  try {
   // Step 1: Transcribe if needed
   let transcript = memo.transcript
   if (!transcript) {
     console.log(`Transcribing memo ${memoId}...`)
     transcript = await transcribeAudio(memo.audio_storage_path)
-    await updateVoiceMemo(memoId, { transcript })
+    await updateVoiceMemo(memoId, { transcript, processing_status: 'transcribed' as const })
     console.log(`Transcribed memo ${memoId}: ${transcript.substring(0, 80)}...`)
   }
 
@@ -492,5 +514,16 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
     // Fall back to old aggregation if no v2 stories yet
     console.log(`[v2] No v2 stories found, falling back to old aggregation`)
     await aggregateCompositeProfile(memo.user_id)
+  }
+
+  await updateVoiceMemo(memoId, { processing_status: 'extracted' as const, processing_error: null })
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err)
+    await updateVoiceMemo(memoId, {
+      processing_status: 'failed' as const,
+      processing_error: msg,
+      retry_count: (memo.retry_count || 0) + 1,
+    }).catch(() => {}) // don't let status update failure mask the real error
+    throw err
   }
 }

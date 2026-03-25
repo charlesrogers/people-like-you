@@ -70,6 +70,9 @@ export interface VoiceMemo {
   transcript: string | null
   extraction: MemoExtraction | null
   day_number: number
+  processing_status: 'pending' | 'transcribed' | 'extracted' | 'failed'
+  processing_error: string | null
+  retry_count: number
   created_at: string
 }
 

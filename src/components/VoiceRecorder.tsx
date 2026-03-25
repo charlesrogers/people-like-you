@@ -7,7 +7,7 @@ interface VoiceRecorderProps {
   promptId: string
   helpText?: string
   exampleAnswer?: string
-  onRecordingComplete: (blob: Blob, durationSeconds: number) => void
+  onRecordingComplete: (blob: Blob, durationSeconds: number) => Promise<void>
   onSkip?: () => void
   maxSeconds?: number
 }
@@ -21,7 +21,7 @@ export default function VoiceRecorder({
   onSkip,
   maxSeconds = 90,
 }: VoiceRecorderProps) {
-  const [state, setState] = useState<'idle' | 'recording' | 'reviewing' | 'submitted'>('idle')
+  const [state, setState] = useState<'idle' | 'recording' | 'uploading' | 'submitted'>('idle')
   const [seconds, setSeconds] = useState(0)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -50,7 +50,6 @@ export default function VoiceRecorder({
 
   const getMimeType = () => {
     if (typeof MediaRecorder === 'undefined') return null
-    // Prefer mp4 on Safari (WebM/Opus can produce silent files on some Safari versions)
     if (MediaRecorder.isTypeSupported('audio/mp4')) return 'audio/mp4'
     if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) return 'audio/webm;codecs=opus'
     if (MediaRecorder.isTypeSupported('audio/webm')) return 'audio/webm'
@@ -70,7 +69,7 @@ export default function VoiceRecorder({
         return
       }
 
-      // Set up audio level monitoring via AnalyserNode
+      // Audio level monitoring via AnalyserNode
       const audioCtx = new AudioContext()
       audioCtxRef.current = audioCtx
       const source = audioCtx.createMediaStreamSource(stream)
@@ -82,7 +81,6 @@ export default function VoiceRecorder({
       const dataArray = new Uint8Array(analyser.frequencyBinCount)
       levelCheckRef.current = setInterval(() => {
         analyser.getByteFrequencyData(dataArray)
-        // Average amplitude across frequency bins
         const avg = dataArray.reduce((sum, v) => sum + v, 0) / dataArray.length
         if (avg > 5) {
           hasSignalRef.current = true
@@ -98,8 +96,7 @@ export default function VoiceRecorder({
         if (e.data.size > 0) chunksRef.current.push(e.data)
       }
 
-      recorder.onstop = () => {
-        // Clean up audio monitoring
+      recorder.onstop = async () => {
         if (levelCheckRef.current) clearInterval(levelCheckRef.current)
         if (audioCtxRef.current?.state !== 'closed') audioCtxRef.current?.close()
 
@@ -109,7 +106,7 @@ export default function VoiceRecorder({
         setAudioUrl(url)
         stream.getTracks().forEach(t => t.stop())
 
-        // Check for silent recording
+        // Reject silent recordings
         const bytesPerSec = blob.size / Math.max(secondsRef.current, 1)
         if (!hasSignalRef.current || bytesPerSec < 500) {
           setError("We didn't pick up any audio. Check that your microphone is working and try again.")
@@ -117,8 +114,15 @@ export default function VoiceRecorder({
           return
         }
 
-        setState('submitted')
-        onRecordingComplete(blob, secondsRef.current)
+        // Upload immediately
+        setState('uploading')
+        try {
+          await onRecordingComplete(blob, secondsRef.current)
+          setState('submitted')
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Failed to save recording. Tap to try again.')
+          setState('idle')
+        }
       }
 
       recorder.start(1000)
@@ -140,7 +144,7 @@ export default function VoiceRecorder({
     } catch {
       setError('Microphone access denied. Please allow microphone access to record.')
     }
-  }, [maxSeconds])
+  }, [maxSeconds, onRecordingComplete])
 
   const stopRecording = useCallback(() => {
     if (mediaRecorderRef.current?.state === 'recording') {
@@ -242,6 +246,13 @@ export default function VoiceRecorder({
         </div>
       )}
 
+      {state === 'uploading' && (
+        <div className="mt-5 flex items-center justify-center gap-3 py-4">
+          <div className="h-5 w-5 animate-spin rounded-full border-2 border-stone-300 border-t-stone-900" />
+          <span className="text-sm text-stone-500">Saving your recording...</span>
+        </div>
+      )}
+
       {state === 'recording' && (
         <div className="mt-5">
           <div className="flex items-center justify-center">
@@ -264,11 +275,10 @@ export default function VoiceRecorder({
             </div>
           </div>
 
-          {/* Live audio signal indicator */}
           <div className="mt-3 flex items-center justify-center gap-2">
             <span className={`h-2 w-2 rounded-full ${hasAudioSignal ? 'animate-pulse bg-red-500' : 'bg-stone-300'}`} />
             <span className="text-xs text-stone-500">
-              {hasAudioSignal ? 'Recording...' : 'Waiting for audio — speak into your mic'}
+              {hasAudioSignal ? 'Recording...' : 'Waiting for audio \u2014 speak into your mic'}
             </span>
           </div>
 
@@ -287,10 +297,6 @@ export default function VoiceRecorder({
             </button>
           </div>
         </div>
-      )}
-
-      {state === 'reviewing' && audioUrl && (
-        <div className="mt-5 text-center text-xs text-stone-400">Processing...</div>
       )}
     </div>
   )
