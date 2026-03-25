@@ -107,9 +107,9 @@ export async function POST(req: NextRequest) {
     await updateUser(user.id, { onboarding_stage: 'day0_complete' })
 
     return NextResponse.json({ id: user.id })
-  } catch (err) {
-    console.error('Profile creation error:', err)
-    const message = err instanceof Error ? err.message : 'Internal server error'
+  } catch (err: unknown) {
+    console.error('Profile creation error:', JSON.stringify(err, null, 2), err)
+    const message = err instanceof Error ? err.message : (typeof err === 'object' && err !== null && 'message' in err) ? String((err as Record<string, unknown>).message) : JSON.stringify(err)
     return NextResponse.json({ error: message }, { status: 500 })
   }
 }
