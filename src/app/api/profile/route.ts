@@ -1,6 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createUser, getUser, getUserByEmail, saveHardPreferences, saveSoftPreferences, updateUser } from '@/lib/db'
 
+// Map relocate answers to valid distance_radius values (client may send either format)
+function normalizeDistanceRadius(val: string | null | undefined): string | null {
+  if (!val) return null
+  const map: Record<string, string> = { yes: 'anywhere', maybe: 'few_hours', no: 'same_metro' }
+  return map[val] || val
+}
+
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
@@ -33,7 +40,7 @@ export async function POST(req: NextRequest) {
           user_id: existing.id,
           age_range_min: hardPreferences.age_range_min || null,
           age_range_max: hardPreferences.age_range_max || null,
-          distance_radius: hardPreferences.distance_radius || null,
+          distance_radius: normalizeDistanceRadius(hardPreferences.distance_radius),
           faith_importance: hardPreferences.faith_importance || null,
           kids: hardPreferences.kids || null,
           marital_history: hardPreferences.marital_history || null,
@@ -81,7 +88,7 @@ export async function POST(req: NextRequest) {
         user_id: user.id,
         age_range_min: hardPreferences.age_range_min || null,
         age_range_max: hardPreferences.age_range_max || null,
-        distance_radius: hardPreferences.distance_radius || null,
+        distance_radius: normalizeDistanceRadius(hardPreferences.distance_radius),
         faith_importance: hardPreferences.faith_importance || null,
         kids: hardPreferences.kids || null,
         marital_history: hardPreferences.marital_history || null,
