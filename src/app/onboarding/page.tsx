@@ -278,56 +278,28 @@ function OnboardingContent() {
           console.log(`Uploaded photo ${i + 1}`)
         }
 
-        // Fire background processing while user does taste calibration
+        // Go straight to reveal — kick off processing and poll for completion
+        setStep('reveal')
+
+        // Process memos (transcribe + extract + composite) — don't fire-and-forget
         fetch('/api/process-memos', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId }),
         }).then(r => r.json()).then(d => {
-          console.log(`Background processing: ${d.processed} memos processed`)
+          console.log(`Processing complete: ${d.processed} memos processed`)
           setProcessingDone(true)
+          // Fetch composite now that processing is done
+          return fetch(`/api/composite?userId=${userId}`)
+        }).then(r => r?.json()).then(d => {
+          if (d?.composite) setComposite(d.composite)
         }).catch(err => {
-          console.error('Background processing failed:', err)
+          console.error('Processing failed:', err)
         })
-
-        // Load taste calibration narratives for opposite gender
-        const seekingGender = gender === 'Man' ? 'Woman' : 'Man'
-        setTasteNarratives(getSeedNarrativesForGender(seekingGender, 6))
-        setTasteIndex(0)
-
-        setStep('taste')
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to upload photos')
       } finally {
         setSubmitting(false)
-      }
-    } else if (step === 'taste') {
-      // Taste calibration is done, move to reveal
-      setStep('reveal')
-
-      // Poll for composite profile if not ready yet
-      if (!processingDone && userId) {
-        const pollInterval = setInterval(async () => {
-          try {
-            const res = await fetch(`/api/extraction-status?userId=${userId}`)
-            const data = await res.json()
-            if (data.compositeReady) {
-              clearInterval(pollInterval)
-              setProcessingDone(true)
-              const compRes = await fetch(`/api/composite?userId=${userId}`)
-              const compData = await compRes.json()
-              if (compData.composite) setComposite(compData.composite)
-            }
-          } catch { /* keep polling */ }
-        }, 3000)
-        // Clean up after 60s max
-        setTimeout(() => clearInterval(pollInterval), 60000)
-      } else if (userId) {
-        // Already done, fetch composite
-        fetch(`/api/composite?userId=${userId}`)
-          .then(r => r.json())
-          .then(d => { if (d.composite) setComposite(d.composite) })
-          .catch(() => {})
       }
     } else if (step === 'reveal') {
       // Save profile feedback if any
@@ -353,7 +325,6 @@ function OnboardingContent() {
     step === 'voice' ? canProceedVoice :
     step === 'preferences' ? canProceedPrefs :
     step === 'photos' ? canProceedPhotos :
-    step === 'taste' ? canProceedTaste :
     canProceedReveal
 
   // Taste calibration handlers
@@ -840,107 +811,7 @@ function OnboardingContent() {
         )}
 
         {/* Step 5: Taste Calibration */}
-        {step === 'taste' && tasteNarratives.length > 0 && tasteIndex < tasteNarratives.length && (
-          <div>
-            <h1 className="text-2xl font-bold text-stone-900">Now let&rsquo;s see what excites you</h1>
-            <p className="mt-2 text-sm text-stone-500">
-              We&rsquo;ll show you a few people. Tell us who you&rsquo;d want to meet — this teaches us your taste.
-            </p>
-
-            {/* Progress */}
-            <div className="mt-4 flex gap-1.5">
-              {tasteNarratives.map((_, i) => (
-                <div
-                  key={i}
-                  className={`h-1.5 flex-1 rounded-full transition-all ${
-                    i < tasteIndex ? 'bg-stone-900' : i === tasteIndex ? 'bg-stone-400' : 'bg-stone-200'
-                  }`}
-                />
-              ))}
-            </div>
-
-            <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-              <p className="mt-0 text-base leading-relaxed text-stone-700">
-                {tasteNarratives[tasteIndex].narrative}
-              </p>
-
-              {/* Attribute tags — what caught your attention */}
-              <div className="mt-5">
-                <p className="text-xs font-medium text-stone-500">What caught your attention? (optional)</p>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {ATTRIBUTE_TAGS.map(attr => (
-                    <button
-                      key={attr.value}
-                      onClick={() => toggleTasteAttr(attr.value)}
-                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition active:translate-y-px ${
-                        tasteSelectedAttrs.includes(attr.value)
-                          ? 'border-stone-900 bg-stone-900 text-white'
-                          : 'border-stone-200 text-stone-500 hover:border-stone-300'
-                      }`}
-                    >
-                      {attr.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="mt-6 flex gap-3">
-                <button
-                  onClick={() => handleTasteVote(true)}
-                  className="flex-1 rounded-xl bg-stone-900 py-3 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
-                >
-                  I&rsquo;d like to meet them
-                </button>
-                <button
-                  onClick={() => {
-                    setShowTasteFeedback(true)
-                  }}
-                  className="flex-1 rounded-xl border border-stone-200 py-3 text-sm font-medium text-stone-600 transition hover:bg-stone-50 active:translate-y-px"
-                >
-                  Not for me
-                </button>
-              </div>
-
-              {/* Feedback panel — shows after "Not for me" */}
-              {showTasteFeedback && (
-                <div className="mt-4 rounded-xl bg-stone-50 p-4 animate-fade-in-up">
-                  <p className="text-xs font-medium text-stone-600">Anything that turned you off? (optional)</p>
-                  <textarea
-                    value={tasteFeedbackText}
-                    onChange={e => setTasteFeedbackText(e.target.value)}
-                    placeholder="Too generic, not my type, nothing specific stood out..."
-                    rows={2}
-                    className="mt-2 w-full rounded-lg border border-stone-200 px-3 py-2 text-sm text-stone-700 placeholder:text-stone-400 focus:border-stone-400 focus:outline-none resize-none"
-                  />
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      onClick={() => {
-                        handleTasteVote(false)
-                        setShowTasteFeedback(false)
-                        setTasteFeedbackText('')
-                      }}
-                      className="flex-1 rounded-lg bg-stone-900 py-2 text-xs font-medium text-white transition hover:bg-stone-800"
-                    >
-                      {tasteFeedbackText ? 'Submit & continue' : 'Skip & continue'}
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Step 5: Taste calibration done, waiting for continue */}
-        {step === 'taste' && tasteIndex >= tasteNarratives.length && (
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-stone-900">Got it.</h1>
-            <p className="mt-2 text-sm text-stone-500">
-              We&rsquo;re using your taste to find better matches. Let&rsquo;s see what we learned about you.
-            </p>
-          </div>
-        )}
-
-        {/* Step 6: Profile Reveal — Personality Quiz Style */}
+        {/* Step 5: Profile Reveal — Personality Quiz Style */}
         {step === 'reveal' && (
           <div>
             {!composite ? (
@@ -1192,7 +1063,7 @@ function OnboardingContent() {
             </button>
           )}
           {/* Hide Continue during active taste card voting — the vote buttons handle progression */}
-          {!(step === 'taste' && tasteIndex < tasteNarratives.length) && (
+          {(
             <button
               onClick={handleNext}
               disabled={!canProceed || submitting}

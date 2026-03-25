@@ -53,10 +53,8 @@ export async function POST(req: NextRequest) {
     day_number: dayNumber,
   })
 
-  // Kick off full pipeline async: transcribe → extract → aggregate composite
-  processVoiceMemo(memo.id).catch(err =>
-    console.error('Async extraction pipeline failed for memo', memo.id, err)
-  )
+  // Processing happens via /api/process-memos after all uploads complete
+  // (fire-and-forget here gets killed by Vercel after response returns)
 
   return NextResponse.json({ id: memo.id, status: 'uploaded' })
 }
