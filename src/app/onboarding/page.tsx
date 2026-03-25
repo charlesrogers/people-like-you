@@ -54,9 +54,13 @@ function OnboardingContent() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // Step 0: Signup
+  // Step 0: Signup (phone-first)
+  const [signupPhone, setSignupPhone] = useState('')
   const [signupEmail, setSignupEmail] = useState('')
   const [signupPassword, setSignupPassword] = useState('')
+  const [useEmail, setUseEmail] = useState(false)
+  const [otpSent, setOtpSent] = useState(false)
+  const [otpCode, setOtpCode] = useState('')
 
   // Step 1: Basics
   const [firstName, setFirstName] = useState('')
@@ -129,7 +133,11 @@ function OnboardingContent() {
     }
   }
 
-  const canProceedSignup = signupEmail && signupPassword && signupPassword.length >= 6
+  const canProceedSignup = useEmail
+    ? (signupEmail && signupPassword && signupPassword.length >= 6)
+    : otpSent
+      ? otpCode.length === 6
+      : signupPhone.replace(/\D/g, '').length >= 10
   const canProceedBasics = firstName && gender && birthYear && zipcode
   const canProceedVoice = recordings.size >= 2
   const canProceedPrefs = faithImportance && kids
@@ -141,31 +149,64 @@ function OnboardingContent() {
     if (step === 'signup') {
       setSubmitting(true)
       try {
-        const res = await fetch('/api/auth/signup', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: signupEmail,
-            password: signupPassword,
-            ref: refCode || undefined,
-          }),
-        })
-        const data = await res.json()
-        if (!res.ok) throw new Error(data.error || 'Signup failed')
+        if (useEmail) {
+          // Email + password signup (fallback)
+          const res = await fetch('/api/auth/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: signupEmail,
+              password: signupPassword,
+              ref: refCode || undefined,
+            }),
+          })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || 'Signup failed')
 
-        // Store auth tokens if returned
-        if (data.access_token) {
-          localStorage.setItem('ply_access_token', data.access_token)
-          localStorage.setItem('ply_refresh_token', data.refresh_token)
-        }
-        if (data.id) {
-          setUserId(data.id)
-          localStorage.setItem('ply_profile_id', data.id)
-        }
+          if (data.access_token) {
+            localStorage.setItem('ply_access_token', data.access_token)
+            localStorage.setItem('ply_refresh_token', data.refresh_token)
+          }
+          if (data.id) {
+            setUserId(data.id)
+            localStorage.setItem('ply_profile_id', data.id)
+          }
 
-        setEmail(signupEmail)
-        posthog.capture('onboarding_started')
-        setStep('basics')
+          setEmail(signupEmail)
+          posthog.capture('onboarding_started', { method: 'email' })
+          setStep('basics')
+        } else if (!otpSent) {
+          // Step 1: Send OTP
+          const res = await fetch('/api/auth/phone-signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: signupPhone }),
+          })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || 'Failed to send code')
+          setOtpSent(true)
+        } else {
+          // Step 2: Verify OTP
+          const res = await fetch('/api/auth/verify-otp', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ phone: signupPhone, token: otpCode }),
+          })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || 'Invalid code')
+
+          if (data.access_token) {
+            localStorage.setItem('ply_access_token', data.access_token)
+            localStorage.setItem('ply_refresh_token', data.refresh_token)
+          }
+          if (data.id) {
+            setUserId(data.id)
+            localStorage.setItem('ply_profile_id', data.id)
+          }
+
+          posthog.capture('onboarding_started', { method: 'phone' })
+          setStep('basics')
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Signup failed')
       } finally {
@@ -377,30 +418,79 @@ function OnboardingContent() {
       </div>
 
       <div className="mx-auto max-w-xl px-6 py-12">
-        {/* Step 0: Signup */}
+        {/* Step 0: Signup (phone-first) */}
         {step === 'signup' && (
           <div>
             <h1 className="text-2xl font-bold text-stone-900">Let&rsquo;s find your person</h1>
-            <p className="mt-2 text-sm text-stone-500">Create your account to get started.</p>
+            <p className="mt-2 text-sm text-stone-500">
+              {otpSent ? 'Enter the code we sent you.' : 'Enter your phone number to get started.'}
+            </p>
 
             <div className="mt-8 space-y-5">
-              <div>
-                <label className="block text-xs font-medium text-stone-500">Email</label>
-                <input
-                  type="email" value={signupEmail} onChange={e => setSignupEmail(e.target.value)}
-                  placeholder="you@email.com"
-                  className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
-                />
-              </div>
+              {!useEmail && !otpSent && (
+                <div>
+                  <label className="block text-xs font-medium text-stone-500">Phone number</label>
+                  <div className="mt-1 flex items-center gap-2">
+                    <span className="rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-500">+1</span>
+                    <input
+                      type="tel" value={signupPhone}
+                      onChange={e => setSignupPhone(e.target.value.replace(/[^\d\-() ]/g, ''))}
+                      placeholder="(555) 123-4567"
+                      inputMode="tel"
+                      className="flex-1 rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                    />
+                  </div>
+                </div>
+              )}
 
-              <div>
-                <label className="block text-xs font-medium text-stone-500">Password</label>
-                <input
-                  type="password" value={signupPassword} onChange={e => setSignupPassword(e.target.value)}
-                  placeholder="6+ characters"
-                  className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
-                />
-              </div>
+              {!useEmail && otpSent && (
+                <div>
+                  <label className="block text-xs font-medium text-stone-500">Verification code</label>
+                  <input
+                    type="text" value={otpCode}
+                    onChange={e => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    placeholder="123456"
+                    inputMode="numeric"
+                    maxLength={6}
+                    autoFocus
+                    className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-center text-lg font-mono tracking-[0.3em] text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                  />
+                  <button
+                    onClick={() => { setOtpSent(false); setOtpCode('') }}
+                    className="mt-2 text-xs text-stone-400 underline decoration-dotted underline-offset-2"
+                  >
+                    Use a different number
+                  </button>
+                </div>
+              )}
+
+              {useEmail && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-stone-500">Email</label>
+                    <input
+                      type="email" value={signupEmail} onChange={e => setSignupEmail(e.target.value)}
+                      placeholder="you@email.com"
+                      className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-stone-500">Password</label>
+                    <input
+                      type="password" value={signupPassword} onChange={e => setSignupPassword(e.target.value)}
+                      placeholder="6+ characters"
+                      className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                    />
+                  </div>
+                </>
+              )}
+
+              <button
+                onClick={() => { setUseEmail(!useEmail); setOtpSent(false); setOtpCode('') }}
+                className="text-xs text-stone-400 underline decoration-dotted underline-offset-2 hover:text-stone-600"
+              >
+                {useEmail ? 'Use phone number instead' : 'Use email instead'}
+              </button>
             </div>
           </div>
         )}

@@ -2,7 +2,8 @@
 
 export interface User {
   id: string
-  email: string
+  email: string | null
+  phone_number: string | null
   first_name: string
   last_name: string | null
   gender: 'Man' | 'Woman'
@@ -97,6 +98,15 @@ export interface AttachmentProxy {
   reassurance_seeking: number  // 0-1
 }
 
+export interface LifeStageSignals {
+  rootedness: number            // 0=nomadic, 1=deeply planted
+  life_pace: number             // 0=slow/settled, 1=high-intensity
+  life_chapter: 'launching' | 'building' | 'established' | 'reinventing' | null
+  trajectory_momentum: number   // 0=stable/content, 1=actively changing
+  trajectory_directions: string[] // 0-3 concrete directions
+  confidence: number
+}
+
 export interface MemoExtraction {
   big_five_signals: {
     openness: number
@@ -159,6 +169,8 @@ export interface CompositeProfile {
   friend_vouch_quotes?: string[]
   // Phase 5: Embedding (optional)
   embedding?: number[] | null
+  // Life-stage signals (extracted from voice memos — see model-rules.md Rule 9)
+  life_stage?: LifeStageSignals | null
 }
 
 // --- Match Types (Phase 3: expanded with narrative metadata) ---

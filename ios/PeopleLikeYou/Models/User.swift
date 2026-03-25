@@ -2,7 +2,8 @@ import Foundation
 
 struct User: Codable, Identifiable {
     let id: String
-    let email: String
+    let email: String?
+    let phoneNumber: String?
     let firstName: String
     let lastName: String?
     let gender: Gender
@@ -24,6 +25,7 @@ struct User: Codable, Identifiable {
 
     enum CodingKeys: String, CodingKey {
         case id, email, gender, seeking, state, zipcode, height, education, community, religion
+        case phoneNumber = "phone_number"
         case firstName = "first_name"
         case lastName = "last_name"
         case birthYear = "birth_year"
