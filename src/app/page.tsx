@@ -183,43 +183,43 @@ export default function Home() {
       {/* ══════ WHAT MAKES US DIFFERENT ══════ */}
       <section className="px-6 py-16 sm:py-24">
         <div className="mx-auto max-w-4xl">
-          <h2 className="text-center text-3xl font-extrabold tracking-tight sm:text-4xl mb-16">
+          <h2 className="text-center text-3xl font-extrabold tracking-tight sm:text-4xl mb-14">
             Not another swipe-fest.
           </h2>
 
-          {/* Column headers */}
-          <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 mb-0">
-            <div />
-            <div className="text-center pb-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-[var(--dark)]/30 line-through decoration-1">
-                Them
-              </span>
+          <div className="rounded-2xl bg-white shadow-[0_4px_40px_rgba(0,0,0,0.08)] overflow-hidden">
+            {/* Column headers */}
+            <div className="grid grid-cols-[1.2fr_1fr_1fr] border-b border-[var(--dark)]/10">
+              <div className="px-7 py-5" />
+              <div className="px-7 py-5 border-l border-[var(--dark)]/10">
+                <p className="text-xs font-bold uppercase tracking-widest text-[var(--dark)]/40">
+                  Everyone else
+                </p>
+              </div>
+              <div className="px-7 py-5 bg-[#f0f5ff] border-l border-[#d4e0ff]">
+                <p className="text-xs font-bold uppercase tracking-widest text-[#3b5ccc]">
+                  People Like You
+                </p>
+              </div>
             </div>
-            <div className="text-center pb-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-[var(--dark)]">
-                People Like You
-              </span>
-            </div>
-          </div>
 
-          {/* Rows */}
-          <div className="divide-y divide-[var(--dark)]/10">
+            {/* Rows */}
             {[
-              ["Discovery", "Swipe through hundreds", "Picks tailored to your tastes"],
-              ["First impression", "Judge by photos first", "Get to know who they really are"],
+              ["Finding cool people", "Swipe through hundreds", "Picks tailored to your tastes"],
+              ["Figuring out if you\u2019d vibe", "Judge by photos first", "Get to know who they really are"],
               ["Messaging", "Generic \u2018hey\u2019 messages", "Matchmaker-written intros about why you\u2019d click"],
               ["Matching", "Compatibility scores", "Chemistry + compatibility"],
-              ["The goal", "Endless browsing", "Curated introductions so you jump right into connecting"],
-            ].map(([category, them, us], i) => (
-              <div key={i} className="grid grid-cols-[1fr_1fr_1fr] gap-0 items-start py-5">
-                <div className="pr-4">
-                  <p className="text-[13px] font-bold text-[var(--dark)] tracking-tight">{category}</p>
+              ["TLDR", "Endless browsing", "Curated intros so you jump right into connecting"],
+            ].map(([category, them, us], i, arr) => (
+              <div key={i} className={`grid grid-cols-[1.2fr_1fr_1fr] ${i < arr.length - 1 ? "border-b border-[var(--dark)]/[0.06]" : ""}`}>
+                <div className="px-7 py-5">
+                  <p className="text-sm font-bold text-[var(--dark)]">{category}</p>
                 </div>
-                <div className="px-4">
-                  <p className="text-[13px] text-[var(--dark)]/35 leading-relaxed">{them}</p>
+                <div className="px-7 py-5 border-l border-[var(--dark)]/10">
+                  <p className="text-sm text-[var(--dark)]/60 leading-relaxed">{them}</p>
                 </div>
-                <div className="px-4 pl-5 border-l-2 border-[var(--neon-dim)]">
-                  <p className="text-[13px] font-medium text-[var(--dark)] leading-relaxed">{us}</p>
+                <div className="px-7 py-5 bg-[#f0f5ff] border-l border-[#d4e0ff]">
+                  <p className="text-sm font-medium text-[var(--dark)] leading-relaxed">{us}</p>
                 </div>
               </div>
             ))}
