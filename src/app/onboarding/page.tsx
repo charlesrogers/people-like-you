@@ -238,7 +238,7 @@ function OnboardingContent() {
             hardPreferences: {
               age_range_min: ageMin,
               age_range_max: ageMax,
-              distance_radius: wouldRelocate || 'anywhere',
+              distance_radius: wouldRelocate === 'yes' ? 'anywhere' : wouldRelocate === 'maybe' ? 'few_hours' : wouldRelocate === 'no' ? 'same_metro' : 'anywhere',
               faith_importance: faithImportance,
               kids,
               marital_history: maritalHistory || null,
@@ -534,6 +534,7 @@ function OnboardingContent() {
                     promptText={prompts[currentVoiceIndex].text}
                     helpText={prompts[currentVoiceIndex].helpText}
                     exampleAnswer={prompts[currentVoiceIndex].exampleAnswer}
+                    onSkip={() => handleSkipPrompt(prompts[currentVoiceIndex].id)}
                     onRecordingComplete={(blob, duration) => {
                       handleRecordingComplete(prompts[currentVoiceIndex].id, blob, duration)
                       // Auto-advance to next unrecorded prompt after a beat
@@ -561,18 +562,6 @@ function OnboardingContent() {
                 )}
               </div>
 
-              {/* Swap question — prominent */}
-              {prompts[currentVoiceIndex] && !recordings.has(prompts[currentVoiceIndex].id) && (
-                <button
-                  onClick={() => handleSkipPrompt(prompts[currentVoiceIndex].id)}
-                  className="mt-4 flex w-full items-center justify-center gap-2 rounded-lg border border-stone-200 px-4 py-3 text-sm font-medium text-stone-500 transition hover:border-stone-300 hover:bg-stone-50 active:translate-y-px"
-                >
-                  <svg className="h-4 w-4" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                    <path d="M2 8h12M10 4l4 4-4 4" />
-                  </svg>
-                  Give me a different question
-                </button>
-              )}
             </div>
 
             {/* Navigation dots */}
