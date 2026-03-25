@@ -24,6 +24,28 @@ export const INTRO_ENGINE_CONFIG = {
   minCriticScore: 30,
 }
 
+// ─── The 3 Hook Types ───
+
+export const HOOK_TYPES = [
+  {
+    id: 'quote' as const,
+    label: 'The Quote',
+    instruction: 'Lead with their most striking actual words — a direct quote that reveals who they are. Let the quote do the work. The first thing the reader sees should be this person\'s own voice.',
+  },
+  {
+    id: 'contradiction' as const,
+    label: 'The Contradiction',
+    instruction: 'Open with two things about them that seem like they shouldn\'t go together — but do. Show the tension between two sides of who they are. This creates depth and complexity in a single sentence.',
+  },
+  {
+    id: 'scene' as const,
+    label: 'The Scene',
+    instruction: 'Paint what being around them is like — a specific moment, a specific place, a specific situation. Make the reader feel like they\'re already there. Don\'t describe the person; describe the experience of them.',
+  },
+] as const
+
+export type HookType = typeof HOOK_TYPES[number]['id']
+
 // ─── Generate intro "trailer" ───
 
 export async function generateTrailer(
@@ -31,26 +53,36 @@ export async function generateTrailer(
   subject: User,
   readerProfile: CompositeProfile,
   subjectProfile: CompositeProfile,
+  hookType?: HookType,
 ): Promise<{
   narrative: string
   criticScore: number | null
+  hookType: HookType
   version: string
 }> {
   const prompt = buildTrailerPrompt(reader, subject, readerProfile, subjectProfile)
 
-  // Generate 3 drafts in parallel with different temperature hints
-  const emphases = [
-    'Focus on the HOOK. The first sentence should be so unexpected it stops them mid-scroll.',
-    'Focus on the BRIDGE. Make the connection to the reader feel uncanny — like you read their mind.',
-    'Focus on THE QUESTION. The ending should haunt them. They should be thinking about it an hour later.',
+  // If specific hook type requested, generate 3 drafts with that hook
+  // Otherwise, generate 1 draft per hook type (for Daily Three)
+  const hook = hookType
+    ? HOOK_TYPES.find(h => h.id === hookType)!
+    : HOOK_TYPES[Math.floor(Math.random() * HOOK_TYPES.length)]
+
+  const hookInstruction = `\n\nHOOK TYPE: ${hook.label}\n${hook.instruction}`
+
+  // Generate 3 drafts with the same hook type but different creative approaches
+  const variations = [
+    'Approach A: Lead with the single most vivid detail you can find.',
+    'Approach B: Build momentum — each sentence should raise the stakes.',
+    'Approach C: Surprise the reader — subvert their expectation in the first two sentences.',
   ]
 
   const drafts = await Promise.all(
-    emphases.map(emphasis =>
+    variations.map(variation =>
       anthropic.messages.create({
         model: INTRO_ENGINE_CONFIG.model,
         max_tokens: INTRO_ENGINE_CONFIG.maxTokens,
-        messages: [{ role: 'user', content: `${prompt}\n\nEMPHASIS FOR THIS DRAFT: ${emphasis}` }],
+        messages: [{ role: 'user', content: `${prompt}${hookInstruction}\n\n${variation}` }],
       }).then(msg => {
         const text = msg.content[0].type === 'text' ? msg.content[0].text : ''
         return text.trim()
@@ -80,6 +112,7 @@ export async function generateTrailer(
       return {
         narrative: regenScored[0].text,
         criticScore: regenScored[0].score,
+        hookType: hook.id,
         version: INTRO_ENGINE_CONFIG.version,
       }
     }
@@ -88,8 +121,42 @@ export async function generateTrailer(
   return {
     narrative: best.text,
     criticScore: best.score,
+    hookType: hook.id,
     version: INTRO_ENGINE_CONFIG.version,
   }
+}
+
+// ─── Generate Daily Three (one intro per candidate, different hook types) ───
+
+export async function generateDailyThree(
+  reader: User,
+  candidates: User[],
+  readerProfile: CompositeProfile,
+  candidateProfiles: CompositeProfile[],
+): Promise<Array<{
+  candidateId: string
+  narrative: string
+  criticScore: number | null
+  hookType: HookType
+}>> {
+  // Assign each candidate a different hook type
+  const shuffledHooks = [...HOOK_TYPES].sort(() => Math.random() - 0.5)
+
+  const results = await Promise.all(
+    candidates.slice(0, 3).map(async (candidate, i) => {
+      const profile = candidateProfiles[i]
+      const hookType = shuffledHooks[i % shuffledHooks.length].id
+      const result = await generateTrailer(reader, candidate, readerProfile, profile, hookType)
+      return {
+        candidateId: candidate.id,
+        narrative: result.narrative,
+        criticScore: result.criticScore,
+        hookType: result.hookType,
+      }
+    })
+  )
+
+  return results
 }
 
 // ─── Build the trailer prompt ───
@@ -144,19 +211,29 @@ The reader is into: ${readerPassions}. They value: ${readerValues}.
 Use this ONLY to choose which of ${subject.first_name}'s qualities to lead with. Do NOT reference the reader directly.
 
 STRUCTURE:
-1. HOOK (1 sentence): The most unexpected, vivid thing about ${subject.first_name}. A quote, a moment, a fact. Something that makes someone stop scrolling.
-2. SELL (2-3 sentences): What makes ${subject.first_name} genuinely remarkable. Use specific stories, actions, quotes — not adjectives. Show, don't tell. Layer multiple facets of who they are.
-3. THE TWIST (1 sentence): The thing that doesn't fit the pattern. The hidden depth. The contradiction that makes them three-dimensional instead of a caricature.
-4. THE QUESTION (1 sentence): Something unresolved about ${subject.first_name} that only meeting them would answer.
+1. HOOK (1 sentence): (see HOOK TYPE instruction below for specific approach)
+2. STORY (2-3 sentences): A specific anecdote or set of facts that shows ${subject.first_name}'s character through ACTION. Not adjectives — the actual thing they did. Use their words. Connect actions to HOW THEY THINK, not just what they did.
+3. PROOF (1 sentence): A concrete accomplishment, thing they built, or how others experience them.
+4. CLOSE (1 sentence): End with a vivid image, a joke, or a specific detail that stays with you. NOT a rhetorical question. NOT sentiment.
 
-RULES:
-- 5-8 sentences. Give it room to breathe.
-- This is about ${subject.first_name}, not the reader. Do NOT say "you both" or "you'd love" or "based on your interests." The reader can decide for themselves what excites them.
+TONE RULES (violating these makes the intro trash):
+1. NEVER BRAGGY. If a story makes ${subject.first_name} sound like they're announcing their own virtue, you've failed. Show actions, don't celebrate them.
+2. NEVER PERSONIFY THE APP. Do NOT say "you need to meet" or "okay so there's this person." No narrator voice.
+3. CONTRADICTION > SINGLE NOTE. Tension between two sides of someone is always more interesting.
+4. CLOSE WITH VIVID IMAGE OR JOKE, NEVER SENTIMENT. If the last sentence could go on a Hallmark card, delete it.
+5. DON'T EXPLAIN THE MEANING. Show behavior, stop. Don't add "and that tells you everything about who they are."
+6. FRAME ACCOMPLISHMENTS AS CREATION, NOT EGO. "Built something that didn't exist before" >> "is really good at building things."
+7. SPECIFICS > PATTERNS. "Tim Ho Wan and then four more Chinese restaurants" >> "loves food."
+8. NO RHETORICAL QUESTIONS as endings. End with a statement or image.
+9. NO SUPERLATIVES. Not "the greatest" or "the most amazing" — just show it.
+
+FORMAT:
+- 5-7 sentences total.
+- This is about ${subject.first_name}, not the reader.
+- Do NOT say "you both" or "you'd love" or reference the reader.
 - NEVER describe physical appearance.
-- NEVER use: "compatible personalities," "you might click," "shared interests," "you'd get along," "you both enjoy."
-- Use ${subject.first_name}'s ACTUAL WORDS. Quotes are the most powerful tool you have.
-- Write like a friend telling you about someone incredible they just met. Not a sales pitch.
-- Do NOT start with "Meet ${subject.first_name}" or "Imagine someone who..." — start with the hook.
+- Use ${subject.first_name}'s ACTUAL WORDS when possible.
+- Do NOT start with "Meet" or "Imagine someone."
 - Do NOT mention the reader's name.`
 }
 
