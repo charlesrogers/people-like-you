@@ -65,12 +65,22 @@ struct VoiceRecordingView: View {
                         .foregroundStyle(.red)
                 }
 
+                // Audio signal indicator
+                if recorder.isRecording && !recorder.hasDetectedSignal && recorder.duration > 1 {
+                    Text("Waiting for audio \u{2014} speak into your mic")
+                        .font(.caption)
+                        .foregroundStyle(.orange)
+                        .transition(.opacity)
+                }
+
                 // Record / Stop button
                 Button {
                     if recorder.isRecording {
                         recorder.stopRecording()
-                        // Auto-submit on stop
-                        if let data = recorder.audioData {
+                        // Check for silent recording
+                        if recorder.isSilent {
+                            // Don't auto-submit — show warning
+                        } else if let data = recorder.audioData {
                             Task { await uploadAndAdvance(data: data) }
                         }
                     } else {
@@ -115,6 +125,35 @@ struct VoiceRecordingView: View {
                     Text(recorder.audioData != nil ? "Tap to record another" : "Tap to record")
                         .font(.caption)
                         .foregroundStyle(.secondary)
+                }
+
+                // Silent recording warning
+                if recorder.isSilent && !uploading {
+                    VStack(spacing: 8) {
+                        Text("We didn\u{2019}t hear anything \u{2014} try again?")
+                            .font(.caption)
+                            .foregroundStyle(.orange)
+                        HStack(spacing: 12) {
+                            Button("Re-record") {
+                                recorder.audioData = nil
+                                recorder.isSilent = false
+                            }
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.orange)
+
+                            Button("Submit anyway") {
+                                if let data = recorder.audioData {
+                                    recorder.isSilent = false
+                                    Task { await uploadAndAdvance(data: data) }
+                                }
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                        }
+                    }
+                    .padding(12)
+                    .background(Color.orange.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
                 }
 
                 // Skip this prompt

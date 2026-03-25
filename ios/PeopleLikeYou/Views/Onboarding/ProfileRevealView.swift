@@ -2,6 +2,7 @@ import SwiftUI
 
 struct ProfileRevealView: View {
     let onComplete: () -> Void
+    var onMoreQuestions: (() -> Void)?
     @EnvironmentObject var appState: AppState
 
     @State private var composite: CompositeProfile?
@@ -171,9 +172,8 @@ struct ProfileRevealView: View {
                                 .font(.subheadline.weight(.medium))
                             ForEach(targeted.targeted + targeted.others, id: \.id) { prompt in
                                 Button {
-                                    // Navigate back to voice recording with this prompt
-                                    // For now, just dismiss — full loop requires navigation refactor
                                     showMoreQuestions = false
+                                    onMoreQuestions?()
                                 } label: {
                                     VStack(alignment: .leading, spacing: 2) {
                                         Text(prompt.text)

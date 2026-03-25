@@ -3,6 +3,7 @@ import SwiftUI
 struct OnboardingContainer: View {
     @EnvironmentObject var appState: AppState
     @State var currentStep: OnboardingStep
+    @State var returnToRevealAfterVoice = false
 
     init(initialStep: OnboardingStep = .basics) {
         _currentStep = State(initialValue: initialStep)
@@ -29,12 +30,24 @@ struct OnboardingContainer: View {
                     case .basics:
                         BasicsView { currentStep = .voice }
                     case .voice:
-                        VoiceRecordingView { currentStep = .preferences }
+                        VoiceRecordingView {
+                            if returnToRevealAfterVoice {
+                                returnToRevealAfterVoice = false
+                                // Re-process memos before returning to reveal
+                                if let userId = appState.userId {
+                                    Task {
+                                        try? await ProfileService.shared.processMemos(userId: userId)
+                                    }
+                                }
+                                currentStep = .reveal
+                            } else {
+                                currentStep = .preferences
+                            }
+                        }
                     case .preferences:
                         PreferencesView { currentStep = .photos }
                     case .photos:
                         PhotoUploadView {
-                            // Fire background processing
                             if let userId = appState.userId {
                                 Task {
                                     try? await ProfileService.shared.processMemos(userId: userId)
@@ -45,7 +58,10 @@ struct OnboardingContainer: View {
                     case .taste:
                         TasteCalibrationView { currentStep = .reveal }
                     case .reveal:
-                        ProfileRevealView { appState.didCompleteOnboarding() }
+                        ProfileRevealView(onComplete: { appState.didCompleteOnboarding() }, onMoreQuestions: {
+                            returnToRevealAfterVoice = true
+                            currentStep = .voice
+                        })
                     }
                 }
                 .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))

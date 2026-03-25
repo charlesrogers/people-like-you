@@ -15,7 +15,7 @@ struct CreateProfileRequest: Codable {
     let softPreferences: String? // Always null now — soft prefs removed
 
     struct Basics: Codable {
-        let email: String
+        let email: String?
         let first_name: String
         let last_name: String?
         let gender: String

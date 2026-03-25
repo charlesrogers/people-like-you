@@ -97,8 +97,10 @@ final class AppState: ObservableObject {
             screen = .onboarding(step: .preferences)
         case "photos":
             screen = .onboarding(step: .photos)
-        case "calibrate":
-            screen = .calibration
+        case "calibrate", "taste":
+            screen = .onboarding(step: .taste)
+        case "reveal":
+            screen = .onboarding(step: .reveal)
         default:
             screen = .dashboard
         }

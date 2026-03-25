@@ -6,6 +6,7 @@ struct BasicsView: View {
 
     @State private var firstName = ""
     @State private var lastName = ""
+    @State private var email = ""
     @State private var birthYear = ""
     @State private var zipcode = ""
     @State private var gender = "Man"
@@ -50,6 +51,14 @@ struct BasicsView: View {
                             }
                     }
 
+                    LabeledField(label: "Email (optional, for notifications)") {
+                        TextField("you@email.com", text: $email)
+                            .textFieldStyle(.roundedBorder)
+                            .textContentType(.emailAddress)
+                            .keyboardType(.emailAddress)
+                            .autocapitalization(.none)
+                    }
+
                     LabeledField(label: "Zip code") {
                         TextField("84101", text: $zipcode)
                             .textFieldStyle(.roundedBorder)
@@ -78,6 +87,7 @@ struct BasicsView: View {
             if let user = appState.user {
                 firstName = user.firstName
                 lastName = user.lastName ?? ""
+                email = user.email ?? ""
                 if let by = user.birthYear { birthYear = String(by) }
                 zipcode = user.zipcode ?? ""
                 gender = user.gender.rawValue
