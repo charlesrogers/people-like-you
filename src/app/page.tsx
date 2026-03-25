@@ -180,41 +180,49 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ══════ WHAT MAKES US DIFFERENT (table) ══════ */}
+      {/* ══════ WHAT MAKES US DIFFERENT ══════ */}
       <section className="px-6 py-16 sm:py-24">
-        <div className="mx-auto max-w-3xl">
-          <h2 className="text-center text-3xl font-extrabold tracking-tight sm:text-4xl mb-12">
+        <div className="mx-auto max-w-4xl">
+          <h2 className="text-center text-3xl font-extrabold tracking-tight sm:text-4xl mb-16">
             Not another swipe-fest.
           </h2>
-          <div className="rounded-bumble-lg overflow-hidden shadow-[0_4px_40px_rgba(0,0,0,0.06)]">
-            <table className="w-full text-left">
-              <thead>
-                <tr>
-                  <th className="bg-[var(--dark)]/5 px-6 py-4 text-sm font-bold text-[var(--dark)]/50 w-1/2"></th>
-                  <th className="bg-[var(--dark)]/5 px-6 py-4 text-sm font-bold text-[var(--dark)]/50 line-through decoration-2">Them</th>
-                  <th className="bg-[var(--neon)] px-6 py-4 text-sm font-bold text-[var(--dark)]">Us</th>
-                </tr>
-              </thead>
-              <tbody className="text-sm">
-                {[
-                  ["Discovery", "Swipe through hundreds", "Picks tailored to your tastes"],
-                  ["First impression", "Judge by photos first", "Get to know who they really are"],
-                  ["Messaging", "Generic 'hey' messages", "Matchmaker-written intros about why you'd click"],
-                  ["Matching", "Compatibility scores", "Chemistry + compatibility"],
-                  ["The goal", "Endless browsing", "Curated introductions so you can jump right into connecting"],
-                ].map(([category, them, us], i) => (
-                  <tr key={i} className={i % 2 === 0 ? "bg-white" : "bg-[var(--dark)]/[0.02]"}>
-                    <td className="px-6 py-4 font-semibold text-[var(--dark)]/70">{category}</td>
-                    <td className="px-6 py-4 text-[var(--dark)]/40">
-                      <span className="mr-2 text-[var(--dark)]/30">&#10005;</span>{them}
-                    </td>
-                    <td className="px-6 py-4 font-medium text-[var(--dark)]">
-                      <span className="mr-2 text-[var(--dark)]">&#10003;</span>{us}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+
+          {/* Column headers */}
+          <div className="grid grid-cols-[1fr_1fr_1fr] gap-0 mb-0">
+            <div />
+            <div className="text-center pb-4">
+              <span className="text-xs font-bold uppercase tracking-widest text-[var(--dark)]/30 line-through decoration-1">
+                Them
+              </span>
+            </div>
+            <div className="text-center pb-4">
+              <span className="text-xs font-bold uppercase tracking-widest text-[var(--dark)]">
+                People Like You
+              </span>
+            </div>
+          </div>
+
+          {/* Rows */}
+          <div className="divide-y divide-[var(--dark)]/10">
+            {[
+              ["Discovery", "Swipe through hundreds", "Picks tailored to your tastes"],
+              ["First impression", "Judge by photos first", "Get to know who they really are"],
+              ["Messaging", "Generic \u2018hey\u2019 messages", "Matchmaker-written intros about why you\u2019d click"],
+              ["Matching", "Compatibility scores", "Chemistry + compatibility"],
+              ["The goal", "Endless browsing", "Curated introductions so you jump right into connecting"],
+            ].map(([category, them, us], i) => (
+              <div key={i} className="grid grid-cols-[1fr_1fr_1fr] gap-0 items-start py-5">
+                <div className="pr-4">
+                  <p className="text-[13px] font-bold text-[var(--dark)] tracking-tight">{category}</p>
+                </div>
+                <div className="px-4">
+                  <p className="text-[13px] text-[var(--dark)]/35 leading-relaxed">{them}</p>
+                </div>
+                <div className="px-4 pl-5 border-l-2 border-[var(--neon-dim)]">
+                  <p className="text-[13px] font-medium text-[var(--dark)] leading-relaxed">{us}</p>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
