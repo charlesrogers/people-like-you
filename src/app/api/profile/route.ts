@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createUser, getUser, getUserByEmail, saveHardPreferences, saveSoftPreferences, updateUser } from '@/lib/db'
 
 // Map relocate answers to valid distance_radius values (client may send either format)
-function normalizeDistanceRadius(val: string | null | undefined): string | null {
+function normalizeDistanceRadius(val: string | null | undefined): 'same_metro' | 'few_hours' | 'anywhere' | null {
   if (!val) return null
-  const map: Record<string, string> = { yes: 'anywhere', maybe: 'few_hours', no: 'same_metro' }
-  return map[val] || val
+  const map: Record<string, 'same_metro' | 'few_hours' | 'anywhere'> = { yes: 'anywhere', maybe: 'few_hours', no: 'same_metro' }
+  return map[val] || (val as 'same_metro' | 'few_hours' | 'anywhere')
 }
 
 export async function POST(req: NextRequest) {
