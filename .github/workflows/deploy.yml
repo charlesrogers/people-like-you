@@ -24,20 +24,10 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ghcr.io/charlesrogers/people-like-you:latest
-            ghcr.io/charlesrogers/people-like-you:${{ github.sha }}
+            ghcr.io/charlesrogers/people-like-you-app:latest
+            ghcr.io/charlesrogers/people-like-you-app:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Make package public
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          echo "Attempting to make package public..."
-          curl -v -X PATCH \
-            -H "Authorization: Bearer $GH_TOKEN" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/user/packages/container/people-like-you" \
-            -d '{"visibility":"public"}' 2>&1 || true
       - name: Deploy
         run: |
           curl -sf -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
