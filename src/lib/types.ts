@@ -11,6 +11,9 @@ export interface User {
   birth_year: number | null
   state: string | null
   zipcode: string | null
+  latitude: number | null
+  longitude: number | null
+  metro_code: string | null
   height: string | null
   education: string | null
   onboarding_stage: string
@@ -70,7 +73,7 @@ export interface VoiceMemo {
   transcript: string | null
   extraction: MemoExtraction | null
   day_number: number
-  processing_status: 'pending' | 'transcribed' | 'extracted' | 'failed'
+  processing_status: 'pending' | 'transcribed' | 'extracted' | 'failed' | 'replaced'
   processing_error: string | null
   retry_count: number
   created_at: string

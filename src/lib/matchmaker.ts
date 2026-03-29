@@ -492,26 +492,48 @@ export async function selectNextCandidate(
 
   const userComposite = await getCompositeProfile(userId)
   const previouslyShown = await getPreviouslyShownUserIds(userId)
-  const candidates = await getCompatibleUsers(user)
+  let candidates = await getCompatibleUsers(user)
+  let fresh = candidates.filter(c => !previouslyShown.includes(c.id))
 
-  const fresh = candidates.filter(c => !previouslyShown.includes(c.id))
-  if (fresh.length === 0) return null
+  // If too few fresh candidates after filtering shown users, widen Elo range
+  let allCompatible = candidates
+  if (fresh.length < 3) {
+    allCompatible = await getCompatibleUsers(user, 300)
+    fresh = allCompatible.filter(c => !previouslyShown.includes(c.id))
+  }
+
+  if (fresh.length === 0) {
+    // Re-pitch: candidates who were passed 60+ days ago get a second chance with fresh narrative
+    const { getRePitchCandidateIds } = await import('./db')
+    const rePitchIds = await getRePitchCandidateIds(userId, 60)
+    const rePitchCandidates = allCompatible.filter(c => rePitchIds.includes(c.id))
+    if (rePitchCandidates.length === 0) return null
+    fresh = rePitchCandidates
+  }
 
   // Fetch hard preferences for soft bonus scoring
   const userPrefs = await getHardPreferences(userId)
   const candidatePrefsMap = await getHardPreferencesForUsers(fresh.map(c => c.id))
 
+  // Location tier scoring
+  const { getLocationTier, getTierMultiplier, userToLocation } = await import('./geo')
+  const userLoc = userToLocation(user)
+
   const scored = await Promise.all(
     fresh.map(async (candidate) => {
       const candidateComposite = await getCompositeProfile(candidate.id)
       const candPrefs = candidatePrefsMap.get(candidate.id)
-      const score = userComposite && candidateComposite
+      let score = userComposite && candidateComposite
         ? scoreCompatibility(userComposite, candidateComposite, user, candidate, userPrefs, candPrefs)
         : 0.5
       // Compute life-stage sub-score for logging on match record (Test 1)
       const lifeStageScore = userComposite && candidateComposite
         ? scoreLifeStageAlignment(userComposite, candidateComposite, user, candidate)
         : null
+      // Apply location tier multiplier
+      const candLoc = userToLocation(candidate)
+      const locationTier = getLocationTier(userLoc, candLoc)
+      score *= getTierMultiplier(locationTier)
       return { candidate, score, lifeStageScore }
     })
   )

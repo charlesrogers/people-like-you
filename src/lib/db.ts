@@ -74,15 +74,28 @@ export async function getCompatibleUsers(user: User, eloRange = 150): Promise<Us
 
   if (error) throw error
 
-  // Apply hard preference filters (Rule 9, Layer 1)
-  const filtered = await applyHardFilters(user, data ?? [])
+  // Only match users who completed onboarding (have sufficient profile data)
+  const completed = (data ?? []).filter(u =>
+    u.onboarding_stage === 'day0_complete' || u.is_seed === true
+  )
 
-  // If too few results, widen range
-  if (filtered.length < 3 && eloRange < 300) {
-    return getCompatibleUsers(user, 300)
+  // Apply hard preference filters (Rule 9, Layer 1)
+  let filtered = await applyHardFilters(user, completed)
+
+  // Apply location hard filter ONLY for users who explicitly said no relocation (same_metro)
+  // All other users get proximity as a scoring boost (getTierMultiplier in matchmaker.ts), not a hard gate
+  const userPrefs = await getHardPreferences(user.id)
+  if (userPrefs?.distance_radius === 'same_metro') {
+    const { getLocationTier, userToLocation } = await import('./geo')
+    const userLoc = userToLocation(user)
+    filtered = filtered.filter(candidate => {
+      const candLoc = userToLocation(candidate)
+      const tier = getLocationTier(userLoc, candLoc)
+      return tier <= 2 // same_metro = metro area or closer
+    })
   }
 
-  // Last resort: all opposite gender (still apply hard filters)
+  // Last resort: all opposite gender (still apply hard filters, skip location filter)
   if (filtered.length === 0) {
     const { data: all, error: err } = await db()
       .from('users')
@@ -301,6 +314,15 @@ export async function updateVoiceMemo(id: string, updates: Partial<VoiceMemo>): 
   return data
 }
 
+export async function markReplacedMemosForPrompt(userId: string, promptId: string): Promise<void> {
+  await db()
+    .from('voice_memos')
+    .update({ processing_status: 'replaced' })
+    .eq('user_id', userId)
+    .eq('prompt_id', promptId)
+    .neq('processing_status', 'replaced')
+}
+
 // ─── Composite Profiles ───
 
 export async function saveCompositeProfile(profile: Omit<CompositeProfile, 'id'>): Promise<CompositeProfile> {
@@ -410,6 +432,9 @@ export interface UserCadence {
   total_likes: number
   total_passes: number
   next_match_user_id: string | null
+  pool_state: string | null
+  pool_state_reason: string | null
+  pool_state_updated_at: string | null
   created_at: string
   updated_at: string
 }
@@ -1110,4 +1135,63 @@ export async function getExpiredChats(): Promise<MutualMatch[]> {
     .lt('chat_expires_at', now)
   if (error) throw error
   return data ?? []
+}
+
+// ─── Admin Alerts & Pool State ───
+
+export async function createAdminAlert(alert: {
+  user_id: string
+  alert_type: string
+  metadata?: Record<string, unknown>
+}): Promise<void> {
+  // Don't create duplicate unresolved alerts of same type for same user
+  const { data: existing } = await db()
+    .from('admin_alerts')
+    .select('id')
+    .eq('user_id', alert.user_id)
+    .eq('alert_type', alert.alert_type)
+    .eq('resolved', false)
+    .limit(1)
+
+  if (existing && existing.length > 0) return // already alerted
+
+  await db().from('admin_alerts').insert({
+    user_id: alert.user_id,
+    alert_type: alert.alert_type,
+    metadata: alert.metadata || {},
+  })
+}
+
+export async function updatePoolState(userId: string, state: string, reason?: string): Promise<void> {
+  await db().from('user_cadence').update({
+    pool_state: state,
+    pool_state_reason: reason || null,
+    pool_state_updated_at: new Date().toISOString(),
+  }).eq('user_id', userId)
+}
+
+export async function getRePitchCandidateIds(userId: string, cooldownDays: number): Promise<string[]> {
+  const cutoff = new Date()
+  cutoff.setDate(cutoff.getDate() - cooldownDays)
+
+  const { data, error } = await db()
+    .from('daily_intros')
+    .select('matched_user_id')
+    .eq('user_id', userId)
+    .eq('status', 'passed')
+    .lt('acted_at', cutoff.toISOString())
+
+  if (error || !data) return []
+
+  // Exclude anyone who was liked (ever) — only re-pitch passes
+  const { data: liked } = await db()
+    .from('daily_intros')
+    .select('matched_user_id')
+    .eq('user_id', userId)
+    .eq('status', 'liked')
+
+  const likedIds = new Set((liked ?? []).map(l => l.matched_user_id))
+  return data
+    .map(d => d.matched_user_id)
+    .filter(id => !likedIds.has(id))
 }

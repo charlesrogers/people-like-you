@@ -208,7 +208,9 @@ Rules:
 // --- Composite Profile Aggregation ---
 
 export async function aggregateCompositeProfile(userId: string): Promise<CompositeProfile> {
-  const memos = await getUserVoiceMemos(userId)
+  const allMemos = await getUserVoiceMemos(userId)
+  // Exclude replaced memos (superseded by re-recordings)
+  const memos = allMemos.filter(m => m.processing_status !== 'replaced')
   const extractedMemos = memos.filter(m => m.extraction !== null)
 
   if (extractedMemos.length === 0) {
