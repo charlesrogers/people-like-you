@@ -99,7 +99,25 @@ interface TestsData {
   userCount: number;
 }
 
-type Tab = "overview" | "users" | "matches" | "matrix" | "tests";
+type Tab = "overview" | "users" | "matches" | "matrix" | "tests" | "pool-health";
+
+interface PoolHealthData {
+  totalUsers: number;
+  totalEmptyPool: number;
+  emptyPoolAlerts: number;
+  segments: Array<{
+    segment: string;
+    total: number;
+    empty_pool: number;
+    paused: number;
+    users: string[];
+  }>;
+  recentAlerts: Array<{
+    user_id: string;
+    metadata: Record<string, unknown>;
+    created_at: string;
+  }>;
+}
 
 // ─── Auth gate ───
 
@@ -185,6 +203,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
   const [profiles, setProfiles] = useState<AdminUser[]>([]);
   const [matches, setMatches] = useState<AdminMatch[]>([]);
   const [testsData, setTestsData] = useState<TestsData | null>(null);
+  const [poolHealth, setPoolHealth] = useState<PoolHealthData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -231,12 +250,22 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
     }
   }, [tab, testsData, secret]);
 
+  // Lazy-load pool health data
+  useEffect(() => {
+    if (tab === "pool-health" && !poolHealth) {
+      adminFetch("/api/admin/pool-health", secret).then(async (r) => {
+        if (r.ok) setPoolHealth(await r.json());
+      });
+    }
+  }, [tab, poolHealth, secret]);
+
   const tabs: { id: Tab; label: string }[] = [
     { id: "overview", label: "Overview" },
     { id: "users", label: "Users" },
     { id: "matches", label: "Matches" },
     { id: "matrix", label: "Matrix" },
     { id: "tests", label: "Tests" },
+    { id: "pool-health", label: "Pool Health" },
   ];
 
   return (
@@ -277,6 +306,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
         {tab === "matches" && <MatchesTab matches={matches} stats={stats} />}
         {tab === "matrix" && <MatrixTab profiles={profiles} />}
         {tab === "tests" && <TestsTab data={testsData} />}
+        {tab === "pool-health" && <PoolHealthTab data={poolHealth} />}
         {loading && !stats && (
           <p className="text-center text-stone-400 py-12">Loading...</p>
         )}
@@ -1230,6 +1260,122 @@ function TestsTab({ data }: { data: TestsData | null }) {
                 <td className="py-2">No difference at N=100</td>
                 <td className="py-2">Merge types, test a new dimension</td>
               </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Pool Health Tab ───
+
+function PoolHealthTab({ data }: { data: PoolHealthData | null }) {
+  if (!data) {
+    return <p className="text-center text-stone-400 py-12">Loading pool health...</p>;
+  }
+
+  const emptyPct = data.totalUsers > 0
+    ? ((data.totalEmptyPool / data.totalUsers) * 100).toFixed(1)
+    : "0";
+
+  return (
+    <div className="space-y-8">
+      {/* Summary cards */}
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <MetricCard
+          label="Empty Pools"
+          value={data.totalEmptyPool}
+          sub={`${emptyPct}% of ${data.totalUsers} active users`}
+        />
+        <MetricCard label="Active Users" value={data.totalUsers} />
+        <MetricCard label="Unresolved Alerts" value={data.emptyPoolAlerts} />
+        <MetricCard
+          label="Segments Affected"
+          value={data.segments.filter(s => s.empty_pool > 0).length}
+          sub={`of ${data.segments.length} total`}
+        />
+      </div>
+
+      {/* Segment table */}
+      <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
+        <div className="px-4 py-3 border-b border-stone-100">
+          <h2 className="text-sm font-semibold text-stone-900">Segments by Empty Pool Count</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-stone-200 text-left text-xs font-medium text-stone-500">
+                <th className="px-4 py-2">Segment</th>
+                <th className="px-4 py-2 text-right">Total</th>
+                <th className="px-4 py-2 text-right">Empty Pool</th>
+                <th className="px-4 py-2 text-right">Paused</th>
+                <th className="px-4 py-2 text-right">% Empty</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.segments
+                .filter(s => s.empty_pool > 0 || s.paused > 0)
+                .map((s) => {
+                  const pctEmpty = s.total > 0 ? (s.empty_pool / s.total) * 100 : 0;
+                  const isHigh = pctEmpty > 50;
+                  return (
+                    <tr
+                      key={s.segment}
+                      className={`border-b border-stone-100 ${isHigh ? "bg-red-50" : ""}`}
+                    >
+                      <td className="px-4 py-2 font-medium text-stone-700">{s.segment}</td>
+                      <td className="px-4 py-2 text-right text-stone-600">{s.total}</td>
+                      <td className={`px-4 py-2 text-right font-medium ${isHigh ? "text-red-600" : "text-stone-900"}`}>
+                        {s.empty_pool}
+                      </td>
+                      <td className="px-4 py-2 text-right text-stone-500">{s.paused}</td>
+                      <td className={`px-4 py-2 text-right font-medium ${isHigh ? "text-red-600" : "text-stone-600"}`}>
+                        {pctEmpty.toFixed(1)}%
+                      </td>
+                    </tr>
+                  );
+                })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Recent alerts */}
+      <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
+        <div className="px-4 py-3 border-b border-stone-100">
+          <h2 className="text-sm font-semibold text-stone-900">Recent Empty Pool Alerts (last 20)</h2>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-stone-200 text-left text-xs font-medium text-stone-500">
+                <th className="px-4 py-2">User ID</th>
+                <th className="px-4 py-2">Reason</th>
+                <th className="px-4 py-2">Time</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.recentAlerts.map((alert, i) => (
+                <tr key={i} className="border-b border-stone-100">
+                  <td className="px-4 py-2 font-mono text-xs text-stone-600">
+                    {alert.user_id.slice(0, 8)}...
+                  </td>
+                  <td className="px-4 py-2 text-stone-700">
+                    {(alert.metadata as Record<string, unknown>)?.reason as string || "unknown"}
+                  </td>
+                  <td className="px-4 py-2 text-stone-500">
+                    {new Date(alert.created_at).toLocaleString()}
+                  </td>
+                </tr>
+              ))}
+              {data.recentAlerts.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="px-4 py-4 text-center text-stone-400">
+                    No unresolved empty pool alerts
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>
