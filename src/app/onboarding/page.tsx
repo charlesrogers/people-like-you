@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
+import { apiFetch } from '@/lib/api-client'
 import posthog from 'posthog-js'
 import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
@@ -120,7 +121,7 @@ function OnboardingContent() {
     const savedId = localStorage.getItem('ply_profile_id')
     if (savedId && !userId) {
       setUserId(savedId)
-      fetch(`/api/voice-memo?userId=${savedId}`)
+      apiFetch(`/api/voice-memo?userId=${savedId}`)
         .then(r => r.json())
         .then(data => {
           if (data.memos?.length > 0) {
@@ -150,7 +151,7 @@ function OnboardingContent() {
     formData.append('dayNumber', '0')
     formData.append('durationSeconds', String(duration))
 
-    const res = await fetch('/api/voice-memo', { method: 'POST', body: formData })
+    const res = await apiFetch('/api/voice-memo', { method: 'POST', body: formData })
     const data = await res.json()
     if (!res.ok) throw new Error(data.error || 'Failed to save recording')
 
@@ -256,7 +257,7 @@ function OnboardingContent() {
       // Create profile + preferences first
       setSubmitting(true)
       try {
-        const res = await fetch('/api/profile', {
+        const res = await apiFetch('/api/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -291,7 +292,7 @@ function OnboardingContent() {
       // Save preferences
       setSubmitting(true)
       try {
-        const res = await fetch('/api/profile', {
+        const res = await apiFetch('/api/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -334,7 +335,7 @@ function OnboardingContent() {
           formData.append('userId', userId)
           formData.append('sortOrder', String(i + 1))
 
-          const res = await fetch('/api/upload-photo', { method: 'POST', body: formData })
+          const res = await apiFetch('/api/upload-photo', { method: 'POST', body: formData })
           if (!res.ok) throw new Error('Failed to upload photo')
           console.log(`Uploaded photo ${i + 1}`)
         }
@@ -343,7 +344,7 @@ function OnboardingContent() {
         setStep('reveal')
 
         // Process memos (transcribe + extract + composite)
-        fetch('/api/process-memos', {
+        apiFetch('/api/process-memos', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId }),
@@ -353,7 +354,7 @@ function OnboardingContent() {
             setProcessingError(`${d.failed} recording(s) couldn't be processed yet. Your recordings are saved — we'll retry automatically.`)
           }
           setProcessingDone(true)
-          return fetch(`/api/composite?userId=${userId}`)
+          return apiFetch(`/api/composite?userId=${userId}`)
         }).then(r => r?.json()).then(d => {
           if (d?.composite) setComposite(d.composite)
         }).catch(err => {
@@ -369,7 +370,7 @@ function OnboardingContent() {
     } else if (step === 'reveal') {
       // Save profile feedback if any
       if (userId && Object.keys(profileFeedback).length > 0) {
-        fetch('/api/profile-feedback', {
+        apiFetch('/api/profile-feedback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ userId, feedback: profileFeedback }),
@@ -398,7 +399,7 @@ function OnboardingContent() {
     if (!narrative || !userId) return
 
     // Save vote
-    fetch('/api/taste-calibration', {
+    apiFetch('/api/taste-calibration', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

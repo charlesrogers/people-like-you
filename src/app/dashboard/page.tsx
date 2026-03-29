@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { apiFetch } from '@/lib/api-client'
 import posthog from 'posthog-js'
 import MatchCard from '@/components/MatchCard'
 import CountdownTimer from '@/components/CountdownTimer'
@@ -131,7 +132,7 @@ export default function Dashboard() {
     async function load() {
       // Load profile first (required for everything else)
       try {
-        const profileRes = await fetch(`/api/profile?id=${profileId}`)
+        const profileRes = await apiFetch(`/api/profile?id=${profileId}`)
         const profileData = await profileRes.json()
         if (!profileData.profile) {
           // Stored profile ID is invalid — clear and redirect
@@ -150,10 +151,10 @@ export default function Dashboard() {
       // Load everything else in parallel (non-blocking)
       try {
         const [extractionRes, matchesRes, compositeRes, memosRes] = await Promise.all([
-          fetch(`/api/extraction-status?userId=${profileId}`),
-          fetch(`/api/matches?userId=${profileId}`),
-          fetch(`/api/composite?userId=${profileId}`),
-          fetch(`/api/voice-memos?userId=${profileId}`),
+          apiFetch(`/api/extraction-status?userId=${profileId}`),
+          apiFetch(`/api/matches?userId=${profileId}`),
+          apiFetch(`/api/composite?userId=${profileId}`),
+          apiFetch(`/api/voice-memos?userId=${profileId}`),
         ])
 
         const extractionData = await extractionRes.json()
@@ -180,7 +181,7 @@ export default function Dashboard() {
         if (matchedUserIds.length > 0) {
           Promise.all(
             matchedUserIds.map(async (id) => {
-              const res = await fetch(`/api/composite?userId=${id}`)
+              const res = await apiFetch(`/api/composite?userId=${id}`)
               const data = await res.json()
               return { id, composite: data.composite }
             })
@@ -214,7 +215,7 @@ export default function Dashboard() {
           // If date is confirmed, fetch the date details
           if (acs.status === 'date_scheduled') {
             try {
-              const dateRes = await fetch(`/api/date-planning?mutualMatchId=${acs.id}&userId=${profileId}`)
+              const dateRes = await apiFetch(`/api/date-planning?mutualMatchId=${acs.id}&userId=${profileId}`)
               const dateData = await dateRes.json()
               if (dateData.phase === 'confirmed' && dateData.date) {
                 setConfirmedDate(dateData.date)
@@ -250,7 +251,7 @@ export default function Dashboard() {
       || (bonusIntro?.id === introId ? bonusIntro.matchedUserId : null)
 
     try {
-      const res = await fetch('/api/feedback', {
+      const res = await apiFetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ introId, matchId, matchedUserId: resolvedMatchedUserId, userId, action: 'interested' }),
@@ -328,7 +329,7 @@ export default function Dashboard() {
     posthog.capture('feedback_submitted', { reason: feedbackReason })
 
     try {
-      const res = await fetch('/api/feedback', {
+      const res = await apiFetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -366,7 +367,7 @@ export default function Dashboard() {
     if (!userId) return
     setResuming(true)
     try {
-      const res = await fetch('/api/cadence', {
+      const res = await apiFetch('/api/cadence', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId, action: 'resume' }),
@@ -444,8 +445,8 @@ export default function Dashboard() {
             onMemoRecorded={async () => {
               // Refresh composite and memos after new recording
               const [compRes, memRes] = await Promise.all([
-                fetch(`/api/composite?userId=${userId}`),
-                fetch(`/api/voice-memos?userId=${userId}`),
+                apiFetch(`/api/composite?userId=${userId}`),
+                apiFetch(`/api/voice-memos?userId=${userId}`),
               ])
               const compData = await compRes.json()
               const memData = await memRes.json()
@@ -550,7 +551,7 @@ export default function Dashboard() {
                     currentRound={activeMutualMatch.currentRound}
                     onSubmit={async () => {
                       try {
-                        const res = await fetch(`/api/disclosure?mutualMatchId=${activeMutualMatch.id}`)
+                        const res = await apiFetch(`/api/disclosure?mutualMatchId=${activeMutualMatch.id}`)
                         const data = await res.json()
                         setActiveMutualMatch(prev => prev ? {
                           ...prev,
@@ -677,7 +678,7 @@ export default function Dashboard() {
               }}
               onPass={(card) => {
                 posthog.capture('daily_three_pass', { intro_id: card.id })
-                fetch('/api/feedback', {
+                apiFetch('/api/feedback', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
