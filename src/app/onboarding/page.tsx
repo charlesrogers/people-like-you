@@ -516,6 +516,12 @@ function OnboardingContent() {
               >
                 {useEmail ? 'Use phone number instead' : 'Use email instead'}
               </button>
+
+              <p className="mt-6 text-center text-[10px] text-stone-300">
+                By signing up you agree to our{' '}
+                <a href="/terms" className="underline">Terms</a> and{' '}
+                <a href="/privacy" className="underline">Privacy Policy</a>.
+              </p>
             </div>
           </div>
         )}

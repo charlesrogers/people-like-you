@@ -267,7 +267,10 @@ export default function Home() {
             </Link>
           </div>
           <p className="text-xs text-[var(--dark)]/30">
-            &copy; 2026 People Like You &middot; Built by{" "}
+            &copy; 2026 People Like You &middot;{" "}
+            <Link href="/privacy" className="hover:text-[var(--dark)]/60 transition">Privacy</Link>{" "}&middot;{" "}
+            <Link href="/terms" className="hover:text-[var(--dark)]/60 transition">Terms</Link>{" "}&middot;{" "}
+            Built by{" "}
             <a href="https://imprevista.com" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--dark)]/60 transition">
               Imprevista
             </a>

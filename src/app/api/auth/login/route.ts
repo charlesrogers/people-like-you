@@ -10,6 +10,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
     }
 
+    // Basic email format check
+    if (!email.includes('@') || !email.includes('.')) {
+      return NextResponse.json({ error: 'Please enter a valid email address' }, { status: 400 })
+    }
+
+    // Check if user exists in our DB first
+    const existingUser = await getUserByEmail(email)
+    if (!existingUser) {
+      return NextResponse.json({ error: 'No account found with that email. Did you mean to sign up?' }, { status: 404 })
+    }
+
     const supabase = createServerClient()
 
     const { data, error } = await supabase.auth.signInWithPassword({
@@ -18,20 +29,21 @@ export async function POST(req: NextRequest) {
     })
 
     if (error) {
+      // Supabase returns generic "Invalid login credentials" for wrong password
+      if (error.message.includes('Invalid login credentials')) {
+        return NextResponse.json({ error: 'Wrong password. Try again or reset it.' }, { status: 401 })
+      }
       return NextResponse.json({ error: error.message }, { status: 401 })
     }
 
-    // Look up the user in our users table to get the correct profile ID
-    const user = await getUserByEmail(email)
-
     return NextResponse.json({
-      id: user?.id || data.user?.id,
+      id: existingUser.id || data.user?.id,
       access_token: data.session?.access_token,
       refresh_token: data.session?.refresh_token,
       expires_at: data.session?.expires_at,
     })
   } catch (err) {
-    console.error('Route error:', err)
+    console.error('Login error:', err)
     const message = err instanceof Error ? err.message :
       (typeof err === 'object' && err !== null && 'message' in err) ? String((err as Record<string, unknown>).message) :
       JSON.stringify(err)
