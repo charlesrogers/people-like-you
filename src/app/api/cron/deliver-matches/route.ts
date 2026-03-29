@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from 'next/server'
 import {
   getEligibleUsersForDelivery,
   getUser,
-  getUserPhotos,
   getCompositeProfile,
+  getCompatibleUsers,
   expirePendingIntros,
   saveDailyIntro,
   saveMatch,
   updateUserCadence,
-  updateUser,
   getCurrentDailyIntro,
+  createAdminAlert,
+  updatePoolState,
 } from '@/lib/db'
 import { selectNextCandidate } from '@/lib/matchmaker'
 import { generateTrailer } from '@/lib/intro-engine-v2'
@@ -50,11 +51,6 @@ export async function GET(req: NextRequest) {
             paused_at: new Date().toISOString(),
             consecutive_inactive_days: newInactiveDays,
           })
-          // 14-day hide
-          if (newInactiveDays >= 14) {
-            await updateUserCadence(cadence.user_id, { is_hidden: true })
-            await updateUser(cadence.user_id, { profile_status: 'hidden' })
-          }
           paused++
           continue
         }
@@ -67,7 +63,30 @@ export async function GET(req: NextRequest) {
       // Select best candidate
       const result = await selectNextCandidate(cadence.user_id)
       if (!result) {
-        console.log(`Cron: No candidates for user ${cadence.user_id}`)
+        // Determine why: check if pool is empty vs all shown
+        const user = await getUser(cadence.user_id)
+        const userComposite = await getCompositeProfile(cadence.user_id)
+
+        let reason = 'unknown'
+        if (!userComposite) {
+          reason = 'no_composite'
+        } else if (user) {
+          const allCompatible = await getCompatibleUsers(user, 300)
+          if (allCompatible.length === 0) {
+            reason = 'no_compatible_users'
+          } else {
+            reason = 'all_candidates_shown'
+          }
+        }
+
+        await createAdminAlert({
+          user_id: cadence.user_id,
+          alert_type: 'empty_pool',
+          metadata: { reason, checked_at: new Date().toISOString() },
+        })
+        await updatePoolState(cadence.user_id, 'empty_pool', reason)
+
+        console.log(`Cron: No candidates for user ${cadence.user_id} (reason: ${reason})`)
         continue
       }
 
@@ -125,6 +144,8 @@ export async function GET(req: NextRequest) {
         voice_message_path: null,
         hook_type: hookType,
       })
+
+      await updatePoolState(cadence.user_id, 'normal')
 
       delivered++
       console.log(`Cron: Delivered intro for ${user.first_name} → ${candidate.first_name} (score: ${score}, hook: ${hookType})`)

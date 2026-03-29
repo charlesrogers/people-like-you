@@ -2,21 +2,29 @@ import { NextResponse } from 'next/server'
 import { getAllUsers } from '@/lib/db'
 
 export async function GET() {
-  const users = await getAllUsers()
-  const men = users.filter(u => u.gender === 'Man')
-  const women = users.filter(u => u.gender === 'Woman')
+  try {
+    const users = await getAllUsers()
+    const men = users.filter(u => u.gender === 'Man')
+    const women = users.filter(u => u.gender === 'Woman')
 
-  const eloValues = users.map(u => u.elo_score).sort((a, b) => a - b)
-  const eloMin = eloValues[0] ?? 0
-  const eloMax = eloValues[eloValues.length - 1] ?? 0
-  const eloAvg = eloValues.length
-    ? Math.round(eloValues.reduce((a, b) => a + b, 0) / eloValues.length)
-    : 0
+    const eloValues = users.map(u => u.elo_score).sort((a, b) => a - b)
+    const eloMin = eloValues[0] ?? 0
+    const eloMax = eloValues[eloValues.length - 1] ?? 0
+    const eloAvg = eloValues.length
+      ? Math.round(eloValues.reduce((a, b) => a + b, 0) / eloValues.length)
+      : 0
 
-  return NextResponse.json({
-    total: users.length,
-    men: men.length,
-    women: women.length,
-    elo: { min: eloMin, max: eloMax, avg: eloAvg },
-  })
+    return NextResponse.json({
+      total: users.length,
+      men: men.length,
+      women: women.length,
+      elo: { min: eloMin, max: eloMax, avg: eloAvg },
+    })
+  } catch (err) {
+    console.error('Route error:', err)
+    const message = err instanceof Error ? err.message :
+      (typeof err === 'object' && err !== null && 'message' in err) ? String((err as Record<string, unknown>).message) :
+      JSON.stringify(err)
+    return NextResponse.json({ error: message }, { status: 500 })
+  }
 }

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { saveVoiceMemo, getUserVoiceMemos } from '@/lib/db'
+import { saveVoiceMemo, getUserVoiceMemos, markReplacedMemosForPrompt } from '@/lib/db'
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,6 +39,9 @@ export async function POST(req: NextRequest) {
     if (uploadError) {
       return NextResponse.json({ error: 'Failed to upload audio: ' + uploadError.message }, { status: 500 })
     }
+
+    // Mark any existing memos for this prompt as replaced (prevent duplicates)
+    await markReplacedMemosForPrompt(userId, promptId)
 
     const memo = await saveVoiceMemo({
       user_id: userId,

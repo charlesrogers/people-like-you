@@ -141,6 +141,9 @@ export async function POST(req: NextRequest) {
           chat_started_at: new Date().toISOString(),
           chat_expires_at: chatExpiresAt.toISOString(),
         } as Partial<typeof mutualMatch>)
+
+        // Mutual match proves engagement — reset anti-gaming counter
+        await updateUserCadence(userId, { consecutive_unresponded_likes: 0 })
       }
     }
 

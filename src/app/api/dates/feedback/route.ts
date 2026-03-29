@@ -8,47 +8,55 @@ const anthropic = new Anthropic()
 
 // POST: Submit post-date feedback
 export async function POST(req: NextRequest) {
-  const body = await req.json()
-  const {
-    scheduledDateId, userId, aboutUserId,
-    whatSurprisedYou, feltSafe, lookedLikePhotos,
-    wantToSeeAgain, additionalNotes
-  } = body
+  try {
+    const body = await req.json()
+    const {
+      scheduledDateId, userId, aboutUserId,
+      whatSurprisedYou, feltSafe, lookedLikePhotos,
+      wantToSeeAgain, additionalNotes
+    } = body
 
-  if (!scheduledDateId || !userId || !aboutUserId || !whatSurprisedYou) {
-    return NextResponse.json({
-      error: 'scheduledDateId, userId, aboutUserId, and whatSurprisedYou required'
-    }, { status: 400 })
+    if (!scheduledDateId || !userId || !aboutUserId || !whatSurprisedYou) {
+      return NextResponse.json({
+        error: 'scheduledDateId, userId, aboutUserId, and whatSurprisedYou required'
+      }, { status: 400 })
+    }
+
+    // Verify the date exists and is completed
+    const date = await getScheduledDate(scheduledDateId)
+    if (!date || date.status !== 'completed') {
+      return NextResponse.json({ error: 'Date not found or not completed' }, { status: 404 })
+    }
+
+    // Extract sentiment and traits from the surprise response
+    const extraction = await extractSurpriseSignals(whatSurprisedYou)
+
+    const feedback: Omit<DateFeedback, 'id' | 'created_at'> = {
+      scheduled_date_id: scheduledDateId,
+      user_id: userId,
+      about_user_id: aboutUserId,
+      what_surprised_you: whatSurprisedYou,
+      surprise_sentiment: extraction.sentiment,
+      surprise_extracted_traits: extraction.traits,
+      felt_safe: feltSafe ?? null,
+      looked_like_photos: lookedLikePhotos ?? null,
+      want_to_see_again: wantToSeeAgain ?? null,
+      additional_notes: additionalNotes ?? null,
+    }
+
+    const saved = await saveDateFeedback(feedback)
+
+    // Process trust score update for the OTHER user
+    await processDateFeedback(saved)
+
+    return NextResponse.json({ ok: true, feedback: saved })
+  } catch (err) {
+    console.error('Route error:', err)
+    const message = err instanceof Error ? err.message :
+      (typeof err === 'object' && err !== null && 'message' in err) ? String((err as Record<string, unknown>).message) :
+      JSON.stringify(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
-
-  // Verify the date exists and is completed
-  const date = await getScheduledDate(scheduledDateId)
-  if (!date || date.status !== 'completed') {
-    return NextResponse.json({ error: 'Date not found or not completed' }, { status: 404 })
-  }
-
-  // Extract sentiment and traits from the surprise response
-  const extraction = await extractSurpriseSignals(whatSurprisedYou)
-
-  const feedback: Omit<DateFeedback, 'id' | 'created_at'> = {
-    scheduled_date_id: scheduledDateId,
-    user_id: userId,
-    about_user_id: aboutUserId,
-    what_surprised_you: whatSurprisedYou,
-    surprise_sentiment: extraction.sentiment,
-    surprise_extracted_traits: extraction.traits,
-    felt_safe: feltSafe ?? null,
-    looked_like_photos: lookedLikePhotos ?? null,
-    want_to_see_again: wantToSeeAgain ?? null,
-    additional_notes: additionalNotes ?? null,
-  }
-
-  const saved = await saveDateFeedback(feedback)
-
-  // Process trust score update for the OTHER user
-  await processDateFeedback(saved)
-
-  return NextResponse.json({ ok: true, feedback: saved })
 }
 
 async function extractSurpriseSignals(text: string): Promise<{

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createUser, getUser, getUserByEmail, saveHardPreferences, saveSoftPreferences, updateUser } from '@/lib/db'
+import { resolveUserLocation } from '@/lib/geo'
 
 // Map relocate answers to valid distance_radius values (client may send either format)
 function normalizeDistanceRadius(val: string | null | undefined): 'same_metro' | 'few_hours' | 'anywhere' | null {
@@ -81,6 +82,18 @@ export async function POST(req: NextRequest) {
       religion: basics.religion || null,
       observance_level: basics.observance_level || null,
     } as Parameters<typeof createUser>[0])
+
+    // Resolve zipcode → lat/lng/metro for location-based matching
+    if (basics.zipcode) {
+      const location = await resolveUserLocation(basics.zipcode)
+      if (location) {
+        await updateUser(user.id, {
+          latitude: location.latitude,
+          longitude: location.longitude,
+          metro_code: location.metro_code,
+        })
+      }
+    }
 
     // Save hard preferences
     if (hardPreferences) {
