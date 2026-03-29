@@ -104,10 +104,20 @@ export default function DailyThree({
     onSave(card)
   }
 
+  const [passExhausted, setPassExhausted] = useState(false)
+
   const handlePass = (card: IntroCard) => {
-    setPassedIds(prev => new Set(prev).add(card.id))
+    const newPassedIds = new Set(passedIds).add(card.id)
+    setPassedIds(newPassedIds)
     if (expandedId === card.id) setExpandedId(null)
     onPass(card)
+
+    // Check if this was the last card — if so, show voice-to-unlock
+    const remaining = cards.filter(c => !newPassedIds.has(c.id) && !savedIds.has(c.id) && getCardState(c.id) !== 'decided')
+    const saved = cards.filter(c => savedIds.has(c.id) && getCardState(c.id) !== 'decided')
+    if (remaining.length === 0 && saved.length === 0) {
+      setPassExhausted(true)
+    }
   }
 
   const handlePhotoInterested = () => {
@@ -329,13 +339,31 @@ export default function DailyThree({
       {/* Active cards */}
       {activeCards.map((card, idx) => renderBrowsingCard(card, card.id === (expandedId || activeCards[0]?.id)))}
 
-      {/* All active passed/saved */}
+      {/* All active passed/saved — show voice-to-unlock if exhausted via pass */}
       {activeCards.length === 0 && savedCards.length === 0 && (
-        <div className="rounded-2xl bg-stone-50 p-6 text-center">
-          <p className="text-sm text-stone-500">
-            You&rsquo;ve seen all today&rsquo;s intros. Come back tomorrow for more!
-          </p>
-        </div>
+        passExhausted ? (
+          <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
+            <p className="text-3xl">&#127908;</p>
+            <p className="mt-3 text-lg font-semibold text-stone-900">
+              Help us find better matches
+            </p>
+            <p className="mt-2 text-sm text-stone-500">
+              Answer a few more questions and we&rsquo;ll unlock new intros based on your stories.
+            </p>
+            <button
+              onClick={onStartVoiceLoop}
+              className="mt-5 rounded-xl bg-stone-900 px-8 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
+            >
+              Record a voice note
+            </button>
+          </div>
+        ) : (
+          <div className="rounded-2xl bg-stone-50 p-6 text-center">
+            <p className="text-sm text-stone-500">
+              You&rsquo;ve seen all today&rsquo;s intros. Come back tomorrow for more!
+            </p>
+          </div>
+        )
       )}
 
       {renderSavedSection()}

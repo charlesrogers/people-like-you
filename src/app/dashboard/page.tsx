@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import Link from 'next/link'
 import { apiFetch } from '@/lib/api-client'
 import posthog from 'posthog-js'
 import MatchCard from '@/components/MatchCard'
@@ -47,6 +46,8 @@ interface CadenceState {
   isPaused: boolean
   isHidden: boolean
   consecutiveInactiveDays: number
+  poolState?: 'normal' | 'empty_pool' | 'processing' | 'exhausted'
+  poolStateReason?: string
 }
 
 interface ExtractionStatus {
@@ -392,9 +393,10 @@ export default function Dashboard() {
 
   const isPaused = cadenceState?.isPaused
   const isHidden = cadenceState?.isHidden
+  const poolState = cadenceState?.poolState || 'normal'
+  const poolStateReason = cadenceState?.poolStateReason || null
   const activeIntro = currentIntro?.status === 'pending' ? currentIntro : null
   const activeBonus = bonusIntro?.status === 'pending' ? bonusIntro : null
-  const doneForToday = !activeIntro && !activeBonus && history.length > 0
 
   return (
     <div className="min-h-screen bg-stone-50 pb-20">
@@ -606,6 +608,23 @@ export default function Dashboard() {
           </div>
         )}
 
+        {/* Active chat — most important thing, show first */}
+        {activeMutualMatch && chatPhase === 'chatting' && !isPaused && !isHidden && (
+          <div className="mb-6">
+            <button
+              onClick={() => setActiveTab('chats')}
+              className="w-full rounded-xl border-2 border-primary/30 bg-primary/5 p-5 text-center hover:bg-primary/10 transition-colors"
+            >
+              <p className="text-[15px] font-semibold text-primary">
+                You matched with {activeMutualMatch.matchedUserName}
+              </p>
+              <p className="mt-1 text-[13px] text-primary/70">
+                Tap to start chatting &mdash; your window is open
+              </p>
+            </button>
+          </div>
+        )}
+
         {/* Processing state */}
         {extraction && !extraction.compositeReady && (
           <div className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-5">
@@ -706,20 +725,8 @@ export default function Dashboard() {
 
         {/* Legacy MatchCard removed — replaced by DailyThree above */}
 
-        {/* Done for today */}
-        {!isPaused && !isHidden && doneForToday && !activeIntro && !activeBonus && (
-          <div className="rounded-2xl bg-white p-8 text-center shadow-sm">
-            <p className="text-base font-medium text-stone-900">You&rsquo;re all set for today.</p>
-            {nextDeliveryAt && (
-              <div className="mt-4">
-                <CountdownTimer targetTime={nextDeliveryAt} />
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Waiting for first intro — explain what's happening */}
-        {!isPaused && !isHidden && !activeIntro && !activeBonus && history.length === 0 && (
+        {/* Empty pool / waiting — show appropriate message based on pool state */}
+        {!isPaused && !isHidden && !activeIntro && !activeBonus && (
           <div className="rounded-2xl bg-white p-8 shadow-sm">
             {extraction && !extraction.compositeReady ? (
               <>
@@ -738,43 +745,53 @@ export default function Dashboard() {
                   <span className="text-xs text-stone-400">{extraction.extracted}/{extraction.total}</span>
                 </div>
               </>
-            ) : (
+            ) : poolState === 'empty_pool' ? (
+              <>
+                <p className="text-base font-semibold text-stone-900">
+                  {poolStateReason === 'no_compatible_users'
+                    ? "You\u2019re early to your area"
+                    : "We\u2019re finding more people for you"}
+                </p>
+                <p className="mt-2 text-sm text-stone-500">
+                  {poolStateReason === 'no_compatible_users'
+                    ? "We\u2019re actively growing the community near you. The best way to get great matches faster? Bring the people you already think are great."
+                    : poolStateReason === 'all_candidates_shown'
+                    ? "You\u2019ve seen everyone who matches your criteria right now. We\u2019re working on bringing in more people. Invite friends to speed things up."
+                    : "We\u2019re prioritizing acquisition in your area. In the meantime, invite friends \u2014 the best matches come from people you already respect."}
+                </p>
+                <button
+                  onClick={() => setActiveTab('invite')}
+                  className="mt-4 w-full rounded-lg bg-stone-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
+                >
+                  Invite friends
+                </button>
+              </>
+            ) : history.length === 0 ? (
               <>
                 <p className="text-base font-semibold text-stone-900">Your profile is ready</p>
                 <p className="mt-2 text-sm text-stone-500">
-                  We&rsquo;re writing personalized introductions for you right now. Each intro is custom — we match
+                  We&rsquo;re writing personalized introductions for you right now. Each intro is custom &mdash; we match
                   your personality with someone specific, then write a story about why you&rsquo;d click.
                 </p>
-                <p className="mt-2 text-sm text-stone-500">
-                  While you wait, head to <button onClick={() => setActiveTab('profile')} className="font-semibold text-stone-900 underline underline-offset-2">My Profile</button> to
-                  see what we learned about you and answer more questions to get even better intros.
-                </p>
+                {nextDeliveryAt && (
+                  <div className="mt-4">
+                    <CountdownTimer targetTime={nextDeliveryAt} label="Your first intro arrives in" />
+                  </div>
+                )}
               </>
-            )}
-            {nextDeliveryAt && (
-              <div className="mt-4">
-                <CountdownTimer targetTime={nextDeliveryAt} label="Your first intro arrives in" />
-              </div>
+            ) : (
+              <>
+                <p className="text-base font-medium text-stone-900">You&rsquo;re all set for today.</p>
+                {nextDeliveryAt && (
+                  <div className="mt-4">
+                    <CountdownTimer targetTime={nextDeliveryAt} />
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}
 
-        {/* Active chat notification banner in Intros tab */}
-        {activeMutualMatch && chatPhase === 'chatting' && !isPaused && !isHidden && (
-          <div className="mt-6">
-            <button
-              onClick={() => setActiveTab('chats')}
-              className="w-full rounded-xl border border-primary/20 bg-primary/5 p-4 text-center hover:bg-primary/10 transition-colors"
-            >
-              <p className="text-[13px] font-medium text-primary">
-                You have an active chat with {activeMutualMatch.matchedUserName}
-              </p>
-              <p className="text-[11px] text-muted-foreground mt-1">
-                Tap to open
-              </p>
-            </button>
-          </div>
-        )}
 
         {/* Pending Date Feedback */}
         {pendingFeedback && (
@@ -883,37 +900,74 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* Pass streak modal */}
+      {/* Pass streak modal — situation-aware messaging */}
       {passStreakAction && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
           <div className="w-full max-w-lg rounded-2xl bg-white p-8">
-            {passStreakAction === 'help_us_help_you' && (
+            {poolState === 'empty_pool' ? (
               <>
-                <h3 className="text-lg font-semibold text-stone-900">We want to find you better matches.</h3>
+                <h3 className="text-lg font-semibold text-stone-900">We&rsquo;re bringing more people in.</h3>
                 <p className="mt-2 text-sm text-stone-600">
-                  The more we know about you, the better we can find someone you&rsquo;ll be excited about.
-                  Share a new story:
+                  Your area is still growing. The best way to get great matches faster? Bring the people you already think are great.
+                </p>
+                <div className="mt-6 flex gap-3">
+                  <button
+                    onClick={() => { setPassStreakAction(null); setActiveTab('invite') }}
+                    className="flex-1 rounded-xl bg-stone-900 py-3 text-center font-medium text-white transition hover:bg-stone-800"
+                  >
+                    Invite friends
+                  </button>
+                  <button onClick={() => setPassStreakAction(null)} className="flex-1 rounded-xl border border-stone-200 py-3 font-medium text-stone-600 transition hover:bg-stone-50">
+                    Maybe later
+                  </button>
+                </div>
+              </>
+            ) : voiceMemos.length < 4 ? (
+              <>
+                <h3 className="text-lg font-semibold text-stone-900">Help us understand you better.</h3>
+                <p className="mt-2 text-sm text-stone-600">
+                  Add more voice notes so we can understand you better and find stronger matches.
+                  The more stories you share, the better we get at knowing who you&rsquo;ll click with.
+                </p>
+                <div className="mt-6 flex gap-3">
+                  <button
+                    onClick={() => { setPassStreakAction(null); setActiveTab('profile') }}
+                    className="flex-1 rounded-xl bg-stone-900 py-3 text-center font-medium text-white transition hover:bg-stone-800"
+                  >
+                    Record a voice note
+                  </button>
+                  <button onClick={() => setPassStreakAction(null)} className="flex-1 rounded-xl border border-stone-200 py-3 font-medium text-stone-600 transition hover:bg-stone-50">
+                    Maybe later
+                  </button>
+                </div>
+              </>
+            ) : passStreakAction === 'help_us_help_you' ? (
+              <>
+                <h3 className="text-lg font-semibold text-stone-900">Want to try something different?</h3>
+                <p className="mt-2 text-sm text-stone-600">
+                  Sometimes the best matches are just outside your usual type. Consider relaxing a criteria or sharing a new story to help us explore different directions.
                 </p>
                 <div className="mt-4 space-y-3">
                   <p className="rounded-lg bg-stone-50 p-3 text-sm text-stone-700">
                     &ldquo;What&rsquo;s a quality in someone that instantly gets your attention?&rdquo;
                   </p>
                   <p className="rounded-lg bg-stone-50 p-3 text-sm text-stone-700">
-                    &ldquo;Describe someone you admire — what makes them special?&rdquo;
+                    &ldquo;Describe someone you admire &mdash; what makes them special?&rdquo;
                   </p>
                 </div>
                 <div className="mt-6 flex gap-3">
-                  <Link href="/onboarding" className="flex-1 rounded-xl bg-stone-900 py-3 text-center font-medium text-white transition hover:bg-stone-800">
+                  <button
+                    onClick={() => { setPassStreakAction(null); setActiveTab('profile') }}
+                    className="flex-1 rounded-xl bg-stone-900 py-3 text-center font-medium text-white transition hover:bg-stone-800"
+                  >
                     Record now
-                  </Link>
+                  </button>
                   <button onClick={() => setPassStreakAction(null)} className="flex-1 rounded-xl border border-stone-200 py-3 font-medium text-stone-600 transition hover:bg-stone-50">
                     Maybe later
                   </button>
                 </div>
               </>
-            )}
-
-            {passStreakAction === 'refresh_profile' && (
+            ) : passStreakAction === 'refresh_profile' ? (
               <>
                 <h3 className="text-lg font-semibold text-stone-900">A fresh photo changes everything.</h3>
                 <p className="mt-2 text-sm text-stone-600">
@@ -928,18 +982,16 @@ export default function Dashboard() {
                   Got it
                 </button>
               </>
-            )}
-
-            {passStreakAction === 'reset' && (
+            ) : (
               <>
                 <h3 className="text-lg font-semibold text-stone-900">Let&rsquo;s recalibrate.</h3>
                 <p className="mt-2 text-sm text-stone-600">
-                  We haven&rsquo;t found your person yet. That&rsquo;s okay — let&rsquo;s try a fresh approach.
+                  We haven&rsquo;t found your person yet. That&rsquo;s okay &mdash; let&rsquo;s try a fresh approach.
                 </p>
                 <div className="mt-4 space-y-3 text-sm text-stone-600">
-                  <p>1. Record 2 new stories — we&rsquo;ll use them to find different types of matches</p>
-                  <p>2. Consider widening your preferences — a slightly wider range can dramatically expand your match pool</p>
-                  <p>3. Add or update your photos — a stronger first photo is the single biggest thing you can do</p>
+                  <p>1. Record 2 new stories &mdash; we&rsquo;ll use them to find different types of matches</p>
+                  <p>2. Consider widening your preferences &mdash; a slightly wider range can dramatically expand your match pool</p>
+                  <p>3. Add or update your photos &mdash; a stronger first photo is the single biggest thing you can do</p>
                 </div>
                 <button onClick={() => setPassStreakAction(null)} className="mt-6 w-full rounded-xl bg-stone-900 py-3 font-medium text-white transition hover:bg-stone-800">
                   Got it
