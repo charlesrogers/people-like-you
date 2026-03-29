@@ -245,6 +245,8 @@ export interface MutualMatch {
   planned_at: string | null
   user_a_phone: string | null
   user_b_phone: string | null
+  nudge_sent_at: string | null
+  pause_offered_at: string | null
 }
 
 export interface DisclosureExchange {

@@ -45,6 +45,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'mutualMatchId, userId, and decision required' }, { status: 400 })
   }
 
+  // Early decline from ghost nudge — close the match without recording ghosting
+  if (decision === 'decline_early') {
+    const mm = await getMutualMatch(mutualMatchId)
+    if (!mm) return NextResponse.json({ error: 'Not found' }, { status: 404 })
+    await updateMutualMatch(mutualMatchId, {
+      status: 'declined',
+      expired_at: new Date().toISOString(),
+    } as Partial<MutualMatch>)
+    return NextResponse.json({ ok: true, phase: 'ended' })
+  }
+
   if (decision !== 'yes' && decision !== 'no') {
     return NextResponse.json({ error: 'Decision must be yes or no' }, { status: 400 })
   }

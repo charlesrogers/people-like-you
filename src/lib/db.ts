@@ -1137,6 +1137,70 @@ export async function getExpiredChats(): Promise<MutualMatch[]> {
   return data ?? []
 }
 
+// ─── Ghost Nudges (24h/48h chat silence) ───
+
+export async function getStaleChats(hoursOld: number): Promise<MutualMatch[]> {
+  const threshold = new Date(Date.now() - hoursOld * 60 * 60 * 1000).toISOString()
+  const { data, error } = await db()
+    .from('mutual_matches')
+    .select('*, users_a:users!mutual_matches_user_a_id_fkey(first_name), users_b:users!mutual_matches_user_b_id_fkey(first_name)')
+    .eq('status', 'chatting')
+    .lt('chat_started_at', threshold)
+  if (error) throw error
+  return data ?? []
+}
+
+export async function getGhostNudges(userId: string): Promise<Array<{
+  matchId: string
+  partnerName: string
+  nudgeLevel: 'gentle' | 'direct'
+}>> {
+  const { data, error } = await db()
+    .from('mutual_matches')
+    .select('id, user_a_id, user_b_id, user_a_msg_count, user_b_msg_count, nudge_sent_at, pause_offered_at')
+    .eq('status', 'chatting')
+    .or(`user_a_id.eq.${userId},user_b_id.eq.${userId}`)
+  if (error) throw error
+
+  const nudges: Array<{ matchId: string; partnerName: string; nudgeLevel: 'gentle' | 'direct' }> = []
+
+  for (const match of data ?? []) {
+    const isUserA = match.user_a_id === userId
+    const userMsgCount = isUserA ? match.user_a_msg_count : match.user_b_msg_count
+    const partnerMsgCount = isUserA ? match.user_b_msg_count : match.user_a_msg_count
+
+    // Only nudge if the user has 0 messages but partner has sent messages (or nudge was triggered)
+    if (userMsgCount === 0 && match.nudge_sent_at) {
+      // Look up partner name
+      const partnerId = isUserA ? match.user_b_id : match.user_a_id
+      const { data: partner } = await db()
+        .from('users')
+        .select('first_name')
+        .eq('id', partnerId)
+        .single()
+
+      nudges.push({
+        matchId: match.id,
+        partnerName: partner?.first_name || 'your match',
+        nudgeLevel: match.pause_offered_at ? 'direct' : 'gentle',
+      })
+    }
+  }
+
+  return nudges
+}
+
+export async function expireMutualMatchEarly(matchId: string): Promise<void> {
+  const { error } = await db()
+    .from('mutual_matches')
+    .update({
+      status: 'declined',
+      expired_at: new Date().toISOString(),
+    })
+    .eq('id', matchId)
+  if (error) throw error
+}
+
 // ─── Admin Alerts & Pool State ───
 
 export async function createAdminAlert(alert: {

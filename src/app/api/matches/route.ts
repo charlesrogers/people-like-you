@@ -9,6 +9,7 @@ import {
   ensureUserCadence,
   updateDailyIntro,
   getActiveMutualMatches,
+  getGhostNudges,
 } from '@/lib/db'
 
 export async function GET(req: NextRequest) {
@@ -105,6 +106,9 @@ export async function GET(req: NextRequest) {
       }
     }
 
+    // Check for ghost nudges (user hasn't messaged in an active mutual match)
+    const ghostNudges = await getGhostNudges(userId)
+
     return NextResponse.json({
       currentIntro,
       bonusIntro: currentBonus,
@@ -118,6 +122,7 @@ export async function GET(req: NextRequest) {
       },
       history,
       activeChatState,
+      ghostNudges,
     })
   } catch (err) {
     console.error('Route error:', err)

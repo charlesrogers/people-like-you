@@ -53,8 +53,16 @@ export async function PATCH(req: NextRequest) {
 export async function POST(req: NextRequest) {
   try {
     const { userId, action } = await req.json()
-    if (!userId || action !== 'resume') {
+    if (!userId || !['resume', 'pause'].includes(action)) {
       return NextResponse.json({ error: 'Missing userId or invalid action' }, { status: 400 })
+    }
+
+    if (action === 'pause') {
+      await updateUserCadence(userId, {
+        is_paused: true,
+        paused_at: new Date().toISOString(),
+      })
+      return NextResponse.json({ ok: true, paused: true })
     }
 
     // Resume from paused/hidden

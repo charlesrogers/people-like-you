@@ -58,7 +58,7 @@ interface ExtractionStatus {
   excitementType: string | null
 }
 
-type PassStreakAction = 'help_us_help_you' | 'refresh_profile' | 'reset' | null
+type PassStreakAction = 'tell_us_more' | null
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState<DashboardTab>('today')
@@ -121,6 +121,12 @@ export default function Dashboard() {
   const [feedbackMatchId, setFeedbackMatchId] = useState<string | null>(null)
   const [feedbackMatchedUserId, setFeedbackMatchedUserId] = useState<string | null>(null)
   const [feedbackReason, setFeedbackReason] = useState<string | null>(null)
+
+  // Ghost nudge state
+  const [ghostNudges, setGhostNudges] = useState<Array<{
+    matchId: string; partnerName: string; nudgeLevel: 'gentle' | 'direct'
+  }>>([])
+  const [ghostNudgeDismissed, setGhostNudgeDismissed] = useState(false)
 
   useEffect(() => {
     const profileId = localStorage.getItem('ply_profile_id')
@@ -191,6 +197,11 @@ export default function Dashboard() {
             results.forEach(r => { if (r.composite) composites[r.id] = r.composite })
             setMatchComposites(prev => ({ ...prev, ...composites }))
           }).catch(() => {})
+        }
+
+        // Load ghost nudges
+        if (matchesData.ghostNudges?.length > 0) {
+          setGhostNudges(matchesData.ghostNudges)
         }
 
         // Restore active chat state if one exists
@@ -900,6 +911,88 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Ghost nudge — you haven't messaged your match */}
+      {ghostNudges.length > 0 && !ghostNudgeDismissed && (() => {
+        const nudge = ghostNudges[0]
+        const isDirectLevel = nudge.nudgeLevel === 'direct'
+
+        async function handleDeclineMatch() {
+          try {
+            await apiFetch('/api/meet-decision', {
+              method: 'POST',
+              body: JSON.stringify({ mutualMatchId: nudge.matchId, userId, decision: 'decline_early' }),
+            })
+            setGhostNudges(prev => prev.filter(n => n.matchId !== nudge.matchId))
+          } catch { /* silent */ }
+        }
+
+        async function handlePauseMatches() {
+          try {
+            await apiFetch('/api/cadence', {
+              method: 'POST',
+              body: JSON.stringify({ userId, action: 'pause' }),
+            })
+            setGhostNudges([])
+            setCadenceState(prev => prev ? { ...prev, isPaused: true } : prev)
+          } catch { /* silent */ }
+        }
+
+        if (isDirectLevel) {
+          return (
+            <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+              <div className="w-full max-w-lg rounded-2xl bg-white p-8">
+                <h3 className="text-lg font-semibold text-stone-900">Not the right time?</h3>
+                <p className="mt-2 text-sm text-stone-600">
+                  You haven&rsquo;t messaged {nudge.partnerName} yet. It looks like now might not be the right time &mdash; and that&rsquo;s okay.
+                </p>
+                <div className="mt-6 flex gap-3">
+                  <button
+                    onClick={() => {
+                      setGhostNudgeDismissed(true)
+                      if (activeMutualMatch) setChatPhase('chatting')
+                    }}
+                    className="flex-1 rounded-xl bg-stone-900 py-3 text-center font-medium text-white transition hover:bg-stone-800"
+                  >
+                    Message {nudge.partnerName}
+                  </button>
+                  <button
+                    onClick={handlePauseMatches}
+                    className="flex-1 rounded-xl border border-stone-200 py-3 font-medium text-stone-600 transition hover:bg-stone-50"
+                  >
+                    Pause my matches
+                  </button>
+                </div>
+              </div>
+            </div>
+          )
+        }
+
+        return (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 mb-4 flex items-center justify-between gap-3">
+            <p className="text-sm text-amber-800">
+              <span className="font-medium">{nudge.partnerName}</span> is waiting to hear from you.
+            </p>
+            <div className="flex gap-2 shrink-0">
+              <button
+                onClick={() => {
+                  setGhostNudgeDismissed(true)
+                  if (activeMutualMatch) setChatPhase('chatting')
+                }}
+                className="rounded-lg bg-stone-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-stone-800"
+              >
+                Open chat
+              </button>
+              <button
+                onClick={handleDeclineMatch}
+                className="rounded-lg border border-stone-200 px-3 py-1.5 text-xs font-medium text-stone-600 transition hover:bg-stone-50"
+              >
+                Not interested
+              </button>
+            </div>
+          </div>
+        )
+      })()}
+
       {/* Pass streak modal — situation-aware messaging */}
       {passStreakAction && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
@@ -941,61 +1034,23 @@ export default function Dashboard() {
                   </button>
                 </div>
               </>
-            ) : passStreakAction === 'help_us_help_you' ? (
+            ) : (
               <>
-                <h3 className="text-lg font-semibold text-stone-900">Want to try something different?</h3>
+                <h3 className="text-lg font-semibold text-stone-900">None of these clicked?</h3>
                 <p className="mt-2 text-sm text-stone-600">
-                  Sometimes the best matches are just outside your usual type. Consider relaxing a criteria or sharing a new story to help us explore different directions.
+                  Tell us what you&rsquo;re looking for &mdash; we&rsquo;ll use it to find better matches.
                 </p>
-                <div className="mt-4 space-y-3">
-                  <p className="rounded-lg bg-stone-50 p-3 text-sm text-stone-700">
-                    &ldquo;What&rsquo;s a quality in someone that instantly gets your attention?&rdquo;
-                  </p>
-                  <p className="rounded-lg bg-stone-50 p-3 text-sm text-stone-700">
-                    &ldquo;Describe someone you admire &mdash; what makes them special?&rdquo;
-                  </p>
-                </div>
                 <div className="mt-6 flex gap-3">
                   <button
                     onClick={() => { setPassStreakAction(null); setActiveTab('profile') }}
                     className="flex-1 rounded-xl bg-stone-900 py-3 text-center font-medium text-white transition hover:bg-stone-800"
                   >
-                    Record now
+                    Record a voice note
                   </button>
                   <button onClick={() => setPassStreakAction(null)} className="flex-1 rounded-xl border border-stone-200 py-3 font-medium text-stone-600 transition hover:bg-stone-50">
                     Maybe later
                   </button>
                 </div>
-              </>
-            ) : passStreakAction === 'refresh_profile' ? (
-              <>
-                <h3 className="text-lg font-semibold text-stone-900">A fresh photo changes everything.</h3>
-                <p className="mt-2 text-sm text-stone-600">
-                  Profiles with updated photos get significantly more mutual matches.
-                </p>
-                <div className="mt-4 space-y-2 text-sm text-stone-500">
-                  <p>- Outdoor light, genuine smile, no sunglasses</p>
-                  <p>- Solo shot where your face is clear</p>
-                  <p>- Action shots outperform posed photos 2:1</p>
-                </div>
-                <button onClick={() => setPassStreakAction(null)} className="mt-6 w-full rounded-xl bg-stone-900 py-3 font-medium text-white transition hover:bg-stone-800">
-                  Got it
-                </button>
-              </>
-            ) : (
-              <>
-                <h3 className="text-lg font-semibold text-stone-900">Let&rsquo;s recalibrate.</h3>
-                <p className="mt-2 text-sm text-stone-600">
-                  We haven&rsquo;t found your person yet. That&rsquo;s okay &mdash; let&rsquo;s try a fresh approach.
-                </p>
-                <div className="mt-4 space-y-3 text-sm text-stone-600">
-                  <p>1. Record 2 new stories &mdash; we&rsquo;ll use them to find different types of matches</p>
-                  <p>2. Consider widening your preferences &mdash; a slightly wider range can dramatically expand your match pool</p>
-                  <p>3. Add or update your photos &mdash; a stronger first photo is the single biggest thing you can do</p>
-                </div>
-                <button onClick={() => setPassStreakAction(null)} className="mt-6 w-full rounded-xl bg-stone-900 py-3 font-medium text-white transition hover:bg-stone-800">
-                  Got it
-                </button>
               </>
             )}
           </div>

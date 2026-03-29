@@ -90,9 +90,6 @@ export async function POST(req: NextRequest) {
         const expiresAt = new Date()
         expiresAt.setDate(expiresAt.getDate() + 1)
 
-        // Check anti-gaming: voice message required after 3 unresponded likes
-        const voiceRequired = cadence.consecutive_unresponded_likes >= 3
-
         const bonusIntro = await saveDailyIntro({
           user_id: userId,
           match_id: match.id,
@@ -104,7 +101,7 @@ export async function POST(req: NextRequest) {
           delivered_at: null,
           acted_at: null,
           expires_at: expiresAt.toISOString(),
-          voice_message_required: voiceRequired,
+          voice_message_required: false,
           voice_message_path: null,
           hook_type: hookType,
         })
@@ -122,7 +119,7 @@ export async function POST(req: NextRequest) {
             status: 'pending',
             introType: 'bonus',
             expiresAt: expiresAt.toISOString(),
-            voiceMessageRequired: voiceRequired,
+            voiceMessageRequired: false,
           },
         })
       }
@@ -142,8 +139,6 @@ export async function POST(req: NextRequest) {
           chat_expires_at: chatExpiresAt.toISOString(),
         } as Partial<typeof mutualMatch>)
 
-        // Mutual match proves engagement — reset anti-gaming counter
-        await updateUserCadence(userId, { consecutive_unresponded_likes: 0 })
       }
     }
 
@@ -183,11 +178,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Check pass streak thresholds
+    // After 5 consecutive passes, prompt voice memo to improve matches
     let passStreakAction: string | null = null
-    if (newPassStreak >= 12) passStreakAction = 'reset'
-    else if (newPassStreak >= 8) passStreakAction = 'refresh_profile'
-    else if (newPassStreak >= 5) passStreakAction = 'help_us_help_you'
+    if (newPassStreak >= 5) passStreakAction = 'tell_us_more'
 
     return NextResponse.json({ ok: true, passStreakAction })
   }
