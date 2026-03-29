@@ -4,7 +4,8 @@ import {
   saveMatch, saveDailyIntro,
 } from '@/lib/db'
 import { shouldUnlockIntro, getProgressInfo } from '@/lib/reward-schedule'
-import { selectNextCandidate, generateMatchAngle, computeCompatibilityBreakdown } from '@/lib/matchmaker'
+import { selectNextCandidate } from '@/lib/matchmaker'
+import { generateTrailer } from '@/lib/intro-engine-v2'
 
 /**
  * POST /api/voice-prompt-loop
@@ -60,14 +61,12 @@ export async function POST(req: NextRequest) {
         const candidateComposite = await getCompositeProfile(candidate.id)
 
         let narrative = "Based on your stories, we found someone you should meet."
+        let hookType: 'quote' | 'contradiction' | 'scene' | null = null
         if (userComposite && candidateComposite) {
           try {
-            const breakdown = computeCompatibilityBreakdown(userComposite, candidateComposite)
-            const { generateNarrativeWithPipeline } = await import('@/lib/matchmaker')
-            const result = await generateNarrativeWithPipeline(
-              user, candidate, userComposite, candidateComposite, breakdown
-            )
-            narrative = result.narrative
+            const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
+            narrative = trailer.narrative
+            hookType = trailer.hookType
           } catch {
             // Use fallback narrative
           }
@@ -100,6 +99,7 @@ export async function POST(req: NextRequest) {
           expires_at: expiresAt.toISOString(),
           voice_message_required: false,
           voice_message_path: null,
+          hook_type: hookType,
         })
 
         const photos = await getUserPhotos(candidate.id)

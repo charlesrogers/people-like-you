@@ -11,7 +11,8 @@ import {
   updateUser,
   getCurrentDailyIntro,
 } from '@/lib/db'
-import { selectNextCandidate, generateMatchAngle } from '@/lib/matchmaker'
+import { selectNextCandidate } from '@/lib/matchmaker'
+import { generateTrailer } from '@/lib/intro-engine-v2'
 
 export async function GET(req: NextRequest) {
   // Verify cron secret (Vercel sends this automatically)
@@ -77,14 +78,16 @@ export async function GET(req: NextRequest) {
       const userComposite = await getCompositeProfile(user.id)
       const candidateComposite = await getCompositeProfile(candidate.id)
 
-      // Generate match angle
+      // Generate intro trailer with hook type
       let narrativeForUser = "There's someone here you should meet. Trust us on this one."
+      let hookType: 'quote' | 'contradiction' | 'scene' | null = null
       if (userComposite && candidateComposite) {
         try {
-          const angles = await generateMatchAngle(user, candidate, userComposite, candidateComposite)
-          narrativeForUser = angles.narrativeForA
+          const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
+          narrativeForUser = trailer.narrative
+          hookType = trailer.hookType
         } catch (err) {
-          console.error(`Cron: Failed to generate angle for ${user.id} <> ${candidate.id}`, err)
+          console.error(`Cron: Failed to generate trailer for ${user.id} <> ${candidate.id}`, err)
         }
       }
 
@@ -120,10 +123,11 @@ export async function GET(req: NextRequest) {
         expires_at: expiresAt.toISOString(),
         voice_message_required: false,
         voice_message_path: null,
+        hook_type: hookType,
       })
 
       delivered++
-      console.log(`Cron: Delivered intro for ${user.first_name} → ${candidate.first_name} (score: ${score})`)
+      console.log(`Cron: Delivered intro for ${user.first_name} → ${candidate.first_name} (score: ${score}, hook: ${hookType})`)
     } catch (err) {
       console.error(`Cron: Error processing user ${cadence.user_id}`, err)
     }

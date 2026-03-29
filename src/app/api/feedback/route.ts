@@ -14,7 +14,8 @@ import {
   updateMutualMatch,
 } from '@/lib/db'
 import { updateRatings } from '@/lib/elo'
-import { selectNextCandidate, generateMatchAngle } from '@/lib/matchmaker'
+import { selectNextCandidate } from '@/lib/matchmaker'
+import { generateTrailer } from '@/lib/intro-engine-v2'
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
@@ -64,10 +65,12 @@ export async function POST(req: NextRequest) {
         const candidateComposite = await getCompositeProfile(candidate.id)
 
         let narrative = "There's someone here you should meet. Trust us on this one."
+        let hookType: 'quote' | 'contradiction' | 'scene' | null = null
         if (userComposite && candidateComposite) {
           try {
-            const angles = await generateMatchAngle(user, candidate, userComposite, candidateComposite)
-            narrative = angles.narrativeForA
+            const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
+            narrative = trailer.narrative
+            hookType = trailer.hookType
           } catch {
             // use fallback
           }
@@ -103,6 +106,7 @@ export async function POST(req: NextRequest) {
           expires_at: expiresAt.toISOString(),
           voice_message_required: voiceRequired,
           voice_message_path: null,
+          hook_type: hookType,
         })
 
         const photos = await getUserPhotos(candidate.id)
