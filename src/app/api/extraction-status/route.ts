@@ -14,6 +14,13 @@ export async function GET(req: NextRequest) {
     const total = memos.length
     const transcribed = memos.filter(m => m.transcript !== null).length
     const extracted = memos.filter(m => m.extraction !== null).length
+    const failedMemos = memos
+      .filter(m => m.processing_status === 'failed' && m.processing_error)
+      .map(m => ({
+        id: m.id,
+        prompt_id: m.prompt_id,
+        error: m.processing_error,
+      }))
 
     return NextResponse.json({
       total,
@@ -22,6 +29,7 @@ export async function GET(req: NextRequest) {
       compositeReady: composite !== null,
       excitementType: composite?.excitement_type || null,
       memoCount: composite?.memo_count || 0,
+      failedMemos,
     })
   } catch (err) {
     console.error('Route error:', err)

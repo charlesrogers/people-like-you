@@ -417,6 +417,36 @@ function inferExcitementTypeFromV2(profile: import('./extraction-v2').Personalit
   return sorted[0][0] as 'explorer' | 'nester' | 'intellectual' | 'spark'
 }
 
+// --- Transcript Coherence Check ---
+
+function isTranscriptCoherent(transcript: string): { coherent: boolean; reason?: string } {
+  const words = transcript.split(/\s+/).filter(Boolean)
+
+  // Too few words — not enough signal
+  if (words.length < 8) {
+    return { coherent: false, reason: 'too_short' }
+  }
+
+  // Check for repetitive content (same word > 50% of transcript)
+  const wordFreq = new Map<string, number>()
+  for (const w of words) {
+    const lower = w.toLowerCase().replace(/[^a-z]/g, '')
+    if (lower.length > 0) wordFreq.set(lower, (wordFreq.get(lower) || 0) + 1)
+  }
+  const maxFreq = Math.max(...wordFreq.values())
+  if (maxFreq / words.length > 0.5) {
+    return { coherent: false, reason: 'repetitive' }
+  }
+
+  // Check unique word ratio — natural speech has variety
+  const uniqueWords = wordFreq.size
+  if (words.length > 15 && uniqueWords / words.length < 0.25) {
+    return { coherent: false, reason: 'low_vocabulary' }
+  }
+
+  return { coherent: true }
+}
+
 // --- Full Pipeline: transcribe + extract + aggregate ---
 
 export async function processVoiceMemo(memoId: string): Promise<void> {
@@ -438,6 +468,17 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
   const wordCount = transcript.split(/\s+/).filter(Boolean).length
   const sentenceCount = transcript.split(/[.!?]+/).filter(s => s.trim().length > 0).length
   console.log(`Memo ${memoId}: ${wordCount} words, ${sentenceCount} sentences, ${memo.duration_seconds || 0}s`)
+
+  // Check transcript coherence before extraction
+  const coherence = isTranscriptCoherent(transcript)
+  if (!coherence.coherent) {
+    console.warn(`Memo ${memoId}: transcript incoherent (${coherence.reason}): "${transcript.substring(0, 100)}"`)
+    await updateVoiceMemo(memoId, {
+      processing_status: 'failed' as const,
+      processing_error: `Transcript too ${coherence.reason === 'too_short' ? 'short' : 'repetitive'} for meaningful extraction. Try re-recording with a clearer answer.`,
+    })
+    return
+  }
 
   // Save prompt-level metrics for question quality tracking
   const supabase = createServerClient()
