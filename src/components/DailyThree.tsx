@@ -397,7 +397,12 @@ export default function DailyThree({
             className="w-full px-5 py-4 text-left flex items-center justify-between"
           >
             <div className="min-w-0 flex-1">
-              <p className="text-[10px] font-medium uppercase tracking-wider text-stone-400">Someone to meet</p>
+              <div className="flex items-center gap-1.5">
+                <p className="text-[10px] font-medium uppercase tracking-wider text-stone-400">Someone to meet</p>
+                {card.locationTier != null && card.locationTier <= 2 && (
+                  <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full">Nearby</span>
+                )}
+              </div>
               <p className="text-[13px] text-stone-600 mt-0.5 truncate">{card.narrative.slice(0, 80)}...</p>
             </div>
             {card.compatibilityPercentile && card.compatibilityPercentile >= 90 && (
@@ -417,7 +422,18 @@ export default function DailyThree({
     return (
       <div key={card.id} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
         <div className="px-5 pt-5 pb-2">
-          <p className="text-[10px] font-medium uppercase tracking-wider text-stone-400">Someone we think you should meet</p>
+          <div className="flex items-center gap-2">
+            <p className="text-[10px] font-medium uppercase tracking-wider text-stone-400">Someone we think you should meet</p>
+            {card.locationTier != null && card.locationTier <= 2 && (
+              <span className="text-[9px] font-bold text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-full flex items-center gap-0.5">
+                <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /></svg>
+                {card.proximityLabel || 'Nearby'}
+              </span>
+            )}
+            {card.locationTier != null && card.locationTier === 3 && card.proximityLabel && (
+              <span className="text-[9px] font-medium text-stone-400">{card.proximityLabel}</span>
+            )}
+          </div>
           {renderSuperlatives(card)}
           <p className="mt-3 text-[13px] leading-relaxed text-stone-600">{card.narrative}</p>
         </div>
@@ -442,14 +458,16 @@ export default function DailyThree({
           </p>
         </div>
 
-        {/* Action row: Not sure / Save / Pass */}
+        {/* Action row: Not sure (only if radar data available) / Save / Pass */}
         <div className="px-5 pb-5 pt-1 flex gap-2.5">
-          <button
-            onClick={() => setCardState(card.id, 'not_sure')}
-            className="flex-1 rounded-lg border border-stone-200 py-2.5 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition active:translate-y-px"
-          >
-            Not sure
-          </button>
+          {userDims && getMatchDimensions(card.matchedUserId) && (
+            <button
+              onClick={() => setCardState(card.id, 'not_sure')}
+              className="flex-1 rounded-lg border border-stone-200 py-2.5 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition active:translate-y-px"
+            >
+              Not sure
+            </button>
+          )}
           <button
             onClick={() => handleSave(card)}
             className={`flex-1 rounded-lg py-2.5 text-[13px] font-medium transition active:translate-y-px ${
