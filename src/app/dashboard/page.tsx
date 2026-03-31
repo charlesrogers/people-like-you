@@ -1067,6 +1067,13 @@ export default function Dashboard() {
       )}
 
         </>)}
+
+        {/* Footer */}
+        <div className="mt-12 pb-8 text-center">
+          <a href="/feedback" className="text-xs text-stone-400 hover:text-stone-600 transition">
+            Have an idea? Share it here
+          </a>
+        </div>
       </div>
     </div>
   )
