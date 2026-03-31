@@ -4,7 +4,7 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 // Until domain is verified, use Resend's default sender
 // After verification, switch to: hello@people-like-you.com
-const FROM = process.env.EMAIL_FROM || 'People Like You <onboarding@resend.dev>'
+const FROM = process.env.EMAIL_FROM || 'People Like You <hello@people-like-you.com>'
 
 interface SendEmailOptions {
   to: string
