@@ -42,3 +42,4 @@ next-env.d.ts
 
 # Backtest results (contain user profile data)
 backtest-results/
+!.env.production
