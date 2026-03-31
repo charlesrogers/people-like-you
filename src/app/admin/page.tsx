@@ -99,7 +99,30 @@ interface TestsData {
   userCount: number;
 }
 
-type Tab = "overview" | "users" | "matches" | "matrix" | "tests" | "pool-health";
+type Tab = "overview" | "users" | "matches" | "matrix" | "tests" | "pool-health" | "matching-health";
+
+interface MatchingHealthData {
+  proximity: {
+    tiers: Array<{ tier: number; tierName: string; total: number; interested: number; interestRate: number; avgDistanceMiles: number | null }>;
+    locationCoverage: number;
+    totalDecisions: number;
+  };
+  introQuality: {
+    totalIntros: number;
+    avgCriticScore: number | null;
+    belowThreshold: number;
+    aboveThreshold: number;
+    regeneratedCount: number;
+    regeneratedRate: number;
+    avgSubscores: { hookPower: number; intrigue: number; specificity: number; mystery: number } | null;
+    hookTypeStats: Array<{ hookType: string; total: number; liked: number; passed: number; expired: number; photoRevealed: number; likeRate: number; photoRevealRate: number; convictionRate: number }>;
+    quoteImpact: { quoted: { total: number; liked: number }; unquoted: { total: number; liked: number }; quotedLikeRate: number; unquotedLikeRate: number };
+  };
+  matchQuality: {
+    compatibilityImpact: Array<{ bucket: string; total: number; interested: number; interestRate: number }>;
+    totalScoredMatches: number;
+  };
+}
 
 interface PoolHealthData {
   totalUsers: number;
@@ -204,6 +227,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
   const [matches, setMatches] = useState<AdminMatch[]>([]);
   const [testsData, setTestsData] = useState<TestsData | null>(null);
   const [poolHealth, setPoolHealth] = useState<PoolHealthData | null>(null);
+  const [matchingHealth, setMatchingHealth] = useState<MatchingHealthData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -259,6 +283,14 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
     }
   }, [tab, poolHealth, secret]);
 
+  useEffect(() => {
+    if (tab === "matching-health" && !matchingHealth) {
+      adminFetch("/api/admin/matching-health", secret).then(async (r) => {
+        if (r.ok) setMatchingHealth(await r.json());
+      });
+    }
+  }, [tab, matchingHealth, secret]);
+
   const tabs: { id: Tab; label: string }[] = [
     { id: "overview", label: "Overview" },
     { id: "users", label: "Users" },
@@ -266,6 +298,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
     { id: "matrix", label: "Matrix" },
     { id: "tests", label: "Tests" },
     { id: "pool-health", label: "Pool Health" },
+    { id: "matching-health", label: "Matching Health" },
   ];
 
   return (
@@ -307,6 +340,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
         {tab === "matrix" && <MatrixTab profiles={profiles} />}
         {tab === "tests" && <TestsTab data={testsData} />}
         {tab === "pool-health" && <PoolHealthTab data={poolHealth} />}
+        {tab === "matching-health" && <MatchingHealthTab data={matchingHealth} />}
         {loading && !stats && (
           <p className="text-center text-stone-400 py-12">Loading...</p>
         )}
@@ -1378,6 +1412,205 @@ function PoolHealthTab({ data }: { data: PoolHealthData | null }) {
               )}
             </tbody>
           </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─── Matching Health Tab ───
+
+function MatchingHealthTab({ data }: { data: MatchingHealthData | null }) {
+  if (!data) return <p className="text-center text-stone-400 py-12">Loading matching health data...</p>;
+
+  const tierColors: Record<number, string> = {
+    1: 'bg-emerald-500', 2: 'bg-emerald-400', 3: 'bg-blue-400',
+    4: 'bg-stone-400', 5: 'bg-amber-400', 6: 'bg-red-400',
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* ─── Proximity Impact ─── */}
+      <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
+        <div className="px-5 py-4 border-b border-stone-100">
+          <h2 className="text-base font-bold text-stone-900">Proximity Impact on Interest Rate</h2>
+          <p className="text-xs text-stone-500 mt-0.5">Does being closer increase the probability of clicking &ldquo;yes&rdquo; after photo reveal?</p>
+        </div>
+        <div className="p-5">
+          {/* Summary cards */}
+          <div className="grid grid-cols-3 gap-3 mb-5">
+            <div className="rounded-lg bg-stone-50 p-3">
+              <p className="text-[10px] font-medium text-stone-400 uppercase">Decisions tracked</p>
+              <p className="text-xl font-bold text-stone-900">{data.proximity.totalDecisions}</p>
+            </div>
+            <div className="rounded-lg bg-stone-50 p-3">
+              <p className="text-[10px] font-medium text-stone-400 uppercase">Location coverage</p>
+              <p className="text-xl font-bold text-stone-900">{data.proximity.locationCoverage}%</p>
+            </div>
+            <div className="rounded-lg bg-stone-50 p-3">
+              <p className="text-[10px] font-medium text-stone-400 uppercase">Tiers with data</p>
+              <p className="text-xl font-bold text-stone-900">{data.proximity.tiers.length}</p>
+            </div>
+          </div>
+
+          {/* Tier breakdown bars */}
+          {data.proximity.tiers.length > 0 ? (
+            <div className="space-y-3">
+              {data.proximity.tiers.map((t) => (
+                <div key={t.tier} className="flex items-center gap-3">
+                  <div className="w-28 shrink-0">
+                    <span className={`inline-block w-2 h-2 rounded-full ${tierColors[t.tier] || 'bg-stone-300'} mr-1.5`} />
+                    <span className="text-xs font-medium text-stone-700">{t.tierName}</span>
+                  </div>
+                  <div className="flex-1 h-6 bg-stone-100 rounded-full overflow-hidden relative">
+                    <div
+                      className={`h-full rounded-full ${tierColors[t.tier] || 'bg-stone-400'} transition-all`}
+                      style={{ width: `${Math.min(t.interestRate, 100)}%` }}
+                    />
+                    <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-stone-700">
+                      {t.interestRate}% ({t.interested}/{t.total})
+                    </span>
+                  </div>
+                  <div className="w-20 text-right shrink-0">
+                    <span className="text-[10px] text-stone-400">
+                      {t.avgDistanceMiles != null ? `~${t.avgDistanceMiles} mi` : '-'}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-center text-stone-400 text-sm py-4">No proximity data yet. Decisions will appear as users interact with matches.</p>
+          )}
+        </div>
+      </div>
+
+      {/* ─── Intro Writer Quality ─── */}
+      <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
+        <div className="px-5 py-4 border-b border-stone-100">
+          <h2 className="text-base font-bold text-stone-900">Intro Writer Quality</h2>
+          <p className="text-xs text-stone-500 mt-0.5">How well is the AI writing introductions?</p>
+        </div>
+        <div className="p-5">
+          {/* Summary row */}
+          <div className="grid grid-cols-4 gap-3 mb-5">
+            <div className="rounded-lg bg-stone-50 p-3">
+              <p className="text-[10px] font-medium text-stone-400 uppercase">Avg critic score</p>
+              <p className="text-xl font-bold text-stone-900">{data.introQuality.avgCriticScore ?? '-'}<span className="text-xs text-stone-400">/100</span></p>
+            </div>
+            <div className="rounded-lg bg-stone-50 p-3">
+              <p className="text-[10px] font-medium text-stone-400 uppercase">Above threshold</p>
+              <p className="text-xl font-bold text-emerald-600">{data.introQuality.aboveThreshold}</p>
+            </div>
+            <div className="rounded-lg bg-stone-50 p-3">
+              <p className="text-[10px] font-medium text-stone-400 uppercase">Below threshold</p>
+              <p className="text-xl font-bold text-red-500">{data.introQuality.belowThreshold}</p>
+            </div>
+            <div className="rounded-lg bg-stone-50 p-3">
+              <p className="text-[10px] font-medium text-stone-400 uppercase">Regenerated</p>
+              <p className="text-xl font-bold text-stone-900">{data.introQuality.regeneratedRate}%</p>
+            </div>
+          </div>
+
+          {/* Critic subscores */}
+          {data.introQuality.avgSubscores && (
+            <div className="mb-5">
+              <p className="text-xs font-semibold text-stone-600 mb-2">Avg critic subscores (1-5)</p>
+              <div className="grid grid-cols-4 gap-2">
+                {(['hookPower', 'intrigue', 'specificity', 'mystery'] as const).map((key) => {
+                  const val = data.introQuality.avgSubscores![key];
+                  const label = key === 'hookPower' ? 'Hook Power' : key.charAt(0).toUpperCase() + key.slice(1);
+                  return (
+                    <div key={key} className="text-center">
+                      <div className="relative w-full h-2 bg-stone-100 rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${val >= 3.5 ? 'bg-emerald-500' : val >= 2.5 ? 'bg-amber-400' : 'bg-red-400'}`} style={{ width: `${(val / 5) * 100}%` }} />
+                      </div>
+                      <p className="text-[10px] text-stone-500 mt-1">{label}</p>
+                      <p className="text-xs font-bold text-stone-700">{val}</p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* Hook type performance */}
+          <p className="text-xs font-semibold text-stone-600 mb-2">Performance by hook type</p>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b border-stone-200 text-left text-[10px] font-medium text-stone-500 uppercase">
+                  <th className="px-3 py-2">Hook</th>
+                  <th className="px-3 py-2">Total</th>
+                  <th className="px-3 py-2">Like %</th>
+                  <th className="px-3 py-2">Photo Reveal %</th>
+                  <th className="px-3 py-2">Conviction %</th>
+                  <th className="px-3 py-2">Expired</th>
+                </tr>
+              </thead>
+              <tbody>
+                {data.introQuality.hookTypeStats.map((h) => (
+                  <tr key={h.hookType} className="border-b border-stone-100">
+                    <td className="px-3 py-2 font-medium text-stone-800 capitalize">{h.hookType}</td>
+                    <td className="px-3 py-2 text-stone-600">{h.total}</td>
+                    <td className="px-3 py-2">
+                      <span className={`font-bold ${h.likeRate >= 40 ? 'text-emerald-600' : h.likeRate >= 20 ? 'text-amber-600' : 'text-red-500'}`}>{h.likeRate}%</span>
+                    </td>
+                    <td className="px-3 py-2 text-stone-600">{h.photoRevealRate}%</td>
+                    <td className="px-3 py-2 text-stone-600">{h.convictionRate}%</td>
+                    <td className="px-3 py-2 text-stone-500">{h.expired}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Quote impact */}
+          <div className="mt-4 p-3 rounded-lg bg-stone-50 flex items-center justify-between">
+            <div>
+              <p className="text-xs font-semibold text-stone-600">Quote usage impact</p>
+              <p className="text-[10px] text-stone-400 mt-0.5">Do intros with real quotes from the person perform better?</p>
+            </div>
+            <div className="flex gap-4 text-center">
+              <div>
+                <p className="text-sm font-bold text-stone-900">{data.introQuality.quoteImpact.quotedLikeRate}%</p>
+                <p className="text-[10px] text-stone-400">With quote ({data.introQuality.quoteImpact.quoted.total})</p>
+              </div>
+              <div>
+                <p className="text-sm font-bold text-stone-900">{data.introQuality.quoteImpact.unquotedLikeRate}%</p>
+                <p className="text-[10px] text-stone-400">No quote ({data.introQuality.quoteImpact.unquoted.total})</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* ─── Compatibility Score vs Outcomes ─── */}
+      <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
+        <div className="px-5 py-4 border-b border-stone-100">
+          <h2 className="text-base font-bold text-stone-900">Compatibility Score vs Outcomes</h2>
+          <p className="text-xs text-stone-500 mt-0.5">Is our matching algorithm actually predictive? ({data.matchQuality.totalScoredMatches} scored matches)</p>
+        </div>
+        <div className="p-5 space-y-3">
+          {data.matchQuality.compatibilityImpact.map((b) => (
+            <div key={b.bucket} className="flex items-center gap-3">
+              <div className="w-32 shrink-0">
+                <span className="text-xs font-medium text-stone-700">{b.bucket}</span>
+              </div>
+              <div className="flex-1 h-6 bg-stone-100 rounded-full overflow-hidden relative">
+                <div
+                  className="h-full rounded-full bg-primary transition-all"
+                  style={{ width: `${Math.min(b.interestRate, 100)}%` }}
+                />
+                <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-stone-700">
+                  {b.interestRate}% ({b.interested}/{b.total})
+                </span>
+              </div>
+            </div>
+          ))}
+          {data.matchQuality.compatibilityImpact.every(b => b.total === 0) && (
+            <p className="text-center text-stone-400 text-sm py-4">No scored matches with outcomes yet.</p>
+          )}
         </div>
       </div>
     </div>
