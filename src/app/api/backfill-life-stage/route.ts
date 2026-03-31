@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { buildPersonalityProfile } from '@/lib/extraction-v2'
+import { extractStory, buildPersonalityProfile } from '@/lib/extraction-v2'
 import type { StoryExtraction } from '@/lib/extraction-v2'
+import { QUESTION_BANK } from '@/lib/prompts'
 
-// One-time backfill: re-run Pass 2 on all users to populate life_stage
+// One-time backfill: re-run Pass 1 + Pass 2 on all users to populate life_stage
+// Most users have v1 extractions (no story_summary), so we need to re-extract from transcripts
 // DELETE THIS FILE after backfill is complete
+export const maxDuration = 300
+
 export async function POST(req: NextRequest) {
   const body = await req.json()
   if (body.secret !== process.env.ADMIN_SECRET) {
@@ -12,9 +16,9 @@ export async function POST(req: NextRequest) {
   }
 
   const supabase = createServerClient()
-  const results: Array<{ userId: string; status: string; chapter?: string; confidence?: number }> = []
+  const promptTextMap = new Map(QUESTION_BANK.map(q => [q.id, q.text]))
+  const results: Array<{ userId: string; status: string; memos?: number; chapter?: string | null; confidence?: number }> = []
 
-  // Get all users with voice memos that have v2 story extractions
   const { data: profiles } = await supabase
     .from('composite_profiles')
     .select('user_id')
@@ -27,28 +31,58 @@ export async function POST(req: NextRequest) {
 
   for (const profile of profiles) {
     try {
-      // Get all voice memos with v2 story extractions
+      // Get all voice memos with transcripts
       const { data: memos } = await supabase
         .from('voice_memos')
-        .select('extraction')
+        .select('id, prompt_id, transcript, extraction')
         .eq('user_id', profile.user_id)
-        .not('extraction', 'is', null)
+        .not('transcript', 'is', null)
 
-      const stories = (memos || [])
-        .filter(m => m.extraction && typeof m.extraction === 'object' && 'story_summary' in m.extraction)
-        .map(m => m.extraction as unknown as StoryExtraction)
-
-      if (stories.length === 0) {
-        results.push({ userId: profile.user_id, status: 'skipped_no_stories' })
-        console.log(`[backfill] ${profile.user_id}: no v2 stories, skipping`)
+      if (!memos || memos.length === 0) {
+        results.push({ userId: profile.user_id, status: 'skipped_no_transcripts' })
+        console.log(`[backfill] ${profile.user_id}: no transcripts, skipping`)
         continue
       }
 
-      // Re-run Pass 2 (this now includes life_stage extraction)
-      console.log(`[backfill] ${profile.user_id}: running Pass 2 on ${stories.length} stories...`)
+      // Check if any already have v2 story extractions
+      const existingStories = memos
+        .filter(m => m.extraction && typeof m.extraction === 'object' && 'story_summary' in (m.extraction as Record<string, unknown>))
+        .map(m => m.extraction as unknown as StoryExtraction)
+
+      let stories: StoryExtraction[]
+
+      if (existingStories.length >= memos.length) {
+        // All memos already have v2 format — just re-run Pass 2
+        stories = existingStories
+        console.log(`[backfill] ${profile.user_id}: ${stories.length} existing v2 stories, re-running Pass 2 only`)
+      } else {
+        // Need to re-run Pass 1 on memos without v2 extractions
+        console.log(`[backfill] ${profile.user_id}: ${memos.length} memos, running Pass 1 + Pass 2...`)
+        stories = []
+        for (const memo of memos) {
+          if (!memo.transcript || memo.transcript.trim().length < 10) continue
+          const hasV2 = memo.extraction && typeof memo.extraction === 'object' && 'story_summary' in (memo.extraction as Record<string, unknown>)
+          if (hasV2) {
+            stories.push(memo.extraction as unknown as StoryExtraction)
+          } else {
+            const promptText = promptTextMap.get(memo.prompt_id) || memo.prompt_id
+            const story = await extractStory(memo.transcript, memo.prompt_id, promptText)
+            stories.push(story)
+            // Save v2 extraction back to memo
+            await supabase.from('voice_memos').update({ extraction: story }).eq('id', memo.id)
+          }
+        }
+      }
+
+      if (stories.length === 0) {
+        results.push({ userId: profile.user_id, status: 'skipped_empty_transcripts' })
+        continue
+      }
+
+      // Run Pass 2 (now includes life_stage)
       const newProfile = await buildPersonalityProfile(stories)
 
-      // Update composite_profiles with life_stage data
+      // Update composite_profiles with life_stage
       const { error } = await supabase
         .from('composite_profiles')
         .update({
@@ -65,10 +99,11 @@ export async function POST(req: NextRequest) {
         results.push({
           userId: profile.user_id,
           status: 'updated',
-          chapter: ls?.life_chapter ?? 'null',
+          memos: stories.length,
+          chapter: ls?.life_chapter ?? null,
           confidence: ls?.confidence ?? 0,
         })
-        console.log(`[backfill] ${profile.user_id}: ${ls?.life_chapter ?? 'null'} (confidence: ${ls?.confidence ?? 0})`)
+        console.log(`[backfill] ${profile.user_id}: ${ls?.life_chapter ?? 'null'} (confidence: ${(ls?.confidence ?? 0).toFixed(2)})`)
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err)
