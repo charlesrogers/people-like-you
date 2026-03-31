@@ -12,6 +12,11 @@ jobs:
       packages: write
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Get previous SHA for rollback
+        id: prev
+        run: echo "sha=$(git rev-parse HEAD~1)" >> $GITHUB_OUTPUT
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -55,15 +60,56 @@ jobs:
           done
           echo "Migrations complete"
 
-      - name: Deploy to Coolify
+      - name: Deploy, verify, rollback if needed
+        env:
+          COOLIFY_TOKEN: ${{ secrets.COOLIFY_TOKEN }}
+          APP_UUID: v62x9o7lxfncksjq5jrgevcc
+          HEALTH_URL: https://people-like-you.com/api/health
+          PREV_SHA: ${{ steps.prev.outputs.sha }}
+          DISCORD_WEBHOOK: https://discord.com/api/webhooks/1486969921542946887/SAD4fP0-JaPrGmnEs_W2WIZmiRMQt1T2kQSbgnNenTTjnRq0YcqNkkLsKdvyPJ5pAA6y
         run: |
-          curl -sf -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
-            "http://95.216.205.160:8000/api/v1/deploy?uuid=v62x9o7lxfncksjq5jrgevcc&force=true"
+          # 1. Trigger deploy
+          curl -sf -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            "http://95.216.205.160:8000/api/v1/deploy?uuid=$APP_UUID&force=true"
+          echo "Deploy triggered"
 
-      - name: Verify health
-        run: |
-          sleep 30
-          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" https://people-like-you.com/api/health || echo "000")
-          if [ "$STATUS" != "200" ]; then
-            echo "::warning::Health check returned $STATUS (may still be deploying)"
+          # 2. Poll health (20 attempts × 10s = ~3 min)
+          HEALTHY=false
+          for i in $(seq 1 20); do
+            sleep 10
+            STATUS=$(curl -sf -o /dev/null -w "%{http_code}" "$HEALTH_URL" 2>/dev/null || echo "000")
+            echo "Health check $i/20: HTTP $STATUS"
+            if [ "$STATUS" = "200" ]; then
+              HEALTHY=true
+              break
+            fi
+          done
+
+          if [ "$HEALTHY" = "true" ]; then
+            echo "Deploy verified healthy"
+            exit 0
           fi
+
+          # 3. Rollback
+          echo "::error::Health check failed — rolling back to $PREV_SHA"
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d "{\"docker_registry_image_tag\": \"$PREV_SHA\"}" \
+            "http://95.216.205.160:8000/api/v1/applications/$APP_UUID"
+          curl -sf -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            "http://95.216.205.160:8000/api/v1/deploy?uuid=$APP_UUID&force=true"
+          sleep 30
+
+          # Reset tag back to latest for future deploys
+          curl -sf -X PATCH \
+            -H "Authorization: Bearer $COOLIFY_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{"docker_registry_image_tag": "latest"}' \
+            "http://95.216.205.160:8000/api/v1/applications/$APP_UUID"
+
+          # 4. Alert Discord
+          curl -sf -H "Content-Type: application/json" \
+            -d "{\"content\": \"**ROLLBACK** ${GITHUB_REPOSITORY}: deploy \`${GITHUB_SHA:0:7}\` failed health check. Rolled back to \`${PREV_SHA:0:7}\`. <https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}>\"}" \
+            "$DISCORD_WEBHOOK" || true
+          exit 1
