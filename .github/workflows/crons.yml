@@ -14,7 +14,7 @@ on:
 
 env:
   CRON_SECRET: ${{ secrets.CRON_SECRET }}
-  BASE_URL: ${{ secrets.VERCEL_BASE_URL }}
+  BASE_URL: ${{ secrets.PLY_BASE_URL }}
 
 jobs:
   deliver-matches:
