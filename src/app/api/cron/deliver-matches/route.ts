@@ -14,6 +14,20 @@ import {
 } from '@/lib/db'
 import { selectNextCandidate } from '@/lib/matchmaker'
 import { generateTrailer } from '@/lib/intro-engine-v2'
+import type { CompositeProfile } from '@/lib/types'
+
+/** Classify profile richness: thin / adequate / rich */
+function computeRichnessTier(profile: CompositeProfile | null): string {
+  if (!profile) return 'thin'
+  const quoteCount = profile.notable_quotes?.length ?? 0
+  const hasVouches = (profile.friend_vouch_quotes?.length ?? 0) > 0
+  const hasLifeStage = profile.life_stage && profile.life_stage.confidence > 0.3
+  const memoCount = profile.memo_count ?? 0
+
+  if (memoCount >= 6 && quoteCount >= 8 && (hasVouches || hasLifeStage)) return 'rich'
+  if (memoCount >= 4 && quoteCount >= 4) return 'adequate'
+  return 'thin'
+}
 
 export async function GET(req: NextRequest) {
   // Verify cron secret (Vercel sends this automatically)
@@ -100,13 +114,39 @@ export async function GET(req: NextRequest) {
       // Generate intro trailer with hook type
       let narrativeForUser = "There's someone here you should meet. Trust us on this one."
       let hookType: 'quote' | 'contradiction' | 'scene' | null = null
+      let criticScore: number | null = null
+      let criticSubscores: { hookPower: number; intrigue: number; specificity: number; mystery: number } | null = null
+      let generationAttempts = 1
+      let quoteUsed = false
       if (userComposite && candidateComposite) {
         try {
           const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
           narrativeForUser = trailer.narrative
           hookType = trailer.hookType
+          criticScore = trailer.criticScore
+          criticSubscores = trailer.criticSubscores
+          generationAttempts = trailer.generationAttempts
+          quoteUsed = trailer.quoteUsed
         } catch (err) {
           console.error(`Cron: Failed to generate trailer for ${user.id} <> ${candidate.id}`, err)
+        }
+      }
+
+      // Compute match pairing metadata
+      const sharedInterests = candidateComposite && userComposite
+        ? userComposite.interest_tags.filter(t => candidateComposite.interest_tags.includes(t))
+        : []
+      const eloDelta = Math.abs((user.elo_score ?? 1200) - (candidate.elo_score ?? 1200))
+      const readerRichness = computeRichnessTier(userComposite)
+      const subjectRichness = computeRichnessTier(candidateComposite)
+
+      // Life stage delta
+      let lifeStageDelta: Record<string, number> | null = null
+      if (userComposite?.life_stage && candidateComposite?.life_stage) {
+        lifeStageDelta = {
+          rootedness: Math.abs(userComposite.life_stage.rootedness - candidateComposite.life_stage.rootedness),
+          life_pace: Math.abs(userComposite.life_stage.life_pace - candidateComposite.life_stage.life_pace),
+          trajectory_momentum: Math.abs(userComposite.life_stage.trajectory_momentum - candidateComposite.life_stage.trajectory_momentum),
         }
       }
 
@@ -120,6 +160,11 @@ export async function GET(req: NextRequest) {
           .filter(t => !userComposite?.interest_tags.includes(t))
           .slice(0, 5) || [],
         life_stage_score: lifeStageScore ?? null,
+        elo_delta: eloDelta,
+        shared_interest_count: sharedInterests.length,
+        life_stage_delta: lifeStageDelta,
+        subject_richness_tier: subjectRichness,
+        reader_richness_tier: readerRichness,
       })
 
       // Calculate expires_at (next delivery time = tomorrow same hour)
@@ -128,7 +173,7 @@ export async function GET(req: NextRequest) {
       expiresAt.setUTCHours(currentHourUtc, 0, 0, 0)
       expiresAt.setDate(expiresAt.getDate() + 1)
 
-      // Create daily intro
+      // Create daily intro with quality tracking metadata
       await saveDailyIntro({
         user_id: user.id,
         match_id: match.id,
@@ -143,9 +188,25 @@ export async function GET(req: NextRequest) {
         voice_message_required: false,
         voice_message_path: null,
         hook_type: hookType,
+        narrative_tier: null, // TODO: populate when strategy-based pipeline is used in cron
+        narrative_strategy: null,
+        critic_score: criticScore,
+        critic_hook_power: criticSubscores?.hookPower ?? null,
+        critic_intrigue: criticSubscores?.intrigue ?? null,
+        critic_specificity: criticSubscores?.specificity ?? null,
+        critic_mystery: criticSubscores?.mystery ?? null,
+        generation_attempts: generationAttempts,
+        quote_used: quoteUsed,
+        repitch_attempt: 0,
+        slot_position: 1,
       })
 
       await updatePoolState(cadence.user_id, 'normal')
+
+      // Email notification (non-blocking)
+      import('@/lib/email').then(({ sendMatchNotification }) => {
+        if (user.email) sendMatchNotification(user.email, user.first_name).catch(console.error)
+      })
 
       delivered++
       console.log(`Cron: Delivered intro for ${user.first_name} → ${candidate.first_name} (score: ${score}, hook: ${hookType})`)

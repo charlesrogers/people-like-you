@@ -98,6 +98,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Send welcome email (non-blocking)
+    import('@/lib/email').then(({ sendWelcomeEmail }) => {
+      sendWelcomeEmail(email, first_name || 'there').catch(console.error)
+    })
+
     // If signUp returned a session directly (email confirmation disabled)
     if (authData.session) {
       return NextResponse.json({
