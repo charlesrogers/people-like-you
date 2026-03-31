@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>People Like You — Match Card Prototype</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: 'oklch(0.45 0.18 265)',
+            'primary-light': 'oklch(0.62 0.19 265)',
+            'primary-bg': 'oklch(0.95 0.03 265)',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+    .card-enter { animation: cardEnter 0.3s ease-out; }
+    @keyframes cardEnter { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+    .slide-up { animation: slideUp 0.3s ease-out; }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .fade-out { animation: fadeOut 0.25s ease-in forwards; }
+    @keyframes fadeOut { to { opacity: 0; transform: scale(0.97); } }
+  </style>
+</head>
+<body class="bg-stone-50 min-h-screen">
+
+<div id="app" class="max-w-md mx-auto pb-24"></div>
+
+<script>
+// ─── Data ───
+
+const DIMENSIONS = [
+  { id: 'explorer',  emoji: '🧭', label: 'Explorer' },
+  { id: 'connector', emoji: '💜', label: 'Connector' },
+  { id: 'builder',   emoji: '⭐', label: 'Builder' },
+  { id: 'nurturer',  emoji: '🏠', label: 'Nurturer' },
+  { id: 'wildcard',  emoji: '⚡', label: 'Wildcard' },
+];
+
+const VIEWERS = {
+  sarah: {
+    name: 'Sarah',
+    gender: 'woman',
+    dimensions: { explorer: 72, connector: 85, builder: 58, nurturer: 68, wildcard: 45 },
+    matchSet: 'men',
+  },
+  alex: {
+    name: 'Alex',
+    gender: 'man',
+    dimensions: { explorer: 78, connector: 60, builder: 80, nurturer: 55, wildcard: 70 },
+    matchSet: 'women',
+  },
+};
+
+const PROFILES = {
+  men: [
+    {
+      id: 'seed_m_01', firstName: 'Marcus', lastName: 'Chen', age: 30, state: 'California',
+      photoUrl: 'https://i.pravatar.cc/400?img=3',
+      narrative: 'He quit consulting to chase fermentation science and now runs pop-up dinners fusing Asian and Mexican flavors. His friends say he remembers your favorite drink and asks about the thing you mentioned three weeks ago. He can identify almost any spice blindfolded.',
+      dimensions: { explorer: 88, connector: 72, builder: 82, nurturer: 65, wildcard: 70 },
+      compatibilityPercentile: 94, valuesAlignment: 0.91,
+    },
+    {
+      id: 'seed_m_02', firstName: 'James', lastName: 'Whitfield', age: 34, state: 'Colorado',
+      photoUrl: 'https://i.pravatar.cc/400?img=7',
+      narrative: 'He traded law school for backcountry photography and now wakes up in places most people only see in screensavers. He can predict weather by reading clouds. The kind of person who cooks dinner over a campfire and asks questions that make you think for days.',
+      dimensions: { explorer: 80, connector: 55, builder: 75, nurturer: 60, wildcard: 50 },
+      compatibilityPercentile: 72, valuesAlignment: 0.68,
+    },
+    {
+      id: 'seed_m_03', firstName: 'Devon', lastName: 'Baptiste', age: 28, state: 'New York',
+      photoUrl: 'https://i.pravatar.cc/400?img=11',
+      narrative: 'He started a music program for 200 kids with zero funding at 19. A 7-year-old once stopped mid-drum-lesson to tell him he needed to practice more. He can beatbox and play piano simultaneously.',
+      dimensions: { explorer: 70, connector: 78, builder: 85, nurturer: 72, wildcard: 88 },
+      compatibilityPercentile: 81, valuesAlignment: 0.78,
+    },
+    {
+      id: 'seed_m_04', firstName: 'Ethan', lastName: 'Park', age: 32, state: 'Washington',
+      photoUrl: 'https://i.pravatar.cc/400?img=14',
+      narrative: 'He published a paper in Nature at 26 that shifted an entire field. His lab partner set his eyebrows on fire and made puns about it in the parking lot. Three-time regional Settlers of Catan champion.',
+      dimensions: { explorer: 90, connector: 60, builder: 78, nurturer: 55, wildcard: 65 },
+      compatibilityPercentile: 76, valuesAlignment: 0.72,
+    },
+  ],
+  women: [
+    {
+      id: 'seed_w_01', firstName: 'Maya', lastName: 'Patel', age: 30, state: 'California',
+      photoUrl: 'https://i.pravatar.cc/400?img=5',
+      narrative: 'She left architecture to study how hospital design affects patient recovery. Once accidentally projected her Sad Girl Autumn playlist to a board of surgeons. She can draw any building from memory to roughly accurate scale.',
+      dimensions: { explorer: 85, connector: 80, builder: 75, nurturer: 78, wildcard: 55 },
+      compatibilityPercentile: 92, valuesAlignment: 0.88,
+    },
+    {
+      id: 'seed_w_02', firstName: 'Sophie', lastName: 'Laurent', age: 31, state: 'New York',
+      photoUrl: 'https://i.pravatar.cc/400?img=9',
+      narrative: 'She got an MBA then immediately became a documentary filmmaker. Her first doc about gig workers made it into Tribeca. She knows the choreography to every music video from 2005-2015.',
+      dimensions: { explorer: 75, connector: 82, builder: 70, nurturer: 50, wildcard: 90 },
+      compatibilityPercentile: 79, valuesAlignment: 0.71,
+    },
+    {
+      id: 'seed_w_03', firstName: 'Iris', lastName: 'Nakamura', age: 32, state: 'Oregon',
+      photoUrl: 'https://i.pravatar.cc/400?img=10',
+      narrative: 'Her PhD on octopus communication changed how we think about invertebrate intelligence. An octopus stole her underwater camera and took 30 photos of its den — she published them. She does scientific illustrations that look like Victorian naturalist journals.',
+      dimensions: { explorer: 92, connector: 55, builder: 72, nurturer: 70, wildcard: 40 },
+      compatibilityPercentile: 73, valuesAlignment: 0.66,
+    },
+    {
+      id: 'seed_w_04', firstName: 'Priya', lastName: 'Sharma', age: 33, state: 'Texas',
+      photoUrl: 'https://i.pravatar.cc/400?img=16',
+      narrative: 'First in her family to go to medical school — chose pediatric oncology, the field everyone warns you away from. A 9-year-old patient told her stethoscope was "giving Spirit Halloween." She\'s folded over 2,000 origami cranes for her patients.',
+      dimensions: { explorer: 65, connector: 70, builder: 88, nurturer: 90, wildcard: 45 },
+      compatibilityPercentile: 95, valuesAlignment: 0.93,
+    },
+  ],
+};
+
+// Generate 20 locked placeholder cards
+const LOCKED_NAMES_M = ['Noah','Liam','Owen','Caleb','Milo','Jasper','Theo','Ezra','Kai','Leo','Nico','Finn','Rowan','Silas','Felix','Jude','Atlas','Idris','Soren','Ravi'];
+const LOCKED_NAMES_W = ['Lena','Nora','Zara','Amara','Sadie','Daphne','Ivy','June','Wren','Simone','Esme','Celeste','Alma','Maren','Freya','Ada','Elise','Thea','Hazel','Lyra'];
+const LOCKED_COMPAT = [88,82,79,77,75,73,71,69,68,66,64,62,61,59,57,55,53,51,49,47];
+
+// ─── State ───
+
+const state = {
+  viewer: 'sarah',
+  revealsRemaining: 3,
+  cardStates: {},     // id -> 'browsing' | 'not_sure' | 'photo_revealed' | 'irl_check' | 'decided'
+  savedIds: new Set(),
+  passedIds: new Set(),
+  expandedId: null,
+  interestedIds: new Set(),
+};
+
+function getViewer() { return VIEWERS[state.viewer]; }
+function getMatches() { return PROFILES[getViewer().matchSet]; }
+function getLockedNames() { return getViewer().matchSet === 'men' ? LOCKED_NAMES_M : LOCKED_NAMES_W; }
+
+// ─── Radar Chart ───
+
+function drawRadar(canvas, viewerDims, matchDims) {
+  const ctx = canvas.getContext('2d');
+  const dpr = window.devicePixelRatio || 1;
+  const size = 240;
+  canvas.width = size * dpr;
+  canvas.height = size * dpr;
+  canvas.style.width = size + 'px';
+  canvas.style.height = size + 'px';
+  ctx.scale(dpr, dpr);
+
+  const cx = size / 2;
+  const cy = size / 2;
+  const radius = 85;
+  const axes = DIMENSIONS.length;
+  const angleStep = (Math.PI * 2) / axes;
+  const startAngle = -Math.PI / 2;
+
+  // Grid rings
+  ctx.strokeStyle = 'rgba(120,113,108,0.08)';
+  ctx.lineWidth = 1;
+  for (let ring = 1; ring <= 4; ring++) {
+    ctx.beginPath();
+    for (let i = 0; i <= axes; i++) {
+      const angle = startAngle + i * angleStep;
+      const r = (ring / 4) * radius;
+      const x = cx + Math.cos(angle) * r;
+      const y = cy + Math.sin(angle) * r;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.closePath();
+    ctx.stroke();
+  }
+
+  // Axis lines
+  ctx.strokeStyle = 'rgba(120,113,108,0.12)';
+  for (let i = 0; i < axes; i++) {
+    const angle = startAngle + i * angleStep;
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.lineTo(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius);
+    ctx.stroke();
+  }
+
+  function drawPoly(dims, fillColor, strokeColor) {
+    ctx.beginPath();
+    DIMENSIONS.forEach((dim, i) => {
+      const val = (dims[dim.id] || 0) / 100;
+      const angle = startAngle + i * angleStep;
+      const x = cx + Math.cos(angle) * radius * val;
+      const y = cy + Math.sin(angle) * radius * val;
+      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    });
+    ctx.closePath();
+    ctx.fillStyle = fillColor;
+    ctx.fill();
+    ctx.strokeStyle = strokeColor;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+
+  drawPoly(viewerDims, 'rgba(168,162,158,0.15)', 'rgba(120,113,108,0.5)');
+  drawPoly(matchDims, 'rgba(99,60,200,0.18)', 'rgba(99,60,200,0.8)');
+
+  // Labels
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.font = '600 11px Inter, system-ui';
+  ctx.fillStyle = '#57534e';
+  const labelPad = 20;
+  DIMENSIONS.forEach((dim, i) => {
+    const angle = startAngle + i * angleStep;
+    const lx = cx + Math.cos(angle) * (radius + labelPad);
+    const ly = cy + Math.sin(angle) * (radius + labelPad);
+    ctx.fillText(dim.emoji + ' ' + dim.label, lx, ly);
+  });
+}
+
+// ─── Helpers ───
+
+function renderSuperlatives(match) {
+  const pills = [];
+  if (match.compatibilityPercentile >= 90) {
+    pills.push(`Top ${100 - match.compatibilityPercentile}% match`);
+  }
+  if (match.valuesAlignment >= 0.85) {
+    pills.push(`Top ${Math.round((1 - match.valuesAlignment) * 100)}% values alignment`);
+  }
+  if (pills.length === 0) return '';
+  return `
+    <div class="flex flex-wrap justify-center gap-1.5 px-5 pt-3">
+      ${pills.slice(0, 2).map(p => `
+        <span class="inline-flex items-center gap-1 rounded-full bg-primary/8 px-2.5 py-0.5 text-[10px] font-bold text-primary border border-primary/15">
+          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+          ${p}
+        </span>
+      `).join('')}
+    </div>
+  `;
+}
+
+function getDimensionInsight(viewerDims, matchDims) {
+  // Find the most interesting dimension relationship
+  let best = null;
+  let bestDelta = 0;
+  DIMENSIONS.forEach(dim => {
+    const delta = matchDims[dim.id] - viewerDims[dim.id];
+    if (Math.abs(delta) > bestDelta) {
+      bestDelta = Math.abs(delta);
+      best = { dim, delta };
+    }
+  });
+  if (!best) return '';
+  if (best.delta > 15) return `Their ${best.dim.emoji} ${best.dim.label} energy could expand your world`;
+  if (best.delta < -15) return `You bring ${best.dim.emoji} ${best.dim.label} energy they're drawn to`;
+  return '';
+}
+
+// ─── Render ───
+
+function render() {
+  const viewer = getViewer();
+  const matches = getMatches();
+  const lockedNames = getLockedNames();
+  const activeCards = matches.filter(m => !state.passedIds.has(m.id) && !state.savedIds.has(m.id));
+  const savedCards = matches.filter(m => state.savedIds.has(m.id));
+
+  let html = '';
+
+  // Sticky header
+  html += `
+    <div class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-stone-200 px-5 py-3 flex items-center justify-between">
+      <span class="text-[15px] font-bold text-stone-900">People Like You</span>
+      <div class="flex items-center gap-2">
+        <span class="text-[11px] text-stone-400 font-medium">Reveals</span>
+        <div class="flex gap-1">
+          ${[0,1,2].map(i => `
+            <div class="w-2.5 h-2.5 rounded-full ${i < state.revealsRemaining ? 'bg-primary' : 'bg-stone-200'}"></div>
+          `).join('')}
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Viewer toggle
+  html += `
+    <div class="px-5 pt-4 pb-2">
+      <button onclick="toggleViewer()" class="inline-flex items-center gap-1.5 rounded-lg bg-stone-100 px-3 py-1.5 text-[12px] font-medium text-stone-600 hover:bg-stone-200 transition">
+        Viewing as: ${viewer.name}
+        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+      </button>
+    </div>
+  `;
+
+  // Empty state
+  if (activeCards.length === 0 && savedCards.length === 0) {
+    html += `
+      <div class="px-5 py-16 text-center">
+        <p class="text-[15px] font-semibold text-stone-700">That's today's batch</p>
+        <p class="mt-1 text-[12px] text-stone-400">Come back tomorrow for more intros.</p>
+      </div>
+    `;
+  }
+
+  // ─── Active cards ───
+  activeCards.forEach((match, idx) => {
+    const cardState = state.cardStates[match.id] || 'browsing';
+    const isExpanded = state.expandedId === match.id || (state.expandedId === null && idx === 0);
+
+    if (cardState === 'decided') return;
+
+    html += `<div class="px-4 pt-3 card-enter" id="card-${match.id}">`;
+    html += `<div class="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden transition-shadow hover:shadow-md">`;
+
+    if (!isExpanded) {
+      // Collapsed preview
+      html += `
+        <button onclick="expand('${match.id}')" class="w-full px-5 py-4 text-left flex items-center justify-between">
+          <div class="min-w-0 flex-1">
+            <p class="text-[10px] font-medium uppercase tracking-wider text-stone-400">Someone to meet</p>
+            <p class="text-[13px] text-stone-600 mt-0.5 truncate">${match.narrative.slice(0, 80)}...</p>
+          </div>
+          ${match.compatibilityPercentile >= 90 ? `<span class="shrink-0 ml-3 text-[10px] font-bold text-primary bg-primary/8 px-2 py-0.5 rounded-full whitespace-nowrap">Top ${100 - match.compatibilityPercentile}%</span>` : ''}
+          <svg class="w-4 h-4 text-stone-400 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </button>
+      `;
+    } else if (cardState === 'browsing') {
+      // Expanded browsing — narrative + buttons, NO radar
+      html += `
+        <div class="px-5 pt-5 pb-2">
+          <p class="text-[10px] font-medium uppercase tracking-wider text-stone-400">Someone we think you should meet</p>
+          ${renderSuperlatives(match)}
+          <p class="mt-3 text-[13px] leading-relaxed text-stone-600">${match.narrative}</p>
+        </div>
+
+        <div class="px-5 pt-4 pb-2">
+          <button onclick="revealPhoto('${match.id}')" ${state.revealsRemaining <= 0 ? 'disabled' : ''}
+            class="w-full rounded-lg py-3 text-[13px] font-semibold transition active:translate-y-px
+              ${state.revealsRemaining > 0
+                ? 'bg-stone-900 text-white hover:bg-stone-800'
+                : 'bg-stone-100 text-stone-400 cursor-not-allowed'}">
+            ${state.revealsRemaining > 0 ? 'I am intrigued — show me the picture' : 'No reveals left today'}
+          </button>
+          <p class="text-center mt-1.5 text-[11px] text-stone-400">
+            ${state.revealsRemaining > 0
+              ? `${state.revealsRemaining} of 3 reveals left today`
+              : 'Save for tomorrow — or upgrade for more'}
+          </p>
+        </div>
+
+        <div class="px-5 pb-2 pt-1 flex gap-2.5">
+          <button onclick="notSure('${match.id}')"
+            class="flex-1 rounded-lg border border-stone-200 py-2.5 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition active:translate-y-px">
+            Not sure
+          </button>
+          <button onclick="saveCard('${match.id}')"
+            class="flex-1 rounded-lg py-2.5 text-[13px] font-medium transition active:translate-y-px
+              ${state.revealsRemaining <= 0
+                ? 'bg-primary text-white hover:bg-primary-light'
+                : 'border border-stone-200 text-stone-600 hover:bg-stone-50'}">
+            Save for later
+          </button>
+          <button onclick="passCard('${match.id}')"
+            class="flex-1 rounded-lg border border-stone-200 py-2.5 text-[13px] font-medium text-stone-500 hover:bg-stone-50 transition active:translate-y-px">
+            Pass
+          </button>
+        </div>
+        <div class="h-3"></div>
+      `;
+    } else if (cardState === 'not_sure') {
+      // "Not sure" state — shows radar comparison card
+      const insight = getDimensionInsight(viewer.dimensions, match.dimensions);
+      html += `
+        <div class="px-5 pt-5 pb-2">
+          <p class="text-[10px] font-medium uppercase tracking-wider text-stone-400">Here's why we think you'd click</p>
+        </div>
+
+        <div class="flex justify-center pt-2 pb-1 slide-up">
+          <canvas id="radar-${match.id}" class="block"></canvas>
+        </div>
+
+        <div class="flex justify-center gap-3 px-5">
+          <span class="inline-flex items-center gap-1.5 text-[10px] font-medium text-stone-400">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-stone-300/60 border border-stone-300"></span> You
+          </span>
+          <span class="inline-flex items-center gap-1.5 text-[10px] font-medium text-stone-400">
+            <span class="inline-block w-2.5 h-2.5 rounded-full bg-primary/30 border border-primary/60"></span> Them
+          </span>
+        </div>
+
+        ${insight ? `<p class="text-center text-[11px] text-stone-500 mt-3 px-8">${insight}</p>` : ''}
+
+        ${renderSuperlatives(match)}
+
+        <div class="px-5 pt-5 pb-2">
+          <button onclick="revealPhoto('${match.id}')" ${state.revealsRemaining <= 0 ? 'disabled' : ''}
+            class="w-full rounded-lg py-3 text-[13px] font-semibold transition active:translate-y-px
+              ${state.revealsRemaining > 0
+                ? 'bg-stone-900 text-white hover:bg-stone-800'
+                : 'bg-stone-100 text-stone-400 cursor-not-allowed'}">
+            ${state.revealsRemaining > 0 ? 'OK, show me the picture' : 'No reveals left today'}
+          </button>
+          <p class="text-center mt-1.5 text-[11px] text-stone-400">
+            ${state.revealsRemaining > 0
+              ? `${state.revealsRemaining} of 3 reveals left today`
+              : 'Save for tomorrow — or upgrade for more'}
+          </p>
+        </div>
+
+        <div class="px-5 pb-2 pt-1 flex gap-2.5">
+          <button onclick="backToBrowsing('${match.id}')"
+            class="flex-1 rounded-lg border border-stone-200 py-2.5 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition active:translate-y-px">
+            Back to intro
+          </button>
+          <button onclick="saveCard('${match.id}')"
+            class="flex-1 rounded-lg border border-stone-200 py-2.5 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition active:translate-y-px">
+            Save for later
+          </button>
+          <button onclick="passCard('${match.id}')"
+            class="flex-1 rounded-lg border border-stone-200 py-2.5 text-[13px] font-medium text-stone-500 hover:bg-stone-50 transition active:translate-y-px">
+            Pass
+          </button>
+        </div>
+        <div class="h-3"></div>
+      `;
+    } else if (cardState === 'photo_revealed') {
+      // Photo revealed
+      html += `
+        <div class="relative">
+          <img src="${match.photoUrl}" alt="" class="w-full h-64 object-cover" />
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-5 py-4">
+            <p class="text-white font-bold text-[18px]">${match.firstName}, ${match.age}</p>
+            <p class="text-white/70 text-[12px]">${match.state}</p>
+          </div>
+        </div>
+
+        <div class="px-5 pt-4">
+          <p class="text-[13px] leading-relaxed text-stone-600">${match.narrative}</p>
+        </div>
+
+        ${renderSuperlatives(match)}
+
+        <div class="px-5 pt-4 pb-2 flex gap-2.5">
+          <button onclick="interested('${match.id}')"
+            class="flex-1 rounded-lg bg-stone-900 py-3 text-[13px] font-semibold text-white hover:bg-stone-800 transition active:translate-y-px">
+            I'm interested
+          </button>
+          <button onclick="notForMe('${match.id}')"
+            class="flex-1 rounded-lg border border-stone-200 py-3 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition active:translate-y-px">
+            Not for me
+          </button>
+        </div>
+        <div class="px-5 pb-5 pt-1 text-center">
+          <button onclick="irlCheck('${match.id}')" class="text-[11px] text-stone-400 underline decoration-dotted underline-offset-2 hover:text-stone-600 transition">
+            I know this person
+          </button>
+        </div>
+      `;
+    } else if (cardState === 'irl_check') {
+      html += `
+        <div class="relative">
+          <img src="${match.photoUrl}" alt="" class="w-full h-48 object-cover opacity-60" />
+        </div>
+        <div class="px-5 py-6 slide-up">
+          <div class="rounded-lg bg-stone-50 border border-stone-200 p-4">
+            <p class="text-[13px] font-semibold text-stone-800">Small world</p>
+            <p class="mt-2 text-[12px] leading-relaxed text-stone-500">
+              We don't think this is a strong match for you. No worries — it just means the chemistry math doesn't add up for us. Doesn't say anything about who they are as a person.
+            </p>
+          </div>
+          <button onclick="dismissIrl('${match.id}')"
+            class="mt-4 w-full rounded-lg border border-stone-200 py-2.5 text-[13px] font-medium text-stone-600 hover:bg-stone-50 transition active:translate-y-px">
+            Got it
+          </button>
+        </div>
+      `;
+    }
+
+    html += `</div></div>`;
+  });
+
+  // ─── Saved section ───
+  if (savedCards.length > 0) {
+    html += `
+      <div class="px-5 pt-8 pb-2">
+        <p class="text-[12px] font-semibold uppercase tracking-wider text-stone-400">Saved intros</p>
+        <p class="text-[11px] text-stone-400 mt-0.5">Come back when you have reveals to see their photos</p>
+      </div>
+    `;
+    savedCards.forEach(match => {
+      const cardState = state.cardStates[match.id] || 'browsing';
+      const isExpanded = state.expandedId === match.id;
+
+      html += `<div class="px-4 pt-2" id="card-${match.id}">`;
+      html += `<div class="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">`;
+
+      if (!isExpanded) {
+        html += `
+          <button onclick="expand('${match.id}')" class="w-full px-5 py-4 text-left flex items-center justify-between">
+            <div class="min-w-0 flex-1">
+              <p class="text-[10px] font-medium uppercase tracking-wider text-primary/70">Saved</p>
+              <p class="text-[13px] text-stone-600 mt-0.5 truncate">${match.narrative.slice(0, 80)}...</p>
+            </div>
+            <svg class="w-4 h-4 text-stone-400 shrink-0 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+          </button>
+        `;
+      } else {
+        html += `
+          <div class="px-5 pt-5 pb-2">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-[10px] font-medium uppercase tracking-wider text-primary/70">Saved</span>
+            </div>
+            <p class="text-[13px] leading-relaxed text-stone-600">${match.narrative}</p>
+          </div>
+          ${renderSuperlatives(match)}
+          <div class="px-5 pt-4 pb-2">
+            <button onclick="revealPhoto('${match.id}')" ${state.revealsRemaining <= 0 ? 'disabled' : ''}
+              class="w-full rounded-lg py-3 text-[13px] font-semibold transition active:translate-y-px
+                ${state.revealsRemaining > 0
+                  ? 'bg-stone-900 text-white hover:bg-stone-800'
+                  : 'bg-stone-100 text-stone-400 cursor-not-allowed'}">
+              ${state.revealsRemaining > 0 ? 'I am intrigued — show me the picture' : 'No reveals left today'}
+            </button>
+            <p class="text-center mt-1.5 text-[11px] text-stone-400">
+              ${state.revealsRemaining > 0 ? `${state.revealsRemaining} of 3 reveals left today` : 'Come back tomorrow for more reveals'}
+            </p>
+          </div>
+          <div class="px-5 pb-5 pt-1">
+            <button onclick="unsaveCard('${match.id}')"
+              class="w-full rounded-lg border border-stone-200 py-2.5 text-[13px] font-medium text-stone-500 hover:bg-stone-50 transition active:translate-y-px">
+              Remove from saved
+            </button>
+          </div>
+        `;
+      }
+
+      html += `</div></div>`;
+    });
+  }
+
+  // ─── Locked cards (20) ───
+  html += `
+    <div class="px-5 pt-8 pb-2">
+      <p class="text-[12px] font-semibold uppercase tracking-wider text-stone-400">More matches waiting</p>
+      <p class="text-[11px] text-stone-400 mt-0.5">These unlock as you work through today's intros</p>
+    </div>
+  `;
+
+  lockedNames.forEach((name, i) => {
+    const compat = LOCKED_COMPAT[i];
+    html += `
+      <div class="px-4 pt-1.5">
+        <div class="rounded-xl border border-stone-200 bg-white/60 shadow-sm overflow-hidden opacity-70">
+          <div class="px-5 py-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-full bg-stone-100 flex items-center justify-center">
+                <svg class="w-4 h-4 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <div class="h-3 w-16 bg-stone-200 rounded-full"></div>
+                  ${compat >= 80 ? `<span class="text-[9px] font-bold text-primary/50 bg-primary/5 px-1.5 py-0.5 rounded-full">Top ${100 - compat}%</span>` : ''}
+                </div>
+                <div class="h-2 w-32 bg-stone-100 rounded-full mt-1.5"></div>
+              </div>
+            </div>
+            <svg class="w-4 h-4 text-stone-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+    `;
+  });
+
+  // Upgrade CTA
+  if (state.revealsRemaining <= 0) {
+    html += `
+      <div class="px-5 pt-6 pb-4">
+        <div class="rounded-xl border border-primary/20 bg-primary/5 p-4 text-center">
+          <p class="text-[13px] font-semibold text-stone-800">Want more reveals?</p>
+          <p class="mt-1 text-[11px] text-stone-500">Upgrade for unlimited daily reveals</p>
+          <button class="mt-3 rounded-lg bg-primary px-5 py-2 text-[12px] font-semibold text-white hover:bg-primary-light transition active:translate-y-px">
+            See plans
+          </button>
+        </div>
+      </div>
+    `;
+  }
+
+  // Bottom spacer
+  html += `<div class="h-8"></div>`;
+
+  document.getElementById('app').innerHTML = html;
+
+  // Draw radar charts after DOM update
+  requestAnimationFrame(() => {
+    const viewer = getViewer();
+    getMatches().forEach(match => {
+      const canvas = document.getElementById(`radar-${match.id}`);
+      if (canvas) drawRadar(canvas, viewer.dimensions, match.dimensions);
+    });
+  });
+}
+
+// ─── Actions ───
+
+function toggleViewer() {
+  state.viewer = state.viewer === 'sarah' ? 'alex' : 'sarah';
+  state.revealsRemaining = 3;
+  state.cardStates = {};
+  state.savedIds = new Set();
+  state.passedIds = new Set();
+  state.expandedId = null;
+  state.interestedIds = new Set();
+  render();
+}
+
+function expand(id) {
+  state.expandedId = state.expandedId === id ? null : id;
+  render();
+}
+
+function notSure(id) {
+  state.cardStates[id] = 'not_sure';
+  render();
+}
+
+function backToBrowsing(id) {
+  state.cardStates[id] = 'browsing';
+  render();
+}
+
+function revealPhoto(id) {
+  if (state.revealsRemaining <= 0) return;
+  state.revealsRemaining--;
+  state.cardStates[id] = 'photo_revealed';
+  render();
+}
+
+function saveCard(id) {
+  state.savedIds.add(id);
+  state.expandedId = null;
+  render();
+}
+
+function unsaveCard(id) {
+  state.savedIds.delete(id);
+  state.passedIds.add(id);
+  render();
+}
+
+function passCard(id) {
+  const el = document.getElementById(`card-${id}`);
+  if (el) el.classList.add('fade-out');
+  setTimeout(() => {
+    state.passedIds.add(id);
+    if (state.expandedId === id) state.expandedId = null;
+    render();
+  }, 250);
+}
+
+function interested(id) {
+  state.interestedIds.add(id);
+  state.cardStates[id] = 'decided';
+  if (state.expandedId === id) state.expandedId = null;
+  const el = document.getElementById(`card-${id}`);
+  if (el) {
+    el.innerHTML = `
+      <div class="rounded-xl border border-emerald-200 bg-emerald-50 p-5 text-center">
+        <p class="text-[13px] font-semibold text-emerald-700">Interest sent!</p>
+        <p class="mt-1 text-[11px] text-emerald-600/70">We'll let you know if it's mutual.</p>
+      </div>
+    `;
+    setTimeout(() => { el.classList.add('fade-out'); setTimeout(render, 250); }, 1500);
+  }
+}
+
+function notForMe(id) {
+  state.passedIds.add(id);
+  state.savedIds.delete(id);
+  if (state.expandedId === id) state.expandedId = null;
+  const el = document.getElementById(`card-${id}`);
+  if (el) el.classList.add('fade-out');
+  setTimeout(render, 250);
+}
+
+function irlCheck(id) {
+  state.cardStates[id] = 'irl_check';
+  render();
+}
+
+function dismissIrl(id) {
+  state.passedIds.add(id);
+  state.savedIds.delete(id);
+  if (state.expandedId === id) state.expandedId = null;
+  render();
+}
+
+// ─── Init ───
+render();
+</script>
+</body>
+</html>
