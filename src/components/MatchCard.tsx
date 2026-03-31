@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 
 interface MatchCardProps {
   intro: {
@@ -18,11 +18,54 @@ interface MatchCardProps {
   isSubmitting: boolean
 }
 
+/** Fire-and-forget event tracking — no await, no retry */
+function trackIntroEvent(introId: string, event: 'viewed' | 'photo_revealed') {
+  fetch('/api/intros/event', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ introId, event }),
+  }).catch(() => {}) // silent — telemetry should never break UX
+}
+
 export default function MatchCard({ intro, onLike, onPass, isSubmitting }: MatchCardProps) {
   const [photoRevealed, setPhotoRevealed] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+  const viewedRef = useRef(false)
+
+  // Track card viewed via IntersectionObserver
+  const handleView = useCallback(() => {
+    if (!viewedRef.current) {
+      viewedRef.current = true
+      trackIntroEvent(intro.id, 'viewed')
+    }
+  }, [intro.id])
+
+  useEffect(() => {
+    const el = cardRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          handleView()
+          observer.disconnect()
+        }
+      },
+      { threshold: 0.5 }
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [handleView])
+
+  // Track photo reveal
+  const handlePhotoReveal = () => {
+    setPhotoRevealed(true)
+    trackIntroEvent(intro.id, 'photo_revealed')
+  }
 
   return (
-    <div className="rounded-2xl bg-white p-8 shadow-sm">
+    <div ref={cardRef} className="rounded-2xl bg-white p-8 shadow-sm">
       <p className="text-xs font-medium uppercase tracking-wider text-stone-400">
         Someone we think you should meet
       </p>
@@ -39,7 +82,7 @@ export default function MatchCard({ intro, onLike, onPass, isSubmitting }: Match
       <div className="mt-6">
         {!photoRevealed ? (
           <button
-            onClick={() => setPhotoRevealed(true)}
+            onClick={handlePhotoReveal}
             className="w-full rounded-xl border-2 border-dashed border-stone-200 py-4 text-sm font-medium text-stone-500 transition hover:border-stone-300 hover:text-stone-700"
           >
             See their photo

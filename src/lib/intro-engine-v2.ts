@@ -57,7 +57,10 @@ export async function generateTrailer(
 ): Promise<{
   narrative: string
   criticScore: number | null
+  criticSubscores: { hookPower: number; intrigue: number; specificity: number; mystery: number } | null
   hookType: HookType
+  generationAttempts: number
+  quoteUsed: boolean
   version: string
 }> {
   const prompt = buildTrailerPrompt(reader, subject, readerProfile, subjectProfile)
@@ -94,10 +97,12 @@ export async function generateTrailer(
   const scored = await scoreDrafts(drafts, reader, subject, readerProfile)
 
   // Pick the best
-  const best = scored.reduce((a, b) => a.score > b.score ? a : b)
+  let best = scored.reduce((a, b) => a.score > b.score ? a : b)
+  let generationAttempts = 1
 
   // If best is below threshold, regenerate with feedback
   if (best.score < INTRO_ENGINE_CONFIG.minCriticScore) {
+    generationAttempts = 2
     const regen = await anthropic.messages.create({
       model: INTRO_ENGINE_CONFIG.model,
       max_tokens: INTRO_ENGINE_CONFIG.maxTokens,
@@ -109,19 +114,26 @@ export async function generateTrailer(
     const regenText = regen.content[0].type === 'text' ? regen.content[0].text.trim() : best.text
     const regenScored = await scoreDrafts([regenText], reader, subject, readerProfile)
     if (regenScored[0].score > best.score) {
-      return {
-        narrative: regenScored[0].text,
-        criticScore: regenScored[0].score,
-        hookType: hook.id,
-        version: INTRO_ENGINE_CONFIG.version,
-      }
+      best = regenScored[0]
     }
   }
+
+  // Check if a quote was used in the final narrative
+  const subjectQuotes = subjectProfile.notable_quotes ?? []
+  const quoteUsed = subjectQuotes.some(q => q.length > 10 && best.text.includes(q))
 
   return {
     narrative: best.text,
     criticScore: best.score,
+    criticSubscores: {
+      hookPower: best.hookPower,
+      intrigue: best.personalization,
+      specificity: best.specificity,
+      mystery: best.mystery,
+    },
     hookType: hook.id,
+    generationAttempts,
+    quoteUsed,
     version: INTRO_ENGINE_CONFIG.version,
   }
 }
@@ -137,7 +149,10 @@ export async function generateDailyThree(
   candidateId: string
   narrative: string
   criticScore: number | null
+  criticSubscores: { hookPower: number; intrigue: number; specificity: number; mystery: number } | null
   hookType: HookType
+  generationAttempts: number
+  quoteUsed: boolean
 }>> {
   // Assign each candidate a different hook type
   const shuffledHooks = [...HOOK_TYPES].sort(() => Math.random() - 0.5)
@@ -151,7 +166,10 @@ export async function generateDailyThree(
         candidateId: candidate.id,
         narrative: result.narrative,
         criticScore: result.criticScore,
+        criticSubscores: result.criticSubscores,
         hookType: result.hookType,
+        generationAttempts: result.generationAttempts,
+        quoteUsed: result.quoteUsed,
       }
     })
   )

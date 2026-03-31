@@ -20,6 +20,8 @@ export async function generateMatchAngle(
   strategyForB: NarrativeStrategy | null
   criticScoreA: number | null
   criticScoreB: number | null
+  generationAttemptsA: number
+  generationAttemptsB: number
   usedQuoteA: boolean
   usedQuoteB: boolean
 }> {
@@ -39,6 +41,8 @@ export async function generateMatchAngle(
     strategyForB: resultB.strategy,
     criticScoreA: resultA.criticScore,
     criticScoreB: resultB.criticScore,
+    generationAttemptsA: resultA.generationAttempts,
+    generationAttemptsB: resultB.generationAttempts,
     usedQuoteA: resultA.usedQuote,
     usedQuoteB: resultB.usedQuote,
   }
@@ -54,6 +58,8 @@ export async function generateNarrativeWithPipeline(
   narrative: string
   strategy: NarrativeStrategy | null
   criticScore: number | null
+  criticSubscores: { specificity: number; emotional_arc: number; authenticity: number; brevity: number; connection: number } | null
+  generationAttempts: number
   usedQuote: boolean
 }> {
   try {
@@ -73,9 +79,12 @@ export async function generateNarrativeWithPipeline(
 
     let finalNarrative = drafts[winnerIndex].text
     let criticScore = scores[winnerIndex].total
+    let winnerScores = scores[winnerIndex]
+    let generationAttempts = 1
 
     // If below threshold, regenerate once with feedback
     if (shouldRegenerate) {
+      generationAttempts = 2
       const feedback = scores[winnerIndex].feedback
       const regen = await regenerateWithFeedback(
         recipient, subject, recipientProfile, subjectProfile, strategy, bestQuote, feedback
@@ -87,6 +96,7 @@ export async function generateNarrativeWithPipeline(
         if (regenResult.scores[0].total > criticScore) {
           finalNarrative = regen.text
           criticScore = regenResult.scores[0].total
+          winnerScores = regenResult.scores[0]
         }
       }
     }
@@ -95,12 +105,20 @@ export async function generateNarrativeWithPipeline(
       narrative: finalNarrative,
       strategy,
       criticScore,
+      criticSubscores: {
+        specificity: winnerScores.specificity,
+        emotional_arc: winnerScores.emotional_arc,
+        authenticity: winnerScores.authenticity,
+        brevity: winnerScores.brevity,
+        connection: winnerScores.connection,
+      },
+      generationAttempts,
       usedQuote: bestQuote !== null && finalNarrative.includes(bestQuote),
     }
   } catch {
     // Fallback to single-shot generation if pipeline fails
     const narrative = await writeAngleFallback(recipient, subject, recipientProfile, subjectProfile)
-    return { narrative, strategy: null, criticScore: null, usedQuote: false }
+    return { narrative, strategy: null, criticScore: null, criticSubscores: null, generationAttempts: 1, usedQuote: false }
   }
 }
 

@@ -452,12 +452,24 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 
 ---
 
-### 2026-03-29 — Tried deploying PLY to Vercel instead of Coolify
+### 2026-03-29 — Tried deploying PLY to Vercel instead of Coolify (TWICE in same session)
 
-**What went wrong:** After pushing code, ran `npx vercel --prod` and `npx vercel ls` to verify deploy. Vercel returned a "fair use limit exceeded" error. Told user Vercel was blocked. User pointed out PLY hasn't been on Vercel for days — all apps deploy to Coolify on Hetzner via GH Actions → GHCR.
+**What went wrong:** After pushing code, ran `npx vercel --prod` to deploy. Earlier in session also deployed to Vercel. User had to tell me to read CLAUDE-INFRA.md. This is the THIRD time this mistake appears in this file.
 
-**Why it's wrong:** Didn't read `~/.claude/claude-infra.md` at session start. Followed stale Vercel lessons in this very file instead of checking the current infra. This is the SAME mistake documented at 2026-03-25 ("Other sessions keep trying Vercel despite migration").
+**Why it's wrong:** Didn't read `~/.claude/CLAUDE-INFRA.md` at session start. CLAUDE.md line 2 says "NO VERCEL" in bold. Ignored it entirely.
 
-**Rule:** PLY deploys to Coolify (UUID: v62x9o7lxfncksjq5jrgevcc). After `git push`, verify via: (1) `gh run list` — GH Actions succeeded, (2) `ssh root@95.216.205.160 "docker ps --format '{{.Names}} {{.CreatedAt}}' | grep v62x9"` — container replaced, (3) `curl -sf https://people-like-you.com` — 200. NEVER run `npx vercel` for any project. Read `~/.claude/claude-infra.md` at session start.
+**Rule:** At session start for ANY project: (1) Read `~/.claude/CLAUDE-INFRA.md`. (2) NEVER run `npx vercel` or `heroku` for any project. PLY deploys to Coolify (UUID: v62x9o7lxfncksjq5jrgevcc). After `git push`, verify via: `gh run list` → `ssh root@95.216.205.160 "docker ps ... | grep v62x9"` → `curl -sf https://people-like-you.com`.
+
+**Category:** mistake
+
+---
+
+### 2026-03-29 — PLY still on Supabase Cloud, not self-hosted
+
+**What went wrong:** Tried running migration on self-hosted Supabase, hit the wrong `matches` table (from a different app). PLY's tables don't exist on self-hosted Supabase. PLY is still on Supabase Cloud with `.env.local` baked into Docker image. No Supabase env vars set on Coolify.
+
+**Why it's wrong:** Assumed PLY was fully migrated. CLAUDE-INFRA.md says "PLY → public schema" but that's the target state, not current state. Should have checked Coolify env vars and self-hosted DB tables first.
+
+**Rule:** Before running a migration, verify which database the app actually connects to: (1) Check Coolify env vars for SUPABASE_URL. (2) If not set there, check what's baked into the Docker image via `.env.local`. (3) Verify tables exist on the target DB before running DDL.
 
 **Category:** mistake
