@@ -32,6 +32,9 @@ interface Intro {
   introType: string
   expiresAt: string
   voiceMessageRequired: boolean
+  proximityLabel?: string | null
+  distanceMiles?: number | null
+  locationTier?: number | null
 }
 
 interface HistoryItem {
@@ -667,6 +670,9 @@ export default function Dashboard() {
               photoUrl: activeIntro.photoUrl,
               tier: '',
               strategy: '',
+              proximityLabel: activeIntro.proximityLabel ?? null,
+              distanceMiles: activeIntro.distanceMiles ?? null,
+              locationTier: activeIntro.locationTier ?? null,
             })
           }
           if (activeBonus) {
@@ -679,6 +685,9 @@ export default function Dashboard() {
               photoUrl: activeBonus.photoUrl,
               tier: '',
               strategy: '',
+              proximityLabel: activeBonus.proximityLabel ?? null,
+              distanceMiles: activeBonus.distanceMiles ?? null,
+              locationTier: activeBonus.locationTier ?? null,
             })
           }
 

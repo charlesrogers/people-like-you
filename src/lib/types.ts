@@ -202,6 +202,15 @@ export interface Match {
   // Phase 3: A/B testing (optional)
   narrative_experiment_id?: string | null
   narrative_variant?: 'a' | 'b' | null
+  // Quality tracking (013_quality_tracking)
+  elo_delta?: number | null
+  shared_interest_count?: number | null
+  life_stage_delta?: Record<string, number> | null
+  // Location tracking
+  location_tier?: number | null
+  distance_miles?: number | null
+  subject_richness_tier?: string | null
+  reader_richness_tier?: string | null
 }
 
 export interface Prompt {

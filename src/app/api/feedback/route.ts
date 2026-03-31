@@ -16,6 +16,7 @@ import {
 import { updateRatings } from '@/lib/elo'
 import { selectNextCandidate } from '@/lib/matchmaker'
 import { generateTrailer } from '@/lib/intro-engine-v2'
+import { getLocationTier, getTierMultiplier, userToLocation, haversineDistance } from '@/lib/geo'
 
 export async function POST(req: NextRequest) {
   const body = await req.json()
@@ -23,6 +24,24 @@ export async function POST(req: NextRequest) {
 
   if (!userId || !action) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  }
+
+  // Compute location tier between user and matched user
+  let locationTier: number | null = null
+  let distanceMiles: number | null = null
+  if (body.matchedUserId) {
+    const [feedbackUser, matchedUser] = await Promise.all([
+      getUser(userId),
+      getUser(body.matchedUserId),
+    ])
+    if (feedbackUser && matchedUser) {
+      const uLoc = userToLocation(feedbackUser)
+      const mLoc = userToLocation(matchedUser)
+      locationTier = getLocationTier(uLoc, mLoc)
+      if (uLoc.latitude != null && uLoc.longitude != null && mLoc.latitude != null && mLoc.longitude != null) {
+        distanceMiles = Math.round(haversineDistance(uLoc.latitude, uLoc.longitude, mLoc.latitude, mLoc.longitude) * 10) / 10
+      }
+    }
   }
 
   // Save feedback record
@@ -34,6 +53,8 @@ export async function POST(req: NextRequest) {
       reason: reason || null,
       details: details || null,
       photo_revealed_before_decision: photoRevealedBeforeDecision || false,
+      location_tier: locationTier,
+      distance_miles: distanceMiles,
     })
   }
 
@@ -76,6 +97,14 @@ export async function POST(req: NextRequest) {
           }
         }
 
+        // Compute location data for the new match
+        const newMatchUserLoc = userToLocation(user)
+        const newMatchCandLoc = userToLocation(candidate)
+        const newMatchTier = getLocationTier(newMatchUserLoc, newMatchCandLoc)
+        const newMatchDist = (newMatchUserLoc.latitude != null && newMatchUserLoc.longitude != null && newMatchCandLoc.latitude != null && newMatchCandLoc.longitude != null)
+          ? Math.round(haversineDistance(newMatchUserLoc.latitude, newMatchUserLoc.longitude, newMatchCandLoc.latitude, newMatchCandLoc.longitude) * 10) / 10
+          : null
+
         const match = await saveMatch({
           user_a_id: userId,
           user_b_id: candidate.id,
@@ -85,6 +114,8 @@ export async function POST(req: NextRequest) {
             .filter(t => !userComposite?.interest_tags.includes(t))
             .slice(0, 5) || [],
           life_stage_score: lifeStageScore ?? null,
+          location_tier: newMatchTier,
+          distance_miles: newMatchDist,
         })
 
         const expiresAt = new Date()

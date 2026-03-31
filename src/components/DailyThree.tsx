@@ -16,6 +16,9 @@ export interface IntroCard {
   strategy: string
   compatibilityPercentile?: number
   valuesAlignment?: number
+  proximityLabel?: string | null
+  distanceMiles?: number | null
+  locationTier?: number | null
 }
 
 type PostInterestState = 'mutual' | 'pending' | 'exhausted' | null
@@ -255,6 +258,12 @@ export default function DailyThree({
               <img src={firedCard.photoUrl} alt="" className="w-full h-72 object-cover" />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent px-5 py-4">
                 <p className="text-white font-bold text-lg">{firedCard.name}</p>
+                {firedCard.proximityLabel && (
+                  <p className="text-white/70 text-[12px] flex items-center gap-1 mt-0.5">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                    {firedCard.proximityLabel}
+                  </p>
+                )}
               </div>
             </div>
           ) : (

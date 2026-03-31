@@ -11,6 +11,7 @@ import {
   getActiveMutualMatches,
   getGhostNudges,
 } from '@/lib/db'
+import { getLocationTier, userToLocation, haversineDistance } from '@/lib/geo'
 
 export async function GET(req: NextRequest) {
   try {
@@ -38,7 +39,7 @@ export async function GET(req: NextRequest) {
       await updateDailyIntro(bonusIntro.id, { delivered_at: new Date().toISOString() })
     }
 
-    // Enrich current intro with photos
+    // Enrich current intro with photos + proximity
     async function enrichIntro(intro: typeof dailyIntro) {
       if (!intro) return null
       const matchedUser = await getUser(intro.matched_user_id)
@@ -48,6 +49,21 @@ export async function GET(req: NextRequest) {
         return null
       }
       const photos = await getUserPhotos(intro.matched_user_id)
+
+      // Compute proximity
+      const uLoc = userToLocation(user!)
+      const mLoc = userToLocation(matchedUser)
+      const locationTier = getLocationTier(uLoc, mLoc)
+      let distanceMiles: number | null = null
+      let proximityLabel: string | null = null
+      if (uLoc.latitude != null && uLoc.longitude != null && mLoc.latitude != null && mLoc.longitude != null) {
+        distanceMiles = Math.round(haversineDistance(uLoc.latitude, uLoc.longitude, mLoc.latitude, mLoc.longitude) * 10) / 10
+        if (distanceMiles <= 5) proximityLabel = `${Math.round(distanceMiles)} mi away`
+        else if (locationTier === 2) proximityLabel = 'Same metro area'
+        else if (distanceMiles <= 150) proximityLabel = `${Math.round(distanceMiles)} mi away`
+        else if (locationTier === 4) proximityLabel = matchedUser.state || 'Same country'
+      }
+
       return {
         id: intro.id,
         matchId: intro.match_id,
@@ -60,6 +76,9 @@ export async function GET(req: NextRequest) {
         scheduledAt: intro.scheduled_at,
         expiresAt: intro.expires_at,
         voiceMessageRequired: intro.voice_message_required,
+        locationTier,
+        distanceMiles,
+        proximityLabel,
       }
     }
 

@@ -376,6 +376,8 @@ export async function saveMatchFeedback(feedback: {
   reason?: string
   details?: string
   photo_revealed_before_decision?: boolean
+  location_tier?: number | null
+  distance_miles?: number | null
 }): Promise<void> {
   const { error } = await db()
     .from('match_feedback')
@@ -414,6 +416,20 @@ export interface DailyIntro {
   voice_message_required: boolean
   voice_message_path: string | null
   hook_type?: 'quote' | 'contradiction' | 'scene' | null
+  // Quality tracking (013_quality_tracking)
+  narrative_tier?: string | null
+  narrative_strategy?: string | null
+  critic_score?: number | null
+  critic_hook_power?: number | null
+  critic_intrigue?: number | null
+  critic_specificity?: number | null
+  critic_mystery?: number | null
+  generation_attempts?: number
+  quote_used?: boolean
+  repitch_attempt?: number
+  slot_position?: number | null
+  viewed_at?: string | null
+  photo_revealed_at?: string | null
   created_at: string
 }
 
@@ -501,6 +517,18 @@ export async function updateDailyIntro(id: string, updates: Partial<DailyIntro>)
     .single()
   if (error) throw error
   return data
+}
+
+/** Record an engagement event on a daily intro. Idempotent: only sets if column is currently null. */
+export async function recordIntroEvent(introId: string, column: 'viewed_at' | 'photo_revealed_at'): Promise<boolean> {
+  const { data, error } = await db()
+    .from('daily_intros')
+    .update({ [column]: new Date().toISOString() })
+    .eq('id', introId)
+    .is(column, null)
+    .select('id')
+  if (error) throw error
+  return (data?.length ?? 0) > 0
 }
 
 export async function getIntroHistory(userId: string, limit = 20): Promise<DailyIntro[]> {
