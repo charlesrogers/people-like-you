@@ -16,5 +16,7 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
+HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
+  CMD wget -qO- http://localhost:3000/api/health || exit 1
 EXPOSE 3000
 CMD ["npm", "start"]
