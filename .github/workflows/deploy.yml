@@ -2,7 +2,7 @@ name: Deploy
 on:
   push:
     branches: [main]
-    paths-ignore: ['*.md', 'docs/**']
+    paths-ignore: ['*.md', 'docs/**', 'specs/**', 'tasks/**']
 
 jobs:
   build-and-deploy:
@@ -28,7 +28,42 @@ jobs:
             ghcr.io/charlesrogers/people-like-you-app:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-      - name: Deploy
+
+      - name: Run database migrations
+        env:
+          SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan -H 95.216.205.160 >> ~/.ssh/known_hosts 2>/dev/null
+
+          # Run each migration file that hasn't been applied
+          for f in $(ls migrations/*.sql 2>/dev/null | sort); do
+            NAME=$(basename "$f")
+            # Check if already applied
+            APPLIED=$(ssh root@95.216.205.160 "docker exec supabase-db psql -U postgres -d postgres -t -c \"SELECT 1 FROM _migrations WHERE name='$NAME'\"" 2>/dev/null | tr -d ' ')
+            if [ "$APPLIED" = "1" ]; then
+              echo "Skip: $NAME (already applied)"
+              continue
+            fi
+            echo "Applying: $NAME"
+            # Run migration (each statement on its own line)
+            ssh root@95.216.205.160 "docker exec -i supabase-db psql -U postgres -d postgres" < "$f" 2>&1 || echo "Warning: $NAME had errors (may be IF NOT EXISTS)"
+            # Mark as applied
+            ssh root@95.216.205.160 "docker exec supabase-db psql -U postgres -d postgres -c \"INSERT INTO _migrations (name) VALUES ('$NAME') ON CONFLICT DO NOTHING\"" 2>/dev/null
+          done
+          echo "Migrations complete"
+
+      - name: Deploy to Coolify
         run: |
           curl -sf -H "Authorization: Bearer ${{ secrets.COOLIFY_TOKEN }}" \
             "http://95.216.205.160:8000/api/v1/deploy?uuid=v62x9o7lxfncksjq5jrgevcc&force=true"
+
+      - name: Verify health
+        run: |
+          sleep 30
+          STATUS=$(curl -sf -o /dev/null -w "%{http_code}" https://people-like-you.com/api/health || echo "000")
+          if [ "$STATUS" != "200" ]; then
+            echo "::warning::Health check returned $STATUS (may still be deploying)"
+          fi

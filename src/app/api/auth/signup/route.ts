@@ -1,9 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { createUser, getUserByEmail } from '@/lib/db'
+import { rateLimit } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown'
+    const { ok } = rateLimit(ip, { maxAttempts: 5, windowMs: 60_000 })
+    if (!ok) {
+      return NextResponse.json(
+        { error: 'Too many signup attempts. Please wait a minute.' },
+        { status: 429, headers: { 'Retry-After': '60' } }
+      )
+    }
+
     const { email, password, first_name, last_name, gender, birth_year, state, community, ref } = await req.json()
 
     if (!email || !password) {
