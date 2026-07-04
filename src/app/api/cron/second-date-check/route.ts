@@ -39,8 +39,12 @@ export async function GET(req: NextRequest) {
 
       const latest = completedDates[completedDates.length - 1]
       const feedback = await getDateFeedback(latest.id)
-      const bothWantMore =
-        feedback.length === 2 && feedback.every(f => f.want_to_see_again === 'yes')
+      // Both DISTINCT users said yes (DB has UNIQUE(scheduled_date_id, user_id),
+      // this is defense-in-depth against dupes)
+      const yesUsers = new Set(
+        feedback.filter(f => f.want_to_see_again === 'yes').map(f => f.user_id)
+      )
+      const bothWantMore = yesUsers.size === 2 && feedback.length === 2
 
       if (!bothWantMore) continue
 

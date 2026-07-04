@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { updateScheduledDate } from '@/lib/db'
+import { updateScheduledDate, getMutualMatch, updateMutualMatch } from '@/lib/db'
 import { createServerClient } from '@/lib/supabase'
 
 export async function GET(req: NextRequest) {
@@ -34,6 +34,13 @@ export async function GET(req: NextRequest) {
         status: 'completed',
         post_checkin_sent: true,
       })
+      // Advance the mutual match so downstream crons (second-date-check) see the
+      // completion — previously only the manual complete action ever set this.
+      // Guarded so a later status ('relationship') is never downgraded.
+      const mm = await getMutualMatch(date.mutual_match_id)
+      if (mm && mm.status === 'date_scheduled') {
+        await updateMutualMatch(mm.id, { status: 'date_completed' })
+      }
       checkedIn++
       console.log(`Post-date check-in: marked date ${date.id} completed`)
     } catch (err) {

@@ -101,4 +101,4 @@ BEGIN
   REFRESH MATERIALIZED VIEW funnel_metrics;
   REFRESH MATERIALIZED VIEW user_journey;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
