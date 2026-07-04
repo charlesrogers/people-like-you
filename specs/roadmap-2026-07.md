@@ -93,14 +93,15 @@ Verified against code 2026-07-02. ✅ built & live · 🟡 partial · ❌ not bu
 
 ## 4. Roadmap
 
-### Phase 0 — Make the north star measurable (~1 wk) — IN PROGRESS
+### Phase 0 — Make the north star measurable (~1 wk) — BUILT 2026-07-03, on staging
 | Item | Status |
 |---|---|
-| `/admin/funnel` page rendering `funnel_metrics`, organized by the five-bottleneck frame | ❌ → building |
-| Elapsed-time metrics: signup→first intro, intro→mutual, mutual→date, **signup→first completed date (north star)** | ❌ → building |
-| `second-date-check` cron + write `relationship` status | ❌ → building |
-| Per-metro gender ratio in pool health | ❌ → building |
-| Fix embedding-path kids/faith multiplier bypass | ❌ → building |
+| `/admin/funnel` page rendering `funnel_metrics`, organized by the five-bottleneck frame | ✅ built (`src/app/admin/funnel/page.tsx`) |
+| Elapsed-time metrics via `user_journey` view: signup→first intro, intro→mutual, mutual→date, **signup→first completed date (north star)** | ✅ built (migration 014) |
+| `second-date-check` cron + write `relationship` status (≥2 completed dates + mutual yes on latest) | ✅ built; GH-Actions schedule fires from main after merge |
+| Per-metro gender ratio (`pool_gender_ratio` view + scarce-side flag on funnel page) | ✅ built |
+| Fix embedding-path kids/faith multiplier bypass | ✅ fixed (`matchmaker.ts`) |
+| Migration 014 applied to shared Supabase | ⏳ pending — staging workflow doesn't run migrations; apply manually or merge to main (deploy.yml runs it) |
 
 North star (pre-launch phase): **median signup → first completed date**, guarded by second-date intent rate. Long-run: exits-for-found-someone.
 
