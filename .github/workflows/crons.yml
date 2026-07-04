@@ -10,6 +10,8 @@ on:
     - cron: '30 * * * *'
     # Pre-date nudge — every 6 hours at :45
     - cron: '45 */6 * * *'
+    # Second-date check — daily at 06:50 UTC
+    - cron: '50 6 * * *'
   workflow_dispatch: # Allow manual triggers for testing
 
 env:
@@ -71,6 +73,21 @@ jobs:
           response=$(curl -s -w "\n%{http_code}" \
             -H "Authorization: Bearer $CRON_SECRET" \
             "$BASE_URL/api/cron/pre-date-nudge")
+          http_code=$(echo "$response" | tail -1)
+          body=$(echo "$response" | head -n -1)
+          echo "Status: $http_code"
+          echo "Response: $body"
+          if [ "$http_code" -ge 400 ]; then exit 1; fi
+
+  second-date-check:
+    if: github.event.schedule == '50 6 * * *' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Promote relationships and find second-date candidates
+        run: |
+          response=$(curl -s -w "\n%{http_code}" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            "$BASE_URL/api/cron/second-date-check")
           http_code=$(echo "$response" | tail -1)
           body=$(echo "$response" | head -n -1)
           echo "Status: $http_code"
