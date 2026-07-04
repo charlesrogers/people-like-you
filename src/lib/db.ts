@@ -1025,6 +1025,59 @@ export async function getFunnelMetrics(): Promise<Record<string, unknown>[]> {
   return data ?? []
 }
 
+export async function refreshFunnelViews(): Promise<void> {
+  const { error } = await db().rpc('refresh_funnel_views')
+  if (error) throw error
+}
+
+export async function getUserJourneys(): Promise<Record<string, unknown>[]> {
+  const { data, error } = await db()
+    .from('user_journey')
+    .select()
+  if (error) throw error
+  return data ?? []
+}
+
+export async function getPoolGenderRatio(): Promise<Record<string, unknown>[]> {
+  const { data, error } = await db()
+    .from('pool_gender_ratio')
+    .select()
+  if (error) throw error
+  return data ?? []
+}
+
+export async function getMutualMatchesByStatus(status: string): Promise<MutualMatch[]> {
+  const { data, error } = await db()
+    .from('mutual_matches')
+    .select()
+    .eq('status', status)
+  if (error) throw error
+  return data ?? []
+}
+
+export async function getCompletedDatesForMutualMatch(mutualMatchId: string): Promise<ScheduledDate[]> {
+  const { data, error } = await db()
+    .from('scheduled_dates')
+    .select()
+    .eq('mutual_match_id', mutualMatchId)
+    .eq('status', 'completed')
+    .order('scheduled_at', { ascending: true })
+  if (error) throw error
+  return data ?? []
+}
+
+export async function getOpenDateForMutualMatch(mutualMatchId: string): Promise<ScheduledDate | null> {
+  const { data, error } = await db()
+    .from('scheduled_dates')
+    .select()
+    .eq('mutual_match_id', mutualMatchId)
+    .in('status', ['proposed', 'confirmed'])
+    .limit(1)
+    .maybeSingle()
+  if (error) throw error
+  return data
+}
+
 // ─── Phase 2: Friend Vouches ───
 
 export async function createFriendVouch(vouch: Pick<FriendVouch, 'user_id' | 'friend_name' | 'friend_email' | 'invite_token'>): Promise<FriendVouch> {

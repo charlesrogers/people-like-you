@@ -320,6 +320,12 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
                 {t.label}
               </button>
             ))}
+            <a
+              href="/admin/funnel"
+              className="rounded-lg px-3 py-1.5 text-sm font-medium text-stone-500 transition hover:bg-stone-100 hover:text-stone-700"
+            >
+              Funnel →
+            </a>
             <button
               onClick={load}
               disabled={loading}
