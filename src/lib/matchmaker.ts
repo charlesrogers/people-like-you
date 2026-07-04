@@ -334,13 +334,12 @@ export function scoreCompatibility(
   userA?: User, userB?: User,
   userAPrefs?: HardPreferences | null, userBPrefs?: HardPreferences | null,
 ): number {
-  // Try embedding-based scoring first (Phase 5)
-  if (a.embedding && b.embedding) {
-    return scoreWithEmbedding(a, b)
-  }
-
-  // Fall back to hand-tuned scorer
-  let score = scoreCompatibilityHandTuned(a, b, userA, userB)
+  // Embedding-based scoring when available (Phase 5), else hand-tuned fallback.
+  // Kids/faith multipliers (Rule 9) apply on BOTH paths — the embedding path
+  // previously returned early and silently skipped them.
+  let score = (a.embedding && b.embedding)
+    ? scoreWithEmbedding(a, b)
+    : scoreCompatibilityHandTuned(a, b, userA, userB)
 
   // Kids/faith soft bonuses (Rule 9) — small multipliers for aligned preferences
   if (userAPrefs && userBPrefs) {
