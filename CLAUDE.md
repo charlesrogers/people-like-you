@@ -1,5 +1,8 @@
 # People Like You (PLY)
 
+## START HERE
+**Read `EXECUTION.md` before doing ANY work.** It is the operator's manual: current state, task checklist with per-task specs, verification protocol, locked decisions, and infra gotchas. Strategy: `specs/roadmap-2026-07.md` (product) + `one-year-plan.md` (business). Update EXECUTION.md's STATE section and checklist as part of every task's commit.
+
 ## Stack
 - Next.js 15, React 19, TypeScript, Tailwind v4
 - Self-hosted Supabase (Postgres + Auth + Storage) on Hetzner
