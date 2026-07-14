@@ -25,12 +25,13 @@
 
 ## 1. STATE (update this section every session)
 
-**As of 2026-07-13:**
-- **Phase 0 is LIVE IN PRODUCTION** (main = staging = 1411c37, deploy green, verified 2026-07-13): `/admin/funnel` dashboard (prod 200), funnel API auth live, migration 014 applied (`_migrations` row confirmed; `user_journey` 23 rows, `funnel_metrics` + `pool_gender_ratio` returning data), PostgREST schema cache reloaded.
-- second-date-check cron schedule now active from main (daily 06:50 UTC) — confirm first run via `gh run list --workflow crons.yml`.
-- Pool: ~25 users (mostly seeds), 16M/6W (real: 12M/2W), pre-launch.
-- Phases 1, 1.5, 2 not started. Monetization not started.
-- Next up: T3 (backups — needs Charles's offsite-target choice), T4 (photos bucket), T5 (staging migrations).
+**As of 2026-07-14:**
+- **Phase 0 LIVE IN PRODUCTION** (main = 1411c37). `staging` is now AHEAD of main by the T3/T5/T6/T7/T14 batch (ea9d169) — all verified on staging, NOT yet merged to main. Charles should eyeball staging, then merge.
+- **Done & verified on staging this session**: T3 (offsite backups finally working + verify drill), T5 (staging runs migrations), T6 (calibration_votes + server-side Elo, migration 015), T7 (attraction prior, soft), T7-followup (pass = hard exclude), T14 (not_attracted tile). Migrations 014 (prod) + 015 (prod, via staging step) both applied.
+- Pool: ~25 users (mostly seeds), 16M/6W (real 12M/2W), pre-launch. Attraction layer intentionally near-inert until ~150 raters/gender.
+- **Gates needing Charles**: T8+T10 multipliers (unanswered), T4 photos-bucket (visual verify before main).
+- **Next no-approval work**: T9 woman-sees-first (behind env flag), T11 conversation cards, T12 two-tap dates, T13 second-date broker.
+- **Advisable before matching drives real decisions at scale**: a correctness review of the T7 scoring changes + re-pitch direction fix (not yet done — low stakes at 25 users, but do it before a populated launch).
 
 ### Master checklist (chronological)
 - [x] T1: Apply migration 014 *(2026-07-13, via main deploy)*
