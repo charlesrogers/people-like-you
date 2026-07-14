@@ -43,6 +43,7 @@ export interface HardPreferences {
   marital_history: 'never_married' | 'divorced' | null
   smoking: 'yes' | 'no' | 'sometimes' | 'dealbreaker' | null
   observance_match: 'must_match' | 'prefer_same' | 'respect_only' | null
+  height_preference_min: number | null
   community_fields: Record<string, unknown>
 }
 

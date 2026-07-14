@@ -24,6 +24,12 @@ const STEP_LABELS: Record<Step, string> = {
 
 const STEPS: Step[] = ['signup', 'basics', 'voice', 'preferences', 'photos', 'taste', 'reveal']
 
+// Height options 4'10"–7'0". `inches` is the stored preference value; `label` the display + users.height text.
+const HEIGHT_OPTIONS = Array.from({ length: 84 - 58 + 1 }, (_, i) => {
+  const inches = 58 + i
+  return { inches, label: `${Math.floor(inches / 12)}'${inches % 12}"` }
+})
+
 const DIMENSION_META_LOCAL: Record<string, { emoji: string; label: string }> = {
   explorer: { emoji: '🧭', label: 'Explorer' },
   connector: { emoji: '💜', label: 'Connector' },
@@ -85,6 +91,8 @@ function OnboardingContent() {
   const [observanceLevel, setObservanceLevel] = useState('')
   const [observanceMatch, setObservanceMatch] = useState('')
   const [marriageTimeline, setMarriageTimeline] = useState('')
+  const [height, setHeight] = useState('')
+  const [heightPrefMin, setHeightPrefMin] = useState('')
   const [kids, setKids] = useState('')
   const [maritalHistory, setMaritalHistory] = useState('')
 
@@ -297,7 +305,7 @@ function OnboardingContent() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            basics: { first_name: firstName, email, gender, religion: religion || null, observance_level: observanceLevel || null, marriage_timeline: marriageTimeline || null },
+            basics: { first_name: firstName, email, gender, religion: religion || null, observance_level: observanceLevel || null, marriage_timeline: marriageTimeline || null, height: height || null },
             hardPreferences: {
               age_range_min: ageMin,
               age_range_max: ageMax,
@@ -306,6 +314,7 @@ function OnboardingContent() {
               kids,
               marital_history: maritalHistory || null,
               observance_match: observanceMatch || null,
+              height_preference_min: heightPrefMin ? parseInt(heightPrefMin) : null,
             },
             softPreferences: null,
           }),
@@ -584,6 +593,17 @@ function OnboardingContent() {
                   className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
                 />
               </div>
+
+              <div>
+                <label className="block text-xs font-medium text-stone-500">Height</label>
+                <select
+                  value={height} onChange={e => setHeight(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                >
+                  <option value="">Select height</option>
+                  {HEIGHT_OPTIONS.map(h => <option key={h.inches} value={h.label}>{h.label}</option>)}
+                </select>
+              </div>
             </div>
           </div>
         )}
@@ -752,6 +772,18 @@ function OnboardingContent() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Minimum height preference (optional, soft) */}
+              <div>
+                <label className="block text-xs font-medium text-stone-500">Minimum height preference (optional)</label>
+                <select
+                  value={heightPrefMin} onChange={e => setHeightPrefMin(e.target.value)}
+                  className="mt-1 w-full rounded-lg border border-stone-200 px-3 py-2.5 text-sm text-stone-900 focus:border-stone-400 focus:outline-none focus:ring-1 focus:ring-stone-400"
+                >
+                  <option value="">No preference</option>
+                  {HEIGHT_OPTIONS.map(h => <option key={h.inches} value={String(h.inches)}>{h.label} or taller</option>)}
+                </select>
               </div>
 
               {/* Marriage timeline */}

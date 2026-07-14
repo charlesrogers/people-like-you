@@ -475,6 +475,17 @@ const OBSERVANCE_INTENSITY: Record<string, number> = { practicing: 8, cultural: 
 // "no timeline" = penalty (one partner chronically pressuring the other).
 const TIMELINE_ORDER: Record<string, number> = { within_1_year: 0, '1_2_years': 1, '2_5_years': 2, no_timeline: 3 }
 
+// Parse a height string like `5'11"` into inches. Returns null if unparseable.
+function parseHeightToInches(height: string | null | undefined): number | null {
+  if (!height) return null
+  const m = height.match(/(\d+)\s*'\s*(\d+)?/)
+  if (!m) return null
+  const feet = parseInt(m[1], 10)
+  const inches = m[2] ? parseInt(m[2], 10) : 0
+  if (isNaN(feet)) return null
+  return feet * 12 + inches
+}
+
 function getPreferenceAlignmentMultiplier(
   prefsA: HardPreferences, prefsB: HardPreferences,
   userA?: User, userB?: User,
@@ -514,6 +525,15 @@ function getPreferenceAlignmentMultiplier(
     if (gap <= 1) multiplier *= 1.05        // same / adjacent bucket
     else if (gap === 2) multiplier *= 0.92
     else multiplier *= 0.82                 // within-1yr vs no-timeline
+  }
+
+  // Height preference (T8): SOFT nudge only, never a hard filter. Candidate below
+  // the recipient's stated minimum → ×0.9. Null-safe (most users set no minimum).
+  if (prefsA.height_preference_min != null && userB?.height) {
+    const candInches = parseHeightToInches(userB.height)
+    if (candInches !== null && candInches < prefsA.height_preference_min) {
+      multiplier *= 0.9
+    }
   }
 
   return multiplier

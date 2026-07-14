@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
       if (basics.religion !== undefined) updates.religion = basics.religion
       if (basics.observance_level !== undefined) updates.observance_level = basics.observance_level
       if (basics.marriage_timeline !== undefined) updates.marriage_timeline = basics.marriage_timeline
+      if (basics.height !== undefined) updates.height = basics.height
 
       if (Object.keys(updates).length > 0) {
         await updateUser(existing.id, updates)
@@ -48,6 +49,7 @@ export async function POST(req: NextRequest) {
           marital_history: hardPreferences.marital_history || null,
           smoking: hardPreferences.smoking || null,
           observance_match: hardPreferences.observance_match || null,
+          height_preference_min: hardPreferences.height_preference_min || null,
           community_fields: hardPreferences.community_fields || {},
         })
       }
@@ -77,7 +79,7 @@ export async function POST(req: NextRequest) {
       birth_year: basics.birth_year ? parseInt(basics.birth_year) : null,
       state: basics.state || null,
       zipcode: basics.zipcode || null,
-      height: null,
+      height: basics.height || null,
       education: null,
       community: basics.community || 'general',
       religion: basics.religion || null,
@@ -109,6 +111,7 @@ export async function POST(req: NextRequest) {
         marital_history: hardPreferences.marital_history || null,
         smoking: hardPreferences.smoking || null,
         observance_match: hardPreferences.observance_match || null,
+        height_preference_min: hardPreferences.height_preference_min || null,
         community_fields: hardPreferences.community_fields || {},
       })
     }

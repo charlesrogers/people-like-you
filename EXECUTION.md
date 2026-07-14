@@ -52,7 +52,8 @@
   - Faith intensity = PROXIMITY on existing observance_level (practicing/cultural/background → 8/5/2): gap≤2 ×1.08, ≤5 ×0.92, else ×0.75. No new question — reuses data already collected.
   - Marriage timeline (new col via migration 016 + onboarding select): proximity ×1.05 / ×0.92 / ×0.82. Null-safe.
   - Community-config fields (temple intent etc.) NOT built — deferred; one clean signal beats several noisy at this scale.
-- [ ] T8: height soft nudge ×0.9 — APPROVED but not built. Needs: height_preference_min col, basics-step height picker, parseHeightToInches helper. Do next.
+- [~] T8: height soft nudge ×0.9 *(2026-07-14, on staging, NOT yet main — awaiting Charles's visual review with T10)*
+  - migration 017 (hard_preferences.height_preference_min int); users.height now collected (basics-step select, was hardcoded null); optional min-height preference (preferences step); parseHeightToInches + ×0.9 soft nudge, null-safe. Never a hard filter.
 - [ ] T11: Phase 1.5a — conversation cards in chat
 - [ ] T12: Phase 1.5b — two-tap date proposals
 - [ ] T13: Phase 1.5c — second-date broker (extends existing cron)
