@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getFunnelMetrics, getUserJourneys, getPoolGenderRatio, refreshFunnelViews } from '@/lib/db'
+import { getFunnelMetrics, getUserJourneys, getPoolGenderRatio, refreshFunnelViews, getPassReasonStats } from '@/lib/db'
 
 function checkAuth(req: NextRequest): boolean {
   const secret = req.headers.get('x-admin-secret')
@@ -28,10 +28,11 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [metrics, journeys, genderRatio] = await Promise.all([
+    const [metrics, journeys, genderRatio, passReasons] = await Promise.all([
       getFunnelMetrics(),
       getUserJourneys(),
       getPoolGenderRatio(),
+      getPassReasonStats(),
     ])
 
     // Velocity medians — real users when any exist, otherwise seeds (pre-launch testing)
@@ -56,9 +57,9 @@ export async function GET(req: NextRequest) {
       },
     }
 
-    return NextResponse.json({ metrics, velocity, genderRatio })
+    return NextResponse.json({ metrics, velocity, genderRatio, passReasons })
   } catch (err) {
     console.error('Funnel: query error', err)
-    return NextResponse.json({ metrics: [], velocity: null, genderRatio: [], error: 'Funnel views not available — run migration 014' })
+    return NextResponse.json({ metrics: [], velocity: null, genderRatio: [], passReasons: null, error: 'Funnel views not available — run migration 014' })
   }
 }

@@ -43,10 +43,17 @@ interface MetroRatio {
   real_women: number;
 }
 
+interface PassReasons {
+  totalPasses: number;
+  notAttracted: number;
+  byReason: Record<string, number>;
+}
+
 interface FunnelData {
   metrics: FunnelWeek[];
   velocity: Velocity | null;
   genderRatio: MetroRatio[];
+  passReasons: PassReasons | null;
   error?: string;
 }
 
@@ -166,6 +173,8 @@ export default function FunnelDashboard() {
   const velocity = data?.velocity;
   const weeks = data?.metrics ?? [];
   const ratios = (data?.genderRatio ?? []).filter((r) => r.men + r.women > 0);
+  const pr = data?.passReasons;
+  const notAttractedPct = pr && pr.totalPasses > 0 ? Math.round((pr.notAttracted / pr.totalPasses) * 100) : null;
 
   return (
     <div className="min-h-screen bg-stone-50">
@@ -227,6 +236,35 @@ export default function FunnelDashboard() {
               value={velocity?.medianDays.mutualToDate ?? null}
               sub=""
             />
+          </div>
+        </section>
+
+        {/* Attractiveness bottleneck signal (H2) */}
+        <section>
+          <h2 className="mb-1 text-sm font-semibold text-stone-900">Attractiveness signal</h2>
+          <p className="mb-3 text-xs text-stone-400">
+            Share of passes citing &ldquo;not attracted.&rdquo; If this dominates, physical attraction is the
+            binding bottleneck (invest in the attraction layer). Watching, not acting, until it&rsquo;s clearly high.
+          </p>
+          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+            <div
+              className={`rounded-xl border bg-white p-4 shadow-sm ${
+                notAttractedPct !== null && notAttractedPct >= 40 ? "border-amber-400" : "border-stone-200"
+              }`}
+            >
+              <p className="text-xs text-stone-500">&ldquo;Not attracted&rdquo; share</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-stone-900">
+                {notAttractedPct === null ? "—" : `${notAttractedPct}%`}
+              </p>
+              <p className="mt-0.5 text-xs text-stone-400">
+                {pr ? `${pr.notAttracted} of ${pr.totalPasses} passes` : "no pass data"}
+              </p>
+            </div>
+            <div className="rounded-xl border border-stone-200 bg-white p-4 shadow-sm">
+              <p className="text-xs text-stone-500">Total passes</p>
+              <p className="mt-1 text-2xl font-bold tabular-nums text-stone-700">{pr?.totalPasses ?? 0}</p>
+              <p className="mt-0.5 text-xs text-stone-400">all pass reasons</p>
+            </div>
           </div>
         </section>
 

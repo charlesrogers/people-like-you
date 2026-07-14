@@ -51,7 +51,8 @@
 - [ ] T11: Phase 1.5a — conversation cards in chat
 - [ ] T12: Phase 1.5b — two-tap date proposals
 - [ ] T13: Phase 1.5c — second-date broker (extends existing cron)
-- [ ] T14: `not_attracted` pass-share metric on admin
+- [x] T7-followup: post-narrative-pass hard-exclude — re-pitch now targets EXPIRED intros only; explicit passes never re-pitched *(2026-07-14)*
+- [x] T14: `not_attracted` pass-share metric on admin *(2026-07-14, tile on /admin/funnel)*
 - [ ] T15: Q2 — Stripe subscription build (write spec first, get approval)
 - [ ] Recurring R1: weekly metrics review (see §7)
 
