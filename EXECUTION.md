@@ -25,17 +25,16 @@
 
 ## 1. STATE (update this section every session)
 
-**As of 2026-07-06:**
-- Branch `staging` is 8 commits ahead of `main` (Phase 0 + specs + one-year plan). All deploys green, staging healthy.
-- **Phase 0 is BUILT and on staging**: `/admin/funnel` dashboard, `user_journey`/`pool_gender_ratio` views (migration `migrations/014_funnel_v2.sql`), `second-date-check` cron, embedding-multiplier bugfix, funnel API auth.
-- **⏳ BLOCKING: migration 014 is NOT applied to the database.** The staging workflow does not run migrations. Until applied, `/admin/funnel` shows a graceful "run migration 014" banner. Resolution = task T1.
-- **⏳ crons.yml schedule for second-date-check only fires from `main`** (GitHub scheduled workflows run from default branch). Takes effect at T2.
-- Pool: ~25 users (mostly seeds), 16M/6W, pre-launch.
+**As of 2026-07-13:**
+- **Phase 0 is LIVE IN PRODUCTION** (main = staging = 1411c37, deploy green, verified 2026-07-13): `/admin/funnel` dashboard (prod 200), funnel API auth live, migration 014 applied (`_migrations` row confirmed; `user_journey` 23 rows, `funnel_metrics` + `pool_gender_ratio` returning data), PostgREST schema cache reloaded.
+- second-date-check cron schedule now active from main (daily 06:50 UTC) — confirm first run via `gh run list --workflow crons.yml`.
+- Pool: ~25 users (mostly seeds), 16M/6W (real: 12M/2W), pre-launch.
 - Phases 1, 1.5, 2 not started. Monetization not started.
+- Next up: T3 (backups — needs Charles's offsite-target choice), T4 (photos bucket), T5 (staging migrations).
 
 ### Master checklist (chronological)
-- [ ] T1: Apply migration 014
-- [ ] T2: Merge staging → main, verify production
+- [x] T1: Apply migration 014 *(2026-07-13, via main deploy)*
+- [x] T2: Merge staging → main, verify production *(2026-07-13, ff cea3bd1→1411c37)*
 - [ ] T3: Backups + restore drill
 - [ ] T4: Photos bucket → private
 - [ ] T5: Staging workflow runs migrations
