@@ -1355,24 +1355,45 @@ export async function getRePitchCandidateIds(userId: string, cooldownDays: numbe
   const cutoff = new Date()
   cutoff.setDate(cutoff.getDate() - cooldownDays)
 
+  // Re-pitch only EXPIRED intros — the recipient never decided ("didn't get to it").
+  // An explicit 'passed' is an INFORMED no after reading the narrative, so it's a
+  // hard exclude, never re-pitched (decision 2026-07-14). This reverses the prior
+  // behavior, which wrongly re-pitched exactly the people who had actively passed.
   const { data, error } = await db()
     .from('daily_intros')
     .select('matched_user_id')
     .eq('user_id', userId)
-    .eq('status', 'passed')
-    .lt('acted_at', cutoff.toISOString())
+    .eq('status', 'expired')
+    .lt('expires_at', cutoff.toISOString())
 
   if (error || !data) return []
 
-  // Exclude anyone who was liked (ever) — only re-pitch passes
-  const { data: liked } = await db()
+  // Never re-pitch anyone the user ever liked OR ever passed (in any cycle).
+  const { data: decided } = await db()
     .from('daily_intros')
     .select('matched_user_id')
     .eq('user_id', userId)
-    .eq('status', 'liked')
+    .in('status', ['liked', 'passed'])
 
-  const likedIds = new Set((liked ?? []).map(l => l.matched_user_id))
+  const decidedIds = new Set((decided ?? []).map(l => l.matched_user_id))
   return data
     .map(d => d.matched_user_id)
-    .filter(id => !likedIds.has(id))
+    .filter(id => !decidedIds.has(id))
+}
+
+// Pass-reason breakdown for the funnel dashboard (T14). The `not_attracted` share
+// is the H2 signal: if it dominates passes, physical attraction is the bottleneck.
+export async function getPassReasonStats(): Promise<{ totalPasses: number; notAttracted: number; byReason: Record<string, number> }> {
+  const { data, error } = await db()
+    .from('match_feedback')
+    .select('reason')
+    .eq('action', 'not_interested')
+  if (error) throw error
+  const rows = data ?? []
+  const byReason: Record<string, number> = {}
+  for (const r of rows) {
+    const key = r.reason || 'unspecified'
+    byReason[key] = (byReason[key] || 0) + 1
+  }
+  return { totalPasses: rows.length, notAttracted: byReason['not_attracted'] || 0, byReason }
 }
