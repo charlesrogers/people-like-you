@@ -179,6 +179,13 @@ function isSmokingDealbreaker(aSmoking: string | null | undefined, bSmoking: str
   return false
 }
 
+export async function saveCalibrationVote(voterId: string, targetId: string, vote: boolean): Promise<void> {
+  const { error } = await db()
+    .from('calibration_votes')
+    .upsert({ voter_id: voterId, target_id: targetId, vote }, { onConflict: 'voter_id,target_id' })
+  if (error) throw error
+}
+
 export async function updateUserElo(id: string, newElo: number, incrementInteractions = false): Promise<void> {
   const updates: Record<string, unknown> = { elo_score: newElo }
   if (incrementInteractions) {

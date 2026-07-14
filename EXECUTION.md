@@ -35,10 +35,10 @@
 ### Master checklist (chronological)
 - [x] T1: Apply migration 014 *(2026-07-13, via main deploy)*
 - [x] T2: Merge staging → main, verify production *(2026-07-13, ff cea3bd1→1411c37)*
-- [ ] T3: Backups + restore drill
+- [x] T3: Backups + verify drill *(2026-07-14 — see note below)*
 - [ ] T4: Photos bucket → private
-- [ ] T5: Staging workflow runs migrations
-- [ ] T6: Phase 1a — persist calibration votes (migration 015 + server-side Elo)
+- [x] T5: Staging workflow runs migrations *(2026-07-14)*
+- [x] T6: Phase 1a — persist calibration votes (migration 015 + server-side Elo) *(2026-07-14)*
 - [ ] T7: Phase 1b — attraction prior in candidate selection
 - [ ] T8: Phase 1c — height collection + soft preference
 - [ ] T9: Phase 1d — woman-sees-first intro sequencing
@@ -103,6 +103,15 @@ Every task follows this session protocol:
 4. If anything contradicts this doc (file moved, schema differs), STOP, investigate, update the doc, then proceed.
 
 ---
+
+### T3 — Backups (DONE 2026-07-14, full saga)
+The offsite backup to the Hetzner Storage Box had **never worked** since setup in March — `backup.sh` used a `SFTP_COMMAND` env var that restic ignores, so it silently failed nightly (box showed 0 B). Fixes applied, all server-side (scripts live in `/data/scripts/` on 95.216.205.160, NOT in this repo):
+- Server SSH key authorized on the box. **Gotcha**: the newer Hetzner Storage Box doesn't support `install-ssh-key`; the key must be uploaded to `.ssh/authorized_keys` via SFTP. Repeated failed password attempts **rate-limit-ban your IP** — route through the server's clean IP if the Mac gets banned. Connection config is in `/root/.ssh/config` under `Host storagebox`.
+- restic repo path fixed to `/home/backups` (the box jails you to your home; `/backups` at FS root fails).
+- `backup.sh`: added Discord #red-alert on failure; repo reachability check. Restic repo initialized (id e809698ac7). First snapshot confirmed on box 2026-07-14.
+- `verify-backup.sh` rewritten: the old one piped a dump into the PROD container (never verified, risked corruption). New one checks gzip integrity + freshness + **counts user rows inside the dump vs prod** + confirms offsite snapshot count. Passing (23=23). NOTE: it does NOT do a full container restore — that fights Supabase's locked-down `supabase_admin` role model; content-count verification was the reliable choice.
+- Backup scope left FULL (~30GB, all apps' Supabase volumes) per Charles 2026-07-14 — he declined slimming. The 27GB is a stale rsync mirror (no `--delete`); harmless on a 1TB box.
+- Cron already scheduled (server `/etc/cron.d/coolify-apps`): backup daily 04:00, verify Sun 05:00.
 
 ### T1 — Apply migration 014 ⏳ BLOCKING
 **Goal**: `funnel_metrics` (v2), `user_journey`, `pool_gender_ratio`, `refresh_funnel_views()` exist in the DB.

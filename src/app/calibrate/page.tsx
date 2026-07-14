@@ -72,45 +72,32 @@ export default function Calibrate() {
     setAnimating(true)
 
     const candidate = candidates[currentIndex]
-    const k = interactions < 20 ? 32 : 16
-
-    // Elo calculation
-    const expectedUser = 1 / (1 + Math.pow(10, (candidate.elo_score - userElo) / 400))
-    const newUserElo = Math.round(userElo + k * (outcome - expectedUser))
-
-    // Also update candidate Elo
-    const expectedCandidate = 1 - expectedUser
-    const newCandidateElo = Math.round(candidate.elo_score + 16 * ((1 - outcome) - expectedCandidate))
-
-    setUserElo(newUserElo)
     setInteractions(prev => prev + 1)
 
-    // Update candidate Elo in local state
-    const updated = [...candidates]
-    updated[currentIndex] = { ...updated[currentIndex], elo_score: newCandidateElo }
-    setCandidates(updated)
-
-    // Persist both Elo updates
+    // Elo is computed server-side now (was client-computed — a trust hole).
+    // Send the raw vote; the API returns the authoritative new Elo and persists
+    // the per-pair vote for the taste model.
+    let finalElo = userElo
     try {
-      await Promise.all([
-        fetch('/api/calibrate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, newElo: newUserElo, interactions: interactions + 1 }),
-        }),
-        fetch('/api/calibrate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId: candidate.id, newElo: newCandidateElo }),
-        }),
-      ])
+      const res = await fetch('/api/calibrate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, targetId: candidate.id, vote: outcome }),
+      })
+      if (res.ok) {
+        const data = await res.json()
+        if (typeof data.newElo === 'number') {
+          finalElo = data.newElo
+          setUserElo(finalElo)
+        }
+      }
     } catch {
       // Non-critical
     }
 
     setTimeout(() => {
       if (currentIndex + 1 >= candidates.length) {
-        posthog.capture('calibration_completed', { final_elo: newUserElo, votes: interactions + 1 })
+        posthog.capture('calibration_completed', { final_elo: finalElo, votes: interactions + 1 })
         router.push('/dashboard')
       } else {
         setCurrentIndex(currentIndex + 1)
