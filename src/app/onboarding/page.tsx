@@ -84,6 +84,7 @@ function OnboardingContent() {
   const [religion, setReligion] = useState('')
   const [observanceLevel, setObservanceLevel] = useState('')
   const [observanceMatch, setObservanceMatch] = useState('')
+  const [marriageTimeline, setMarriageTimeline] = useState('')
   const [kids, setKids] = useState('')
   const [maritalHistory, setMaritalHistory] = useState('')
 
@@ -296,7 +297,7 @@ function OnboardingContent() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            basics: { first_name: firstName, email, gender, religion: religion || null, observance_level: observanceLevel || null },
+            basics: { first_name: firstName, email, gender, religion: religion || null, observance_level: observanceLevel || null, marriage_timeline: marriageTimeline || null },
             hardPreferences: {
               age_range_min: ageMin,
               age_range_max: ageMax,
@@ -743,6 +744,30 @@ function OnboardingContent() {
                       key={opt.value} onClick={() => setWouldRelocate(opt.value)}
                       className={`rounded-full border px-4 py-2 text-sm font-medium transition active:translate-y-px ${
                         wouldRelocate === opt.value
+                          ? 'border-stone-900 bg-stone-900 text-white'
+                          : 'border-stone-200 text-stone-600 hover:border-stone-300'
+                      }`}
+                    >
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Marriage timeline */}
+              <div>
+                <label className="block text-xs font-medium text-stone-500">When would you like to be married?</label>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {[
+                    { value: 'within_1_year', label: 'Within a year' },
+                    { value: '1_2_years', label: '1–2 years' },
+                    { value: '2_5_years', label: '2–5 years' },
+                    { value: 'no_timeline', label: 'No specific timeline' },
+                  ].map(opt => (
+                    <button
+                      key={opt.value} onClick={() => setMarriageTimeline(opt.value)}
+                      className={`rounded-full border px-4 py-2 text-sm font-medium transition active:translate-y-px ${
+                        marriageTimeline === opt.value
                           ? 'border-stone-900 bg-stone-900 text-white'
                           : 'border-stone-200 text-stone-600 hover:border-stone-300'
                       }`}

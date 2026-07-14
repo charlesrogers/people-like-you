@@ -30,6 +30,7 @@ export async function POST(req: NextRequest) {
       if (basics.zipcode) updates.zipcode = basics.zipcode
       if (basics.religion !== undefined) updates.religion = basics.religion
       if (basics.observance_level !== undefined) updates.observance_level = basics.observance_level
+      if (basics.marriage_timeline !== undefined) updates.marriage_timeline = basics.marriage_timeline
 
       if (Object.keys(updates).length > 0) {
         await updateUser(existing.id, updates)
@@ -81,6 +82,7 @@ export async function POST(req: NextRequest) {
       community: basics.community || 'general',
       religion: basics.religion || null,
       observance_level: basics.observance_level || null,
+      marriage_timeline: basics.marriage_timeline || null,
     } as Parameters<typeof createUser>[0])
 
     // Resolve zipcode → lat/lng/metro for location-based matching

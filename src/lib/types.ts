@@ -22,6 +22,7 @@ export interface User {
   community: string
   religion: string | null
   observance_level: string | null
+  marriage_timeline: string | null
   invite_code: string | null
   invited_by: string | null
   invite_count: number

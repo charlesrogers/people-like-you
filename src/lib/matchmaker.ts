@@ -465,6 +465,16 @@ function scoreLifeStageAlignment(
 
 // --- Preference Alignment Soft Bonuses (Rule 9) ---
 
+// Faith intensity via observance level (T10, approved 2026-07-14). In an all-community
+// pool, affiliation is ~constant; intensity is the real sorting axis, and it's a
+// PROXIMITY match (a devout 'practicing' vs a relaxed 'background' is a real life-vision
+// mismatch, not just a preference). Soft only — the hard dealbreaker path is still the
+// existing faith 'essential' + observance 'must_match' filter in applyHardFilters.
+const OBSERVANCE_INTENSITY: Record<string, number> = { practicing: 8, cultural: 5, background: 2 }
+// Marriage timeline proximity (T10): aligned urgency = boost; "within a year" vs
+// "no timeline" = penalty (one partner chronically pressuring the other).
+const TIMELINE_ORDER: Record<string, number> = { within_1_year: 0, '1_2_years': 1, '2_5_years': 2, no_timeline: 3 }
+
 function getPreferenceAlignmentMultiplier(
   prefsA: HardPreferences, prefsB: HardPreferences,
   userA?: User, userB?: User,
@@ -477,21 +487,33 @@ function getPreferenceAlignmentMultiplier(
     else if (prefsA.kids === 'open' || prefsB.kids === 'open') multiplier *= 1.02
   }
 
-  // Faith alignment bonus
-  if (userA && userB && prefsA.faith_importance && prefsB.faith_importance) {
-    if (
-      prefsA.faith_importance === prefsB.faith_importance &&
-      userA.religion && userB.religion && userA.religion === userB.religion
-    ) {
-      multiplier *= 1.05
-    }
-    if (
-      (prefsA.observance_match === 'prefer_same' || prefsB.observance_match === 'prefer_same') &&
-      userA.observance_level && userB.observance_level &&
-      userA.observance_level === userB.observance_level
-    ) {
-      multiplier *= 1.03
-    }
+  // Same religion + same importance (constant in a single-community pool, but real cross-community)
+  if (
+    userA && userB && prefsA.faith_importance && prefsB.faith_importance &&
+    prefsA.faith_importance === prefsB.faith_importance &&
+    userA.religion && userB.religion && userA.religion === userB.religion
+  ) {
+    multiplier *= 1.05
+  }
+
+  // Faith intensity proximity (replaces the old weak observance_match bonus)
+  const ia = userA?.observance_level ? OBSERVANCE_INTENSITY[userA.observance_level] : undefined
+  const ib = userB?.observance_level ? OBSERVANCE_INTENSITY[userB.observance_level] : undefined
+  if (ia !== undefined && ib !== undefined) {
+    const gap = Math.abs(ia - ib)
+    if (gap <= 2) multiplier *= 1.08        // same level
+    else if (gap <= 5) multiplier *= 0.92   // one level apart
+    else multiplier *= 0.75                 // practicing vs background — near-dealbreaker
+  }
+
+  // Marriage timeline proximity (null-safe: inert until onboarding collects it)
+  const ta = userA?.marriage_timeline ? TIMELINE_ORDER[userA.marriage_timeline] : undefined
+  const tb = userB?.marriage_timeline ? TIMELINE_ORDER[userB.marriage_timeline] : undefined
+  if (ta !== undefined && tb !== undefined) {
+    const gap = Math.abs(ta - tb)
+    if (gap <= 1) multiplier *= 1.05        // same / adjacent bucket
+    else if (gap === 2) multiplier *= 0.92
+    else multiplier *= 0.82                 // within-1yr vs no-timeline
   }
 
   return multiplier
