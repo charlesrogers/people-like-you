@@ -186,6 +186,35 @@ export async function saveCalibrationVote(voterId: string, targetId: string, vot
   if (error) throw error
 }
 
+// Both-direction calibration votes between userId and a set of candidates (T7 attraction prior).
+// myVote = how userId voted on the candidate; theirVote = how the candidate voted on userId.
+export async function getCalibrationVotesForPairs(
+  userId: string,
+  candidateIds: string[],
+): Promise<Map<string, { myVote?: boolean; theirVote?: boolean }>> {
+  const result = new Map<string, { myVote?: boolean; theirVote?: boolean }>()
+  if (candidateIds.length === 0) return result
+
+  const [{ data: mine, error: e1 }, { data: theirs, error: e2 }] = await Promise.all([
+    db().from('calibration_votes').select('target_id, vote').eq('voter_id', userId).in('target_id', candidateIds),
+    db().from('calibration_votes').select('voter_id, vote').eq('target_id', userId).in('voter_id', candidateIds),
+  ])
+  if (e1) throw e1
+  if (e2) throw e2
+
+  for (const row of mine ?? []) {
+    const entry = result.get(row.target_id) ?? {}
+    entry.myVote = row.vote
+    result.set(row.target_id, entry)
+  }
+  for (const row of theirs ?? []) {
+    const entry = result.get(row.voter_id) ?? {}
+    entry.theirVote = row.vote
+    result.set(row.voter_id, entry)
+  }
+  return result
+}
+
 export async function updateUserElo(id: string, newElo: number, incrementInteractions = false): Promise<void> {
   const updates: Record<string, unknown> = { elo_score: newElo }
   if (incrementInteractions) {
@@ -621,7 +650,7 @@ export async function getEligibleUsersForDelivery(currentHourUtc: number): Promi
 
 // ─── Elo Calibration Candidates ───
 
-export async function getCalibrationCandidates(gender: string, excludeUserId: string, limit = 15): Promise<(User & { photos: Photo[] })[]> {
+export async function getCalibrationCandidates(gender: string, excludeUserId: string, limit = 25): Promise<(User & { photos: Photo[] })[]> {
   const { data, error } = await db()
     .from('users')
     .select('*, photos(*)')

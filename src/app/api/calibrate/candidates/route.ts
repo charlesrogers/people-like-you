@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing gender or excludeUserId' }, { status: 400 })
     }
 
-    const results = await getCalibrationCandidates(gender, excludeUserId, 15)
+    const results = await getCalibrationCandidates(gender, excludeUserId, 25)
 
     const candidates = results.map(user => ({
       id: user.id,

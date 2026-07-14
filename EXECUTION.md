@@ -39,6 +39,11 @@
 - [ ] T4: Photos bucket → private
 - [x] T5: Staging workflow runs migrations *(2026-07-14)*
 - [x] T6: Phase 1a — persist calibration votes (migration 015 + server-side Elo) *(2026-07-14)*
+- [x] T7: Phase 1b — attraction prior in candidate selection *(2026-07-14, soft shape)*
+  - Multipliers approved: myYes ×1.15, myNo ×0.6, theirYes ×1.10, theirNo ×0.6. SOFT only.
+  - Decision: calibration photo-no = soft (revivable while pool is small); a hard "never again" exclude only fires on a **post-narrative pass**. That pass-hard-exclude is a small follow-up tweak to re-pitch logic (`getRePitchCandidateIds`), NOT yet built — currently passes re-pitch after 60 days. Do next.
+  - Calibration candidate cap raised 15 → 25 (every face counts at low pool).
+  - Reality check (Charles + Keeper data): attraction/Elo is data-starved until ~150 raters/gender per metro. This layer barely moves at ~25 users by design — it's banking data now, not driving matching yet.
 - [ ] T7: Phase 1b — attraction prior in candidate selection
 - [ ] T8: Phase 1c — height collection + soft preference
 - [ ] T9: Phase 1d — woman-sees-first intro sequencing

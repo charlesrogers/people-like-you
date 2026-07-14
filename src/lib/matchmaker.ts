@@ -499,10 +499,15 @@ function getPreferenceAlignmentMultiplier(
 
 // ─── Candidate Selection ───
 
+// Attraction prior multipliers (T7, approved by Charles 2026-07-14). Soft nudges only.
+// myYes/myNo = how the recipient voted on the candidate's photo during calibration.
+// theirYes/theirNo = how the candidate voted on the recipient. Mutual yes ≈ ×1.27.
+const ATTRACTION_PRIOR = { myYes: 1.15, myNo: 0.6, theirYes: 1.10, theirNo: 0.6 }
+
 export async function selectNextCandidate(
   userId: string
 ): Promise<{ candidate: User; score: number; lifeStageScore: number | null } | null> {
-  const { getUser, getCompatibleUsers, getCompositeProfile, getPreviouslyShownUserIds, getHardPreferences, getHardPreferencesForUsers } = await import('./db')
+  const { getUser, getCompatibleUsers, getCompositeProfile, getPreviouslyShownUserIds, getHardPreferences, getHardPreferencesForUsers, getCalibrationVotesForPairs } = await import('./db')
 
   const user = await getUser(userId)
   if (!user) return null
@@ -532,6 +537,12 @@ export async function selectNextCandidate(
   const userPrefs = await getHardPreferences(userId)
   const candidatePrefsMap = await getHardPreferencesForUsers(fresh.map(c => c.id))
 
+  // Attraction prior from calibration photo-swipes (T7, approved 2026-07-14).
+  // SOFT ONLY — photo votes nudge ranking, they never hard-exclude. A real hard
+  // "no" only happens after a narrative intro. At current pool size this barely
+  // moves anything (few votes exist); it warms up as the pool fills in.
+  const voteMap = await getCalibrationVotesForPairs(userId, fresh.map(c => c.id))
+
   // Location tier scoring
   const { getLocationTier, getTierMultiplier, userToLocation } = await import('./geo')
   const userLoc = userToLocation(user)
@@ -551,6 +562,14 @@ export async function selectNextCandidate(
       const candLoc = userToLocation(candidate)
       const locationTier = getLocationTier(userLoc, candLoc)
       score *= getTierMultiplier(locationTier)
+      // Apply attraction prior (T7). ATTRACTION_PRIOR values approved 2026-07-14.
+      const v = voteMap.get(candidate.id)
+      if (v) {
+        if (v.myVote === true) score *= ATTRACTION_PRIOR.myYes
+        else if (v.myVote === false) score *= ATTRACTION_PRIOR.myNo
+        if (v.theirVote === true) score *= ATTRACTION_PRIOR.theirYes
+        else if (v.theirVote === false) score *= ATTRACTION_PRIOR.theirNo
+      }
       return { candidate, score, lifeStageScore }
     })
   )
