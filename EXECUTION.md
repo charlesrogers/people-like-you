@@ -37,7 +37,10 @@
 - [x] T1: Apply migration 014 *(2026-07-13, via main deploy)*
 - [x] T2: Merge staging → main, verify production *(2026-07-13, ff cea3bd1→1411c37)*
 - [x] T3: Backups + verify drill *(2026-07-14 — see note below)*
-- [ ] T4: Photos bucket → private
+- [~] T4: Photos bucket → private *(2026-07-15, IN PROGRESS)*
+  - Signed-URL serving built (`src/lib/photos.ts` signPhotoUrl; wired into matches, feedback, calibrate/candidates, voice-prompt-loop, upload-photo). On staging.
+  - **Bucket NOT yet flipped private** — MUST merge serving to main FIRST (staging+prod share the `photos` bucket; flipping it before prod has signed serving breaks prod photos). Order: verify staging → merge main → THEN `UPDATE storage.buckets SET public=false WHERE id='photos'` → verify old public URL 403s + photos still render both envs.
+  - createSignedUrl works on public buckets too, so no downtime. All 5 existing photos have valid storage_path.
 - [x] T5: Staging workflow runs migrations *(2026-07-14)*
 - [x] T6: Phase 1a — persist calibration votes (migration 015 + server-side Elo) *(2026-07-14)*
 - [x] T7: Phase 1b — attraction prior in candidate selection *(2026-07-14, soft shape)*

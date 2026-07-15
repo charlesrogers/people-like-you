@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { signPhotoUrl } from '@/lib/photos'
 import {
   getUser,
   getUserPhotos,
@@ -70,7 +71,7 @@ export async function GET(req: NextRequest) {
         matchedUserId: intro.matched_user_id,
         name: matchedUser.first_name || 'Someone',
         narrative: intro.narrative,
-        photoUrl: photos[0]?.public_url || null,
+        photoUrl: await signPhotoUrl(photos[0]?.storage_path),
         status: intro.status,
         introType: intro.intro_type,
         scheduledAt: intro.scheduled_at,

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { signPhotoUrl } from '@/lib/photos'
 import {
   getUser,
   updateUserElo,
@@ -146,7 +147,7 @@ export async function POST(req: NextRequest) {
             matchedUserId: candidate.id,
             name: candidate.first_name,
             narrative,
-            photoUrl: photos[0]?.public_url || null,
+            photoUrl: await signPhotoUrl(photos[0]?.storage_path),
             status: 'pending',
             introType: 'bonus',
             expiresAt: expiresAt.toISOString(),

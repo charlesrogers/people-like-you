@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getCalibrationCandidates } from '@/lib/db'
+import { signPhotoUrl } from '@/lib/photos'
 
 export async function GET(req: NextRequest) {
   try {
@@ -12,12 +13,12 @@ export async function GET(req: NextRequest) {
 
     const results = await getCalibrationCandidates(gender, excludeUserId, 25)
 
-    const candidates = results.map(user => ({
+    const candidates = await Promise.all(results.map(async user => ({
       id: user.id,
       first_name: user.first_name,
       elo_score: user.elo_score,
-      photoUrl: user.photos?.[0]?.public_url || null,
-    }))
+      photoUrl: await signPhotoUrl(user.photos?.[0]?.storage_path),
+    })))
 
     return NextResponse.json({ candidates })
   } catch (err) {

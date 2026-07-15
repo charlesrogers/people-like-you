@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { savePhoto } from '@/lib/db'
+import { signPhotoUrl } from '@/lib/photos'
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,7 +31,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to upload photo: ' + uploadError.message }, { status: 500 })
     }
 
-    // Get public URL
+    // Bucket is private (T4). Keep getPublicUrl only as a stable storage-path
+    // reference in the column; real access is via short-lived signed URLs.
     const { data: urlData } = supabase.storage.from('photos').getPublicUrl(fileName)
 
     // Save photo record
@@ -41,7 +43,9 @@ export async function POST(req: NextRequest) {
       sort_order: sortOrder,
     })
 
-    return NextResponse.json({ id: record.id, url: record.public_url })
+    // Return a signed URL for immediate use (clients that render the response)
+    const signedUrl = await signPhotoUrl(record.storage_path)
+    return NextResponse.json({ id: record.id, url: signedUrl })
   } catch (err) {
     console.error('Route error:', err)
     const message = err instanceof Error ? err.message :
