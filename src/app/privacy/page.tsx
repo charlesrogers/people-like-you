@@ -47,7 +47,7 @@ export default function PrivacyPolicy() {
           <section>
             <h2 className="text-lg font-semibold text-stone-900">Data storage and security</h2>
             <p className="mt-3">
-              Your data is stored in Supabase (PostgreSQL database and file storage), hosted in secure data centers. Audio files and photos are stored in private/public buckets respectively. We use encryption in transit (HTTPS) and authentication tokens to protect your account.
+              Your data is stored in Supabase (PostgreSQL database and file storage), hosted in secure data centers. Audio files and photos are stored in private buckets and served only through short-lived, signed URLs — they are never publicly accessible. We use encryption in transit (HTTPS) and authentication tokens to protect your account.
             </p>
           </section>
 
