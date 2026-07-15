@@ -106,6 +106,7 @@
 - **Cron auth**: `Authorization: Bearer $CRON_SECRET`. Admin auth: `x-admin-secret: $ADMIN_SECRET` header. Both are Coolify env vars + GH secrets.
 - **Local build gotcha**: worktree `node_modules` is a symlink → Turbopack fails with "Symlink node_modules is invalid". Fix: `rm node_modules && cp -Rc /Users/charlesrogers/.claude/worktree-nm/people-like-you/node_modules ./node_modules`.
 - **Always `npx next build` locally before pushing.**
+- **⚠ Staging deploy "success" ≠ new code serving.** The deploy-staging health-check can pass on the OLD container during Coolify's rolling restart. Before verifying app behavior, wait for the NEW container to be healthy: `until ssh root@95.216.205.160 "docker ps --filter name=<APP_UUID> --format '{{.Status}}'" | grep -q healthy; do sleep 5; done` AND confirm its CreatedAt is after your push (`docker ps --filter name=<APP_UUID> --format '{{.CreatedAt}}'`). Curling too early hits stale code and gives false negatives/positives. (Migrations run via SSH, separate from the container, so those verify independently.)
 
 ---
 
