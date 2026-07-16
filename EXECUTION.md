@@ -25,12 +25,13 @@
 
 ## 1. STATE (update this section every session)
 
-**As of 2026-07-14:**
-- **Phase 0 LIVE IN PRODUCTION** (main = 1411c37). `staging` is now AHEAD of main by the T3/T5/T6/T7/T14 batch (ea9d169) — all verified on staging, NOT yet merged to main. Charles should eyeball staging, then merge.
-- **Done & verified on staging this session**: T3 (offsite backups finally working + verify drill), T5 (staging runs migrations), T6 (calibration_votes + server-side Elo, migration 015), T7 (attraction prior, soft), T7-followup (pass = hard exclude), T14 (not_attracted tile). Migrations 014 (prod) + 015 (prod, via staging step) both applied.
+**As of 2026-07-16:**
+- **Everything through T14 is LIVE IN PRODUCTION.** staging == main (the T4 merge on 7/15 carried T8+T10 to main; migrations 014–017 all applied in prod, verified via `_migrations`). Charles is testing T8/T10 onboarding changes directly in prod (his call 7/16 — no real users yet).
+- **CRON INCIDENT (resolved 7/16, follow-up open)**: two sessions converged on the same signal. Final diagnosis (other session, commit 3ad51ed): PLY crons were split-brain — the real ones run **server-side** (`/etc/cron.d/coolify-apps`) with the correct secret; the GH Actions `crons.yml` was a drifted duplicate (rotate-cron-secret.sh updates Coolify + server cron, never the GH secret) that 401'd on every run. Fix: `crons.yml` deleted; `second-date-check` (which existed ONLY in GH Actions and had never run) added server-side and verified 200. No GH CRON_SECRET rotation needed. **Follow-up open**: (a) `daily_intros` has no rows since 2026-03-30 — server cron runs but delivers nothing; almost certainly all seeds are auto-paused (3-day rule) and/or `delivery_hour` mismatch — must unpause/reset before Charles can see intros in prod, and before launch; (b) server-side crons need a failure alert path (Discord) — silent-cron rule; the deleted GH workflow's alert steps died with it.
 - Pool: ~25 users (mostly seeds), 16M/6W (real 12M/2W), pre-launch. Attraction layer intentionally near-inert until ~150 raters/gender.
-- **Gates needing Charles**: T8+T10 multipliers (unanswered), T4 photos-bucket (visual verify before main).
-- **Next no-approval work**: T9 woman-sees-first (behind env flag), T11 conversation cards, T12 two-tap dates, T13 second-date broker.
+- **Launch track (specs/launch-plan-2026-07.md + specs/onboarding-launch-scope.md)**: ad credits usable 7/22; Meta dating-ads authorization application is BLOCKING (30-day SLA — Charles submits); target go-live ~Aug 19–20, Utah Valley.
+- **Decisions from Charles 2026-07-16**: T19 referral boost approved (+1 intro/day ×7d per completed invite; hard cap 2/day; further invites EXTEND duration, never 3/day; women's boost identical). T20 approved (inline calibration deck as onboarding taste step, min 10 votes; cutting the narrative swipes explained, awaiting explicit OK). T16 REVISED: no email waitlist — everyone fully onboards; per-metro go-live gate on count+ratio with a public per-gender countdown ("30 men, 20 women to go") as the invite driver. T21 (voice-step drop-off recovery email) + T22 (delivery-hour default → evening MT) approved.
+- **Next work**: unpause seeds + verify deliver-matches produces intros in prod (Charles testing); then T16 (revised) → T19 → T20 → T23 → T21 → T22; T9/T11/T12/T13 continue in parallel.
 - **Advisable before matching drives real decisions at scale**: a correctness review of the T7 scoring changes + re-pitch direction fix (not yet done — low stakes at 25 users, but do it before a populated launch).
 
 ### Master checklist (chronological)
@@ -51,11 +52,11 @@
 - [ ] T7: Phase 1b — attraction prior in candidate selection
 - [ ] T8: Phase 1c — height collection + soft preference
 - [ ] T9: Phase 1d — woman-sees-first intro sequencing
-- [~] T10: faith intensity + marriage timeline scoring *(2026-07-14, on staging, NOT yet in main — awaiting Charles's visual review of the onboarding change)*
+- [x] T10: faith intensity + marriage timeline scoring *(2026-07-14; reached main+prod 7/15 via T4 merge; Charles testing in prod)*
   - Faith intensity = PROXIMITY on existing observance_level (practicing/cultural/background → 8/5/2): gap≤2 ×1.08, ≤5 ×0.92, else ×0.75. No new question — reuses data already collected.
   - Marriage timeline (new col via migration 016 + onboarding select): proximity ×1.05 / ×0.92 / ×0.82. Null-safe.
   - Community-config fields (temple intent etc.) NOT built — deferred; one clean signal beats several noisy at this scale.
-- [~] T8: height soft nudge ×0.9 *(2026-07-14, on staging, NOT yet main — awaiting Charles's visual review with T10)*
+- [x] T8: height soft nudge ×0.9 *(2026-07-14; reached main+prod 7/15 via T4 merge; Charles testing in prod)*
   - migration 017 (hard_preferences.height_preference_min int); users.height now collected (basics-step select, was hardcoded null); optional min-height preference (preferences step); parseHeightToInches + ×0.9 soft nudge, null-safe. Never a hard filter.
 - [ ] T11: Phase 1.5a — conversation cards in chat
 - [ ] T12: Phase 1.5b — two-tap date proposals
@@ -63,6 +64,13 @@
 - [x] T7-followup: post-narrative-pass hard-exclude — re-pitch now targets EXPIRED intros only; explicit passes never re-pitched *(2026-07-14)*
 - [x] T14: `not_attracted` pass-share metric on admin *(2026-07-14, tile on /admin/funnel)*
 - [ ] T15: Q2 — Stripe subscription build (write spec first, get approval)
+- [ ] **T-INCIDENT follow-up**: unpause seeds / reset `user_cadence` so deliver-matches produces intros again (none since 3/30); add Discord failure alerting to the server-side cron path
+- [ ] T16 (REVISED): full-onboarding signup + per-metro go-live gate + public per-gender countdown (spec: launch-plan §3 + onboarding-launch-scope gap list)
+- [ ] T19: referral intro-boost (+1/day ×7d, cap 2/day, duration-stacking) — APPROVED, spec in onboarding-launch-scope.md
+- [ ] T20: calibration deck as onboarding taste step (min 10 votes) — APPROVED; narrative-swipe removal awaiting explicit OK
+- [ ] T21: voice-step drop-off recovery email — APPROVED
+- [ ] T22: delivery-hour default → evening Mountain Time — APPROVED
+- [ ] T23: post-reveal invite moment (boost pitch + founding-member status)
 - [ ] Recurring R1: weekly metrics review (see §7)
 
 ---

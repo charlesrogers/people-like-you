@@ -72,17 +72,21 @@ Why then: ~4 weeks of list-building (inside the 30-day conversion window), YSA w
 
 ---
 
-## 3. Waitlist build spec (T16 — needs Charles's go)
+## 3. Pre-launch signup build spec (T16, REVISED 2026-07-16 per Charles)
 
-**Landing page** (`/` pre-launch mode or `/waitlist`): headline + 3-line pitch (anti-swipe, one real intro a day, nobody asks anyone out — we broker it), gender-forked CTA:
-- **Women → straight into existing onboarding.** Copy: *"No line for you. Your face is never in a feed; nobody sees you until we're confident — and you approve him first."*
-- **Men → email + zip + birth year → queue position.** Post-signup screen: position, people behind you, unique referral link, prize ladder. (Loss-aversion framing: show both numbers, Robinhood-style.)
+**No email waitlist. Everyone fully onboards immediately** (profile, voice, photos, taste calibration). What's gated per metro is **intro delivery** — the city "goes live" when it hits a member-count + gender-ratio threshold. This is the Cerca density-gate at full-onboarding depth: launch-day liquidity is instant (profiles + taste votes already banked), and a fully-onboarded member is a far more committed referrer than an email address.
 
-**Schema** (migration 018): `waitlist (id, email unique, gender, zipcode, birth_year, referral_code unique, referred_by, position, created_at, admitted_at, converted_user_id)`. Position = insertion order minus referral jumps (each verified referral = jump ~20 spots, computed not stored-race-prone).
+**The countdown is the growth mechanic.** Post-onboarding dashboard (and landing page) shows a live per-gender counter: *"Utah Valley goes live when **28 more men and 17 more women** join — invite someone and get a head start."* Loss-aversion + agency in one surface; women-first pressure is built in (the male side will usually be waiting on women, which points every eager man at inviting women).
 
-**Emails** (extend `src/lib/email.ts`): welcome-with-referral-link (highest-leverage send — ~84% open rate), weekly nurture, "you moved up N spots," admission ("you're in — 48h to complete your profile").
+**Landing page** (`/` pre-launch mode): headline + 3-line pitch (anti-swipe, one real intro a day, nobody asks anyone out — we broker it) + city counter + straight into onboarding. Women-targeted copy block: *"Your face is never in a feed; nobody sees you until we're confident — and you approve him first."*
 
-**Instrumentation:** UTM → `waitlist.source`; conversion events to the funnel dashboard; per-source CPL visible before spending a second dollar of real money in Q3.
+**Go-live gate:** per-metro config `{metro, min_men, min_women, max_ratio}` (initial: Utah Valley, thresholds Charles sets — e.g. 60M/40W, ratio ≤2:1 to open, throttle male-side intro starts toward ≤1.5:1). Deliver-matches skips users in not-yet-live metros; flipping a metro live is an admin action, announced by email ("Doors open — your first introduction arrives tomorrow").
+
+**Referral linkage:** the existing `users.invite_code` / `?ref=` / `invite_events` pipeline is reused as-is — pre-launch invites bank T19 boosts that begin paying out at metro go-live (boost `starts_at` = go-live for pre-launch referrals).
+
+**Emails** (extend `src/lib/email.ts`): welcome-with-referral-link (highest-leverage send — ~84% open rate), weekly nurture with the counter, threshold-crossed announcements, go-live.
+
+**Instrumentation:** UTM → signup source on `invite_events`; funnel dashboard already tracks per-metro counts + ratio; per-source CPL visible before spending a second dollar of real money in Q3.
 
 ---
 

@@ -1,6 +1,8 @@
 # Onboarding & Referral-Boost Scope — pre-launch build list
 
-**Written 2026-07-16. Companion to `specs/launch-plan-2026-07.md` (timeline: ads 7/22, launch ~8/19–20) and `EXECUTION.md`. These are scoped specs awaiting Charles's go — nothing here is built yet.**
+**Written 2026-07-16. Companion to `specs/launch-plan-2026-07.md` (timeline: ads 7/22, launch ~8/19–20) and `EXECUTION.md`.**
+
+**APPROVALS (Charles, 2026-07-16):** T19 approved — 2/day hard cap, additional invites extend duration (never 3/day), women's boost identical. T20 approved — inline calibration deck, min 10 votes (narrative-swipe removal: explained, awaiting explicit OK). T16 revised — no email waitlist; full onboarding for everyone + per-metro go-live gate with public per-gender countdown (see launch-plan §3). T21 + T22 approved. Build order stands: T16 → T19 → T20 → T23 → T21 → T22.
 
 **Charles's directives this scope encodes:**
 1. Referral reward = **product, not queue points**: invite one person (who completes onboarding) → the inviter gets **one extra presented person per day for 7 days** (~7 extra presentations).
@@ -76,7 +78,7 @@ CREATE INDEX IF NOT EXISTS idx_intro_boosts_user_active ON intro_boosts(user_id,
 
 Ordered by launch-criticality:
 
-1. **T16 — Waitlist + gender fork** (spec in launch-plan §3). Addition from this scope: the waitlist referral link and the in-app `invite_code` should be THE SAME code per user, so pre-launch referrals convert into post-launch boosts seamlessly (waitlist signup stores `referred_by`; when both parties activate, grant the boost).
+1. **T16 (REVISED) — full onboarding for everyone + per-metro go-live gate + public per-gender countdown** (spec in launch-plan §3). Referral linkage: the in-app `invite_code` pipeline is reused as-is; pre-launch referrals bank T19 boosts whose `starts_at` = metro go-live.
 2. **T21 — Onboarding drop-off recovery.** The voice step is the highest-friction step and ad traffic is colder than vouched traffic. Scope: resume-where-you-left-off already exists (state restore, `onboarding/page.tsx:128`); add a day-1 "finish your profile" email (Resend template) for `signup_completed`-but-not-`onboarding_completed` users, cron-driven, opportunity-toned. Funnel dashboard already tracks the stage; add per-step drop-off if not present.
 3. **T22 — Delivery-hour sanity for ad cohorts.** `getEligibleUsersForDelivery` matches `delivery_hour` in UTC with a TODO on timezones (`db.ts:638`). Everyone launching is Mountain Time: default new users' `delivery_hour` to ~[01:00 UTC = 6-7pm MT] instead of whatever the current default is. One-line-ish fix + backfill; full timezone support stays deferred.
 4. **T23 — Post-onboarding "invite" moment.** After profile reveal, a single screen: your invite link + the boost pitch + founding-member status. This is where Monzo-style earned referral energy is highest (activation peak). Mostly copy + existing `/api/invite` link generation.
