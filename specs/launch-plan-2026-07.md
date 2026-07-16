@@ -93,9 +93,8 @@ Free beta already means "3 months free" is hollow (everything is free until Q2).
 | Tier | Reward |
 |---|---|
 | Join at all (founding cohort, pre-launch only) | **Founding Member**: badge + **$19/mo locked for life when paid starts** (vs $29) + 30-day trial (vs 14). Already-planned grandfathering, now made loud. |
-| 1 referral | Jump ~20 spots in line (men) / a golden-ticket invite to give (women) |
-| 3 referrals | Skip to the front of the next admission batch |
-| 5 referrals | **First date's on us** — PLY covers the tab on your first verified date (~$40 cap). On-brand, self-qualifying, only pays out on the north-star event. |
+| Each completed invite (invitee finishes onboarding) | **A second introduction every day for a week** (+1 presentation/day × 7 days; further invites extend the week — spec: `specs/onboarding-launch-scope.md` T19). Pre-launch waitlist referrals bank this for launch day. Men additionally jump the admission queue. |
+| 5 completed invites | **First date's on us** — PLY covers the tab on your first verified date (~$40 cap). On-brand, self-qualifying, only pays out on the north-star event. |
 | Top 10 referrers at launch | Founding Member **free for the first year** (capped at 10 people — scarcity preserved, revenue intact) |
 
 Golden tickets (post-launch): every user active 14 days earns exactly ONE skip-the-line invite. Monzo got 40% of a year's signups from this.
