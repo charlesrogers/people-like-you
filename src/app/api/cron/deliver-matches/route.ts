@@ -46,13 +46,16 @@ export async function GET(req: NextRequest) {
 
   for (const cadence of eligible) {
     try {
-      // Check if user already has a pending intro today
+      // Expire stale pending intros FIRST. A pending intro from a previous day must
+      // never block today's delivery — checking pending before expiring froze ALL
+      // delivery from 2026-03-30 to 2026-07-19 (21 intros stuck pending forever).
+      // 20h cutoff: safely older than same-day, safely younger than the daily cadence.
+      const expiredCount = await expirePendingIntros(cadence.user_id, 20)
+      expired += expiredCount
+
+      // Check if user still has a fresh pending intro (delivered <20h ago)
       const existing = await getCurrentDailyIntro(cadence.user_id)
       if (existing?.status === 'pending') continue // already has one
-
-      // Expire any old pending intros
-      const expiredCount = await expirePendingIntros(cadence.user_id)
-      expired += expiredCount
 
       // If yesterday's expired, increment inactive days
       if (expiredCount > 0) {

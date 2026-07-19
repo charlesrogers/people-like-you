@@ -588,13 +588,18 @@ export async function getPreviouslyShownUserIds(userId: string): Promise<string[
   return (data ?? []).map(d => d.matched_user_id)
 }
 
-export async function expirePendingIntros(userId: string): Promise<number> {
-  const { data, error } = await db()
+export async function expirePendingIntros(userId: string, olderThanHours?: number): Promise<number> {
+  // Without olderThanHours: expire ALL pendings (resume-from-pause path).
+  // With it: only expire pendings older than the cutoff, so a same-day intro survives.
+  let query = db()
     .from('daily_intros')
     .update({ status: 'expired' })
     .eq('user_id', userId)
     .eq('status', 'pending')
-    .select('id')
+  if (olderThanHours !== undefined) {
+    query = query.lt('scheduled_at', new Date(Date.now() - olderThanHours * 3600_000).toISOString())
+  }
+  const { data, error } = await query.select('id')
   if (error) throw error
   return data?.length ?? 0
 }
