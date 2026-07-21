@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { savePhoto } from '@/lib/db'
 import { signPhotoUrl } from '@/lib/photos'
+import { moderateImageDataUrl, screenAndLog } from '@/lib/moderation'
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,6 +17,18 @@ export async function POST(req: NextRequest) {
 
     if (photo.size > 10 * 1024 * 1024) {
       return NextResponse.json({ error: 'File too large (max 10MB)' }, { status: 400 })
+    }
+
+    // Content moderation (Apple 1.2 filter pillar): screen the image BEFORE it is stored
+    // or ever shown to another member. Rejected content never reaches the bucket.
+    const buf = Buffer.from(await photo.arrayBuffer())
+    const dataUrl = `data:${photo.type || 'image/jpeg'};base64,${buf.toString('base64')}`
+    const mod = await screenAndLog(userId, 'photo', `${userId}/${sortOrder}`, await moderateImageDataUrl(dataUrl))
+    if (mod.rejected) {
+      return NextResponse.json(
+        { error: 'This photo doesn\'t meet our community standards. Please choose another.' },
+        { status: 422 },
+      )
     }
 
     const supabase = createServerClient()

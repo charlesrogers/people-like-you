@@ -1,6 +1,12 @@
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+// Lazy: constructing Resend at module load throws when RESEND_API_KEY is unset
+// (e.g. during `next build` page-data collection). Defer until an email is actually sent.
+let _resend: Resend | null = null
+function resendClient(): Resend {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY)
+  return _resend
+}
 
 // Until domain is verified, use Resend's default sender
 // After verification, switch to: hello@people-like-you.com
@@ -11,12 +17,13 @@ interface SendEmailOptions {
   subject: string
   html: string
   text?: string
+  from?: string
 }
 
-export async function sendEmail({ to, subject, html, text }: SendEmailOptions) {
+export async function sendEmail({ to, subject, html, text, from }: SendEmailOptions) {
   try {
-    const { data, error } = await resend.emails.send({
-      from: FROM,
+    const { data, error } = await resendClient().emails.send({
+      from: from || FROM,
       to,
       subject,
       html,
@@ -91,6 +98,55 @@ export async function sendDateReminder(to: string, firstName: string, partnerNam
           <p style="margin: 4px 0 0; font-size: 15px; color: #333;"><strong>When:</strong> ${time}</p>
         </div>
         <p style="font-size: 14px; color: #888; margin-top: 32px;">— The People Like You team</p>
+      </div>
+    `,
+  })
+}
+
+// ─── T24: Safety / Trust & Safety emails (from communityhealth@) ───
+
+const SAFETY_FROM = 'People Like You Community Health <communityhealth@people-like-you.com>'
+
+export async function sendWarningEmail(to: string, firstName: string) {
+  return sendEmail({
+    to,
+    from: SAFETY_FROM,
+    subject: `A note from People Like You`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px;">
+        <h1 style="font-size: 22px; font-weight: 600; color: #111;">A note about your account</h1>
+        <p style="font-size: 16px; line-height: 1.6; color: #444;">
+          Hi ${firstName}, we received a report about activity on your account that doesn't align
+          with our community standards. We take this seriously.
+        </p>
+        <p style="font-size: 16px; line-height: 1.6; color: #444;">
+          Please review our <a href="https://people-like-you.com/terms">community standards</a>.
+          Continued reports may lead to your account being paused or removed. If you believe this
+          was a mistake, reply to this email — a person will read it.
+        </p>
+        <p style="font-size: 14px; color: #888; margin-top: 32px;">— People Like You, Community Health</p>
+      </div>
+    `,
+  })
+}
+
+export async function sendBanEmail(to: string, firstName: string) {
+  return sendEmail({
+    to,
+    from: SAFETY_FROM,
+    subject: `Your People Like You account has been removed`,
+    html: `
+      <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 560px; margin: 0 auto; padding: 40px 20px;">
+        <h1 style="font-size: 22px; font-weight: 600; color: #111;">Your account has been removed</h1>
+        <p style="font-size: 16px; line-height: 1.6; color: #444;">
+          Hi ${firstName}, following a review, your People Like You account has been removed for
+          violating our community standards. This decision protects the safety of our members.
+        </p>
+        <p style="font-size: 16px; line-height: 1.6; color: #444;">
+          If you believe this was made in error, you may contact
+          <a href="mailto:communityhealth@people-like-you.com">communityhealth@people-like-you.com</a>.
+        </p>
+        <p style="font-size: 14px; color: #888; margin-top: 32px;">— People Like You, Community Health</p>
       </div>
     `,
   })

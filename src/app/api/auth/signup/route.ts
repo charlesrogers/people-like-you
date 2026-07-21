@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
-import { createUser, getUserByEmail } from '@/lib/db'
+import { createUser, getUserByEmail, recordEulaAcceptance } from '@/lib/db'
 import { rateLimit } from '@/lib/rate-limit'
+
+// Bump when the zero-tolerance community standards / EULA text materially changes.
+const EULA_VERSION = '2026-07-20'
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,10 +17,14 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { email, password, first_name, last_name, gender, birth_year, state, community, ref } = await req.json()
+    const { email, password, first_name, last_name, gender, birth_year, state, community, ref, eulaAccepted } = await req.json()
 
     if (!email || !password) {
       return NextResponse.json({ error: 'Email and password are required' }, { status: 400 })
+    }
+    // Apple 1.2: affirmative agreement to zero-tolerance community standards is required.
+    if (!eulaAccepted) {
+      return NextResponse.json({ error: 'You must agree to the community standards to join.' }, { status: 400 })
     }
 
     const supabase = createServerClient()
@@ -81,6 +88,9 @@ export async function POST(req: NextRequest) {
       community: community || 'general',
       invited_by: invitedBy,
     } as Parameters<typeof createUser>[0])
+
+    // Record affirmative EULA / community-standards acceptance.
+    await recordEulaAcceptance(user.id, EULA_VERSION).catch(console.error)
 
     // Track signup event for referrer
     if (invitedBy && ref) {

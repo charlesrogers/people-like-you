@@ -74,6 +74,16 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
+            <h2 className="text-lg font-semibold text-stone-900">Safety &amp; content review</h2>
+            <p className="mt-3">
+              To keep members safe, photos, messages, and voice notes are automatically screened for
+              objectionable content before they reach anyone. When you report someone, our team may
+              review the relevant conversation to act on your report. We do not read your private
+              conversations otherwise.
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-lg font-semibold text-stone-900">Contact</h2>
             <p className="mt-3">
               Questions about your privacy? Email us at{" "}

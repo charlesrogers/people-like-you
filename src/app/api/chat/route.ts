@@ -6,6 +6,8 @@ import {
 } from '@/lib/db'
 import type { MutualMatch } from '@/lib/types'
 import OpenAI from 'openai'
+import { moderateText, screenAndLog } from '@/lib/moderation'
+import { createReport } from '@/lib/db'
 
 const MAX_MESSAGES_PER_USER = 10
 
@@ -40,6 +42,7 @@ export async function GET(req: NextRequest) {
     messages,
     myCount,
     partnerCount,
+    partnerId: isUserA ? mutualMatch.user_b_id : mutualMatch.user_a_id,
     maxMessages: MAX_MESSAGES_PER_USER,
     status: mutualMatch.status,
     timeRemaining,
@@ -143,6 +146,22 @@ export async function POST(req: NextRequest) {
 
   if (currentCount >= MAX_MESSAGES_PER_USER) {
     return NextResponse.json({ error: 'Message limit reached' }, { status: 400 })
+  }
+
+  // Content moderation (Apple 1.2): screen the text/transcript before it is stored or
+  // shown to the other member. Rejected content is blocked and auto-reported for review.
+  const mod = await screenAndLog(userId, voiceUrl ? 'voice_transcript' : 'chat_message', mutualMatchId, await moderateText(content))
+  if (mod.rejected) {
+    await createReport({
+      reporterId: userId, reportedId: userId, mutualMatchId,
+      reason: 'inappropriate_messages',
+      details: `Auto-moderation blocked a message (${mod.categories.join(', ')})`,
+      source: 'auto_moderation',
+    }).catch(console.error)
+    return NextResponse.json(
+      { error: 'That message goes against our community standards and wasn\'t sent.' },
+      { status: 422 },
+    )
   }
 
   const messageNumber = currentCount + 1

@@ -1,6 +1,20 @@
 # Block & Report Spec (T24)
 
-**Written 2026-07-19. Status: spec, not built. Launch-relevant: real strangers arrive with the 7/22 ads; block/report is table-stakes for a dating product, core to the women-first safety positioning (one-year-plan §4), and Meta's dating-authorization reviewers inspect the product via test login — safety surfaces should exist before they look.**
+**Updated 2026-07-20: BUILT to the Apple Guideline 1.2 terminal state (all four UGC pillars).**
+Implemented: (1) **Filter** — OpenAI omni-moderation (free) screens photos, chat messages, and voice
+transcripts before they reach anyone (`src/lib/moderation.ts`; wired into upload-photo, chat, transcribe;
+audit trail in `moderation_events`). (2) **Report** — `/api/report`, implies block, Discord alert, auto-pause
+at 2 distinct reporters, 24h-SLA escalation cron `/api/cron/report-sla`. (3) **Block** — `/api/block`,
+silent + bidirectional, enforced at the `applyHardFilters` + calibration choke points; `SafetyMenu` in chat.
+(4) **Contact + EULA** — affirmative zero-tolerance checkbox at signup (`eula_accepted_at`), community
+standards + `communityhealth@people-like-you.com` on /terms and /privacy. Admin queue at /admin → Reports.
+Pure decision logic in `src/lib/safety-logic.ts`, tested by `scripts/test-safety.ts` (17 assertions).
+**Deploy prerequisites (Charles):** set Coolify env `DISCORD_SAFETY_WEBHOOK`; register the `report-sla`
+endpoint in the server cron (hourly); verify `communityhealth@` as a Resend sender.
+
+---
+
+**Original spec (Written 2026-07-19). Launch-relevant: real strangers arrive with the 7/22 ads; block/report is table-stakes for a dating product, core to the women-first safety positioning (one-year-plan §4), and Meta's dating-authorization reviewers inspect the product via test login — safety surfaces should exist before they look.**
 
 **Design principles:**
 1. **Blocking is silent and absolute.** The blocked person is never told, and nothing in their UX changes except the other person no longer appears. Never leak that a block happened.

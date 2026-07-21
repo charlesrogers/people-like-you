@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import AdminReports from "@/components/AdminReports";
 
 // ─── Types ───
 
@@ -99,7 +100,7 @@ interface TestsData {
   userCount: number;
 }
 
-type Tab = "overview" | "users" | "matches" | "matrix" | "tests" | "pool-health" | "matching-health";
+type Tab = "overview" | "users" | "matches" | "matrix" | "tests" | "pool-health" | "matching-health" | "reports";
 
 interface MatchingHealthData {
   proximity: {
@@ -299,6 +300,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
     { id: "tests", label: "Tests" },
     { id: "pool-health", label: "Pool Health" },
     { id: "matching-health", label: "Matching Health" },
+    { id: "reports", label: "Reports" },
   ];
 
   return (
@@ -338,6 +340,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
       </header>
 
       <div className="mx-auto max-w-7xl px-6 py-8">
+        {tab === "reports" && <AdminReports secret={secret} />}
         {tab === "overview" && stats && <OverviewTab stats={stats} />}
         {tab === "users" && (
           <UsersTab profiles={profiles} secret={secret} onRefresh={load} />

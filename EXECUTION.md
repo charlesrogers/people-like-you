@@ -72,7 +72,7 @@
 - [ ] T21: voice-step drop-off recovery email — APPROVED
 - [ ] T22: delivery-hour default → evening Mountain Time — APPROVED
 - [ ] T23: post-reveal invite moment (boost pitch + founding-member status)
-- [ ] T24: block & report (spec: `specs/block-report.md`) — build after T20, MUST be live before metro go-live, ideally before ad traffic
+- [~] T24: block, report & content moderation — BUILT to Apple 1.2 terminal state *(2026-07-20, on staging)*. All 4 UGC pillars: OpenAI moderation on photos/chat/voice (free), /api/block (silent bidirectional), /api/report (Discord alert + auto-pause@2 + 24h-SLA cron), zero-tolerance EULA at signup, communityhealth@ contact on terms/privacy, /admin Reports tab. Pure logic tested (`scripts/test-safety.ts`, 17 assertions). **Deploy prereqs before it's fully live: (1) Coolify env `DISCORD_SAFETY_WEBHOOK` on prod+staging; (2) register `/api/cron/report-sla` in server cron hourly; (3) verify `communityhealth@people-like-you.com` as a Resend sender.** Migration 018 applies on deploy.
 - [ ] Recurring R1: weekly metrics review (see §7)
 
 ---

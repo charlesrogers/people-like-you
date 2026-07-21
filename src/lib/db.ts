@@ -2,8 +2,10 @@ import { createServerClient } from './supabase'
 import type {
   User, HardPreferences, SoftPreferences, Photo, VoiceMemo, CompositeProfile, Match,
   MutualMatch, DisclosureExchange, UserAvailability, ScheduledDate, DateFeedback,
-  TrustScore, TrustTier, ExitSurvey, FriendVouch, ChatMessage, MeetDecision, DatePlanningPrefs
+  TrustScore, TrustTier, ExitSurvey, FriendVouch, ChatMessage, MeetDecision, DatePlanningPrefs,
+  Block, Report, ReportReason, ModerationEvent
 } from './types'
+import { blockedIdsFromRows } from './safety-logic'
 
 function db() {
   return createServerClient()
@@ -118,9 +120,14 @@ async function applyHardFilters(user: User, candidates: User[]): Promise<User[]>
 
   const userPrefs = await getHardPreferences(user.id)
   const candidatePrefsMap = await getHardPreferencesForUsers(candidates.map(c => c.id))
+  // Block exclusion (T24): drop anyone this user blocked OR who blocked this user.
+  // Bidirectional and absolute — blocks always win over every compatibility signal.
+  const blockedIds = await getBlockedUserIds(user.id)
   const currentYear = new Date().getFullYear()
 
   return candidates.filter(candidate => {
+    if (blockedIds.has(candidate.id)) return false
+
     const candPrefs = candidatePrefsMap.get(candidate.id) ?? null
 
     // Age filter (bidirectional)
@@ -656,15 +663,18 @@ export async function getEligibleUsersForDelivery(currentHourUtc: number): Promi
 // ─── Elo Calibration Candidates ───
 
 export async function getCalibrationCandidates(gender: string, excludeUserId: string, limit = 25): Promise<(User & { photos: Photo[] })[]> {
+  // T24: exclude banned/paused/hidden faces and anyone in a block relationship with the viewer.
+  const blockedIds = await getBlockedUserIds(excludeUserId)
   const { data, error } = await db()
     .from('users')
     .select('*, photos(*)')
     .eq('gender', gender)
+    .eq('profile_status', 'active')
     .neq('id', excludeUserId)
     .order('elo_score', { ascending: false })
-    .limit(limit)
+    .limit(limit + blockedIds.size)
   if (error) throw error
-  return data ?? []
+  return (data ?? []).filter((u: User) => !blockedIds.has(u.id)).slice(0, limit)
 }
 
 // ─── Phase 1: Mutual Matches ───
@@ -1401,4 +1411,162 @@ export async function getPassReasonStats(): Promise<{ totalPasses: number; notAt
     byReason[key] = (byReason[key] || 0) + 1
   }
   return { totalPasses: rows.length, notAttracted: byReason['not_attracted'] || 0, byReason }
+}
+
+// ─── T24: Safety — blocks, reports, moderation, ban enforcement ───
+
+/** All user ids in a block relationship with userId (either direction). */
+export async function getBlockedUserIds(userId: string): Promise<Set<string>> {
+  const { data, error } = await db()
+    .from('blocks')
+    .select('blocker_id, blocked_id')
+    .or(`blocker_id.eq.${userId},blocked_id.eq.${userId}`)
+  if (error) throw error
+  return blockedIdsFromRows(userId, data ?? [])
+}
+
+export async function createBlock(
+  blockerId: string, blockedId: string, source: Block['source'] = 'manual',
+): Promise<void> {
+  const { error } = await db()
+    .from('blocks')
+    .upsert({ blocker_id: blockerId, blocked_id: blockedId, source }, { onConflict: 'blocker_id,blocked_id' })
+  if (error) throw error
+}
+
+/**
+ * Full block enforcement: record the block, then tear down any live connection
+ * between the pair. Neutral terminal states only — never leak that a block happened.
+ */
+export async function enforceBlock(
+  blockerId: string, blockedId: string, source: Block['source'] = 'manual',
+): Promise<void> {
+  await createBlock(blockerId, blockedId, source)
+
+  // End any active mutual match between the two (neutral 'declined').
+  const { data: matches } = await db()
+    .from('mutual_matches')
+    .select('id, status')
+    .or(`and(user_a_id.eq.${blockerId},user_b_id.eq.${blockedId}),and(user_a_id.eq.${blockedId},user_b_id.eq.${blockerId})`)
+  for (const m of matches ?? []) {
+    if (!['declined', 'expired', 'relationship'].includes(m.status)) {
+      await db().from('mutual_matches').update({ status: 'declined' }).eq('id', m.id)
+    }
+    // Cancel any open scheduled date on that match.
+    await db().from('scheduled_dates')
+      .update({ status: 'cancelled' })
+      .eq('mutual_match_id', m.id)
+      .in('status', ['proposed', 'confirmed'])
+  }
+
+  // Expire pending intros that feature the blocked person, both directions.
+  for (const [uid, other] of [[blockerId, blockedId], [blockedId, blockerId]] as const) {
+    await db().from('daily_intros')
+      .update({ status: 'expired' })
+      .eq('user_id', uid)
+      .eq('matched_user_id', other)
+      .eq('status', 'pending')
+  }
+}
+
+export async function createReport(input: {
+  reporterId: string; reportedId: string; mutualMatchId?: string | null;
+  reason: ReportReason; details?: string | null; source?: 'user' | 'auto_moderation';
+}): Promise<Report> {
+  const { data, error } = await db()
+    .from('reports')
+    .insert({
+      reporter_id: input.reporterId,
+      reported_id: input.reportedId,
+      mutual_match_id: input.mutualMatchId ?? null,
+      reason: input.reason,
+      details: input.details ?? null,
+      source: input.source ?? 'user',
+    })
+    .select()
+    .single()
+  if (error) throw error
+  return data
+}
+
+/** Distinct users who have an OPEN report against reportedId. */
+export async function countDistinctOpenReporters(reportedId: string): Promise<number> {
+  const { data, error } = await db()
+    .from('reports')
+    .select('reporter_id')
+    .eq('reported_id', reportedId)
+    .eq('status', 'open')
+  if (error) throw error
+  return new Set((data ?? []).map(r => r.reporter_id)).size
+}
+
+export async function getOpenReports(): Promise<Report[]> {
+  const { data, error } = await db()
+    .from('reports')
+    .select()
+    .in('status', ['open', 'reviewing'])
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return data ?? []
+}
+
+export async function getReport(id: string): Promise<Report | null> {
+  const { data, error } = await db().from('reports').select().eq('id', id).single()
+  if (error && error.code !== 'PGRST116') throw error
+  return data
+}
+
+export async function resolveReport(id: string, updates: Partial<Report>): Promise<void> {
+  const { error } = await db().from('reports').update(updates).eq('id', id)
+  if (error) throw error
+}
+
+/** Reports overdue for review (open past the SLA cutoff), for the 24h escalation cron. */
+export async function getOverdueReports(cutoffIso: string): Promise<Report[]> {
+  const { data, error } = await db()
+    .from('reports')
+    .select()
+    .eq('status', 'open')
+    .is('escalated_at', null)
+    .lt('created_at', cutoffIso)
+  if (error) throw error
+  return data ?? []
+}
+
+/**
+ * Change a user's profile_status. Banning or pausing also removes them from the
+ * delivery pool (getEligibleUsersForDelivery filters on cadence flags, not status).
+ */
+export async function setProfileStatus(
+  userId: string, status: User['profile_status'],
+): Promise<void> {
+  const { error } = await db().from('users').update({ profile_status: status }).eq('id', userId)
+  if (error) throw error
+  if (status === 'banned' || status === 'paused' || status === 'hidden') {
+    await db().from('user_cadence')
+      .update({ is_paused: true, paused_at: new Date().toISOString() })
+      .eq('user_id', userId)
+  }
+}
+
+export async function recordEulaAcceptance(userId: string, version: string): Promise<void> {
+  const { error } = await db()
+    .from('users')
+    .update({ eula_accepted_at: new Date().toISOString(), eula_version: version })
+    .eq('id', userId)
+  if (error) throw error
+}
+
+export async function logModerationEvent(event: ModerationEvent): Promise<void> {
+  const { error } = await db().from('moderation_events').insert(event)
+  if (error) throw error
+}
+
+/** Apply a trust penalty for a confirmed safety violation (report resolved with action). */
+export async function adjustTrustForViolation(userId: string, penalty = 20): Promise<void> {
+  const ts = await ensureTrustScore(userId)
+  await updateTrustScore(userId, {
+    score: ts.score - penalty,
+    safety_negative: (ts.safety_negative ?? 0) + 1,
+  })
 }

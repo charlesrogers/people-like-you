@@ -28,8 +28,49 @@ export interface User {
   invite_count: number
   queue_priority: number
   is_seed: boolean
-  profile_status: 'active' | 'paused' | 'hidden' | 'deactivated'
+  profile_status: 'active' | 'paused' | 'hidden' | 'deactivated' | 'banned'
+  eula_accepted_at: string | null
+  eula_version: string | null
   created_at: string
+}
+
+export interface Block {
+  id: string
+  blocker_id: string
+  blocked_id: string
+  source: 'manual' | 'report' | 'moderation'
+  created_at: string
+}
+
+export type ReportReason =
+  | 'inappropriate_messages' | 'harassment' | 'fake_profile' | 'inappropriate_photos'
+  | 'safety_concern' | 'underage' | 'married_or_taken' | 'spam_or_scam' | 'other'
+
+export interface Report {
+  id: string
+  reporter_id: string
+  reported_id: string
+  mutual_match_id: string | null
+  reason: ReportReason
+  details: string | null
+  source: 'user' | 'auto_moderation'
+  status: 'open' | 'reviewing' | 'resolved' | 'dismissed'
+  action_taken: 'none' | 'warned' | 'paused' | 'banned' | null
+  admin_notes: string | null
+  escalated_at: string | null
+  created_at: string
+  resolved_at: string | null
+}
+
+export interface ModerationEvent {
+  user_id: string
+  surface: 'photo' | 'chat_message' | 'voice_transcript' | 'profile_text'
+  content_ref: string | null
+  flagged: boolean
+  rejected: boolean
+  categories: string[]
+  scores: Record<string, number>
+  outcome: 'checked' | 'rejected' | 'error'
 }
 
 export interface HardPreferences {

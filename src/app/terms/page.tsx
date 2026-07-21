@@ -82,6 +82,24 @@ export default function TermsOfService() {
           </section>
 
           <section>
+            <h2 className="text-lg font-semibold text-stone-900">Community standards &mdash; zero tolerance</h2>
+            <p className="mt-3">
+              PLY has <strong>zero tolerance for objectionable content and abusive behavior</strong>.
+              That includes harassment, threats, hate speech, nudity or sexually explicit content,
+              impersonation or fake profiles, and contacting anyone who does not want to hear from you.
+              You agree not to post any of it.
+            </p>
+            <p className="mt-3">
+              You can <strong>block</strong> anyone instantly, and <strong>report</strong> anyone from
+              the chat or match screen. Every report is reviewed, and we act on valid reports &mdash;
+              removing content and the offending member &mdash; <strong>within 24 hours</strong>. We
+              screen photos, messages, and voice notes for objectionable material automatically before
+              they reach anyone. Accounts that violate these standards are warned, paused, or permanently
+              removed.
+            </p>
+          </section>
+
+          <section>
             <h2 className="text-lg font-semibold text-stone-900">Changes to these terms</h2>
             <p className="mt-3">
               We may update these terms. If we make significant changes, we&rsquo;ll notify you in the app. Continued use after changes means you accept the new terms.
@@ -93,6 +111,10 @@ export default function TermsOfService() {
             <p className="mt-3">
               Questions? Email us at{" "}
               <a href="mailto:hello@people-like-you.com" className="text-stone-900 underline">hello@people-like-you.com</a>.
+            </p>
+            <p className="mt-3">
+              Safety concerns, reports, or to appeal a decision:{" "}
+              <a href="mailto:communityhealth@people-like-you.com" className="text-stone-900 underline">communityhealth@people-like-you.com</a>.
             </p>
           </section>
         </div>

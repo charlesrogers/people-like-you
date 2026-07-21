@@ -66,6 +66,7 @@ function OnboardingContent() {
   const [signupEmail, setSignupEmail] = useState('')
   const [signupPassword, setSignupPassword] = useState('')
   const [useEmail, setUseEmail] = useState(false)
+  const [agreedToStandards, setAgreedToStandards] = useState(false)
   const [otpSent, setOtpSent] = useState(false)
   const [otpCode, setOtpCode] = useState('')
 
@@ -179,11 +180,11 @@ function OnboardingContent() {
     }
   }
 
-  const canProceedSignup = useEmail
+  const canProceedSignup = agreedToStandards && (useEmail
     ? (signupEmail && signupPassword && signupPassword.length >= 6)
     : otpSent
       ? otpCode.length === 6
-      : signupPhone.replace(/\D/g, '').length >= 10
+      : signupPhone.replace(/\D/g, '').length >= 10)
   const canProceedBasics = firstName && gender && birthYear && zipcode
   const canProceedVoice = recordings.size >= 2
   const canProceedPrefs = faithImportance && kids
@@ -204,6 +205,7 @@ function OnboardingContent() {
               email: signupEmail,
               password: signupPassword,
               ref: refCode || undefined,
+              eulaAccepted: agreedToStandards,
             }),
           })
           const data = await res.json()
@@ -527,11 +529,21 @@ function OnboardingContent() {
                 {useEmail ? 'Use phone number instead' : 'Use email instead'}
               </button>
 
-              <p className="mt-6 text-center text-[10px] text-stone-300">
-                By signing up you agree to our{' '}
-                <a href="/terms" className="underline">Terms</a> and{' '}
-                <a href="/privacy" className="underline">Privacy Policy</a>.
-              </p>
+              <label className="mt-6 flex items-start gap-2 text-left text-[11px] text-stone-400">
+                <input
+                  type="checkbox"
+                  checked={agreedToStandards}
+                  onChange={e => setAgreedToStandards(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 rounded border-stone-300"
+                />
+                <span>
+                  I agree to the{' '}
+                  <a href="/terms" className="underline">Terms</a> and{' '}
+                  <a href="/privacy" className="underline">Privacy Policy</a>, and to our
+                  zero-tolerance policy for objectionable content and abusive behavior. There is no
+                  place here for harassment, nudity, or hate.
+                </span>
+              </label>
             </div>
           </div>
         )}

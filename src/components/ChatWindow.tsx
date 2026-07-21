@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react'
 import type { ChatMessage } from '@/lib/types'
+import SafetyMenu from './SafetyMenu'
 
 interface Props {
   mutualMatchId: string
@@ -21,6 +22,7 @@ export default function ChatWindow({
   const [messages, setMessages] = useState<ChatMessage[]>([])
   const [myCount, setMyCount] = useState(0)
   const [partnerCount, setPartnerCount] = useState(0)
+  const [partnerId, setPartnerId] = useState<string | null>(null)
   const [maxMessages] = useState(10)
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
@@ -43,6 +45,7 @@ export default function ChatWindow({
       setMessages(data.messages)
       setMyCount(data.myCount)
       setPartnerCount(data.partnerCount)
+      if (data.partnerId) setPartnerId(data.partnerId)
       setStatus(data.status)
       setChatExpiresAt(data.chatExpiresAt)
       if (data.status !== 'chatting') {
@@ -180,7 +183,7 @@ export default function ChatWindow({
   return (
     <div className="space-y-4">
       {/* Header */}
-      <div className="text-center">
+      <div className="relative text-center">
         <p className="text-[11px] uppercase tracking-wider text-muted-foreground font-medium">
           You matched
         </p>
@@ -194,6 +197,17 @@ export default function ChatWindow({
             </span>
           )}
         </div>
+        {partnerId && (
+          <div className="absolute right-0 top-0">
+            <SafetyMenu
+              userId={userId}
+              targetUserId={partnerId}
+              targetName={partnerName}
+              mutualMatchId={mutualMatchId}
+              onBlocked={() => onPhaseChange('declined')}
+            />
+          </div>
+        )}
       </div>
 
       {/* Messages */}
