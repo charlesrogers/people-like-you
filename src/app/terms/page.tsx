@@ -92,9 +92,9 @@ export default function TermsOfService() {
             <p className="mt-3">
               You can <strong>block</strong> anyone instantly, and <strong>report</strong> anyone from
               the chat or match screen. Every report is reviewed, and we act on valid reports &mdash;
-              removing content and the offending member &mdash; <strong>within 24 hours</strong>. We
-              screen photos, messages, and voice notes for objectionable material automatically before
-              they reach anyone. Accounts that violate these standards are warned, paused, or permanently
+              removing content and the offending member &mdash; <strong>within 24 hours</strong>. Photos
+              and profile content are screened for objectionable material automatically before they&rsquo;re
+              shown to anyone. Accounts that violate these standards are warned, paused, or permanently
               removed.
             </p>
           </section>

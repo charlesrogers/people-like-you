@@ -473,3 +473,9 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Rule:** Before running a migration, verify which database the app actually connects to: (1) Check Coolify env vars for SUPABASE_URL. (2) If not set there, check what's baked into the Docker image via `.env.local`. (3) Verify tables exist on the target DB before running DDL.
 
 **Category:** mistake
+
+### 2026-07-20 — Over-scoped content moderation onto private messages
+**What went wrong:** Built OpenAI moderation pre-screening on private chat messages + chat voice transcripts (src/app/api/chat/route.ts), not just public-facing content. Charles pushed back ("wtf we have to filter messages??").
+**Why it's wrong:** Apple 1.2's "filter" pillar is defensibly about BROADCAST content (profile photos, profile text/voice that matches see). Private 1:1 chat is standardly handled REACTIVELY (report + block + review-on-report). Pre-scanning every DM is aggressive, unnecessary for compliance, and directly contradicts PLY's privacy positioning ("we don't read your private conversations") — the privacy page even said so while the code did the opposite.
+**Rule:** Only auto-moderate PUBLIC-FACING / broadcast content (photos shown to matches, profile-derived voice memos). NEVER pre-screen private 1:1 messages — govern those with block + report + on-report review. When adding a safety feature, check it against the product's stated privacy promises before shipping.
+**Category:** anti-pattern

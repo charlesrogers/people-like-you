@@ -1,9 +1,11 @@
 # Block & Report Spec (T24)
 
 **Updated 2026-07-20: BUILT to the Apple Guideline 1.2 terminal state (all four UGC pillars).**
-Implemented: (1) **Filter** — OpenAI omni-moderation (free) screens photos, chat messages, and voice
-transcripts before they reach anyone (`src/lib/moderation.ts`; wired into upload-photo, chat, transcribe;
-audit trail in `moderation_events`). (2) **Report** — `/api/report`, implies block, Discord alert, auto-pause
+Implemented: (1) **Filter (public-facing content ONLY)** — OpenAI omni-moderation (free) screens photos
+and onboarding profile voice memos before they become member-visible (`src/lib/moderation.ts`; wired into
+upload-photo + transcribe; audit trail in `moderation_events`). Private 1:1 chat is deliberately NOT
+pre-screened — it's governed reactively by block + report + on-report review (Charles, 2026-07-20), which
+is the standard for private messaging and consistent with our privacy promise. (2) **Report** — `/api/report`, implies block, Discord alert, auto-pause
 at 2 distinct reporters, 24h-SLA escalation cron `/api/cron/report-sla`. (3) **Block** — `/api/block`,
 silent + bidirectional, enforced at the `applyHardFilters` + calibration choke points; `SafetyMenu` in chat.
 (4) **Contact + EULA** — affirmative zero-tolerance checkbox at signup (`eula_accepted_at`), community
