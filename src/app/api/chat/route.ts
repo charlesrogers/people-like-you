@@ -7,7 +7,10 @@ import {
 import type { MutualMatch } from '@/lib/types'
 import OpenAI from 'openai'
 
-const MAX_MESSAGES_PER_USER = 10
+// Chat cap removed "for now" (2026-07-21) — set non-binding. Migration 019 drops the
+// matching DB CHECK. NOTE: chats no longer auto-advance to 'deciding' (that fired at
+// the 10/10 cap); they stay 'chatting' until expiry until the meet-decision flow is reworked.
+const MAX_MESSAGES_PER_USER = 1000
 
 // GET: Fetch chat state for a mutual match
 export async function GET(req: NextRequest) {
