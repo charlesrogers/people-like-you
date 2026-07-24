@@ -66,7 +66,7 @@
 - [x] T14: `not_attracted` pass-share metric on admin *(2026-07-14, tile on /admin/funnel)*
 - [ ] T15: Q2 — Stripe subscription build (write spec first, get approval)
 - [ ] **T-INCIDENT follow-up**: unpause seeds / reset `user_cadence` so deliver-matches produces intros again (none since 3/30); add Discord failure alerting to the server-side cron path
-- [ ] T16 (REVISED): full-onboarding signup + per-metro go-live gate + public per-gender countdown (spec: launch-plan §3 + onboarding-launch-scope gap list)
+- [~] T16: pre-launch waitlist — `/waitlist` capture page (email/phone/zip→metro/gender) + `/api/waitlist` + migration 020 `waitlist` table. LIVE IN PROD 2026-07-23, verified (Provo zip→Provo-Orem metro, position + referral code). Charles driving Meta traffic here; app stays gated. Table empty/ready. **Not yet built:** referral link stores `referred_by` but does NOT reorder position yet; per-metro go-live gate + public per-gender countdown (the fuller density-gate model) still pending — this is the lightweight capture version.
 - [ ] T19: referral intro-boost (+1/day ×7d, cap 2/day, duration-stacking) — APPROVED, spec in onboarding-launch-scope.md
 - [ ] T20: calibration deck as onboarding taste step (min 10 votes) — APPROVED; narrative-swipe removal awaiting explicit OK
 - [ ] T21: voice-step drop-off recovery email — APPROVED
