@@ -111,7 +111,7 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// GET /api/waitlist/status?code=<referral_code> — live position + referral count + metro countdown.
+// GET /api/waitlist?code=<referral_code> — live position + referral count + metro countdown.
 export async function GET(req: NextRequest) {
   const code = req.nextUrl.searchParams.get('code')
   if (!code) return NextResponse.json({ error: 'code required' }, { status: 400 })
