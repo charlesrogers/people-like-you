@@ -2,6 +2,13 @@
 
 import { useState, useEffect } from 'react'
 
+interface MetroCountdown {
+  name: string
+  women: number; men: number; total: number
+  minWomen: number; minTotal: number; maxRatio: number
+  womenToGo: number; ready: boolean
+}
+
 export default function WaitlistPage() {
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
@@ -12,7 +19,10 @@ export default function WaitlistPage() {
 
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [done, setDone] = useState<{ position: number | null; referralCode: string | null; already: boolean } | null>(null)
+  const [done, setDone] = useState<{
+    position: number | null; referralCode: string | null; already: boolean
+    referrals: number; metro: MetroCountdown | null
+  } | null>(null)
   const [copied, setCopied] = useState(false)
 
   useEffect(() => {
@@ -33,7 +43,10 @@ export default function WaitlistPage() {
       })
       const data = await res.json()
       if (!res.ok) { setError(data.error || 'Something went wrong.'); return }
-      setDone({ position: data.position ?? null, referralCode: data.referralCode ?? null, already: !!data.alreadyJoined })
+      setDone({
+        position: data.position ?? null, referralCode: data.referralCode ?? null,
+        already: !!data.alreadyJoined, referrals: data.referrals ?? 0, metro: data.metro ?? null,
+      })
     } catch {
       setError('Something went wrong. Please try again.')
     } finally {
@@ -138,11 +151,35 @@ export default function WaitlistPage() {
             </h1>
             {done.position && (
               <p className="mt-2 text-lg font-medium text-[var(--dark)]/60">
-                You&rsquo;re <span className="font-extrabold text-[var(--dark)]">#{done.position.toLocaleString()}</span> in line.
+                You&rsquo;re <span className="font-extrabold text-[var(--dark)]">#{done.position.toLocaleString()}</span>
+                {done.metro ? <> in <span className="font-semibold text-[var(--dark)]">{done.metro.name}</span></> : ' in line'}.
               </p>
             )}
+
+            {/* Metro countdown — "open your city" rallying mechanic */}
+            {done.metro && !done.metro.ready && (
+              <div className="mt-5 rounded-2xl bg-[var(--cream)]/60 p-4 text-left">
+                <p className="text-sm font-bold">
+                  {done.metro.name} opens when {done.metro.minWomen} women join.
+                </p>
+                <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-black/10">
+                  <div className="h-full bg-[var(--dark)]" style={{ width: `${Math.min(100, Math.round((done.metro.women / done.metro.minWomen) * 100))}%` }} />
+                </div>
+                <p className="mt-1 text-[12px] text-[var(--dark)]/60">
+                  {done.metro.women} of {done.metro.minWomen} — {done.metro.womenToGo} to go. Every friend you invite gets your city there faster.
+                </p>
+              </div>
+            )}
+            {done.metro?.ready && (
+              <p className="mt-4 rounded-2xl bg-emerald-100 p-3 text-sm font-semibold text-emerald-800">
+                {done.metro.name} has hit critical mass — you&rsquo;re in the first launch group. 🎉
+              </p>
+            )}
+
             <p className="mt-5 text-[var(--dark)]/70">
-              Want in sooner? Share your link — every friend who joins moves you up.
+              {done.referrals > 0
+                ? <>You&rsquo;ve referred <b>{done.referrals}</b> — that&rsquo;s <b>{done.referrals * 25} spots</b> higher. Keep going.</>
+                : <>Want in sooner? Share your link — every friend who joins moves you up <b>25 spots</b>{done.metro ? <> and helps open {done.metro.name}</> : null}.</>}
             </p>
             <div className="mt-4 flex items-center gap-2 rounded-xl border border-black/10 p-2">
               <span className="flex-1 truncate px-2 text-sm text-[var(--dark)]/60">{shareUrl}</span>
