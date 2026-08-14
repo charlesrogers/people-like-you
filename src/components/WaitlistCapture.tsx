@@ -130,21 +130,23 @@ export default function WaitlistCapture() {
         </div>
 
         <h1 className="mt-8 text-4xl font-extrabold tracking-tight leading-[1.05] sm:text-5xl">
-          A matchmaker for people who{' '}
-          <span className="italic">date to marry</span>.
+          You don&rsquo;t want matches. You want a{' '}
+          <span className="italic">spark</span>.
         </h1>
         <p className="mt-4 text-lg font-medium text-[var(--dark)]/60">
-          One real introduction a day — picked by someone who knows what you&rsquo;re actually
-          looking for. No swiping. No feed.
-          <span className="font-bold text-[var(--dark)]"> No wondering if they&rsquo;re serious.</span>
+          You can&rsquo;t see that in a swipe. So we learn who you actually are, then bring you
+          one person a day — with the reason you&rsquo;d like them. No cold opens. No fishing for
+          something to say.
+          <span className="font-bold text-[var(--dark)]"> Just the best odds we can build on
+          every person you meet.</span>
         </p>
 
         {/* Value props — why this is different, in the three seconds they'll give us. */}
         <ul className="mt-7 space-y-3">
           {[
-            ['💛', 'One a day, not a hundred', 'You get one person, chosen on purpose, with the reason why. Then you decide.'],
-            ['🙅', 'Nobody swipes on you', 'Your face isn’t sitting in a deck. The woman sees the introduction first, and she decides.'],
-            ['📍', 'We open one ZIP at a time', 'Enough people near you have to join before we launch there. Yours counts.'],
+            ['✨', 'The spark is the point', 'We don’t hand you a name and wish you luck. You see what you’d genuinely have in common before you say a word.'],
+            ['💛', 'You weren’t the problem', 'Great people scrolled past you, and you past them. That’s a sorting problem, not a you problem.'],
+            ['📍', 'We open one ZIP at a time', 'We launch where enough people nearby have joined. Yours tells us where to go next.'],
           ].map(([icon, title, body]) => (
             <li key={title} className="flex gap-3">
               <span className="text-xl leading-none" aria-hidden>{icon}</span>
@@ -157,7 +159,7 @@ export default function WaitlistCapture() {
         </ul>
 
         <p className="mt-7 text-base font-bold">
-          Add your number and ZIP. You&rsquo;re in the moment we open near you.
+          Add your number and ZIP. You&rsquo;re in the day we open near you.
         </p>
 
         <form onSubmit={submit} className="mt-8 rounded-3xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
