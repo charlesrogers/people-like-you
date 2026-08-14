@@ -3,21 +3,15 @@
 import { useState, useEffect, useRef } from 'react'
 import SiteFooter from '@/components/SiteFooter'
 
-interface MetroCountdown {
-  name: string
-  women: number; men: number; total: number
-  minWomen: number; minTotal: number; maxRatio: number
-  womenToGo: number; totalToGo: number
-  genderTracked: boolean; ready: boolean
-}
-
+// The API still returns counts, gate thresholds and queue position — the admin launch
+// dashboard needs them. The public popup deliberately reads only the metro's name: no
+// position, no headcount, no progress. Nothing here should signal how full a city is.
 type Result = {
-  position: number | null
   referralCode: string | null
   referrals: number
   city: string | null
   state: string | null
-  metro: MetroCountdown | null
+  metro: { name: string } | null
   already: boolean
 }
 
@@ -86,7 +80,6 @@ export default function WaitlistCapture() {
         return
       }
       setResult({
-        position: data.position ?? null,
         referralCode: data.referralCode ?? null,
         referrals: data.referrals ?? 0,
         city: data.city ?? null,
@@ -212,75 +205,22 @@ export default function WaitlistCapture() {
               <h2 id="wl-dialog-title" className="mt-3 text-3xl font-extrabold tracking-tight">
                 {result.already ? 'You’re already on the list' : `We’re launching in ${placeName} soon.`}
               </h2>
+              {/* No status markers here — no queue position, no headcount, no progress bar.
+                  At low volume every one of those reads as "nobody else is here." */}
               <p className="mt-3 text-[var(--dark)]/60">
-                {result.position ? (
-                  <>
-                    You&rsquo;re{' '}
-                    <span className="font-extrabold text-[var(--dark)]">#{result.position.toLocaleString()}</span>
-                    {result.metro ? <> in {result.metro.name}</> : ' in line'}. We open each city once
-                    enough people nearby have joined — so your spot is what decides where we go first.
-                  </>
-                ) : (
-                  <>You&rsquo;re on the list. We open each city once enough people nearby have joined.</>
-                )}
+                You&rsquo;re on the list. We open each city once enough people nearby have
+                joined — so where you are is part of what decides where we go first.
               </p>
             </div>
-
-            {/* Metro countdown — the "open your city" rallying mechanic (T16b). */}
-            {result.metro && !result.metro.ready && (() => {
-              // Gender isn't collected on the phone+ZIP form, so show the headcount
-              // countdown unless this metro actually has gender data behind it.
-              const useWomen = result.metro.genderTracked
-              const have = useWomen ? result.metro.women : result.metro.total
-              const need = useWomen ? result.metro.minWomen : result.metro.minTotal
-              const pct = Math.min(100, Math.round((have / Math.max(1, need)) * 100))
-
-              // Show progress as a percentage, never the raw headcount — "1 of 150" reads as
-              // "nobody is here". Below PCT_FLOOR even the percentage undersells it, so we
-              // drop the number entirely rather than print something discouraging (or fake).
-              const PCT_FLOOR = 10
-              return (
-                <div className="mt-5 rounded-2xl bg-[var(--cream)] p-4">
-                  {pct >= PCT_FLOOR ? (
-                    <>
-                      <p className="text-sm font-bold">
-                        {result.metro.name} is {pct}% of the way to opening.
-                      </p>
-                      <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-black/10">
-                        <div className="h-full bg-[var(--dark)]" style={{ width: `${pct}%` }} />
-                      </div>
-                      <p className="mt-2 text-xs text-[var(--dark)]/60">
-                        Every friend you invite gets your city there faster.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <p className="text-sm font-bold">{result.metro.name} is just getting started.</p>
-                      <p className="mt-2 text-xs text-[var(--dark)]/60">
-                        Which means your invites count for more — every friend who joins gets your
-                        city open sooner.
-                      </p>
-                    </>
-                  )}
-                </div>
-              )
-            })()}
-
-            {result.metro?.ready && (
-              <p className="mt-5 rounded-2xl bg-[var(--cream)] p-4 text-sm font-bold">
-                {result.metro.name} has hit critical mass — you&rsquo;re in the first launch group. 🎉
-              </p>
-            )}
 
             <div className="mt-6 rounded-2xl bg-[var(--cream)] p-5">
               <h3 className="text-lg font-extrabold tracking-tight">
                 Want in sooner — and more matches?
               </h3>
               <p className="mt-2 text-sm text-[var(--dark)]/70">
-                Every friend who joins moves you up <span className="font-bold text-[var(--dark)]">25
-                spots</span> — and gets you <span className="font-bold text-[var(--dark)]">two
-                introductions a day instead of one</span> for a week once we open. Invite three,
-                and that runs for three weeks.
+                Every friend who joins gets you in earlier — and gets you{' '}
+                <span className="font-bold text-[var(--dark)]">two introductions a day instead of
+                one</span> for a week once we open. Invite three, and that runs for three weeks.
               </p>
               {result.referrals > 0 && (
                 <p className="mt-2 text-sm font-bold">

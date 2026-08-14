@@ -39,8 +39,8 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
       <>
         We open one city at a time, and a city opens once enough people nearby have joined —
         it&rsquo;s density, not a date on a calendar. That&rsquo;s exactly why we ask for your
-        ZIP: it tells us where people are actually waiting. You&rsquo;ll see your city&rsquo;s
-        progress the moment you join.
+        ZIP: it tells us where people are actually waiting. We&rsquo;ll text you the day yours
+        opens.
       </>
     ),
   },
@@ -57,10 +57,10 @@ const FAQS: { q: string; a: React.ReactNode }[] = [
     q: 'How do I get in sooner?',
     a: (
       <>
-        Invite people. Every friend who joins with your link moves you up 25 spots, and earns
-        you two introductions a day instead of one for your first week once we open. Invite
-        three and that runs for three weeks. It also helps your city hit the number it needs
-        to open at all.
+        Invite people. Every friend who joins with your link gets you in earlier, and earns you
+        two introductions a day instead of one for your first week once we open. Invite three
+        and that runs for three weeks. It also helps your city reach the point where we can
+        open it at all.
       </>
     ),
   },
