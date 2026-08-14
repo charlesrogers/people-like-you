@@ -15,6 +15,20 @@ function makeReferralCode(): string {
   return s
 }
 
+// Digits-only phone for dedupe. Accepts 10-digit US or 11-digit with country code.
+function normalizePhone(raw: unknown): string | null {
+  const d = String(raw ?? '').replace(/\D/g, '')
+  if (d.length === 11 && d.startsWith('1')) return d.slice(1)
+  if (d.length === 10) return d
+  return null
+}
+
+// zip_locations stores "New york" / "Beverly hills" — fix the casing for display.
+function titleCase(s: string | null): string | null {
+  if (!s) return s
+  return s.replace(/\b[a-z]/g, c => c.toUpperCase())
+}
+
 type DB = ReturnType<typeof createServerClient>
 
 /** Live position within the signup's metro (or global if metro unresolved), after referral jumps. */
@@ -33,7 +47,15 @@ async function computePosition(db: DB, row: { created_at: string; metro_key: str
   return { position, referrals: referrals ?? 0 }
 }
 
-/** Public countdown for a metro: women joined vs the gate, and whether it's ready. */
+/**
+ * Public countdown for a metro.
+ *
+ * NOTE (2026-08-13): the capture form is now phone + ZIP only, so new signups carry no
+ * `gender`. The women-first gate (min_women / max_ratio) can't be evaluated from waitlist
+ * data alone anymore, so a metro with no gender data falls back to the headcount gate
+ * (min_total). `genderTracked` tells the UI which countdown is honest to show. Decision
+ * pending from Charles: re-add a one-tap gender toggle, or move the gate to headcount.
+ */
 async function metroCountdown(db: DB, metroKey: string) {
   const metro = METROS.find(m => m.key === metroKey)
   if (!metro) return null
@@ -42,16 +64,22 @@ async function metroCountdown(db: DB, metroKey: string) {
   const { count: women } = await db.from('waitlist').select('id', { count: 'exact', head: true }).eq('metro_key', metroKey).eq('gender', 'Woman')
   const { count: men } = await db.from('waitlist').select('id', { count: 'exact', head: true }).eq('metro_key', metroKey).eq('gender', 'Man')
   const ratio = (women ?? 0) > 0 ? (men ?? 0) / (women ?? 1) : null
+  const genderTracked = (women ?? 0) + (men ?? 0) > 0
+
   return {
     name: metro.name,
     women: women ?? 0, men: men ?? 0, total: total ?? 0,
     minWomen: gate.min_women, minTotal: gate.min_total, maxRatio: gate.max_ratio,
     womenToGo: Math.max(0, gate.min_women - (women ?? 0)),
-    ready: (women ?? 0) >= gate.min_women && (total ?? 0) >= gate.min_total && (ratio === null || ratio <= gate.max_ratio),
+    totalToGo: Math.max(0, gate.min_total - (total ?? 0)),
+    genderTracked,
+    ready: genderTracked
+      ? (women ?? 0) >= gate.min_women && (total ?? 0) >= gate.min_total && (ratio === null || ratio <= gate.max_ratio)
+      : (total ?? 0) >= gate.min_total,
   }
 }
 
-// POST /api/waitlist { email, phone?, zipcode?, gender?, ref?, source? }
+// POST /api/waitlist { phone, zipcode, ref?, source? }
 export async function POST(req: NextRequest) {
   try {
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown'
@@ -59,40 +87,53 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Too many attempts. Please wait a minute.' }, { status: 429 })
     }
 
-    const { email, phone, zipcode, gender, ref, source } = await req.json()
-    const cleanEmail = typeof email === 'string' ? email.trim().toLowerCase() : ''
-    if (!cleanEmail || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(cleanEmail)) {
-      return NextResponse.json({ error: 'Please enter a valid email.' }, { status: 400 })
+    const { phone, zipcode, ref, source } = await req.json()
+
+    const phone_normalized = normalizePhone(phone)
+    if (!phone_normalized) {
+      return NextResponse.json({ error: 'Please enter a valid 10-digit phone number.' }, { status: 400 })
+    }
+
+    const zip = String(zipcode ?? '').trim()
+    if (!/^\d{5}$/.test(zip)) {
+      return NextResponse.json({ error: 'Please enter a valid 5-digit ZIP code.' }, { status: 400 })
     }
 
     const db = createServerClient()
-    const zip = zipcode && /^\d{5}$/.test(String(zipcode).trim()) ? String(zipcode).trim() : null
 
-    // Resolve ZIP → named metro (CBSA metro_area first, ZIP3 fallback).
-    let metro_key: string | null = null
-    let metro_area: string | null = null
-    if (zip) {
-      const loc = await lookupZip(zip).catch(() => null)
-      const metro = resolveMetro({ metroArea: loc?.metro_area, zipcode: zip })
-      if (metro) { metro_key = metro.key; metro_area = metro.name }
-      else if (loc?.metro_area) { metro_area = loc.metro_area }
-    }
+    // Resolve ZIP → city (for the "launching in <your city>" copy) and → named metro
+    // (CBSA metro_area first, ZIP3 fallback) for the launch-order signal.
+    const loc = await lookupZip(zip).catch(() => null)
+    const city = titleCase(loc?.city ?? null)
+    const state = loc?.state ?? null
+    const metro = resolveMetro({ metroArea: loc?.metro_area, zipcode: zip })
+    const metro_key = metro?.key ?? null
+    const metro_area = metro?.name ?? loc?.metro_area ?? null
 
+    // Already on the list? Return their existing spot rather than erroring.
     const { data: existing } = await db.from('waitlist')
-      .select('created_at, metro_key, referral_code').eq('email', cleanEmail).single()
+      .select('created_at, metro_key, referral_code, city, state')
+      .eq('phone_normalized', phone_normalized).single()
     if (existing) {
       const pos = await computePosition(db, existing)
       const countdown = existing.metro_key ? await metroCountdown(db, existing.metro_key) : null
-      return NextResponse.json({ ok: true, alreadyJoined: true, ...pos, referralCode: existing.referral_code, metro: countdown })
+      return NextResponse.json({
+        ok: true, alreadyJoined: true, ...pos,
+        referralCode: existing.referral_code,
+        city: existing.city ?? city, state: existing.state ?? state,
+        metro: countdown,
+      })
     }
 
     const referral_code = makeReferralCode()
     const { data: inserted, error } = await db.from('waitlist').insert({
-      email: cleanEmail,
-      phone: phone ? String(phone).trim() : null,
+      phone: String(phone).trim(),
+      phone_normalized,
       zipcode: zip,
+      zip3: zip.slice(0, 3),
+      city, state,
       metro_key, metro_area,
-      gender: gender === 'Man' || gender === 'Woman' ? gender : null,
+      metro_code: loc?.metro_code ?? null,
       referral_code,
       referred_by: ref ? String(ref).trim() : null,
       source: source ? String(source).slice(0, 120) : null,
@@ -104,7 +145,7 @@ export async function POST(req: NextRequest) {
 
     const pos = await computePosition(db, inserted)
     const countdown = metro_key ? await metroCountdown(db, metro_key) : null
-    return NextResponse.json({ ok: true, ...pos, referralCode: referral_code, metro: countdown })
+    return NextResponse.json({ ok: true, ...pos, referralCode: referral_code, city, state, metro: countdown })
   } catch (err) {
     console.error('Waitlist error:', err)
     return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 })
@@ -117,9 +158,9 @@ export async function GET(req: NextRequest) {
   if (!code) return NextResponse.json({ error: 'code required' }, { status: 400 })
   const db = createServerClient()
   const { data: row } = await db.from('waitlist')
-    .select('created_at, metro_key, referral_code').eq('referral_code', code).single()
+    .select('created_at, metro_key, referral_code, city, state').eq('referral_code', code).single()
   if (!row) return NextResponse.json({ error: 'Not found' }, { status: 404 })
   const pos = await computePosition(db, row)
   const countdown = row.metro_key ? await metroCountdown(db, row.metro_key) : null
-  return NextResponse.json({ ok: true, ...pos, referralCode: code, metro: countdown })
+  return NextResponse.json({ ok: true, ...pos, referralCode: code, city: row.city, state: row.state, metro: countdown })
 }
