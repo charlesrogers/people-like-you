@@ -241,23 +241,26 @@ export default function WaitlistCapture() {
               const PCT_FLOOR = 10
               return (
                 <div className="mt-5 rounded-2xl bg-[var(--cream)] p-4">
-                  <p className="text-sm font-bold">
-                    {result.metro.name} opens once enough people nearby have joined.
-                  </p>
                   {pct >= PCT_FLOOR ? (
                     <>
+                      <p className="text-sm font-bold">
+                        {result.metro.name} is {pct}% of the way to opening.
+                      </p>
                       <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-black/10">
                         <div className="h-full bg-[var(--dark)]" style={{ width: `${pct}%` }} />
                       </div>
                       <p className="mt-2 text-xs text-[var(--dark)]/60">
-                        {pct}% of the way there. Every friend you invite gets your city there faster.
+                        Every friend you invite gets your city there faster.
                       </p>
                     </>
                   ) : (
-                    <p className="mt-2 text-xs text-[var(--dark)]/60">
-                      It&rsquo;s early here — which means your invites count for more. Every friend
-                      who joins gets your city open sooner.
-                    </p>
+                    <>
+                      <p className="text-sm font-bold">{result.metro.name} is just getting started.</p>
+                      <p className="mt-2 text-xs text-[var(--dark)]/60">
+                        Which means your invites count for more — every friend who joins gets your
+                        city open sooner.
+                      </p>
+                    </>
                   )}
                 </div>
               )
