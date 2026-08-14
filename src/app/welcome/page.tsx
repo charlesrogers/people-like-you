@@ -11,7 +11,7 @@ export default function Home() {
       {/* ══════ NAV ══════ */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-4 sm:px-10 backdrop-blur-md bg-[var(--cream)]/80">
         <span className="text-xl font-bold tracking-tight">
-          P<span className="italic text-[var(--neon-dim)]">L</span>Y
+          People <span className="italic">Like</span> You
         </span>
         <Link
           href="/onboarding"
@@ -253,7 +253,7 @@ export default function Home() {
       <footer className="border-t border-[var(--dark)]/10 px-6 py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 sm:flex-row">
           <span className="text-lg font-bold tracking-tight">
-            P<span className="italic text-[var(--neon-dim)]">L</span>Y
+            People <span className="italic">Like</span> You
           </span>
           <div className="flex items-center gap-6 text-sm text-[var(--dark)]/40 font-medium">
             <Link href="/thesis" className="hover:text-[var(--dark)] transition">

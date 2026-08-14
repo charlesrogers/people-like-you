@@ -124,8 +124,10 @@ export default function WaitlistCapture() {
     <div className="min-h-screen bg-[var(--cream)] text-[var(--dark)] flex flex-col items-center px-6 py-12 sm:py-20">
       <div className="w-full max-w-md">
         <div className="text-center">
-          <span className="text-2xl font-bold tracking-tight">
-            P<span className="italic text-[var(--neon-dim)]">L</span>Y
+          {/* Spell the name out: "PLY" means nothing to someone arriving from an ad. Never
+              tint it with --neon-dim — that's yellow on a yellow (--cream) background. */}
+          <span className="text-xl font-bold tracking-tight sm:text-2xl">
+            People <span className="italic">Like</span> You
           </span>
         </div>
 
