@@ -97,9 +97,12 @@ export default function WaitlistCapture() {
     }
   }
 
-  const placeName = result?.city
-    ? `${result.city}${result.state ? `, ${result.state}` : ''}`
-    : result?.metro?.name || 'your area'
+  // Always name the METRO, never the ZIP's town. The queue and the go-live gate are both
+  // per-metro, so "launching in Alta soon / you're #1 in Salt Lake" read as a contradiction.
+  // City+state is only a fallback for ZIPs that don't resolve to a launch metro at all.
+  const placeName =
+    result?.metro?.name ||
+    (result?.city ? `${result.city}${result.state ? `, ${result.state}` : ''}` : 'your area')
 
   const shareUrl = result?.referralCode
     ? `https://people-like-you.com/?ref=${result.referralCode}`
@@ -108,7 +111,7 @@ export default function WaitlistCapture() {
   const inviteMessage =
     `ok this one's actually different — it's a matchmaker, not another swipe app. ` +
     `One real introduction a day and they do the picking.\n\n` +
-    `It opens in ${result?.city || placeName} once enough of us are on the list, and I'm already in line. ` +
+    `It opens in ${placeName} once enough of us are on the list, and I'm already in line. ` +
     `Use my link so we both get in early + double intros the first week:\n${shareUrl}`
 
   function copy(text: string, which: 'link' | 'message') {
@@ -226,21 +229,32 @@ export default function WaitlistCapture() {
               const useWomen = result.metro.genderTracked
               const have = useWomen ? result.metro.women : result.metro.total
               const need = useWomen ? result.metro.minWomen : result.metro.minTotal
-              const toGo = useWomen ? result.metro.womenToGo : result.metro.totalToGo
+              const pct = Math.min(100, Math.round((have / Math.max(1, need)) * 100))
+
+              // Show progress as a percentage, never the raw headcount — "1 of 150" reads as
+              // "nobody is here". Below PCT_FLOOR even the percentage undersells it, so we
+              // drop the number entirely rather than print something discouraging (or fake).
+              const PCT_FLOOR = 10
               return (
                 <div className="mt-5 rounded-2xl bg-[var(--cream)] p-4">
                   <p className="text-sm font-bold">
-                    {result.metro.name} opens when {need}{useWomen ? ' women' : ' people'} join.
+                    {result.metro.name} opens once enough people nearby have joined.
                   </p>
-                  <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-black/10">
-                    <div
-                      className="h-full bg-[var(--dark)]"
-                      style={{ width: `${Math.min(100, Math.round((have / Math.max(1, need)) * 100))}%` }}
-                    />
-                  </div>
-                  <p className="mt-2 text-xs text-[var(--dark)]/60">
-                    {have} of {need} — {toGo} to go. Every friend you invite gets your city there faster.
-                  </p>
+                  {pct >= PCT_FLOOR ? (
+                    <>
+                      <div className="mt-2 h-2 w-full overflow-hidden rounded-full bg-black/10">
+                        <div className="h-full bg-[var(--dark)]" style={{ width: `${pct}%` }} />
+                      </div>
+                      <p className="mt-2 text-xs text-[var(--dark)]/60">
+                        {pct}% of the way there. Every friend you invite gets your city there faster.
+                      </p>
+                    </>
+                  ) : (
+                    <p className="mt-2 text-xs text-[var(--dark)]/60">
+                      It&rsquo;s early here — which means your invites count for more. Every friend
+                      who joins gets your city open sooner.
+                    </p>
+                  )}
                 </div>
               )
             })()}

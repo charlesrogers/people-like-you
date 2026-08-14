@@ -31,7 +31,7 @@ export const DEFAULT_GATE: MetroGate = { min_women: 75, min_total: 150, max_rati
 // Ordered by launch priority. Utah Valley is first regardless of signup ranking.
 export const METROS: MetroDef[] = [
   // ── Utah / Idaho (LDS-dense core — launch here first) ──
-  { key: 'utah-valley', name: 'Utah Valley',  metroAreas: ['Provo-Orem'],     zip3: ['846'], gate: { min_women: 50, min_total: 100 } },
+  { key: 'utah-valley', name: 'Utah County',  metroAreas: ['Provo-Orem'],     zip3: ['846'], gate: { min_women: 50, min_total: 100 } },
   { key: 'salt-lake',   name: 'Salt Lake',    metroAreas: ['Salt Lake City'], zip3: ['841'] },
   { key: 'rexburg',     name: 'Rexburg',      metroAreas: [],                 zip3: ['834'] }, // Rexburg + Idaho Falls
   { key: 'boise',       name: 'Boise',        metroAreas: [],                 zip3: ['836', '837'] },
