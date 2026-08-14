@@ -130,21 +130,20 @@ export default function WaitlistCapture() {
         </div>
 
         <h1 className="mt-8 text-4xl font-extrabold tracking-tight leading-[1.05] sm:text-5xl">
-          You don&rsquo;t want matches. You want a{' '}
+          Matches won&rsquo;t get you married. You need a{' '}
           <span className="italic">spark</span>.
         </h1>
         <p className="mt-4 text-lg font-medium text-[var(--dark)]/60">
-          You can&rsquo;t see that in a swipe. So we learn who you actually are, then bring you
-          one person a day — with the reason you&rsquo;d like them. No cold opens. No fishing for
-          something to say.
-          <span className="font-bold text-[var(--dark)]"> Just the best odds we can build on
-          every person you meet.</span>
+          A swipe can intrigue you — a cold opener almost never lands. So we go past matching:
+          every introduction starts with the reason you&rsquo;d like each other. It&rsquo;s like
+          you&rsquo;ve already had the first date. No cold opens. No fishing for something to say.
+          <span className="font-bold text-[var(--dark)]"> Just the best odds, with the best people.</span>
         </p>
 
         {/* Value props — why this is different, in the three seconds they'll give us. */}
         <ul className="mt-7 space-y-3">
           {[
-            ['✨', 'The spark is the point', 'We don’t hand you a name and wish you luck. You see what you’d genuinely have in common before you say a word.'],
+            ['🔥', 'You start warm', 'We don’t hand you a name and wish you luck. You get what you’d genuinely have in common — so the first message writes itself.'],
             ['💛', 'You weren’t the problem', 'Great people scrolled past you, and you past them. That’s a sorting problem, not a you problem.'],
             ['📍', 'We open one ZIP at a time', 'We launch where enough people nearby have joined. Yours tells us where to go next.'],
           ].map(([icon, title, body]) => (
