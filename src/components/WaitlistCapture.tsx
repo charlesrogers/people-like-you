@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import SiteFooter from '@/components/SiteFooter'
 
 interface MetroCountdown {
   name: string
@@ -182,6 +183,8 @@ export default function WaitlistCapture() {
           </p>
         </form>
       </div>
+
+      <SiteFooter />
 
       {/* ══════ SUCCESS POPUP ══════ */}
       {result && (
