@@ -82,9 +82,15 @@ async function metroCountdown(db: DB, metroKey: string) {
 // POST /api/waitlist { phone, zipcode, ref?, source? }
 export async function POST(req: NextRequest) {
   try {
+    // 40/min, not 8: waitlist growth runs through in-person groups (an activity, a
+    // dorm, a friend group), and everyone on one WiFi shares an IP — at 8/min the
+    // ninth person to sign up at an event got blocked. Still low enough to stop a script.
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown'
-    if (!rateLimit(ip, { maxAttempts: 8, windowMs: 60_000 }).ok) {
-      return NextResponse.json({ error: 'Too many attempts. Please wait a minute.' }, { status: 429 })
+    if (!rateLimit(ip, { maxAttempts: 40, windowMs: 60_000 }).ok) {
+      return NextResponse.json(
+        { error: "Lots of signups from your network right now — give it a minute and try again. Your spot isn't taken." },
+        { status: 429 }
+      )
     }
 
     const { phone, zipcode, ref, source } = await req.json()
