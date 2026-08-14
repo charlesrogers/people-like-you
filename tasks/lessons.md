@@ -479,3 +479,21 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** Apple 1.2's "filter" pillar is defensibly about BROADCAST content (profile photos, profile text/voice that matches see). Private 1:1 chat is standardly handled REACTIVELY (report + block + review-on-report). Pre-scanning every DM is aggressive, unnecessary for compliance, and directly contradicts PLY's privacy positioning ("we don't read your private conversations") — the privacy page even said so while the code did the opposite.
 **Rule:** Only auto-moderate PUBLIC-FACING / broadcast content (photos shown to matches, profile-derived voice memos). NEVER pre-screen private 1:1 messages — govern those with block + report + on-report review. When adding a safety feature, check it against the product's stated privacy promises before shipping.
 **Category:** anti-pattern
+
+### 2026-08-13 — Rewrote a file without checking remote branches first; nearly clobbered another session's work
+**What went wrong:** Rewrote `src/app/api/waitlist/route.ts` wholesale from the version on my session branch. `origin/staging` was 2 commits ahead with T16b Phase 1 (named-metro registry, real referral jumps, admin launch dashboard, `GET /api/waitlist?code=`). The push was rejected as non-fast-forward — that rejection is the ONLY reason the work wasn't destroyed. I also numbered a migration `021_` when `021_waitlist_metro_key.sql` already existed on staging.
+**Why it's wrong:** A worktree session branch is not the source of truth. Another Claude session had shipped substantial work to `staging` that never reached my branch, and a full-file `Write` silently discards it. Migration numbers are a shared namespace across branches.
+**Rule:** Before rewriting ANY file (especially a full-file Write) or adding a migration, run `git fetch origin && git log --oneline HEAD..origin/staging --stat` and `ls migrations/` against the remote. Rebase onto `origin/staging` FIRST, then edit. Never pick a migration number without checking the remote branch's migrations directory.
+**Category:** near-miss
+
+### 2026-08-13 — `docker container prune -f` on a cron deleted the production database container
+**What went wrong:** `/data/scripts/docker-cleanup.sh` ran `docker container prune -f` every 6 hours. When `supabase-db` exited under memory pressure on 2026-08-08, the cron permanently DELETED the container. Every app on the Hetzner box was down for 5 days; PLY served Traefik 503s the whole time.
+**Why it's wrong:** Container prune is indiscriminate — it removes any stopped container, including stateful infrastructure. A crashed DB is recoverable in seconds; a *deleted* DB container turns a blip into a multi-day outage. Disk pressure is reclaimed by image/builder prune, not container prune.
+**Rule:** NEVER run `docker container prune` on a scheduled job on a host running stateful services. Prune images and build cache only (`docker image prune -af`, `docker builder prune -af`). If containers must be reaped, filter explicitly by label/name and exclude infrastructure.
+**Category:** anti-pattern
+
+### 2026-08-13 — "Noticed a compromise" is not "remediated a compromise"
+**What went wrong:** The sales-analyzer cryptominer documented as a "May 2026" incident was never actually removed. The dropper `/tmp/npm_update` was dated 2026-04-02 and `[system-check]` processes had 64+ days of accumulated CPU — the same infection had been mining continuously for 4.5 months on an unpatched Next.js 15.1.6 image that was never rebuilt.
+**Why it's wrong:** The container kept running with its writable layer intact, so the malware survived. Writing the incident into CLAUDE.md created a false sense that it was handled.
+**Rule:** Remediating a compromised container means: stop it, `--restart=no`, REMOVE the container (destroying the writable layer), rebuild the image from source on a patched base, and rotate every credential that container could read. Verify with `docker top` afterwards. An incident is not closed until the malicious process is gone AND the entry vector is patched.
+**Category:** mistake
