@@ -134,18 +134,18 @@ export default function WaitlistCapture() {
           <span className="italic">spark</span>.
         </h1>
         <p className="mt-4 text-lg font-medium text-[var(--dark)]/60">
-          A swipe can intrigue you — a cold opener almost never lands. So we go past matching:
-          every introduction starts with the reason you&rsquo;d like each other. It&rsquo;s like
-          you&rsquo;ve already had the first date. No cold opens. No fishing for something to say.
-          <span className="font-bold text-[var(--dark)]"> Just the best odds, with the best people.</span>
+          We go past matching: every introduction opens with a tailored preview of why
+          you&rsquo;d like them — and why they&rsquo;d like you. It&rsquo;s like you&rsquo;ve
+          already had the first date. No cold opens. No fishing for something to say.
+          <span className="font-bold text-[var(--dark)]"> Just the best odds that the right
+          person doesn&rsquo;t slip past you.</span>
         </p>
 
         {/* Value props — why this is different, in the three seconds they'll give us. */}
         <ul className="mt-7 space-y-3">
           {[
-            ['🔥', 'You start warm', 'We don’t hand you a name and wish you luck. You get what you’d genuinely have in common — so the first message writes itself.'],
-            ['💛', 'You weren’t the problem', 'Great people scrolled past you, and you past them. That’s a sorting problem, not a you problem.'],
-            ['📍', 'We open one ZIP at a time', 'We launch where enough people nearby have joined. Yours tells us where to go next.'],
+            ['🔥', 'You’ll know why before you meet', 'We tell you the things about them you’d find most attractive — and tell them the same about you.'],
+            ['💛', 'You weren’t the problem', 'Great people scrolled past you, and you past them. That’s ours to fix, not yours.'],
           ].map(([icon, title, body]) => (
             <li key={title} className="flex gap-3">
               <span className="text-xl leading-none" aria-hidden>{icon}</span>
