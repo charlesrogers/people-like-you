@@ -22,8 +22,12 @@ type Result = {
 }
 
 // Display a US phone as (801) 555-0123 while they type.
-function formatPhone(raw: string): string {
-  const d = raw.replace(/\D/g, '').slice(0, 10)
+export function formatPhone(raw: string): string {
+  let d = raw.replace(/\D/g, '')
+  // Drop the US country code BEFORE truncating. Slicing first turned "+1 801 555 0123"
+  // into "(180) 155-5012" and stored that wrong number — phone is our only contact channel.
+  if (d.length > 10 && d.startsWith('1')) d = d.slice(1)
+  d = d.slice(0, 10)
   if (d.length <= 3) return d
   if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`
   return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}`
