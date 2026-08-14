@@ -134,31 +134,11 @@ export default function WaitlistCapture() {
           <span className="italic">spark</span>.
         </h1>
         <p className="mt-4 text-lg font-medium text-[var(--dark)]/60">
-          We go past matching: every introduction opens with a tailored preview of why
-          you&rsquo;d like them — and why they&rsquo;d like you. It&rsquo;s like you&rsquo;ve
+          People Like You starts every introduction with a tailored preview of why you&rsquo;d
+          like them (and we tell them why they&rsquo;d like you). It&rsquo;s like you&rsquo;ve
           already had the first date. No cold opens. No fishing for something to say.
           <span className="font-bold text-[var(--dark)]"> Just the best odds that the right
-          person doesn&rsquo;t slip past you.</span>
-        </p>
-
-        {/* Value props — why this is different, in the three seconds they'll give us. */}
-        <ul className="mt-7 space-y-3">
-          {[
-            ['🔥', 'You’ll know why before you meet', 'We tell you the things about them you’d find most attractive — and tell them the same about you.'],
-            ['💛', 'You weren’t the problem', 'Great people scrolled past you, and you past them. That’s ours to fix, not yours.'],
-          ].map(([icon, title, body]) => (
-            <li key={title} className="flex gap-3">
-              <span className="text-xl leading-none" aria-hidden>{icon}</span>
-              <span>
-                <span className="font-bold">{title}.</span>{' '}
-                <span className="text-[var(--dark)]/60">{body}</span>
-              </span>
-            </li>
-          ))}
-        </ul>
-
-        <p className="mt-7 text-base font-bold">
-          Add your number and ZIP. You&rsquo;re in the day we open near you.
+          person doesn&rsquo;t slip past you in a sea 🌊 of swipes.</span>
         </p>
 
         <form onSubmit={submit} className="mt-8 rounded-3xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
