@@ -107,7 +107,7 @@ export default function WaitlistCapture() {
   const inviteMessage =
     `ok this one's actually different — it's a matchmaker, not another swipe app. ` +
     `One real introduction a day and they do the picking.\n\n` +
-    `It opens in ${placeName} once enough of us are on the list, and I'm already in line. ` +
+    `It opens in ${result?.city || placeName} once enough of us are on the list, and I'm already in line. ` +
     `Use my link so we both get in early + double intros the first week:\n${shareUrl}`
 
   function copy(text: string, which: 'link' | 'message') {
@@ -136,14 +136,14 @@ export default function WaitlistCapture() {
         <p className="mt-4 text-lg font-medium text-[var(--dark)]/60">
           One real introduction a day — picked by someone who knows what you&rsquo;re actually
           looking for. No swiping. No feed.
-          <span className="font-bold text-[var(--dark)]"> No wondering if he&rsquo;s serious.</span>
+          <span className="font-bold text-[var(--dark)]"> No wondering if they&rsquo;re serious.</span>
         </p>
 
         {/* Value props — why this is different, in the three seconds they'll give us. */}
         <ul className="mt-7 space-y-3">
           {[
             ['💛', 'One a day, not a hundred', 'You get one person, chosen on purpose, with the reason why. Then you decide.'],
-            ['🙈', 'You’re not a card in a deck', 'Nobody scrolls past your face. She sees the introduction first — and she goes first.'],
+            ['🃏', 'You’re not a card in a deck', 'Nobody scrolls past your face. The woman sees the introduction first, and she decides.'],
             ['📍', 'We open one ZIP at a time', 'Enough people near you have to join before we launch there. Yours counts.'],
           ].map(([icon, title, body]) => (
             <li key={title} className="flex gap-3">
