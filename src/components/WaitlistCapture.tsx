@@ -143,7 +143,7 @@ export default function WaitlistCapture() {
         <ul className="mt-7 space-y-3">
           {[
             ['💛', 'One a day, not a hundred', 'You get one person, chosen on purpose, with the reason why. Then you decide.'],
-            ['🃏', 'You’re not a card in a deck', 'Nobody scrolls past your face. The woman sees the introduction first, and she decides.'],
+            ['🙅', 'Nobody swipes on you', 'Your face isn’t sitting in a deck. The woman sees the introduction first, and she decides.'],
             ['📍', 'We open one ZIP at a time', 'Enough people near you have to join before we launch there. Yours counts.'],
           ].map(([icon, title, body]) => (
             <li key={title} className="flex gap-3">
