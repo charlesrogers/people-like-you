@@ -105,11 +105,10 @@ export default function WaitlistCapture() {
     : 'https://people-like-you.com/'
 
   const inviteMessage =
-    `I just got on the list for People Like You — it's a matchmaker that sends you ` +
-    `one real introduction a day instead of making you swipe for hours. ` +
-    `They're launching in ${placeName} soon.\n\n` +
-    `Join with my link and we both get early access — plus extra matches every day ` +
-    `for the first few weeks: ${shareUrl}`
+    `ok this one's actually different — it's a matchmaker, not another swipe app. ` +
+    `One real introduction a day and they do the picking.\n\n` +
+    `It opens in ${placeName} once enough of us are on the list, and I'm already in line. ` +
+    `Use my link so we both get in early + double intros the first week:\n${shareUrl}`
 
   function copy(text: string, which: 'link' | 'message') {
     navigator.clipboard
@@ -131,13 +130,34 @@ export default function WaitlistCapture() {
         </div>
 
         <h1 className="mt-8 text-4xl font-extrabold tracking-tight leading-[1.05] sm:text-5xl">
-          One introduction a day.{' '}
-          <span className="italic">Never swipe again.</span>
+          A matchmaker for people who{' '}
+          <span className="italic">date to marry</span>.
         </h1>
         <p className="mt-4 text-lg font-medium text-[var(--dark)]/60">
-          People Like You is a matchmaker that learns who you actually are — then hand-picks
-          one real person a day.
-          <span className="font-bold text-[var(--dark)]"> We&rsquo;re opening city by city.</span>
+          One real introduction a day — picked by someone who knows what you&rsquo;re actually
+          looking for. No swiping. No feed.
+          <span className="font-bold text-[var(--dark)]"> No wondering if he&rsquo;s serious.</span>
+        </p>
+
+        {/* Value props — why this is different, in the three seconds they'll give us. */}
+        <ul className="mt-7 space-y-3">
+          {[
+            ['💛', 'One a day, not a hundred', 'You get one person, chosen on purpose, with the reason why. Then you decide.'],
+            ['🙈', 'You’re not a card in a deck', 'Nobody scrolls past your face. She sees the introduction first — and she goes first.'],
+            ['📍', 'We open one ZIP at a time', 'Enough people near you have to join before we launch there. Yours counts.'],
+          ].map(([icon, title, body]) => (
+            <li key={title} className="flex gap-3">
+              <span className="text-xl leading-none" aria-hidden>{icon}</span>
+              <span>
+                <span className="font-bold">{title}.</span>{' '}
+                <span className="text-[var(--dark)]/60">{body}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-7 text-base font-bold">
+          Add your number and ZIP. You&rsquo;re in the moment we open near you.
         </p>
 
         <form onSubmit={submit} className="mt-8 rounded-3xl bg-white p-5 shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
@@ -172,10 +192,10 @@ export default function WaitlistCapture() {
             disabled={submitting}
             className="mt-4 w-full rounded-full bg-[var(--dark)] px-6 py-4 text-base font-bold text-white transition hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
           >
-            {submitting ? 'Getting your spot…' : 'Get early access'}
+            {submitting ? 'Saving your spot…' : 'Get early access'}
           </button>
           <p className="mt-3 text-center text-[11px] text-[var(--dark)]/40">
-            We&rsquo;ll only text you when we open in your area. No spam, ever.
+            One text when we open near you. That&rsquo;s it — no spam, no daily nudges.
           </p>
         </form>
       </div>
