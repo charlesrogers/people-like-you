@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
+  alternates: { canonical: "/privacy" },
   title: "Privacy Policy — People Like You",
 };
 

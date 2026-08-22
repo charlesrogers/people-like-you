@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
+  alternates: { canonical: "/thesis" },
   title: "Our Thesis — People Like You",
   description:
     "Why dating apps fail at chemistry, and what we're doing about it.",

@@ -5,6 +5,13 @@ import Link from "next/link";
    Bumble-inspired. Neon yellow. Futura vibes. Whimsy.
    ───────────────────────────────────────────────────────── */
 
+export const metadata = {
+  alternates: { canonical: "/welcome" },
+  title: "People Like You — A matchmaker that actually knows you",
+  description:
+    "Tell us your stories out loud. We learn who you are, then send one real introduction at a time. No swiping, no small talk, no endless feed.",
+};
+
 export default function Home() {
   return (
     <div className="overflow-x-hidden bg-[var(--cream)]">

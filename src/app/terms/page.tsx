@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 export const metadata = {
+  alternates: { canonical: "/terms" },
   title: "Terms of Service — People Like You",
 };
 

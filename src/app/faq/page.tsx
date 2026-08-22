@@ -2,6 +2,7 @@ import Link from 'next/link'
 import SiteFooter from '@/components/SiteFooter'
 
 export const metadata = {
+  alternates: { canonical: '/faq' },
   title: 'FAQ — People Like You',
   description: 'Common questions about People Like You, the matchmaker that sends one real introduction a day.',
 }
