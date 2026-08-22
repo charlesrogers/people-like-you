@@ -70,6 +70,8 @@ eligible pool (hard filters + Elo band + active)          [unchanged]
 
 ## 4. Reader instrument — Battery B (~23 items, ~4–5 min)
 
+> **⚠ This section and §5 are a first sketch, superseded item-by-item by the questionnaire deep-dive** (`specs/matching-v2-questionnaire-deep-dive.md`, commissioned 2026-08-22 — a dedicated session that must complete before V2-T2/T3/T4 freeze copy). The *structure* below (blocks, storage, derived fields, envelope) is binding; the *items and copy* are placeholders.
+
 Placement: new onboarding step **after basics, before voice memos** (quiz answers feed the voice prompts, §4.4). Results are **private** — never shown to the user or to matches as scores; individual answers may surface *as pitch content* (that's their second job).
 
 ### 4.1 Big Five mini — 10 items, 5-pt agree scale (Strongly disagree … Strongly agree)
@@ -317,6 +319,7 @@ create table pitch_taste_votes (
 
 | task | what | key files |
 |---|---|---|
+| V2-T0 | **Questionnaire deep dive — dedicated session**, per `specs/matching-v2-questionnaire-deep-dive.md`. Produces the final battery, 16 sample pitches, voice-prompt map, UX flow, pilot. **Blocks copy freeze of V2-T2/T3/T4** (their build can start against the sketch; nothing ships until D-QD deliverables land) | that charter |
 | V2-T1 | Migration §10 + PostgREST reload + db helpers | `migrations/`, `src/lib/db.ts` |
 | V2-T2 | Quiz step UI + scoring + `reader_traits` persist + politics hard-filter toggle wiring | `src/app/onboarding/page.tsx`, `src/lib/db.ts`, `applyHardFilters` |
 | V2-T3 | 16 sample pitches (authored, critic-passing) + pitch-taste step UI + derived pickiness/scale_use/taste_priors | onboarding `taste` step (currently skipped — rewire), `src/lib/sample-pitches.ts` |
