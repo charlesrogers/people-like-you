@@ -131,3 +131,18 @@ Use Census counts for **pool size only**. For the gender skew, cite the LDS-spec
 ---
 
 **Synopsis:** We now hold LDS congregation + adherent counts for all 869 US metros, sourced and citable, saved at `data/lds-metro-density-2020.csv`. Build 8–12 hand-written metro pages (not 869) plus three ranking pages as link magnets. The non-obvious call: weight toward diaspora metros — Phoenix has 617 congregations and LA has more adherents than Boise, the SERPs there are empty, and that market is exactly where a brokered introduction beats a swipe feed.
+
+---
+
+## PARKED — LDS singles per metro (Charles's static-rate method)
+
+The metro table above puts LDS adherents next to all-population never-married counts. **Those columns are not comparable** — NYC's 2.98M never-married 20–34 is the whole city, while its LDS single pool is a subset of 62,194 adherents. Do not ship that table as-is.
+
+Charles's fix: derive one static LDS-single rate per age decile nationally and apply it to each metro's adherent count.
+
+Inputs gathered so far:
+- **LDS adherents nationally (2020 Religion Census):** 6,721,031 across 14,567 congregations — 2.03% of US population.
+- **US never-married (ACS 2023 5-yr, all religions):** 20–29 = 34,570,110; 30–39 = 16,797,698.
+- Still needed: LDS age distribution and never-married share by decile. Pew's Religious Landscape Study (2023–24 refresh) publishes both by religious tradition; the numbers were not pulled before this was parked.
+
+Method when resumed: `LDS_singles(metro, decile) = LDS_adherents(metro) × LDS_share_in_decile × LDS_never_married_rate_in_decile`. Label the output an estimate and show the derivation — it is a modeled number, not a measured one.
