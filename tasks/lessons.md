@@ -515,3 +515,15 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** the no-LDS-branding rule is Charles's own decision, recorded by Charles. He is the person with standing to revise it, and he holds the actual risk information about how Meta reviews dating apps. Flagging a conflict once is correct; building the entire deliverable around the flag, and substituting a different premise for his, is not — it converts "here is your strategy plus one caveat" into "here is a strategy for a question you didn't ask." The ZIP framing compounded it: he said location pages, I heard programmatic SEO and answered the doorway-page question instead of the what-goes-on-a-metro-page question.
 **Rule:** When a request conflicts with a previously locked decision, raise it in at most one short paragraph and then build what was asked, on the requester's premise. Never restructure a deliverable around the objection or swap in a substitute premise. And when the ask names a geographic unit (metro, city, region), build at exactly that unit — do not generalize to a finer one and then argue against the generalization.
 **Category:** anti-pattern
+
+### 2026-08-22 — Decisions must be asked inline, never in a file
+**What went wrong:** Matching v2 decision memo ended with "answer D1–D10 in §9"; the chat reply gave only compressed labels, forcing Charles to open specs/matching-v2-decision-memo.md to decide.
+**Why it's wrong:** Charles answers from the conversation. A file-bound ask adds a find-the-file round trip and stalls the decision loop.
+**Rule:** Always write decision questions out in the reply itself — self-contained (question + options + rec). Files may duplicate the ask, never replace it.
+**Category:** anti-pattern
+
+### 2026-08-22 — Farm-outs ship with a 🔫 copy-paste prompt; URLs always inline
+**What went wrong:** Delivered farm-out charters (questionnaire deep-dive, v2 brief) without ready-to-copy launch prompts; Charles had to ask for them.
+**Why it's wrong:** A farm-out spec without its launch prompt isn't finished — Charles pastes prompts into fresh sessions; making him compose one (or hunt for a path/URL) is friction on every single farm-out.
+**Rule:** Every farm-out deliverable ends with the full absolute path AND a self-contained copy-paste prompt starting with 🔫. Any URL the user might need goes in the message, full and clickable.
+**Category:** anti-pattern
