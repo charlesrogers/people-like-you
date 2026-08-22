@@ -94,11 +94,39 @@ Already a decided feature (T16 revised). Metro pages are its home. But `waitlist
 
 ---
 
-## Open data gap
+## The singles overlay — RESOLVED, no API key needed
 
-The singles overlay — never-married adults 20–34 by sex, and the **sex ratio** per metro — comes from Census ACS table B12002 (`B12002_006/007/008E` male, `B12002_099/100/101E` female). Verified those variables exist and are published at metro level. The API requires a **free key** (no billing, unlike Cloud DNS): `api.census.gov/data/key_signup.html`. Needs Charles's email, so it is his to request.
+Charles's Census key never activated (API returns `invalid_key.html`). Not needed: the ACS 5-year **table-based Summary File** is keyless bulk download —
+`https://www2.census.gov/programs-surveys/acs/summary_file/2023/table-based-SF/data/5YRData/acsdt5y2023-b12002.dat`
+(323 MB, one file per table; metro rows are `GEO_ID` prefix `310M700US`, geography lookup in `documentation/Geos20235YR.txt`). Table B12002, never-married ages 20–34, summing `E006/E007/E008` (male) and `E099/E100/E101` (female).
 
-Worth having: the sex ratio is the single most on-thesis number PLY could publish, since the whole launch mechanic is the female-supply constraint. But every page type above ships without it.
+Saved: `data/acs-nevermarried-20-34-2023.csv`, and joined to the Religion Census in `data/metro-pages-data.csv`.
+
+### The seven approved metros
+
+| Metro | LDS congs | LDS adherents | % of pop | Never-married 20–34 |
+|---|---:|---:|---:|---:|
+| Salt Lake City-Murray, UT | 1,476 | 653,868 | 52.0% | 169,697 |
+| Provo-Orem-Lehi, UT | 1,356 | 554,604 | 82.6% | 88,092 |
+| Phoenix-Mesa-Chandler, AZ | 617 | 301,196 | 6.2% | 691,293 |
+| Boise City, ID | 265 | 115,016 | 15.0% | 89,916 |
+| Washington-Arlington-Alexandria | 134 | 72,147 | 1.1% | 898,116 |
+| New York-Newark-Jersey City | 107 | 62,194 | 0.3% | 2,982,294 |
+| Rexburg, ID | 97 | 35,114 | 53.0% | 11,770 |
+
+(CBSA names differ slightly between sources — 2020 Religion Census says "Provo-Orem" / "Salt Lake City", 2023 ACS says "Provo-Orem-Lehi" / "Salt Lake City-Murray". Same CBSA codes, 39340 and 41620.)
+
+---
+
+## ⚠ The sex-ratio trap — do not ship the raw Census ratio
+
+ACS gives never-married women per 100 men, ages 20–34: **Provo-Orem 76.3, Boise 77.0, SLC 78.8, Phoenix 82.3, Rexburg 88.5, DC 92.6, NYC 93.4.** Read naively, that says Utah has a surplus of single *men*.
+
+**Publishing that on an LDS dating page would be wrong and would contradict our own product thesis.** It measures all never-married residents regardless of religion. Among *active Latter-day Saints* the ratio runs hard the other way — ARIS / Trinity College work (Phillips, Cragun, Kosmin) puts Utah's LDS gender ratio around 60:40 female-to-male, roughly 150 women per 100 men, because men leave the faith at higher rates. Utah has more men than women overall *and* a large surplus of single LDS women. Both are true; they are different populations.
+
+Use Census counts for **pool size only**. For the gender skew, cite the LDS-specific research explicitly and at the level it was measured (state, not metro).
+
+**And the gap between the two ratios is the single best content idea we have.** "Utah County has 76 never-married women per 100 never-married men overall — but among active Latter-day Saints it runs the other way, closer to 150 to 100. Here is why, and what it means for you." Counterintuitive, sourced, nobody has written it well, and it sets up the women-first mechanic without arguing for it.
 
 ---
 
