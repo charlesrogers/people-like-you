@@ -89,7 +89,7 @@ Two separate registrations:
 ## 7. Launch gate checklist
 
 - [ ] All §2 unit + §3 integration tests green in CI (build gate before Docker, per house deploy standard)
-- [ ] T-SIM S1–S4 pass; realized MDEs written into E-STYLE registration
+- [x] **T-SIM S1–S4 PASS (2026-08-22)** — `scripts/matching_v2_sim.py`, results in `specs/matching-v2-tsim-results.md`, run log `specs/matching-v2-tsim-run.txt`. S2 (the C12 gate) passes decisively: injected position-3 drift moves angle estimates by ≤0.044pp. Realized angle-contrast MDEs **+10.62 / +7.46 / +5.11 pp** at 1,200 / 2,250 / 4,500 events — still to be written into the E-STYLE registration. **Two corrections fall out of the sim: the §11 fitter recipe (results §3) and H1/H2/H4 power (results §5).**
 - [ ] Migration applied on staging + prod, `_migrations` row by exact filename, PostgREST schema reloaded
 - [ ] `MILIEU_WEIGHT` set in Coolify (staging + prod), kill-switch flip verified on staging (I5)
 - [ ] E-STYLE + E-MILIEU registered; experiment IDs recorded in the DONE block and EXECUTION.md

@@ -1,0 +1,835 @@
+
+################ S1/S2 (2000 cohorts) ################
+==============================================================================
+T-SIM — PLY matching v2 design validation  (test plan §4)
+==============================================================================
+design: 50 readers x <=45 pitches, pool 50, K~{1:.2,2:.3,3:.5}, lead coin .5, hard-pass 15%
+truth : angles {'admiration': 0.0, 'self_expansion': 10.0, 'i_sharing': 0.0, 'comfort': -5.0}, lead +5.0pp, position-3 +5.0pp, sd_reader 0.5, sd_candidate 1.0 (dominant)
+model : fire ~ C(angle, Treatment('admiration')) + C(lead, Treatment('character')) + C(position, Treatment(1)) + pickiness  + (1|reader) + (1|candidate), Laplace/MAP
+cohorts per stage: 2000
+
+calibrated b0 = -1.7699 (marginal fire rate targeted at 20%)
+
+[S1/S2 — recovery + confound separation] 2000 cohorts | 50 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/2000 cohorts  (  4.0s, 20 converged)
+    ... 40/2000 cohorts  (  5.8s, 40 converged)
+    ... 60/2000 cohorts  (  7.5s, 60 converged)
+    ... 80/2000 cohorts  (  9.2s, 80 converged)
+    ... 100/2000 cohorts  ( 11.2s, 100 converged)
+    ... 120/2000 cohorts  ( 12.9s, 120 converged)
+    ... 140/2000 cohorts  ( 14.8s, 140 converged)
+    ... 160/2000 cohorts  ( 16.7s, 160 converged)
+    ... 180/2000 cohorts  ( 18.5s, 180 converged)
+    ... 200/2000 cohorts  ( 20.4s, 200 converged)
+    ... 220/2000 cohorts  ( 22.4s, 220 converged)
+    ... 240/2000 cohorts  ( 24.4s, 240 converged)
+    ... 260/2000 cohorts  ( 26.2s, 260 converged)
+    ... 280/2000 cohorts  ( 28.1s, 280 converged)
+    ... 300/2000 cohorts  ( 29.9s, 300 converged)
+    ... 320/2000 cohorts  ( 32.1s, 320 converged)
+    ... 340/2000 cohorts  ( 34.1s, 340 converged)
+    ... 360/2000 cohorts  ( 35.9s, 360 converged)
+    ... 380/2000 cohorts  ( 37.7s, 380 converged)
+    ... 400/2000 cohorts  ( 39.4s, 400 converged)
+    ... 420/2000 cohorts  ( 41.3s, 420 converged)
+    ... 440/2000 cohorts  ( 43.0s, 440 converged)
+    ... 460/2000 cohorts  ( 44.9s, 460 converged)
+    ... 480/2000 cohorts  ( 46.7s, 480 converged)
+    ... 500/2000 cohorts  ( 48.5s, 500 converged)
+    ... 520/2000 cohorts  ( 50.3s, 520 converged)
+    ... 540/2000 cohorts  ( 52.1s, 540 converged)
+    ... 560/2000 cohorts  ( 54.0s, 560 converged)
+    ... 580/2000 cohorts  ( 55.8s, 580 converged)
+    ... 600/2000 cohorts  ( 57.7s, 600 converged)
+    ... 620/2000 cohorts  ( 59.5s, 620 converged)
+    ... 640/2000 cohorts  ( 61.3s, 640 converged)
+    ... 660/2000 cohorts  ( 63.1s, 660 converged)
+    ... 680/2000 cohorts  ( 64.9s, 680 converged)
+    ... 700/2000 cohorts  ( 66.6s, 700 converged)
+    ... 720/2000 cohorts  ( 68.5s, 720 converged)
+    ... 740/2000 cohorts  ( 70.2s, 740 converged)
+    ... 760/2000 cohorts  ( 72.0s, 760 converged)
+    ... 780/2000 cohorts  ( 73.9s, 780 converged)
+    ... 800/2000 cohorts  ( 75.8s, 800 converged)
+    ... 820/2000 cohorts  ( 77.5s, 820 converged)
+    ... 840/2000 cohorts  ( 79.3s, 840 converged)
+    ... 860/2000 cohorts  ( 81.1s, 860 converged)
+    ... 880/2000 cohorts  ( 82.8s, 880 converged)
+    ... 900/2000 cohorts  ( 84.5s, 900 converged)
+    ... 920/2000 cohorts  ( 86.3s, 920 converged)
+    ... 940/2000 cohorts  ( 88.2s, 940 converged)
+    ... 960/2000 cohorts  ( 90.0s, 960 converged)
+    ... 980/2000 cohorts  ( 91.7s, 980 converged)
+    ... 1000/2000 cohorts  ( 93.5s, 1000 converged)
+    ... 1020/2000 cohorts  ( 95.3s, 1020 converged)
+    ... 1040/2000 cohorts  ( 97.3s, 1040 converged)
+    ... 1060/2000 cohorts  ( 99.1s, 1060 converged)
+    ... 1080/2000 cohorts  (101.0s, 1080 converged)
+    ... 1100/2000 cohorts  (102.9s, 1100 converged)
+    ... 1120/2000 cohorts  (105.1s, 1120 converged)
+    ... 1140/2000 cohorts  (107.0s, 1140 converged)
+    ... 1160/2000 cohorts  (108.8s, 1160 converged)
+    ... 1180/2000 cohorts  (110.6s, 1180 converged)
+    ... 1200/2000 cohorts  (112.4s, 1200 converged)
+    ... 1220/2000 cohorts  (114.5s, 1220 converged)
+    ... 1240/2000 cohorts  (116.3s, 1240 converged)
+    ... 1260/2000 cohorts  (118.1s, 1260 converged)
+    ... 1280/2000 cohorts  (119.9s, 1280 converged)
+    ... 1300/2000 cohorts  (121.7s, 1300 converged)
+    ... 1320/2000 cohorts  (123.5s, 1320 converged)
+    ... 1340/2000 cohorts  (125.5s, 1340 converged)
+    ... 1360/2000 cohorts  (127.2s, 1360 converged)
+    ... 1380/2000 cohorts  (129.0s, 1380 converged)
+    ... 1400/2000 cohorts  (131.1s, 1400 converged)
+    ... 1420/2000 cohorts  (133.0s, 1420 converged)
+    ... 1440/2000 cohorts  (134.9s, 1440 converged)
+    ... 1460/2000 cohorts  (136.7s, 1460 converged)
+    ... 1480/2000 cohorts  (138.5s, 1480 converged)
+    ... 1500/2000 cohorts  (140.3s, 1500 converged)
+    ... 1520/2000 cohorts  (142.0s, 1520 converged)
+    ... 1540/2000 cohorts  (144.0s, 1540 converged)
+    ... 1560/2000 cohorts  (146.0s, 1560 converged)
+    ... 1580/2000 cohorts  (147.8s, 1580 converged)
+    ... 1600/2000 cohorts  (149.6s, 1600 converged)
+    ... 1620/2000 cohorts  (151.4s, 1620 converged)
+    ... 1640/2000 cohorts  (153.4s, 1640 converged)
+    ... 1660/2000 cohorts  (155.2s, 1660 converged)
+    ... 1680/2000 cohorts  (157.0s, 1680 converged)
+    ... 1700/2000 cohorts  (158.8s, 1700 converged)
+    ... 1720/2000 cohorts  (160.8s, 1720 converged)
+    ... 1740/2000 cohorts  (162.8s, 1740 converged)
+    ... 1760/2000 cohorts  (164.6s, 1760 converged)
+    ... 1780/2000 cohorts  (166.7s, 1780 converged)
+    ... 1800/2000 cohorts  (168.6s, 1800 converged)
+    ... 1820/2000 cohorts  (170.3s, 1820 converged)
+    ... 1840/2000 cohorts  (172.3s, 1840 converged)
+    ... 1860/2000 cohorts  (174.4s, 1860 converged)
+    ... 1880/2000 cohorts  (176.2s, 1880 converged)
+    ... 1900/2000 cohorts  (177.9s, 1900 converged)
+    ... 1920/2000 cohorts  (179.8s, 1920 converged)
+    ... 1940/2000 cohorts  (181.7s, 1940 converged)
+    ... 1960/2000 cohorts  (183.7s, 1960 converged)
+    ... 1980/2000 cohorts  (185.5s, 1980 converged)
+    ... 2000/2000 cohorts  (187.0s, 2000 converged)
+    done: 2000/2000 converged, mean N=2250 events, mean fire rate 0.216, mean pairs/cohort 1305, pos-3 share 0.123
+    recovered RE sd (VB): reader 0.492, candidate 0.990  | true reader 0.5, candidate 1.0
+
+--- S1/S2 estimates (2000 cohorts, injected position-3 drift +5pp) ---
+                 term  fitter true_beta true_pp mean_beta mean_pp bias_pp mcse_pp emp_sd med_se coverage power
+angle[self_expansion]  vb+map    +0.539  +10.00    +0.539   +9.99   -0.01   +0.15 +0.155 +0.148    93.8% 95.2%
+     angle[i_sharing]  vb+map    +0.000   +0.00    -0.007   -0.10   -0.10   +0.12 +0.165 +0.156    94.0%  6.0%
+       angle[comfort]  vb+map    -0.348   -5.00    -0.357   -5.11   -0.11   +0.10 +0.172 +0.164    94.2% 58.5%
+       lead[interest]  vb+map    +0.288   +5.00    +0.293   +5.11   +0.11   +0.10 +0.117 +0.110    92.8% 74.4%
+          position[2]  vb+map    +0.000   +0.00    +0.006   +0.09   +0.09   +0.10 +0.134 +0.125    92.8%  7.2%
+          position[3]  vb+map    +0.288   +5.00    +0.298   +5.19   +0.19   +0.16 +0.185 +0.171    93.2% 42.4%
+            pickiness cluster    +0.000   +0.00    +0.004   +0.06   +0.06   +0.19 +0.268 +0.251    93.3%  6.7%
+
+S1  CI coverage >=90% for every true beta : PASS (min 92.8% on lead[interest])
+S1  +10pp angle detected in >=80% of runs : PASS (95.2%)
+S1  OVERALL: PASS
+S2  mean |angle bias| < 1pp despite drift : PASS (0.07pp +/- 0.14 MC; worst single angle 0.11pp)
+
+==============================================================================
+ACCEPTANCE SUMMARY
+==============================================================================
+  S1: PASS
+  S2: PASS
+
+total runtime 190s
+
+################ S2 DECISIVE (2000 x 2 arms) ################
+==============================================================================
+T-SIM — PLY matching v2 design validation  (test plan §4)
+==============================================================================
+design: 50 readers x <=45 pitches, pool 50, K~{1:.2,2:.3,3:.5}, lead coin .5, hard-pass 15%
+truth : angles {'admiration': 0.0, 'self_expansion': 10.0, 'i_sharing': 0.0, 'comfort': -5.0}, lead +5.0pp, position-3 +5.0pp, sd_reader 0.5, sd_candidate 1.0 (dominant)
+model : fire ~ C(angle, Treatment('admiration')) + C(lead, Treatment('character')) + C(position, Treatment(1)) + pickiness  + (1|reader) + (1|candidate), Laplace/MAP
+cohorts per stage: 2000
+
+calibrated b0 = -1.7699 (marginal fire rate targeted at 20%)
+
+==============================================================================
+S2 (decisive) — angle bias WITH vs WITHOUT the injected position drift
+==============================================================================
+
+[S2-diff [drift +5pp]] 2000 cohorts | 50 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/2000 cohorts  (  3.2s, 20 converged)
+    ... 40/2000 cohorts  (  5.1s, 40 converged)
+    ... 60/2000 cohorts  (  6.8s, 60 converged)
+    ... 80/2000 cohorts  (  9.1s, 80 converged)
+    ... 100/2000 cohorts  ( 10.9s, 100 converged)
+    ... 120/2000 cohorts  ( 12.8s, 120 converged)
+    ... 140/2000 cohorts  ( 14.9s, 140 converged)
+    ... 160/2000 cohorts  ( 16.8s, 160 converged)
+    ... 180/2000 cohorts  ( 18.5s, 180 converged)
+    ... 200/2000 cohorts  ( 20.3s, 200 converged)
+    ... 220/2000 cohorts  ( 22.2s, 220 converged)
+    ... 240/2000 cohorts  ( 24.0s, 240 converged)
+    ... 260/2000 cohorts  ( 25.9s, 260 converged)
+    ... 280/2000 cohorts  ( 27.8s, 280 converged)
+    ... 300/2000 cohorts  ( 29.7s, 300 converged)
+    ... 320/2000 cohorts  ( 31.5s, 320 converged)
+    ... 340/2000 cohorts  ( 33.3s, 340 converged)
+    ... 360/2000 cohorts  ( 35.2s, 360 converged)
+    ... 380/2000 cohorts  ( 37.0s, 380 converged)
+    ... 400/2000 cohorts  ( 38.9s, 400 converged)
+    ... 420/2000 cohorts  ( 41.2s, 420 converged)
+    ... 440/2000 cohorts  ( 43.2s, 440 converged)
+    ... 460/2000 cohorts  ( 44.9s, 460 converged)
+    ... 480/2000 cohorts  ( 46.8s, 480 converged)
+    ... 500/2000 cohorts  ( 48.8s, 500 converged)
+    ... 520/2000 cohorts  ( 50.6s, 520 converged)
+    ... 540/2000 cohorts  ( 52.3s, 540 converged)
+    ... 560/2000 cohorts  ( 54.1s, 560 converged)
+    ... 580/2000 cohorts  ( 55.9s, 580 converged)
+    ... 600/2000 cohorts  ( 57.7s, 600 converged)
+    ... 620/2000 cohorts  ( 59.5s, 620 converged)
+    ... 640/2000 cohorts  ( 61.3s, 640 converged)
+    ... 660/2000 cohorts  ( 63.2s, 660 converged)
+    ... 680/2000 cohorts  ( 65.0s, 680 converged)
+    ... 700/2000 cohorts  ( 66.8s, 700 converged)
+    ... 720/2000 cohorts  ( 68.7s, 720 converged)
+    ... 740/2000 cohorts  ( 70.6s, 740 converged)
+    ... 760/2000 cohorts  ( 72.4s, 760 converged)
+    ... 780/2000 cohorts  ( 74.2s, 780 converged)
+    ... 800/2000 cohorts  ( 76.0s, 800 converged)
+    ... 820/2000 cohorts  ( 77.8s, 820 converged)
+    ... 840/2000 cohorts  ( 79.6s, 840 converged)
+    ... 860/2000 cohorts  ( 81.4s, 860 converged)
+    ... 880/2000 cohorts  ( 83.4s, 880 converged)
+    ... 900/2000 cohorts  ( 85.2s, 900 converged)
+    ... 920/2000 cohorts  ( 86.9s, 920 converged)
+    ... 940/2000 cohorts  ( 88.7s, 940 converged)
+    ... 960/2000 cohorts  ( 90.6s, 960 converged)
+    ... 980/2000 cohorts  ( 92.4s, 980 converged)
+    ... 1000/2000 cohorts  ( 94.2s, 1000 converged)
+    ... 1020/2000 cohorts  ( 96.1s, 1020 converged)
+    ... 1040/2000 cohorts  ( 97.9s, 1040 converged)
+    ... 1060/2000 cohorts  (100.3s, 1060 converged)
+    ... 1080/2000 cohorts  (102.3s, 1080 converged)
+    ... 1100/2000 cohorts  (104.2s, 1100 converged)
+    ... 1120/2000 cohorts  (106.0s, 1120 converged)
+    ... 1140/2000 cohorts  (107.8s, 1140 converged)
+    ... 1160/2000 cohorts  (109.6s, 1160 converged)
+    ... 1180/2000 cohorts  (111.3s, 1180 converged)
+    ... 1200/2000 cohorts  (113.4s, 1200 converged)
+    ... 1220/2000 cohorts  (115.3s, 1220 converged)
+    ... 1240/2000 cohorts  (117.0s, 1240 converged)
+    ... 1260/2000 cohorts  (118.7s, 1260 converged)
+    ... 1280/2000 cohorts  (120.5s, 1280 converged)
+    ... 1300/2000 cohorts  (122.3s, 1300 converged)
+    ... 1320/2000 cohorts  (124.1s, 1320 converged)
+    ... 1340/2000 cohorts  (125.9s, 1340 converged)
+    ... 1360/2000 cohorts  (127.7s, 1360 converged)
+    ... 1380/2000 cohorts  (129.5s, 1380 converged)
+    ... 1400/2000 cohorts  (131.3s, 1400 converged)
+    ... 1420/2000 cohorts  (133.4s, 1420 converged)
+    ... 1440/2000 cohorts  (135.2s, 1440 converged)
+    ... 1460/2000 cohorts  (137.0s, 1460 converged)
+    ... 1480/2000 cohorts  (138.8s, 1480 converged)
+    ... 1500/2000 cohorts  (140.6s, 1500 converged)
+    ... 1520/2000 cohorts  (142.4s, 1520 converged)
+    ... 1540/2000 cohorts  (144.2s, 1540 converged)
+    ... 1560/2000 cohorts  (146.0s, 1560 converged)
+    ... 1580/2000 cohorts  (147.9s, 1580 converged)
+    ... 1600/2000 cohorts  (149.6s, 1600 converged)
+    ... 1620/2000 cohorts  (151.3s, 1620 converged)
+    ... 1640/2000 cohorts  (153.0s, 1640 converged)
+    ... 1660/2000 cohorts  (155.2s, 1660 converged)
+    ... 1680/2000 cohorts  (157.2s, 1680 converged)
+    ... 1700/2000 cohorts  (158.9s, 1700 converged)
+    ... 1720/2000 cohorts  (161.2s, 1720 converged)
+    ... 1740/2000 cohorts  (163.1s, 1740 converged)
+    ... 1760/2000 cohorts  (165.2s, 1760 converged)
+    ... 1780/2000 cohorts  (166.9s, 1780 converged)
+    ... 1800/2000 cohorts  (168.7s, 1800 converged)
+    ... 1820/2000 cohorts  (170.5s, 1820 converged)
+    ... 1840/2000 cohorts  (172.4s, 1840 converged)
+    ... 1860/2000 cohorts  (174.2s, 1860 converged)
+    ... 1880/2000 cohorts  (176.1s, 1880 converged)
+    ... 1900/2000 cohorts  (177.9s, 1900 converged)
+    ... 1920/2000 cohorts  (179.6s, 1920 converged)
+    ... 1940/2000 cohorts  (181.3s, 1940 converged)
+    ... 1960/2000 cohorts  (183.1s, 1960 converged)
+    ... 1980/2000 cohorts  (184.8s, 1980 converged)
+    ... 2000/2000 cohorts  (186.5s, 2000 converged)
+    done: 2000/2000 converged, mean N=2250 events, mean fire rate 0.216, mean pairs/cohort 1306, pos-3 share 0.123
+    recovered RE sd (VB): reader 0.490, candidate 0.992  | true reader 0.5, candidate 1.0
+
+[S2-diff [no drift]] 2000 cohorts | 50 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/2000 cohorts  (  3.2s, 20 converged)
+    ... 40/2000 cohorts  (  5.5s, 40 converged)
+    ... 60/2000 cohorts  (  7.2s, 60 converged)
+    ... 80/2000 cohorts  (  9.0s, 80 converged)
+    ... 100/2000 cohorts  ( 10.8s, 100 converged)
+    ... 120/2000 cohorts  ( 12.6s, 120 converged)
+    ... 140/2000 cohorts  ( 14.4s, 140 converged)
+    ... 160/2000 cohorts  ( 16.1s, 160 converged)
+    ... 180/2000 cohorts  ( 17.9s, 180 converged)
+    ... 200/2000 cohorts  ( 19.7s, 200 converged)
+    ... 220/2000 cohorts  ( 21.7s, 220 converged)
+    ... 240/2000 cohorts  ( 23.5s, 240 converged)
+    ... 260/2000 cohorts  ( 25.5s, 260 converged)
+    ... 280/2000 cohorts  ( 27.3s, 280 converged)
+    ... 300/2000 cohorts  ( 29.2s, 300 converged)
+    ... 320/2000 cohorts  ( 31.0s, 320 converged)
+    ... 340/2000 cohorts  ( 32.9s, 340 converged)
+    ... 360/2000 cohorts  ( 34.8s, 360 converged)
+    ... 380/2000 cohorts  ( 36.7s, 380 converged)
+    ... 400/2000 cohorts  ( 38.5s, 400 converged)
+    ... 420/2000 cohorts  ( 40.2s, 420 converged)
+    ... 440/2000 cohorts  ( 42.1s, 440 converged)
+    ... 460/2000 cohorts  ( 44.0s, 460 converged)
+    ... 480/2000 cohorts  ( 46.0s, 480 converged)
+    ... 500/2000 cohorts  ( 48.2s, 500 converged)
+    ... 520/2000 cohorts  ( 50.2s, 520 converged)
+    ... 540/2000 cohorts  ( 52.0s, 540 converged)
+    ... 560/2000 cohorts  ( 54.0s, 560 converged)
+    ... 580/2000 cohorts  ( 55.9s, 580 converged)
+    ... 600/2000 cohorts  ( 57.6s, 600 converged)
+    ... 620/2000 cohorts  ( 59.4s, 620 converged)
+    ... 640/2000 cohorts  ( 61.3s, 640 converged)
+    ... 660/2000 cohorts  ( 63.1s, 660 converged)
+    ... 680/2000 cohorts  ( 65.2s, 680 converged)
+    ... 700/2000 cohorts  ( 67.2s, 700 converged)
+    ... 720/2000 cohorts  ( 69.0s, 720 converged)
+    ... 740/2000 cohorts  ( 70.8s, 740 converged)
+    ... 760/2000 cohorts  ( 72.6s, 760 converged)
+    ... 780/2000 cohorts  ( 74.5s, 780 converged)
+    ... 800/2000 cohorts  ( 76.2s, 800 converged)
+    ... 820/2000 cohorts  ( 77.9s, 820 converged)
+    ... 840/2000 cohorts  ( 79.8s, 840 converged)
+    ... 860/2000 cohorts  ( 81.7s, 860 converged)
+    ... 880/2000 cohorts  ( 83.5s, 880 converged)
+    ... 900/2000 cohorts  ( 85.3s, 900 converged)
+    ... 920/2000 cohorts  ( 87.2s, 920 converged)
+    ... 940/2000 cohorts  ( 89.1s, 940 converged)
+    ... 960/2000 cohorts  ( 91.3s, 960 converged)
+    ... 980/2000 cohorts  ( 93.0s, 980 converged)
+    ... 1000/2000 cohorts  ( 95.0s, 1000 converged)
+    ... 1020/2000 cohorts  ( 96.8s, 1020 converged)
+    ... 1040/2000 cohorts  ( 98.5s, 1040 converged)
+    ... 1060/2000 cohorts  (100.3s, 1060 converged)
+    ... 1080/2000 cohorts  (102.1s, 1080 converged)
+    ... 1100/2000 cohorts  (104.1s, 1100 converged)
+    ... 1120/2000 cohorts  (105.9s, 1120 converged)
+    ... 1140/2000 cohorts  (107.8s, 1140 converged)
+    ... 1160/2000 cohorts  (109.6s, 1160 converged)
+    ... 1180/2000 cohorts  (111.4s, 1180 converged)
+    ... 1200/2000 cohorts  (113.2s, 1200 converged)
+    ... 1220/2000 cohorts  (115.0s, 1220 converged)
+    ... 1240/2000 cohorts  (116.8s, 1240 converged)
+    ... 1260/2000 cohorts  (118.5s, 1260 converged)
+    ... 1280/2000 cohorts  (120.5s, 1280 converged)
+    ... 1300/2000 cohorts  (122.2s, 1300 converged)
+    ... 1320/2000 cohorts  (124.1s, 1320 converged)
+    ... 1340/2000 cohorts  (126.1s, 1340 converged)
+    ... 1360/2000 cohorts  (127.8s, 1360 converged)
+    ... 1380/2000 cohorts  (129.7s, 1380 converged)
+    ... 1400/2000 cohorts  (131.5s, 1400 converged)
+    ... 1420/2000 cohorts  (133.3s, 1420 converged)
+    ... 1440/2000 cohorts  (135.2s, 1440 converged)
+    ... 1460/2000 cohorts  (137.2s, 1460 converged)
+    ... 1480/2000 cohorts  (139.0s, 1480 converged)
+    ... 1500/2000 cohorts  (140.9s, 1500 converged)
+    ... 1520/2000 cohorts  (142.7s, 1520 converged)
+    ... 1540/2000 cohorts  (144.5s, 1540 converged)
+    ... 1560/2000 cohorts  (146.3s, 1560 converged)
+    ... 1580/2000 cohorts  (148.2s, 1580 converged)
+    ... 1600/2000 cohorts  (150.2s, 1600 converged)
+    ... 1620/2000 cohorts  (152.3s, 1620 converged)
+    ... 1640/2000 cohorts  (154.3s, 1640 converged)
+    ... 1660/2000 cohorts  (156.1s, 1660 converged)
+    ... 1680/2000 cohorts  (157.9s, 1680 converged)
+    ... 1700/2000 cohorts  (159.8s, 1700 converged)
+    ... 1720/2000 cohorts  (161.7s, 1720 converged)
+    ... 1740/2000 cohorts  (163.5s, 1740 converged)
+    ... 1760/2000 cohorts  (165.4s, 1760 converged)
+    ... 1780/2000 cohorts  (167.1s, 1780 converged)
+    ... 1800/2000 cohorts  (168.9s, 1800 converged)
+    ... 1820/2000 cohorts  (171.0s, 1820 converged)
+    ... 1840/2000 cohorts  (172.8s, 1840 converged)
+    ... 1860/2000 cohorts  (174.6s, 1860 converged)
+    ... 1880/2000 cohorts  (176.4s, 1880 converged)
+    ... 1900/2000 cohorts  (178.3s, 1900 converged)
+    ... 1920/2000 cohorts  (180.0s, 1920 converged)
+    ... 1940/2000 cohorts  (181.8s, 1940 converged)
+    ... 1960/2000 cohorts  (183.7s, 1960 converged)
+    ... 1980/2000 cohorts  (185.4s, 1980 converged)
+    ... 2000/2000 cohorts  (187.0s, 2000 converged)
+    done: 2000/2000 converged, mean N=2250 events, mean fire rate 0.214, mean pairs/cohort 1309, pos-3 share 0.122
+    recovered RE sd (VB): reader 0.490, candidate 0.990  | true reader 0.5, candidate 1.0
+
+--- leakage = (angle bias with drift) - (angle bias without drift) ---
+                 term  bias_drift_pp  bias_nodrift_pp  leakage_pp  MC_95ci  clean
+angle[self_expansion]          0.107            0.063       0.044 +/-0.409   True
+     angle[i_sharing]         -0.088           -0.078      -0.010 +/-0.331   True
+       angle[comfort]         -0.105           -0.062      -0.043 +/-0.274   True
+
+S2-decisive: largest leakage 0.044pp; every angle's leakage is INDISTINGUISHABLE FROM ZERO.
+    => randomised angle order + an explicit position term do decorrelate
+       the position confound. This is the direct answer to C12.
+
+==============================================================================
+ACCEPTANCE SUMMARY
+==============================================================================
+
+total runtime 382s
+
+################ S3 NULL (2000 cohorts) ################
+==============================================================================
+T-SIM — PLY matching v2 design validation  (test plan §4)
+==============================================================================
+design: 50 readers x <=45 pitches, pool 50, K~{1:.2,2:.3,3:.5}, lead coin .5, hard-pass 15%
+truth : angles {'admiration': 0.0, 'self_expansion': 10.0, 'i_sharing': 0.0, 'comfort': -5.0}, lead +5.0pp, position-3 +5.0pp, sd_reader 0.5, sd_candidate 1.0 (dominant)
+model : fire ~ C(angle, Treatment('admiration')) + C(lead, Treatment('character')) + C(position, Treatment(1)) + pickiness  + (1|reader) + (1|candidate), Laplace/MAP
+cohorts per stage: 2000
+
+calibrated b0 = -1.7699 (marginal fire rate targeted at 20%)
+
+[S3 — null safety (all true effects 0)] 2000 cohorts | 50 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/2000 cohorts  (  3.3s, 20 converged)
+    ... 40/2000 cohorts  (  5.0s, 40 converged)
+    ... 60/2000 cohorts  (  7.1s, 60 converged)
+    ... 80/2000 cohorts  (  8.8s, 80 converged)
+    ... 100/2000 cohorts  ( 10.7s, 100 converged)
+    ... 120/2000 cohorts  ( 12.7s, 120 converged)
+    ... 140/2000 cohorts  ( 14.4s, 140 converged)
+    ... 160/2000 cohorts  ( 16.1s, 160 converged)
+    ... 180/2000 cohorts  ( 18.1s, 180 converged)
+    ... 200/2000 cohorts  ( 19.8s, 200 converged)
+    ... 220/2000 cohorts  ( 21.6s, 220 converged)
+    ... 240/2000 cohorts  ( 23.5s, 240 converged)
+    ... 260/2000 cohorts  ( 25.2s, 260 converged)
+    ... 280/2000 cohorts  ( 27.0s, 280 converged)
+    ... 300/2000 cohorts  ( 28.8s, 300 converged)
+    ... 320/2000 cohorts  ( 30.5s, 320 converged)
+    ... 340/2000 cohorts  ( 32.4s, 340 converged)
+    ... 360/2000 cohorts  ( 34.2s, 360 converged)
+    ... 380/2000 cohorts  ( 35.8s, 380 converged)
+    ... 400/2000 cohorts  ( 37.8s, 400 converged)
+    ... 420/2000 cohorts  ( 39.6s, 420 converged)
+    ... 440/2000 cohorts  ( 41.5s, 440 converged)
+    ... 460/2000 cohorts  ( 43.2s, 460 converged)
+    ... 480/2000 cohorts  ( 44.9s, 480 converged)
+    ... 500/2000 cohorts  ( 46.8s, 500 converged)
+    ... 520/2000 cohorts  ( 48.5s, 520 converged)
+    ... 540/2000 cohorts  ( 50.2s, 540 converged)
+    ... 560/2000 cohorts  ( 51.9s, 560 converged)
+    ... 580/2000 cohorts  ( 53.7s, 580 converged)
+    ... 600/2000 cohorts  ( 55.5s, 600 converged)
+    ... 620/2000 cohorts  ( 57.3s, 620 converged)
+    ... 640/2000 cohorts  ( 59.4s, 640 converged)
+    ... 660/2000 cohorts  ( 61.2s, 660 converged)
+    ... 680/2000 cohorts  ( 63.0s, 680 converged)
+    ... 700/2000 cohorts  ( 64.7s, 700 converged)
+    ... 720/2000 cohorts  ( 66.4s, 720 converged)
+    ... 740/2000 cohorts  ( 68.1s, 740 converged)
+    ... 760/2000 cohorts  ( 70.0s, 760 converged)
+    ... 780/2000 cohorts  ( 71.9s, 780 converged)
+    ... 800/2000 cohorts  ( 73.7s, 800 converged)
+    ... 820/2000 cohorts  ( 75.8s, 820 converged)
+    ... 840/2000 cohorts  ( 78.1s, 840 converged)
+    ... 860/2000 cohorts  ( 79.9s, 860 converged)
+    ... 880/2000 cohorts  ( 81.7s, 880 converged)
+    ... 900/2000 cohorts  ( 83.5s, 900 converged)
+    ... 920/2000 cohorts  ( 85.2s, 920 converged)
+    ... 940/2000 cohorts  ( 87.0s, 940 converged)
+    ... 960/2000 cohorts  ( 88.9s, 960 converged)
+    ... 980/2000 cohorts  ( 90.7s, 980 converged)
+    ... 1000/2000 cohorts  ( 92.5s, 1000 converged)
+    ... 1020/2000 cohorts  ( 94.2s, 1020 converged)
+    ... 1040/2000 cohorts  ( 96.0s, 1040 converged)
+    ... 1060/2000 cohorts  ( 97.9s, 1060 converged)
+    ... 1080/2000 cohorts  ( 99.8s, 1080 converged)
+    ... 1100/2000 cohorts  (101.7s, 1100 converged)
+    ... 1120/2000 cohorts  (103.6s, 1120 converged)
+    ... 1140/2000 cohorts  (105.5s, 1140 converged)
+    ... 1160/2000 cohorts  (107.2s, 1160 converged)
+    ... 1180/2000 cohorts  (109.1s, 1180 converged)
+    ... 1200/2000 cohorts  (110.9s, 1200 converged)
+    ... 1220/2000 cohorts  (112.6s, 1220 converged)
+    ... 1240/2000 cohorts  (114.4s, 1240 converged)
+    ... 1260/2000 cohorts  (116.4s, 1260 converged)
+    ... 1280/2000 cohorts  (118.2s, 1280 converged)
+    ... 1300/2000 cohorts  (120.0s, 1300 converged)
+    ... 1320/2000 cohorts  (121.9s, 1320 converged)
+    ... 1340/2000 cohorts  (123.8s, 1340 converged)
+    ... 1360/2000 cohorts  (125.6s, 1360 converged)
+    ... 1380/2000 cohorts  (127.4s, 1380 converged)
+    ... 1400/2000 cohorts  (129.2s, 1400 converged)
+    ... 1420/2000 cohorts  (130.9s, 1420 converged)
+    ... 1440/2000 cohorts  (132.7s, 1440 converged)
+    ... 1460/2000 cohorts  (134.7s, 1460 converged)
+    ... 1480/2000 cohorts  (136.6s, 1480 converged)
+    ... 1500/2000 cohorts  (138.8s, 1500 converged)
+    ... 1520/2000 cohorts  (140.8s, 1520 converged)
+    ... 1540/2000 cohorts  (142.8s, 1540 converged)
+    ... 1560/2000 cohorts  (144.7s, 1560 converged)
+    ... 1580/2000 cohorts  (146.4s, 1580 converged)
+    ... 1600/2000 cohorts  (148.2s, 1600 converged)
+    ... 1620/2000 cohorts  (150.0s, 1620 converged)
+    ... 1640/2000 cohorts  (151.8s, 1640 converged)
+    ... 1660/2000 cohorts  (153.6s, 1660 converged)
+    ... 1680/2000 cohorts  (155.4s, 1680 converged)
+    ... 1700/2000 cohorts  (157.2s, 1700 converged)
+    ... 1720/2000 cohorts  (159.1s, 1720 converged)
+    ... 1740/2000 cohorts  (161.1s, 1740 converged)
+    ... 1760/2000 cohorts  (162.9s, 1760 converged)
+    ... 1780/2000 cohorts  (164.5s, 1780 converged)
+    ... 1800/2000 cohorts  (175.8s, 1800 converged)
+    ... 1820/2000 cohorts  (188.1s, 1820 converged)
+    ... 1840/2000 cohorts  (201.8s, 1840 converged)
+    ... 1860/2000 cohorts  (212.5s, 1860 converged)
+    ... 1880/2000 cohorts  (214.3s, 1880 converged)
+    ... 1900/2000 cohorts  (215.9s, 1900 converged)
+    ... 1920/2000 cohorts  (217.6s, 1920 converged)
+    ... 1940/2000 cohorts  (219.3s, 1940 converged)
+    ... 1960/2000 cohorts  (221.3s, 1960 converged)
+    ... 1980/2000 cohorts  (223.0s, 1980 converged)
+    ... 2000/2000 cohorts  (224.6s, 2000 converged)
+    done: 2000/2000 converged, mean N=2250 events, mean fire rate 0.206, mean pairs/cohort 1302, pos-3 share 0.124
+    recovered RE sd (VB): reader 0.488, candidate 0.994  | true reader 0.5, candidate 1.0
+
+--- S3 estimates under the null ---
+                 term  fitter true_beta true_pp mean_beta mean_pp bias_pp mcse_pp emp_sd med_se coverage power
+angle[self_expansion]  vb+map    +0.000   +0.00    -0.004   -0.06   -0.06   +0.11 +0.161 +0.155    93.8%  6.2%
+     angle[i_sharing]  vb+map    +0.000   +0.00    -0.010   -0.15   -0.15   +0.11 +0.160 +0.155    94.8%  5.1%
+       angle[comfort]  vb+map    +0.000   +0.00    -0.009   -0.15   -0.15   +0.11 +0.161 +0.156    94.3%  5.7%
+       lead[interest]  vb+map    +0.000   +0.00    +0.005   +0.09   +0.09   +0.09 +0.122 +0.110    92.0%  8.1%
+          position[2]  vb+map    +0.000   +0.00    +0.004   +0.06   +0.06   +0.10 +0.134 +0.125    94.2%  5.9%
+          position[3]  vb+map    +0.000   +0.00    +0.004   +0.07   +0.07   +0.14 +0.193 +0.181    93.5%  6.5%
+            pickiness cluster    +0.000   +0.00    +0.010   +0.16   +0.16   +0.19 +0.261 +0.254    93.9%  6.1%
+
+False-positive rate per angle contrast (nominal 5%):
+    self_exp vs ref        6.2%
+    i_shar vs ref          5.1%
+    comfort vs ref         5.7%
+    self_exp vs i_shar     6.0%
+    self_exp vs comfort    6.6%
+    i_shar vs comfort      5.5%
+    ANY of the 6 (family-wise) 23.6%   (uncorrected; expected ~13-15% — report contrasts pre-registered, not fished)
+    joint 3-df Wald        6.6%
+
+S3  per-contrast FPR <= 7% and joint test calibrated : PASS (worst contrast 6.6%, joint 6.6%)
+
+==============================================================================
+ACCEPTANCE SUMMARY
+==============================================================================
+  S3: PASS
+
+total runtime 230s
+
+################ S4 POWER (200/config) ################
+==============================================================================
+T-SIM — PLY matching v2 design validation  (test plan §4)
+==============================================================================
+design: 50 readers x <=45 pitches, pool 50, K~{1:.2,2:.3,3:.5}, lead coin .5, hard-pass 15%
+truth : angles {'admiration': 0.0, 'self_expansion': 10.0, 'i_sharing': 0.0, 'comfort': -5.0}, lead +5.0pp, position-3 +5.0pp, sd_reader 0.5, sd_candidate 1.0 (dominant)
+model : fire ~ C(angle, Treatment('admiration')) + C(lead, Treatment('character')) + C(position, Treatment(1)) + pickiness  + (1|reader) + (1|candidate), Laplace/MAP
+cohorts per stage: 200
+
+calibrated b0 = -1.7699 (marginal fire rate targeted at 20%)
+
+==============================================================================
+S4 — POWER HONESTY: realised MDEs for the E-STYLE pre-registration
+==============================================================================
+
+[S4 N~1200] 200 cohorts | 50 readers x <=24 pitches | hard_pass=0.15 | 10 workers
+    ... 20/200 cohorts  (  3.6s, 20 converged)
+    ... 40/200 cohorts  (  5.6s, 40 converged)
+    ... 60/200 cohorts  (  7.5s, 60 converged)
+    ... 80/200 cohorts  (  9.3s, 80 converged)
+    ... 100/200 cohorts  ( 11.2s, 100 converged)
+    ... 120/200 cohorts  ( 13.1s, 120 converged)
+    ... 140/200 cohorts  ( 15.0s, 140 converged)
+    ... 160/200 cohorts  ( 16.9s, 160 converged)
+    ... 180/200 cohorts  ( 18.7s, 180 converged)
+    ... 200/200 cohorts  ( 20.5s, 200 converged)
+    done: 200/200 converged, mean N=1200 events, mean fire rate 0.219, mean pairs/cohort 703, pos-3 share 0.119
+    recovered RE sd (VB): reader 0.481, candidate 0.996  | true reader 0.5, candidate 1.0
+    realised N = 1200 events
+
+[S4 N~2250] 200 cohorts | 50 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/200 cohorts  (  3.4s, 20 converged)
+    ... 40/200 cohorts  (  5.9s, 40 converged)
+    ... 60/200 cohorts  (  7.7s, 60 converged)
+    ... 80/200 cohorts  (  9.4s, 80 converged)
+    ... 100/200 cohorts  ( 11.2s, 100 converged)
+    ... 120/200 cohorts  ( 13.1s, 120 converged)
+    ... 140/200 cohorts  ( 15.2s, 140 converged)
+    ... 160/200 cohorts  ( 17.1s, 160 converged)
+    ... 180/200 cohorts  ( 18.9s, 180 converged)
+    ... 200/200 cohorts  ( 20.5s, 200 converged)
+    done: 200/200 converged, mean N=2250 events, mean fire rate 0.217, mean pairs/cohort 1306, pos-3 share 0.123
+    recovered RE sd (VB): reader 0.483, candidate 0.991  | true reader 0.5, candidate 1.0
+    realised N = 2250 events
+
+[S4 N~4500] 200 cohorts | 100 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/200 cohorts  ( 83.0s, 20 converged)
+    ... 40/200 cohorts  ( 94.6s, 40 converged)
+    ... 60/200 cohorts  (106.0s, 60 converged)
+    ... 80/200 cohorts  (154.6s, 80 converged)
+    ... 100/200 cohorts  (250.9s, 100 converged)
+    ... 120/200 cohorts  (374.8s, 120 converged)
+    ... 140/200 cohorts  (477.6s, 140 converged)
+    ... 160/200 cohorts  (575.0s, 160 converged)
+    ... 180/200 cohorts  (679.5s, 180 converged)
+    ... 200/200 cohorts  (743.2s, 200 converged)
+    done: 200/200 converged, mean N=4500 events, mean fire rate 0.214, mean pairs/cohort 2607, pos-3 share 0.123
+    recovered RE sd (VB): reader 0.497, candidate 0.983  | true reader 0.5, candidate 1.0
+    realised N = 4500 events
+
+--- Minimal detectable effect (two-sided alpha=.05, 80% power) ---
+    'pp' = percentage-point lift on a 20% baseline fire rate.
+
+config  realised_N                  term  median_SE  MDE_logodds  MDE_OR  MDE_pp
+N~1200        1200 angle[self_expansion]     0.1935        0.542   1.720   10.07
+N~1200        1200        lead[interest]     0.1437        0.403   1.496    7.22
+N~1200        1200           position[3]     0.2276        0.638   1.892   12.11
+N~2250        2250 angle[self_expansion]     0.1481        0.415   1.514    7.46
+N~2250        2250        lead[interest]     0.1097        0.307   1.360    5.37
+N~2250        2250           position[3]     0.1709        0.479   1.614    8.75
+N~4500        4500 angle[self_expansion]     0.1048        0.294   1.341    5.11
+N~4500        4500        lead[interest]     0.0779        0.218   1.244    3.72
+N~4500        4500           position[3]     0.1204        0.337   1.401    5.94
+
+--- MDE interpolated to exactly 1,200 / 2,250 / 4,500 events (SE scaled by sqrt(N)) ---
+                 term    N  MDE_logodds  MDE_OR  MDE_pp
+angle[self_expansion] 1200        0.568   1.765   10.62
+angle[self_expansion] 2250        0.415   1.514    7.46
+angle[self_expansion] 4500        0.293   1.341    5.11
+       lead[interest] 1200        0.421   1.523    7.58
+       lead[interest] 2250        0.307   1.360    5.37
+       lead[interest] 4500        0.217   1.243    3.70
+          position[3] 1200        0.655   1.926   12.50
+          position[3] 2250        0.479   1.614    8.75
+          position[3] 4500        0.338   1.403    5.96
+
+[S4-validate — inject +7.46pp, expect ~80% power] 200 cohorts | 50 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/200 cohorts  ( 24.8s, 20 converged)
+    ... 40/200 cohorts  ( 38.9s, 40 converged)
+    ... 60/200 cohorts  ( 51.1s, 60 converged)
+    ... 80/200 cohorts  ( 65.0s, 80 converged)
+    ... 100/200 cohorts  ( 80.1s, 100 converged)
+    ... 120/200 cohorts  ( 93.5s, 120 converged)
+    ... 140/200 cohorts  (106.9s, 140 converged)
+    ... 160/200 cohorts  (119.8s, 160 converged)
+    ... 180/200 cohorts  (132.7s, 180 converged)
+    ... 200/200 cohorts  (146.1s, 200 converged)
+    done: 200/200 converged, mean N=2250 events, mean fire rate 0.212, mean pairs/cohort 1302, pos-3 share 0.124
+    recovered RE sd (VB): reader 0.478, candidate 0.991  | true reader 0.5, candidate 1.0
+
+S4-validate  injected +7.46pp -> realised power 78.0% (target 80%). consistent
+
+==============================================================================
+ACCEPTANCE SUMMARY
+==============================================================================
+  S4: PASS
+  Realised MDE on an angle contrast (pp on a 20% baseline):
+      N= 1200: +10.62pp
+      N= 2250: +7.46pp
+      N= 4500: +5.11pp
+
+total runtime 947s
+
+################ SENSITIVITY (500) ################
+==============================================================================
+T-SIM — PLY matching v2 design validation  (test plan §4)
+==============================================================================
+design: 50 readers x <=45 pitches, pool 50, K~{1:.2,2:.3,3:.5}, lead coin .5, hard-pass 15%
+truth : angles {'admiration': 0.0, 'self_expansion': 10.0, 'i_sharing': 0.0, 'comfort': -5.0}, lead +5.0pp, position-3 +5.0pp, sd_reader 0.5, sd_candidate 1.0 (dominant)
+model : fire ~ C(angle, Treatment('admiration')) + C(lead, Treatment('character')) + C(position, Treatment(1)) + pickiness  + (1|reader) + (1|candidate), Laplace/MAP
+cohorts per stage: 500
+
+calibrated b0 = -1.7699 (marginal fire rate targeted at 20%)
+
+[Sensitivity — no hard pass (test-plan truth verbatim)] 500 cohorts | 50 readers x <=45 pitches | hard_pass=0.0 | 10 workers
+    ... 20/500 cohorts  ( 20.7s, 20 converged)
+    ... 40/500 cohorts  ( 35.2s, 40 converged)
+    ... 60/500 cohorts  ( 53.6s, 60 converged)
+    ... 80/500 cohorts  ( 69.5s, 80 converged)
+    ... 100/500 cohorts  ( 89.1s, 100 converged)
+    ... 120/500 cohorts  (108.1s, 120 converged)
+    ... 140/500 cohorts  (121.9s, 140 converged)
+    ... 160/500 cohorts  (137.1s, 160 converged)
+    ... 180/500 cohorts  (151.5s, 180 converged)
+    ... 200/500 cohorts  (167.1s, 200 converged)
+    ... 220/500 cohorts  (183.8s, 220 converged)
+    ... 240/500 cohorts  (212.2s, 240 converged)
+    ... 260/500 cohorts  (238.5s, 260 converged)
+    ... 280/500 cohorts  (256.2s, 280 converged)
+    ... 300/500 cohorts  (270.2s, 300 converged)
+    ... 320/500 cohorts  (285.5s, 320 converged)
+    ... 340/500 cohorts  (302.7s, 340 converged)
+    ... 360/500 cohorts  (317.8s, 360 converged)
+    ... 380/500 cohorts  (331.9s, 380 converged)
+    ... 400/500 cohorts  (349.5s, 400 converged)
+    ... 420/500 cohorts  (363.7s, 420 converged)
+    ... 440/500 cohorts  (379.7s, 440 converged)
+    ... 460/500 cohorts  (394.7s, 460 converged)
+    ... 480/500 cohorts  (414.4s, 480 converged)
+    ... 500/500 cohorts  (428.2s, 500 converged)
+    done: 500/500 converged, mean N=2250 events, mean fire rate 0.212, mean pairs/cohort 1181, pos-3 share 0.157
+    recovered RE sd (VB): reader 0.498, candidate 0.999  | true reader 0.5, candidate 1.0
+                 term  fitter true_beta true_pp mean_beta mean_pp bias_pp mcse_pp emp_sd med_se coverage power
+angle[self_expansion]  vb+map    +0.539  +10.00    +0.535   +9.92   -0.08   +0.29 +0.155 +0.149    93.6% 94.2%
+     angle[i_sharing]  vb+map    +0.000   +0.00    +0.003   +0.05   +0.05   +0.23 +0.162 +0.157    94.4%  5.6%
+       angle[comfort]  vb+map    -0.348   -5.00    -0.357   -5.11   -0.11   +0.20 +0.174 +0.166    94.2% 57.2%
+       lead[interest]  vb+map    +0.288   +5.00    +0.285   +4.95   -0.05   +0.19 +0.113 +0.111    95.0% 70.8%
+          position[2]  vb+map    +0.000   +0.00    +0.003   +0.04   +0.04   +0.20 +0.140 +0.126    92.8%  7.2%
+          position[3]  vb+map    +0.288   +5.00    +0.287   +4.99   -0.01   +0.29 +0.173 +0.160    93.0% 44.0%
+            pickiness cluster    +0.000   +0.00    +0.006   +0.10   +0.10   +0.37 +0.260 +0.257    94.0%  6.0%
+
+Sensitivity S2 (no hard-pass truncation): max angle bias 0.11pp, min coverage 92.8%
+
+==============================================================================
+ACCEPTANCE SUMMARY
+==============================================================================
+
+total runtime 438s
+
+################ DIAGNOSTIC (300/config) ################
+==============================================================================
+T-SIM — PLY matching v2 design validation  (test plan §4)
+==============================================================================
+design: 50 readers x <=45 pitches, pool 50, K~{1:.2,2:.3,3:.5}, lead coin .5, hard-pass 15%
+truth : angles {'admiration': 0.0, 'self_expansion': 10.0, 'i_sharing': 0.0, 'comfort': -5.0}, lead +5.0pp, position-3 +5.0pp, sd_reader 0.5, sd_candidate 1.0 (dominant)
+model : fire ~ C(angle, Treatment('admiration')) + C(lead, Treatment('character')) + C(position, Treatment(1)) + pickiness  + (1|reader) + (1|candidate), Laplace/MAP
+cohorts per stage: 300
+
+calibrated b0 = -1.7699 (marginal fire rate targeted at 20%)
+
+==============================================================================
+DIAGNOSTIC — is the position bias caused by selection on the REs?
+==============================================================================
+
+[diag sd_reader=0.0 sd_cand=0.0] 300 cohorts | 50 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/300 cohorts  ( 39.0s, 20 converged)
+    ... 40/300 cohorts  ( 56.3s, 40 converged)
+    ... 60/300 cohorts  ( 59.3s, 60 converged)
+    ... 80/300 cohorts  ( 62.5s, 80 converged)
+    ... 100/300 cohorts  ( 65.8s, 100 converged)
+    ... 120/300 cohorts  ( 69.0s, 120 converged)
+    ... 140/300 cohorts  ( 72.7s, 140 converged)
+    ... 160/300 cohorts  ( 76.2s, 160 converged)
+    ... 180/300 cohorts  ( 79.5s, 180 converged)
+    ... 200/300 cohorts  ( 83.0s, 200 converged)
+    ... 220/300 cohorts  ( 86.5s, 220 converged)
+    ... 240/300 cohorts  ( 89.9s, 240 converged)
+    ... 260/300 cohorts  ( 93.5s, 260 converged)
+    ... 280/300 cohorts  ( 96.7s, 280 converged)
+    ... 300/300 cohorts  ( 99.4s, 300 converged)
+    done: 300/300 converged, mean N=2250 events, mean fire rate 0.198, mean pairs/cohort 1275, pos-3 share 0.128
+    recovered RE sd (VB): reader 0.183, candidate 0.186  | true reader 0.0, candidate 0.0
+
+[diag sd_reader=0.25 sd_cand=0.5] 300 cohorts | 50 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/300 cohorts  (  4.6s, 20 converged)
+    ... 40/300 cohorts  (  7.5s, 40 converged)
+    ... 60/300 cohorts  ( 10.3s, 60 converged)
+    ... 80/300 cohorts  ( 13.0s, 80 converged)
+    ... 100/300 cohorts  ( 16.0s, 100 converged)
+    ... 120/300 cohorts  ( 18.7s, 120 converged)
+    ... 140/300 cohorts  ( 21.3s, 140 converged)
+    ... 160/300 cohorts  ( 24.1s, 160 converged)
+    ... 180/300 cohorts  ( 26.9s, 180 converged)
+    ... 200/300 cohorts  ( 30.0s, 200 converged)
+    ... 220/300 cohorts  ( 32.8s, 220 converged)
+    ... 240/300 cohorts  ( 35.6s, 240 converged)
+    ... 260/300 cohorts  ( 38.4s, 260 converged)
+    ... 280/300 cohorts  ( 40.8s, 280 converged)
+    ... 300/300 cohorts  ( 43.2s, 300 converged)
+    done: 300/300 converged, mean N=2250 events, mean fire rate 0.206, mean pairs/cohort 1287, pos-3 share 0.126
+    recovered RE sd (VB): reader 0.271, candidate 0.500  | true reader 0.25, candidate 0.5
+
+[diag sd_reader=0.5 sd_cand=1.0] 300 cohorts | 50 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/300 cohorts  (  3.6s, 20 converged)
+    ... 40/300 cohorts  (  5.5s, 40 converged)
+    ... 60/300 cohorts  (  7.3s, 60 converged)
+    ... 80/300 cohorts  (  9.1s, 80 converged)
+    ... 100/300 cohorts  ( 11.1s, 100 converged)
+    ... 120/300 cohorts  ( 13.1s, 120 converged)
+    ... 140/300 cohorts  ( 14.9s, 140 converged)
+    ... 160/300 cohorts  ( 16.7s, 160 converged)
+    ... 180/300 cohorts  ( 18.5s, 180 converged)
+    ... 200/300 cohorts  ( 20.3s, 200 converged)
+    ... 220/300 cohorts  ( 22.2s, 220 converged)
+    ... 240/300 cohorts  ( 24.0s, 240 converged)
+    ... 260/300 cohorts  ( 26.0s, 260 converged)
+    ... 280/300 cohorts  ( 27.8s, 280 converged)
+    ... 300/300 cohorts  ( 29.4s, 300 converged)
+    done: 300/300 converged, mean N=2250 events, mean fire rate 0.216, mean pairs/cohort 1305, pos-3 share 0.123
+    recovered RE sd (VB): reader 0.488, candidate 0.991  | true reader 0.5, candidate 1.0
+
+[diag sd_reader=1.0 sd_cand=2.0] 300 cohorts | 50 readers x <=45 pitches | hard_pass=0.15 | 10 workers
+    ... 20/300 cohorts  (  2.8s, 20 converged)
+    ... 40/300 cohorts  (  4.0s, 40 converged)
+    ... 60/300 cohorts  (  5.1s, 60 converged)
+    ... 80/300 cohorts  (  6.7s, 80 converged)
+    ... 100/300 cohorts  (  7.9s, 100 converged)
+    ... 120/300 cohorts  (  9.2s, 120 converged)
+    ... 140/300 cohorts  ( 10.5s, 140 converged)
+    ... 160/300 cohorts  ( 11.9s, 160 converged)
+    ... 180/300 cohorts  ( 13.1s, 180 converged)
+    ... 200/300 cohorts  ( 14.4s, 200 converged)
+    ... 220/300 cohorts  ( 15.6s, 220 converged)
+    ... 240/300 cohorts  ( 17.0s, 240 converged)
+    ... 260/300 cohorts  ( 18.1s, 260 converged)
+    ... 280/300 cohorts  ( 19.8s, 280 converged)
+    ... 300/300 cohorts  ( 20.7s, 300 converged)
+    done: 300/300 converged, mean N=2250 events, mean fire rate 0.217, mean pairs/cohort 1320, pos-3 share 0.124
+    recovered RE sd (VB): reader 0.989, candidate 1.943  | true reader 1.0, candidate 2.0
+
+--- position-3 bias vs angle bias, by random-effect size ---
+    (true position-3 drift = +5.00pp; true angle effects +10/-5/0pp)
+   REs  sd_reader  sd_cand  pos3_bias_pp pos3_cover  max_angle_bias_pp min_angle_cover
+no REs       0.00      0.0          0.67        94%               0.25             92%
+  half       0.25      0.5          0.20        94%               0.11             94%
+launch       0.50      1.0          0.08        93%               0.28             93%
+ heavy       1.00      2.0         -0.52        96%               0.46             93%
+
+    Read: if pos3_bias_pp -> 0 as the REs -> 0 while angle bias stays
+    flat, the position term is attenuated by dynamic selection, and the
+    randomisation still protects the angle estimates (S2's claim).
+
+==============================================================================
+ACCEPTANCE SUMMARY
+==============================================================================
+
+total runtime 213s
+ALL STAGES COMPLETE
+==============================================================================
+T-SIM — PLY matching v2 design validation  (test plan §4)
+==============================================================================
+design: 50 readers x <=45 pitches, pool 50, K~{1:.2,2:.3,3:.5}, lead coin .5, hard-pass 15%
+truth : angles {'admiration': 0.0, 'self_expansion': 10.0, 'i_sharing': 0.0, 'comfort': -5.0}, lead +5.0pp, position-3 +5.0pp, sd_reader 0.5, sd_candidate 1.0 (dominant)
+model : fire ~ C(angle, Treatment('admiration')) + C(lead, Treatment('character')) + C(position, Treatment(1)) + pickiness
+        + (1|reader) + (1|candidate)
+fit   : point estimates fit_vb | SEs/CIs fit_map | reader-level covariates cluster-robust
+cohorts per stage: 100
+
+calibrated b0 = -1.7699 (marginal fire rate targeted at 20%)
+
+==============================================================================
+H1/H2 — realised MDE for a reader-segment x angle INTERACTION
+==============================================================================
+
+[H1/H2 interaction] 100 cohorts | 50 readers x <=45 pitches
+    ... 20/100 cohorts  (  7.5s, 20 usable)
+    ... 40/100 cohorts  ( 14.7s, 40 usable)
+    ... 60/100 cohorts  ( 22.2s, 60 usable)
+    ... 80/100 cohorts  ( 29.8s, 80 usable)
+    ... 100/100 cohorts  ( 36.9s, 100 usable)
+
+    median SE on the interaction = 0.2996
+    MDE at N= 2250: +16.66pp  (OR 2.31)
+    MDE at N= 4500: +11.16pp  (OR 1.81)
+    MDE at N= 9000:  +7.56pp  (OR 1.52)
+
+    Compare: the ANGLE MAIN EFFECT MDE at N=2250 is +7.46pp.
+
+==============================================================================
+ACCEPTANCE SUMMARY
+==============================================================================
+
+total runtime 40s

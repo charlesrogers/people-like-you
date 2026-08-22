@@ -1,0 +1,9 @@
+# T-SIM (scripts/matching_v2_sim.py) — no app dependencies.
+# Python 3.13 (3.14 has no statsmodels wheel as of 2026-08).
+#   uv venv --python 3.13 .venv-sim
+#   uv pip install --python .venv-sim/bin/python -r scripts/requirements-sim.txt
+#   .venv-sim/bin/python scripts/matching_v2_sim.py
+numpy>=2.0
+pandas>=2.2
+scipy>=1.13
+statsmodels>=0.14.6
