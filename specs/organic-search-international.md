@@ -84,7 +84,11 @@ Sections mirror the metro template, re-grounded per country:
 
 ---
 
-## 6. Sequencing (recommendation)
+## 6. Sequencing (SUPERSEDED 2026-08-22)
+
+**Charles's call: skip the phased translation gating — ship an in-language page for every top-10 country now.** Built and shipped 2026-08-22: six Spanish pages (`/es/solteros-sud/mexico|peru|chile|argentina|guatemala|ecuador`), one Portuguese (`/pt/namoro-sud/brasil`), two English (`/lds-singles/philippines|nigeria`), plus the global ranking page (`/lds-singles/countries-with-most-latter-day-saints`) and the waitlist country capture (migration 023, `IntlWaitlistForm`, intl branch in `/api/waitlist`). The measurement loop (§8) and the what-NOT-to-do list below still stand. Original phased plan kept for the record:
+
+### Original recommendation (superseded)
 
 | Phase | Gate | Ships |
 |---|---|---|

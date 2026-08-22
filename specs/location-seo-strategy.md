@@ -138,7 +138,7 @@ Use Census counts for **pool size only**. For the gender skew, cite the LDS-spec
 
 Charles asked for the strategy across *major US metros* (and the top-10 countries — that half lives in `specs/organic-search-international.md`). The 8–12-page ceiling above stands per wave, not forever; the roster grows only when GSC proves the prior wave ranks.
 
-**Wave 1 — the seven approved metros + the three type-B ranking pages.** Already decided (§ the seven approved metros). Ships first; nothing else ships until these are indexed.
+**Wave 1 — eight metros + the three type-B ranking pages.** The seven approved metros **plus Philadelphia** (Charles, 2026-08-22: "I do want philly and dc" — DC was already wave 1; Philly added despite its modest numbers: 37 congregations, 18,600 adherents, 0.3%). SHIPPED 2026-08-22 as `/lds-singles/*`.
 
 **Wave 2 — the diaspora eight** (gate: wave-1 pages earning impressions in GSC): Los Angeles, Las Vegas, Dallas–Fort Worth, Seattle, Houston, Portland, Ogden–Clearfield, St. George. All from the diaspora/adjacent tables above; each has ≥83K adherents or ≥64% share. LA alone has more adherents than Boise and no good page exists for it.
 
