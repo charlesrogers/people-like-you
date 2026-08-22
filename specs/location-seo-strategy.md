@@ -1,144 +1,105 @@
-# Location pages — organic content strategy
+# Metro pages — organic content strategy
 
-**Written 2026-08-22.** Answers Charles's question: what should location pages contain, and what would actually help us rank?
-
----
-
-## HARD CONSTRAINTS (check every proposal against these)
-
-1. **LOCKED — EXECUTION.md Decision Log #4 (standing):** "No community-specific branding in UX; generic platform + per-community config." Restated at EXECUTION.md §9 line 297: *"No LDS-specific words anywhere in product UX. Community targeting lives in marketing channels, not the product."*
-2. **Meta dating authorization is still pending and gates the entire paid plan.** launch-plan §5: never assert/imply the viewer's attributes; the landing page must match the ad. Reviewers inspect the product.
-3. **model-rules.md Scenario C, rule 4:** "Never show a countdown timer to nothing."
-4. Domain `people-like-you.com` was created **2026-03-21** — five months old, effectively zero authority, zero indexed pages until robots.txt/sitemap.xml shipped 2026-08-22.
-
-Constraints 1 and 2 are the reason the recommendation below is *not* the ward-count page.
+**Written 2026-08-22.** Replaces the first draft, which was wrong: it argued against LDS content instead of building with it, and it framed the data per-ZIP when the unit is the metro area. Charles's call: **LDS content on every page, metro-level, Meta risk accepted.** Built on that premise.
 
 ---
 
-## 1. The finding that changes the plan: ward counts are the wrong hook
+## The data we now own
 
-The instinct — *density is our differentiated number* — is right. The specific execution fails on three independent grounds, any one of which is disqualifying.
+`data/lds-metro-density-2020.csv` — **869 metros**, LDS congregations and adherents each, with national ranks.
 
-**a) The intent is navigational, not dating.** Someone searching "YSA ward map Utah County" wants to know where to attend church on Sunday. They are not shopping for a matchmaker. The SERP is owned by [maps.churchofjesuschrist.org](https://maps.churchofjesuschrist.org), individual stake sites ([provoysa18.org](https://provoysa18.org/wards), [utahvalleysouthysa.com](https://www.utahvalleysouthysa.com/ward-and-building-locations)), the [FamilySearch wiki](https://www.familysearch.org/en/wiki/Wards_and_Branches_of_The_Church_of_Jesus_Christ_of_Latter-day_Saints_in_Salt_Lake_City,_Salt_Lake_County,_Utah), and Wikipedia. Traffic that converts near zero.
+Source: [2020 U.S. Religion Census](https://www.usreligioncensus.org/), Religious Congregations & Membership Study, sheet `2020 Group by Metro`. Freely published, standard academic citation, no scraping — the meetinghouse API is closed to us (see `project_lds_scrape_blocked`), and this is the better substitute anyway because it is *citable* and covers the whole country.
 
-**b) The SERP is unwinnable.** We would be competing against the Church's own official locator, for the Church's own members' navigational query, on a five-month-old domain with no backlinks.
+**What it is:** all LDS congregations (wards + branches) per metro. **What it is not:** a YSA-ward count. The Religion Census does not break out singles wards. Do not label these "singles wards" on a page — label them congregations, which is what they are, and let the density do the work.
 
-**c) It breaks constraint 1 and endangers constraint 2.** "247 singles wards within 15 miles" is community-specific vocabulary on an indexable page of the product domain, published while dating authorization is pending. That trades the gate on the entire paid plan for traffic that does not convert.
+Charles's named metros:
 
-**The fix is to keep the density idea and change the source.** See §3.
+| Metro | Congregations | Adherents | % of population | Rank (adherents) | Rank (%) |
+|---|---:|---:|---:|---:|---:|
+| Provo-Orem, UT | 1,356 | 554,604 | **82.6%** | 2 | **1** |
+| Salt Lake City, UT | 1,476 | 653,868 | 52.0% | **1** | 7 |
+| Boise City, ID | 265 | 115,016 | 15.0% | 8 | 21 |
+| Rexburg, ID | 97 | 35,114 | 53.0% | 25 | 6 |
+| Sacramento-Roseville-Folsom, CA | 120 | 75,384 | 3.1% | 16 | 114 |
+| San Francisco-Oakland-Berkeley, CA | 112 | 70,288 | 1.5% | 18 | 267 |
 
-> **Dependency note.** The parallel session executing `specs/meetinghouse-density-scrape.md` hit an expired API token and a sandbox block on extracting the client-side credential, and was mid-way through a Terms-of-Use review when it paused. Treat that dataset as **not yet available and possibly not obtainable within ToS**. Nothing in this strategy depends on it. If it does land, it is an internal targeting asset (which metros to open next) — that use has no constraint problem at all, because it never appears on a public page.
-
----
-
-## 2. What the winning page actually looks like
-
-The incumbent for the money query is [provo.com/student-life/dating-in-provo](https://provo.com/student-life/dating-in-provo/) — "Dating in Provo: An Honest Guide (2026)". Its shape:
-
-- **3,500–4,000 words**, ten H2s, eleven H3s
-- **Cited statistics**: median marriage age 24.8 women / 26.1 men; one in four BYU students married; students average ~two dates a month
-- **Named venues**: Y Mountain, Provo River Parkway, Utah Lake, Alpine Loop, Covey Center, Riverwoods, Center Street
-- **Segment-specific H3s**: freshman, returned missionary, not LDS, feeling pressure, non-student, BYU–UVU
-- **A trust play as its closing section**: *"What Is Actually Known Here, and What Only Gets Repeated"* — it wins by pointing out that everyone else's numbers are unsourced
-
-That last section is the opening. **They win by complaining that nobody sources the numbers. We win by being the source of the numbers.**
+Adjacent metros worth pages: Ogden-Clearfield (1,083 / 442,947 / 63.7%), Logan UT-ID (276 / 113,846 / 77.3%), St. George (284 / 116,156 / 64.4%), Idaho Falls (213 / 92,507 / 58.8%).
 
 ---
 
-## 3. The proprietary asset: a Census-sourced Singles Density Index
+## The finding that should shape the page list
 
-**Source:** Census ACS 5-year, table **B12002** — "Sex by Marital Status by Age for the Population 15 Years and Over." Never-married counts, split by sex, by age band, available at ZCTA, tract, and county level. Free API; requires a free key from `api.census.gov/data/key_signup.html` (verified 2026-08-22: the API now 302s to a "Missing Key" page without one — **no billing account, unlike Cloud DNS**).
+**The diaspora metros are far bigger than they feel.**
 
-**Join:** our `zip_locations` table already holds **33,144 US ZIPs with lat/lng, city, state, metro_area, metro_code**, and `src/lib/geo.ts` already implements haversine distance. So for any ZIP we can compute:
+| Metro | Congregations | Adherents |
+|---|---:|---:|
+| Phoenix-Mesa-Chandler, AZ | 617 | 301,196 |
+| Los Angeles-Long Beach-Anaheim, CA | 314 | 198,134 |
+| Las Vegas-Henderson-Paradise, NV | 237 | 132,329 |
+| Riverside-San Bernardino-Ontario, CA | 172 | 108,532 |
+| Dallas-Fort Worth-Arlington, TX | 199 | 105,071 |
+| Seattle-Tacoma-Bellevue, WA | 184 | 104,512 |
+| Houston-The Woodlands-Sugar Land, TX | 162 | 85,938 |
+| Portland-Vancouver-Hillsboro, OR-WA | 151 | 83,481 |
+| Washington-Arlington-Alexandria, DC | 134 | 72,147 |
 
-- never-married adults 21–35 within 5 / 15 / 30 / 60 miles
-- **the sex ratio** — never-married women per 100 never-married men in that radius
-- density per square mile, and the national percentile rank
-
-Why this beats the ward count on every axis:
-
-| | Ward count | Census density |
-|---|---|---|
-| Sourced & citable | Estimated, contested | Federal, footnotable |
-| Community-neutral | ✗ breaks Decision #4 | ✓ |
-| Meta risk pre-authorization | Real | None |
-| Coverage | Utah-heavy | All 33,144 ZIPs |
-| Obtainable today | Blocked on auth/ToS | Free key, no billing |
-| Anyone else publishing it at radius granularity | — | Not that I can find |
-
-**The sex ratio is the headline number, not the raw count.** PLY's entire launch mechanic is the female-supply constraint (launch-plan §16: women skip the line). A page that says "there are N never-married women aged 21–35 per 100 men within 30 miles of Provo" is simultaneously the most shareable stat we own, the most press-friendly, and a direct restatement of the product thesis. It is the "see what others miss by synthesizing data into a clear decision" JTBD, executed literally.
+Los Angeles has **more LDS adherents than Boise**. Phoenix has more than triple Rexburg's. Nobody writes the good "LDS dating in Phoenix" page, because everyone assumes the audience is Utah. Utah metros are where the launch is; the diaspora metros are where the *organic* upside is, because the SERPs are empty and the pain is sharper — a dense community spread across a huge metro is exactly the market where you cannot meet people through your ward and a brokered introduction beats a feed.
 
 ---
 
-## 4. Answering "sparse density vs. rich density pages"
+## Page types
 
-Yes — and **the sparse pages are the better half of the strategy.** This is the non-obvious finding.
+### A. Metro page — one per metro, the workhorse
 
-**Rich-density pages** (Provo, Salt Lake, Rexburg, Mesa) target crowded SERPs. provo.com, KSL, BYU Universe, and every LDS-dating listicle are already there. We will win these eventually, on the strength of §3's data, but slowly.
+URL: `/lds-singles/provo-orem`, `/lds-singles/phoenix`, etc.
 
-**Sparse-density pages** target people with an acute struggling moment and no competition for the query. Someone in a market with forty never-married adults in their band within thirty miles has already dated the pool. Their search is not "best dating app" — it is closer to *"how to date when there are no single people where I live."* Nobody has written the good version of that page.
+Recommended over `/dating/[metro]` now that community language is allowed: it matches the query, and it is the phrase people actually type.
 
-And it maps to product capability we already ship:
+Sections, in order:
 
-- `src/lib/geo.ts` — `DISTANCE_RADIUS_MAX_TIER`, tier multipliers, haversine; long-distance matching is built
-- `model-rules.md` Scenario C — *"Want to see people within a few hours? Some of the best connections start long-distance."*
+1. **The numbers.** Congregations, adherents, share of population, national rank. A real table, above the fold. This is the citable asset and the reason the page exists.
+2. **What that means for dating here.** The interpretation, and it must differ per metro — this is what stops the pages being templates. Provo: enormous pool, brutal velocity, you have met everyone by your third semester. Phoenix: big community, 40-minute drives, your ward is not your dating pool. Rexburg: tiny, seasonal, empties in summer. San Francisco: 1.5% of the population, so the community is real but you will not stumble into it.
+3. **How people actually meet here.** Named, specific, local. Institute, specific singles wards' reputations, FHE groups, the actual venues.
+4. **The seasonal rhythm.** Semester ramp, YSA ward reshuffle, summer emptying, post-mission waves. Real, specific, and nobody writes it well. Provo's calendar is genuinely different from Phoenix's.
+5. **The honest problem with this market.** The trust play — say the true, slightly unflattering thing. This is what makes the page worth linking to.
+6. **PLY here** — CTA, and the live status when it clears the floor (§4).
 
-Mutual cannot serve this user, because a swipe feed in a sparse market is an empty feed. A brokered one-introduction-a-day model degrades gracefully across distance in a way a feed does not. **The sparse-market page is the one place our product is categorically better, and the query has no incumbent.** Lower volume per page, far higher intent, and it compounds into a national footprint instead of a Utah-only one.
+### B. Ranking / comparison pages — the link magnets
 
-Recommended split: build the sparse pages first, as the wedge; the rich pages second, when the Index has earned enough links to compete.
+These earn the backlinks that make the metro pages rank. We have the data to own them outright:
 
----
+- **"The 25 U.S. metros with the highest LDS population share"** — Provo-Orem #1 at 82.6%. Definitive, sourced, shareable.
+- **"Where LDS singles actually live outside Utah"** — the diaspora table above. Genuinely surprising; this is the one most likely to get picked up.
+- **"LDS congregations by metro: the full list"** — all 869, sortable. Reference page, accumulates links forever.
 
-## 5. Page architecture — three tiers
+### C. The sleeper query type
 
-**Tier 1 — The Index (one page).** National, sortable, the link magnet. Every metro ranked by never-married density and sex ratio, with a radius lookup. This is what earns citations and backlinks; it is what makes Tier 2 rank later. Build first.
+**"How many Latter-day Saints live in [metro]?"** is informational, high-intent-adjacent, and we hold the authoritative sourced answer for 869 metros. It puts us in front of exactly the right audience at the top of the funnel, and the page pivots naturally into the dating content.
 
-**Tier 2 — Metro guides (6–10 pages, hand-finished, 2,500+ words).** Only metros we actually intend to open. Structure, mirroring what works and adding what provo.com cannot:
-
-1. The numbers here (our Census data — the hook)
-2. What the sex ratio means for you specifically
-3. How people actually meet here
-4. Where to go — named, specific venues
-5. Segment advice
-6. Live: how close this metro is to opening
-
-**Tier 3 — DO NOT BUILD thousands of ZIP pages.** Google's scaled-content-abuse policy explicitly targets template-with-variable-substitution at scale; the documented pattern is "`[service]` in `[city]`" across hundreds of locations with only the variables changing, and enforcement has run 60–90% ranking losses with **no Search Console manual-action message**. Location pages survive only when each carries real, page-specific data and editorial work. On a five-month-old domain this is a site-level risk, not a per-page one. ZIP-level data lives behind a lookup on the Index, not as indexable URLs.
-
-**On the map:** Google cannot read a map. Ship every map with an HTML table equivalent in the same page; the table is what ranks, the map is what gets shared. Never map-only.
+I have no search-volume data to size this — **GSC will tell us within weeks of verification, and that is the cheapest possible validation.** Treat it as the top hypothesis to check, not a measured fact.
 
 ---
 
-## 6. "% of the way there"
+## What NOT to build
 
-This is already a decided feature — T16 (revised): per-metro go-live gate on count + ratio, with a public per-gender countdown as the invite driver. Location pages are its natural home.
+**Not 869 pages.** Google's scaled-content-abuse policy targets template-with-variable-substitution at scale; documented enforcement runs 60–90% ranking loss with **no Search Console message**. The differentiator is section 2 of the metro template — the per-metro interpretation. If a page's only unique content is the numbers in the table, it is a doorway page.
 
-**But it cannot ship as-is.** The `waitlist` table currently holds **2 rows**, both zip3 840. A page reading "2 of 50" destroys credibility, violates the activation-tone rule (scarcity = opportunity, never anxiety), and breaks model-rules Scenario C rule 4 outright.
-
-Gate it: show the live countdown only above a floor; below the floor show the Scenario C copy ("You're early to [area]" + invite CTA). **The floor is a judgment call Charles should set — I am not going to invent a number and present it as derived.**
+Ship **8–12 hand-finished metro pages**. The full 869 live as rows on the type-B reference page, not as URLs.
 
 ---
 
-## 7. Honest timeline
+## The countdown ("% of the way there")
 
-The domain is five months old with no authority and, as of today, no indexed pages. Competitive local queries realistically take 6–12 months. The Index is the accelerant because it earns links; the guides are the compounding asset.
-
-**Judge Q1 organic on indexed pages and impressions, not signups.** Anyone promising signups from SEO this quarter is guessing.
-
-**Before any of this matters:** `/` is a bare phone+ZIP form with essentially no body copy, and it is the URL that ranks. The three pages with real content are `/welcome`, `/faq`, `/thesis`. Fixing that is worth more than the first three location pages combined, and it is a prerequisite, not a parallel track.
+Already a decided feature (T16 revised). Metro pages are its home. But `waitlist` currently holds **2 rows**, and `model-rules.md` Scenario C rule 4 is explicit: *"Never show a countdown timer to nothing."* Show the counter above a floor; below it, Scenario C copy ("You're early to [area]" + invite CTA). **The floor is Charles's number to set — I am not inventing one and calling it derived.**
 
 ---
 
-## 8. Sequencing (respects the Meta gate)
+## Open data gap
 
-| Phase | Work | Meta risk |
-|---|---|---|
-| 0 | Fix GSC TXT to apex. Give `/` real body copy (or route organic to `/welcome`). | none |
-| 1 | Free Census key → build the density dataset → ship the Index. | none — community-neutral |
-| 2 | Sparse-market guides (the wedge), then rich-market guides. | none — community-neutral |
-| 3 | *Only after authorization lands:* decide whether community-specific pages are worth it at all. | gated |
+The singles overlay — never-married adults 20–34 by sex, and the **sex ratio** per metro — comes from Census ACS table B12002 (`B12002_006/007/008E` male, `B12002_099/100/101E` female). Verified those variables exist and are published at metro level. The API requires a **free key** (no billing, unlike Cloud DNS): `api.census.gov/data/key_signup.html`. Needs Charles's email, so it is his to request.
 
-If Charles wants community-explicit content regardless, the lower-risk home is a **separate content property**, not `people-like-you.com`. Tradeoff to name plainly: a separate domain protects the Meta gate and the locked product-UX rule, but starts at zero authority and passes little benefit to the main domain.
+Worth having: the sex ratio is the single most on-thesis number PLY could publish, since the whole launch mechanic is the female-supply constraint. But every page type above ships without it.
 
 ---
 
-**Synopsis:** Location pages are worth building, but the ward-count version is the wrong page — wrong intent, unwinnable SERP, and it risks Meta authorization for traffic that will not convert. The same idea sourced from Census B12002 is free, defensible, community-neutral, and covers all 33,144 ZIPs we already have. Build the sparse-market pages first: no incumbent, acute pain, and the one query set where our brokered model beats a swipe feed outright.
+**Synopsis:** We now hold LDS congregation + adherent counts for all 869 US metros, sourced and citable, saved at `data/lds-metro-density-2020.csv`. Build 8–12 hand-written metro pages (not 869) plus three ranking pages as link magnets. The non-obvious call: weight toward diaspora metros — Phoenix has 617 congregations and LA has more adherents than Boise, the SERPs there are empty, and that market is exactly where a brokered introduction beats a swipe feed.
