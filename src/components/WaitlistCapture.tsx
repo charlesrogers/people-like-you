@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import SiteFooter from '@/components/SiteFooter'
+import { track } from '@/lib/analytics'
 
 // The API still returns counts, gate thresholds and queue position — the admin launch
 // dashboard needs them. The public popup deliberately reads only the metro's name: no
@@ -86,6 +87,13 @@ export default function WaitlistCapture() {
         state: data.state ?? null,
         metro: data.metro ?? null,
         already: !!data.alreadyJoined,
+      })
+      // The conversion. Metro and state only — never the phone or the ZIP.
+      track(data.alreadyJoined ? 'waitlist_already_joined' : 'waitlist_signup', {
+        metro: data.metro?.name ?? null,
+        state: data.state ?? null,
+        referred: !!ref,
+        source: source || null,
       })
     } catch {
       setError('Something went wrong. Please try again.')
