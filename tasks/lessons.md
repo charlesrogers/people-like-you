@@ -503,3 +503,9 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** The API and the UI are two different entry points with two different normalizers. Exercising the one that isn't user-facing proves nothing about the one that is, and phone was the product's ONLY contact channel — a corrupted number means that lead is permanently unreachable.
 **Rule:** When a client-side transform exists between the user and the API (formatters, masks, debounce, truncation), test THROUGH it, not around it. For any input field with a display formatter, unit-test the formatter itself across paste + keystroke + country-code + overlong input, and assert the value that actually reaches the request body — never claim "verified" from API-level tests alone.
 **Category:** mistake
+
+### 2026-08-22 — Decisions must be asked inline, never in a file
+**What went wrong:** Matching v2 decision memo ended with "answer D1–D10 in §9"; the chat reply gave only compressed labels, forcing Charles to open specs/matching-v2-decision-memo.md to decide.
+**Why it's wrong:** Charles answers from the conversation. A file-bound ask adds a find-the-file round trip and stalls the decision loop.
+**Rule:** Always write decision questions out in the reply itself — self-contained (question + options + rec). Files may duplicate the ask, never replace it.
+**Category:** anti-pattern
