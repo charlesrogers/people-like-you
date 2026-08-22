@@ -509,3 +509,9 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** Charles answers from the conversation. A file-bound ask adds a find-the-file round trip and stalls the decision loop.
 **Rule:** Always write decision questions out in the reply itself — self-contained (question + options + rec). Files may duplicate the ask, never replace it.
 **Category:** anti-pattern
+
+### 2026-08-22 — Farm-outs ship with a 🔫 copy-paste prompt; URLs always inline
+**What went wrong:** Delivered farm-out charters (questionnaire deep-dive, v2 brief) without ready-to-copy launch prompts; Charles had to ask for them.
+**Why it's wrong:** A farm-out spec without its launch prompt isn't finished — Charles pastes prompts into fresh sessions; making him compose one (or hunt for a path/URL) is friction on every single farm-out.
+**Rule:** Every farm-out deliverable ends with the full absolute path AND a self-contained copy-paste prompt starting with 🔫. Any URL the user might need goes in the message, full and clickable.
+**Category:** anti-pattern
