@@ -134,6 +134,22 @@ Use Census counts for **pool size only**. For the gender skew, cite the LDS-spec
 
 ---
 
+## ADDENDUM 2026-08-22 — the full US metro roster, in waves
+
+Charles asked for the strategy across *major US metros* (and the top-10 countries — that half lives in `specs/organic-search-international.md`). The 8–12-page ceiling above stands per wave, not forever; the roster grows only when GSC proves the prior wave ranks.
+
+**Wave 1 — the seven approved metros + the three type-B ranking pages.** Already decided (§ the seven approved metros). Ships first; nothing else ships until these are indexed.
+
+**Wave 2 — the diaspora eight** (gate: wave-1 pages earning impressions in GSC): Los Angeles, Las Vegas, Dallas–Fort Worth, Seattle, Houston, Portland, Ogden–Clearfield, St. George. All from the diaspora/adjacent tables above; each has ≥83K adherents or ≥64% share. LA alone has more adherents than Boise and no good page exists for it.
+
+**Wave 3 — the long tail** (gate: ≥3 wave-2 pages ranking page 1–2 for "lds singles [city]"): Logan, Idaho Falls, Riverside–San Bernardino, Sacramento, San Francisco, Denver, Atlanta, Chicago. Stop at ~25 metro URLs total, ever — beyond that the per-metro interpretation can't stay genuinely distinct and we're building doorway pages.
+
+**Keyword architecture per metro page:** primary "lds singles [city]"; secondaries "lds dating [city]", "latter-day saint singles [city]". The word "Mormon" still carries real query volume but is against the Church's style guidance and off-brand for the audience — capture it with one FAQ entry ("Is this a Mormon dating site?") + FAQPage schema, never in titles or H1s.
+
+**Technical checklist (once, with wave 1):** `/lds-singles/` hub page linking all metro + ranking pages; metro pages in the sitemap; Dataset schema on the type-B reference table, FAQPage on metro pages; breadcrumbs. All measurement is gated on the Search Console DNS TXT record (still open in EXECUTION.md STATE).
+
+---
+
 ## PARKED — LDS singles per metro (Charles's static-rate method)
 
 The metro table above puts LDS adherents next to all-population never-married counts. **Those columns are not comparable** — NYC's 2.98M never-married 20–34 is the whole city, while its LDS single pool is a subset of 62,194 adherents. Do not ship that table as-is.
