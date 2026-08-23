@@ -182,7 +182,7 @@ Canonical examples; the generator's output should sit stylistically inside this 
 | comfort × character | "Dane is unhurried in a way that's getting rare — he listens without loading his next sentence, and friends swear problems shrink a size just from saying them to him." |
 
 ### 6.4 Register — personalized, never randomized
-`playful` vs `earnest`, set once per reader from M5 (banter item), tiebreak CS1. Register is the pitch's **voice to the reader**, not a claim about the subject — a playful pitch about an earnest person is legitimate. Stored on reader_traits, stamped on every pitch_event.
+`playful` vs `earnest`, set once per reader from **two independent indicators — Q16 (`M5`) and Q17 (`CS1`) — majority wins, tie -> `earnest` (SV), both missing -> `earnest`** (V2-T2, `src/lib/quiz-scoring.ts` `deriveRegister`). This replaces the original "M5 with CS1 tiebreak": CS1 was a tiebreak with no trigger, because Q16 is required and all four of its options map cleanly. Test: **U19**. Register is the pitch's **voice to the reader**, not a claim about the subject — a playful pitch about an earnest person is legitimate. Stored on reader_traits, stamped on every pitch_event.
 
 ### 6.5 Intro Tone Rules — carried verbatim from v1, still binding
 1. Never braggy — show actions, don't celebrate them. 2. Never personify the app — no narrator voice. 3. Contradiction > single note. 4. Close with vivid image or joke, never sentiment; no rhetorical questions. 5. Don't explain the meaning — show behavior, stop. 6. Accomplishments as creation, not ego. 7. No superlatives. 8. Specifics > patterns. 9. The intro is about the SUBJECT, not the reader — never "you'd love."

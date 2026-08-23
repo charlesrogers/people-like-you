@@ -1,7 +1,7 @@
 # Matching v2 — Canonical Test Plan
 
 **Binding companion to `matching_algo-v2.md`.** A v2 task is not done until its tests here are green; launch is gated on §7. Constants marked **(SV)** are starting values.
-**Test stack:** unit/integration in the repo's test runner (add `vitest` if none exists — check `package.json` first; scheduled jobs must not install dev deps, so tests run in CI's build gate only, never in cron containers). Statistical validation is python (`scripts/`).
+**Test stack:** vitest (`npm test`), added in V2-T2 and wired into `deploy-staging.yml` as a build gate that runs before the docker build. Scheduled jobs must not install dev deps, so tests run in CI's build gate only, never in cron containers. Statistical validation is python (`scripts/`).
 
 ---
 
@@ -36,17 +36,36 @@ Three failure classes, three defenses:
 - U13: missing-data paths — one block missing → renormalized over present blocks; ALL blocks missing on either side → exactly 0.5 (neutral).
 - U14: `MILIEU_WEIGHT=0` → `score_with_milieu === score_base` for every candidate (bit-identical ranking to pre-v2).
 - U15: multiplier bounds — for any sim ∈ [0,1] and weight 0.1: multiplier ∈ [0.9, 1.1].
-- U16: politics hard-toggle — toggle on + gap > 2 steps → filtered bidirectionally; toggle off → never filters, only feeds sim.
+- U16 **(rewritten, V2-T2)**: politics importance is 3-way, not a toggle. `strong` + gap > 2 steps → filtered bidirectionally; `prefer` → logged, NEVER filters at launch; `none` → no effect; either side missing a position → never filters. Implemented: `src/lib/__tests__/politics-filter.test.ts`.
 
 ### 2.4 Quiz scoring
-- U17: Big Five reversal — all-5s answers → E=O=C=A=N computed with reversed items as 6−x (hand-computed fixtures).
+- U17 **(rewritten, V2-T2 — the agree-scale version is void)**: item-specific scoring. Trait score = mean of that trait's
+  items on the 1-4 scale after un-flipping option polarity, to 2dp. Hand-computed fixture: canonical option 0 on every
+  scored item → `{O: 2, E: 1.75, C: 4, A: 2, N: 2.5}`. Skipped items contribute nothing and are never imputed to a
+  midpoint. **Q9 is exempt from polarity randomisation** (its options are a clock) and its test asserts that.
+  Implemented: `src/lib/__tests__/quiz-scoring.test.ts`.
 - U18: pickiness/scale_use — all-5s taste votes → pickiness 1.0, scale_use 0; alternating 1/5 → hand-computed values.
-- U19: register derivation — M5 teasing → `playful`; earnest → `earnest`; M5 missing → CS1 tiebreak; both missing → `earnest` (default **(SV)**).
+  **(V2-T3, not yet built — `pickiness`/`scale_use`/`taste_priors` ship null.)**
+- U19 **(rewritten, V2-T2)**: register from two indicators — Q16 + Q17, majority wins, tie → `earnest` **(SV)**,
+  one present → that one, both missing → `earnest`. Un-flips polarity before reading the register map.
 
 ### 2.5 Generator contract (mocked LLM)
 - U20: prompt contains the assigned angle's feeling contract, the lead's operational test, and the register instruction (string assertions on the built prompt).
 - U21: thin-data swap — empty vouches+quotes+values_in_action with `admiration` assigned → next angle in order used, `angle_swapped_from='admiration'` logged. Never an unlogged substitution.
 - U22: every generated pitch_event row has non-null angle, content_lead, register, position, k_assigned, narrative.
+
+### 2.6 Voice-prompt map (V2-T4, from `specs/matching-v2-voice-prompt-map.md` §6)
+- U23: every `(itemId, optionIndex)` pair for the 10 table-seeding items resolves to exactly one `FISHED_PROMPTS`
+  entry — no gaps, no duplicate ids, and no fished prompt carries an `exampleAnswer`.
+- U24: selection returns exactly 6 prompts, ≤3 fished, no duplicate ids, no two fished prompts seeded from the same block.
+- U25: all four non-`fun` angles covered for every single-item answer set and for a fully answered quiz.
+- U26: empty answers → 6 bank prompts, delegating to today's `getOnboardingPrompts(6)` (no-quiz path bit-identical).
+- U27: Q19 templating — text under 120 chars verbatim; over-length transcript cut at the first sentence boundary,
+  else 80 chars on a word boundary, never mid-word, no ellipsis; null → `rabbit_hole` from the bank.
+- U28: a skipped fished prompt is replaced by the next fished prompt by coverage, respects the same-block rule,
+  falls back to the bank only once fished candidates are exhausted, and is never re-offered.
+- **Copy freeze**: every stem, option, framing string and all 46 mapped prompts are asserted byte-for-byte against
+  the spec files themselves (`src/lib/__tests__/quiz-copy-freeze.test.ts`), so drift fails the build.
 
 ## 3. Integration tests (staging, scripted curl + psql assertions; run per deploy of V2-T6..T8)
 
