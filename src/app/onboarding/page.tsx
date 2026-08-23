@@ -1,20 +1,24 @@
 'use client'
 
-import { useState, useEffect, Suspense } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { apiFetch } from '@/lib/api-client'
 import posthog from 'posthog-js'
 import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
 import { getOnboardingPrompts, getRandomPrompt, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
+import QuizStep, { type QuizResult } from '@/components/QuizStep'
+import { selectVoicePrompts, replaceSelectedPrompt, type SelectedPrompt } from '@/lib/voice-prompt-map'
+import { canonicalIndex } from '@/lib/quiz-scoring'
 import { computePersonalityReveal } from '@/lib/personality-reveal'
 import { getSeedNarrativesForGender, ATTRIBUTE_TAGS, type SeedNarrative } from '@/lib/seed-narratives'
 
-type Step = 'signup' | 'basics' | 'voice' | 'preferences' | 'photos' | 'taste' | 'reveal'
+type Step = 'signup' | 'basics' | 'quiz' | 'voice' | 'preferences' | 'photos' | 'taste' | 'reveal'
 
 const STEP_LABELS: Record<Step, string> = {
   signup: 'Sign up',
   basics: 'About you',
+  quiz: 'Questions',
   voice: 'About you',
   preferences: 'Preferences',
   photos: 'Photos',
@@ -22,7 +26,7 @@ const STEP_LABELS: Record<Step, string> = {
   reveal: 'Your profile',
 }
 
-const STEPS: Step[] = ['signup', 'basics', 'voice', 'preferences', 'photos', 'taste', 'reveal']
+const STEPS: Step[] = ['signup', 'basics', 'quiz', 'voice', 'preferences', 'photos', 'taste', 'reveal']
 
 // Height options 4'10"–7'0". `inches` is the stored preference value; `label` the display + users.height text.
 const HEIGHT_OPTIONS = Array.from({ length: 84 - 58 + 1 }, (_, i) => {
@@ -79,7 +83,11 @@ function OnboardingContent() {
   const [zipcode, setZipcode] = useState('')
 
   // Step 2: Voice recordings — stores server-confirmed memo IDs (not blobs)
-  const [prompts, setPrompts] = useState<PromptDef[]>(() => getOnboardingPrompts(6))
+  const [prompts, setPrompts] = useState<SelectedPrompt[]>(
+    () => getOnboardingPrompts(6).map(p => ({ ...p, source: 'bank' as const })))
+  const [quizAnswers, setQuizAnswers] = useState<Record<string, number | null>>({})
+  const [m9Text, setM9Text] = useState<string | null>(null)
+  const skippedPromptIdsRef = useRef<string[]>([])
   const [recordings, setRecordings] = useState<Map<string, { memoId: string; duration: number }>>(new Map())
   const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0)
 
@@ -147,12 +155,26 @@ function OnboardingContent() {
     }
   }, [])
 
+  // N2/D-QD7: which prompt each user actually saw, and whether the quiz aimed it.
+  useEffect(() => {
+    if (step !== 'voice') return
+    const p = prompts[currentVoiceIndex]
+    if (!p) return
+    posthog.capture('voice_prompt_shown', {
+      prompt_id: p.id,
+      source: p.source,
+      seed_item: p.seed?.itemId ?? null,
+      seed_option: p.seed?.optionIndex ?? null,
+    })
+  }, [step, currentVoiceIndex, prompts])
+
   const stepIndex = STEPS.indexOf(step)
   const progress = ((stepIndex + 1) / STEPS.length) * 100
 
-  const handleRecordingComplete = async (promptId: string, blob: Blob, duration: number) => {
+  const handleRecordingComplete = async (prompt: SelectedPrompt, blob: Blob, duration: number) => {
     if (!userId) throw new Error('Session expired. Please refresh and try again.')
 
+    const promptId = prompt.id
     const formData = new FormData()
     const ext = blob.type.includes('mp4') || blob.type.includes('m4a') ? 'm4a' : 'webm'
     formData.append('audio', blob, `${promptId}.${ext}`)
@@ -160,6 +182,8 @@ function OnboardingContent() {
     formData.append('promptId', promptId)
     formData.append('dayNumber', '0')
     formData.append('durationSeconds', String(duration))
+    formData.append('promptSource', prompt.source)
+    if (prompt.seed) formData.append('promptSeed', JSON.stringify(prompt.seed))
 
     const res = await apiFetch('/api/voice-memo', { method: 'POST', body: formData })
     const data = await res.json()
@@ -173,11 +197,30 @@ function OnboardingContent() {
   }
 
   const handleSkipPrompt = (promptId: string) => {
-    const currentIds = prompts.map(p => p.id)
-    const replacement = getRandomPrompt(currentIds)
+    const replacement = replaceSelectedPrompt(
+      prompts, promptId, quizAnswers, m9Text, skippedPromptIdsRef.current)
+    skippedPromptIdsRef.current = [...skippedPromptIdsRef.current, promptId]
     if (replacement) {
       setPrompts(prev => prev.map(p => p.id === promptId ? replacement : p))
+    } else {
+      // Fished and bank both exhausted — fall back to today's behaviour.
+      const fallback = getRandomPrompt(prompts.map(p => p.id))
+      if (fallback) setPrompts(prev => prev.map(p => p.id === promptId ? { ...fallback, source: 'bank' } : p))
     }
+  }
+
+  // The quiz aims the mic: answers select up to 3 fished prompts for the voice step.
+  const handleQuizComplete = (result: QuizResult) => {
+    const canonical: Record<string, number | null> = {}
+    for (const [itemId, a] of Object.entries(result.answers)) {
+      canonical[itemId] = a.optionIndex == null
+        ? null
+        : canonicalIndex(itemId, a.optionIndex, a.polarityFlipped)
+    }
+    setQuizAnswers(canonical)
+    setM9Text(result.m9Text)
+    setPrompts(selectVoicePrompts(canonical, result.m9Text, 6))
+    setStep('voice')
   }
 
   const canProceedSignup = agreedToStandards && (useEmail
@@ -261,7 +304,10 @@ function OnboardingContent() {
         setSubmitting(false)
       }
     } else if (step === 'basics') {
-      setStep('voice')
+      setStep('quiz')
+    } else if (step === 'quiz') {
+      // QuizStep drives its own progression via handleQuizComplete.
+      return
     } else if (step === 'voice') {
       posthog.capture('onboarding_section_progressed', { section: 'voice', recordings: recordings.size })
 
@@ -400,6 +446,7 @@ function OnboardingContent() {
   const canProceed =
     step === 'signup' ? canProceedSignup :
     step === 'basics' ? canProceedBasics :
+    step === 'quiz' ? false :
     step === 'voice' ? canProceedVoice :
     step === 'preferences' ? canProceedPrefs :
     step === 'photos' ? canProceedPhotos :
@@ -621,6 +668,10 @@ function OnboardingContent() {
         )}
 
         {/* Step 2: Voice Recordings — one card at a time */}
+        {step === 'quiz' && userId && (
+          <QuizStep userId={userId} onComplete={handleQuizComplete} />
+        )}
+
         {step === 'voice' && (
           <div>
             <h1 className="text-2xl font-bold text-stone-900">Tell us about yourself</h1>
@@ -661,7 +712,7 @@ function OnboardingContent() {
                     exampleAnswer={prompts[currentVoiceIndex].exampleAnswer}
                     onSkip={() => handleSkipPrompt(prompts[currentVoiceIndex].id)}
                     onRecordingComplete={async (blob, duration) => {
-                      await handleRecordingComplete(prompts[currentVoiceIndex].id, blob, duration)
+                      await handleRecordingComplete(prompts[currentVoiceIndex], blob, duration)
                       // Auto-advance to next unrecorded prompt after a beat
                       setTimeout(() => {
                         const nextUnrecorded = prompts.findIndex((p, i) => i > currentVoiceIndex && !recordings.has(p.id))
@@ -1204,7 +1255,7 @@ function OnboardingContent() {
                             key={p.id}
                             onClick={() => {
                               // Go back to voice step with this specific prompt
-                              setPrompts([p])
+                              setPrompts([{ ...p, source: 'bank' }])
                               setCurrentVoiceIndex(0)
                               setShowMoreQuestions(false)
                               setStep('voice')
@@ -1219,7 +1270,7 @@ function OnboardingContent() {
                           <button
                             key={p.id}
                             onClick={() => {
-                              setPrompts([p])
+                              setPrompts([{ ...p, source: 'bank' }])
                               setCurrentVoiceIndex(0)
                               setShowMoreQuestions(false)
                               setStep('voice')
@@ -1244,7 +1295,7 @@ function OnboardingContent() {
         )}
 
         {/* Navigation */}
-        <div className="mt-10 flex gap-3">
+        <div className={`mt-10 flex gap-3 ${step === 'quiz' ? 'hidden' : ''}`}>
           {stepIndex > 0 && step !== 'taste' && step !== 'reveal' && (
             <button
               onClick={() => setStep(STEPS[stepIndex - 1])}
