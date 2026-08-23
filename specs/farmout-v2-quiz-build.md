@@ -2,6 +2,7 @@
 
 **For:** a dedicated Opus 5 session. **Commissioned by Charles 2026-08-23.**
 **Goal in his words:** *"I want it to be fun, fast, and feel like they really are being seen / describing themselves well."* Those three words are the acceptance criteria, not decoration — §4 turns each into something measurable.
+**Branch:** all of the deep-dive output lives on **`session/s-0822-1436`** (pushed to origin). Branch from it — `git fetch origin && git checkout -b <your-session-branch> origin/session/s-0822-1436`. None of these specs are on `main` yet.
 **Ship target:** staging (`https://staging-ply.imprevista.com`), clickable end to end, so Charles can run the flow himself. **Not** production.
 
 ---
