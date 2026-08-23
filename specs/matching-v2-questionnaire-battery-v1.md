@@ -1,9 +1,9 @@
-# D-QD1 — Reader Instrument, Battery v1.0-rc5
+# D-QD1 — Reader Instrument, Battery v1.0-rc6
 
 **Supersedes** `matching_algo-v2.md` §4.1–§4.3 (items and copy). Structure, storage and envelope from the brief still bind.
 **Voice:** dry stems + warm-sincere framing copy (Charles, 2026-08-22 — Q1 answer **b**).
 **Research basis:** `specs/matching-v2-questionnaire-research.md`. **Three-voice draft it was chosen from:** `specs/matching-v2-questionnaire-batteries.md`.
-**Status:** release candidate 5. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
+**Status:** release candidate 6. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
 
 ---
 
@@ -78,8 +78,8 @@ Consequences, binding on every item below:
 > theatre kid · jock · honor-roll grinder · the one organizing the hang · happily unaffiliated · a completely different person
 
 **Q2 · `M2` · milieu + E**
-> **Someone in the group chat says "wait, are we actually doing this?"**
-> I make the call · I ask what time and who's driving · I send a meme · I'm three minutes into a voice note · I read it and said nothing
+> **The group is picking a restaurant. Fourteen messages in.**
+> I've already picked it · I've sent three links and a walking distance · I said "I'm easy" and meant it · I sent a meme about how long this is taking · I muted it and I'll go wherever
 
 **Q3 · `M3` · milieu + E**
 > **Wedding reception, 10pm.**
@@ -136,22 +136,22 @@ Consequences, binding on every item below:
 > Option 6 exists so that indifference to a living space reads as a preference, not a deficiency (Charles, 2026-08-23: "it's just not a priority for many guys... so we don't highlight it"). It routes to a **non-object prompt** in D-QD4 — never "tell us about your place."
 
 **Q15 · `M8` · milieu + A** · **seeds a prompt**
-> **Their birthday, and you got it exactly right. What was it?**
-> something that made them laugh out loud · something I made · the thing they mentioned once, months ago · not a thing at all — a day
+> **It's their birthday. Your move:**
+> something that makes them laugh out loud · something I made · the thing they mentioned once, months ago · a day out, not an object · I'm not a gift person — I'll be there, though
 
 ### Block 4 — How you talk · *"How you come across."*
 
-**Q16 · `M5` · register**
+**Q16 · `M5` · register (1st indicator)**
 > **The tell that you like someone:**
 > the teasing starts → *playful* · the jokes get weirdly specific → *playful* · I say it out loud, probably too early → *earnest* · I start showing up for things → *earnest*
 
-**Q17 · `CS1` · register tiebreak (used only when Q16 is missing)**
-> **The first good conversation you'd want:**
-> we're joking, then suddenly we're not → *playful* · we're deep, then suddenly we're laughing → *earnest*
+**Q17 · `CS1` · second register indicator** — *replaced. The old item was a tiebreak with no trigger (Q16 is required and all four of its options map cleanly), and it assumed everyone wants a depth-seeking conversation. Register sets the voice of every pitch a reader ever receives, so it gets two independent reads in different contexts.*
+> **Your friend just did something genuinely impressive. What you actually say:**
+> something that sounds like an insult → *playful* · "okay, that's actually incredible" → *playful* · I tell them properly, out loud → *earnest* · I tell everyone except them → *earnest*
 
 **Q18 · `CS2` · logged**
 > **Dinner with someone you just met goes well. Afterwards:**
-> they know more about me · I know more about them · honestly, about even
+> they know more about me · I know more about them · we found one thing we both care about and never left it · we argued about something for an hour · about even, honestly
 
 ### Block 5 — One thing
 
@@ -204,7 +204,7 @@ Audio: upload → existing `/api/transcribe` (gpt-4o-mini-transcribe, whisper-1 
 | Q14 | milieu | milieu | **yes** — this is the item's entire justification |
 | Q15 | milieu + A | milieu | **yes** |
 | Q16 | register | §6.4 register (playful/earnest) | no |
-| Q17 | register tiebreak | §6.4 | no |
+| Q17 | register (2nd indicator) | §6.4 | no |
 | Q18 | conversation role | logged; later pairing analysis | no |
 | Q19 | free response | — | **yes — verbatim** |
 | Q20 | education | milieu eduAdjacency | no |
@@ -240,5 +240,6 @@ The close is load-bearing: D7 forbids showing the reader their own pitch, which 
 4. Milieu function §9 input keys change from `M1–M8` to the ids here. The travel item is gone; Q6 replaces it and carries both O and milieu.
 5. **V2-T2 scope grows**: Q19 audio capture, upload, transcription hand-off, moderation, audio storage column.
 6. Politics importance is 3-way (`H2b ∈ {none, prefer, strong}`), not boolean — schema and `applyHardFilters` change; **U16** must test all three tiers and that tier 2 never filters.
-7. **Item design rules now binding on any future revision** (from `tasks/lessons.md`, 2026-08-23): every stem carries at least two concrete particulars — time, place, object, number, or a specific second person; if "in general" can be prefixed to it, it is not an item. Options are behaviours, not attitudes. Every option set has a named cost — four flavours of the same virtue is not an item.
-8. **D-QD4 must handle Q14 option 6** ("never once thought about it") with a non-object prompt — never "tell us about your place."
+7. **Register is derived from two items now (Q16 + Q17), not one plus a dead tiebreak.** Brief §6.4 says "set once per reader from M5, tiebreak CS1" — update it: both items score playful/earnest, majority wins, tie → `earnest` **(SV)**, both missing → `earnest`. Test-plan **U19** must be rewritten against this.
+8. **Item design rules now binding on any future revision** (from `tasks/lessons.md`, 2026-08-23): every stem carries at least two concrete particulars — time, place, object, number, or a specific second person; if "in general" can be prefixed to it, it is not an item. Options are behaviours, not attitudes. Every option set has a named cost — four flavours of the same virtue is not an item.
+9. **D-QD4 must handle Q14 option 6** ("never once thought about it") with a non-object prompt — never "tell us about your place."
