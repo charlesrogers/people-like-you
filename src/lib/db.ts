@@ -3,7 +3,7 @@ import type {
   User, HardPreferences, SoftPreferences, Photo, VoiceMemo, CompositeProfile, Match,
   MutualMatch, DisclosureExchange, UserAvailability, ScheduledDate, DateFeedback,
   TrustScore, TrustTier, ExitSurvey, FriendVouch, ChatMessage, MeetDecision, DatePlanningPrefs,
-  Block, Report, ReportReason, ModerationEvent
+  Block, Report, ReportReason, ModerationEvent, ReaderTraitsRow, QuizResponseRow
 } from './types'
 import { blockedIdsFromRows } from './safety-logic'
 
@@ -115,11 +115,14 @@ export async function getCompatibleUsers(user: User, eloRange = 150): Promise<Us
 // --- Hard Preference Filters (Rule 9, Layer 1) ---
 // Bidirectional: both users' hard preferences must be satisfied.
 
-async function applyHardFilters(user: User, candidates: User[]): Promise<User[]> {
+export async function applyHardFilters(user: User, candidates: User[]): Promise<User[]> {
   if (candidates.length === 0) return []
 
   const userPrefs = await getHardPreferences(user.id)
   const candidatePrefsMap = await getHardPreferencesForUsers(candidates.map(c => c.id))
+  // V2-T2: politics is a 3-way importance, hard-filtering on the top tier only.
+  const userTraits = await getReaderTraits(user.id)
+  const candidateTraitsMap = await getReaderTraitsForUsers(candidates.map(c => c.id))
   // Block exclusion (T24): drop anyone this user blocked OR who blocked this user.
   // Bidirectional and absolute — blocks always win over every compatibility signal.
   const blockedIds = await getBlockedUserIds(user.id)
@@ -153,6 +156,9 @@ async function applyHardFilters(user: User, candidates: User[]): Promise<User[]>
     // Smoking dealbreaker (bidirectional)
     if (isSmokingDealbreaker(userPrefs?.smoking, candPrefs?.smoking)) return false
 
+    // Politics dealbreaker (bidirectional, top importance tier only)
+    if (isPoliticsDealbreaker(userTraits, candidateTraitsMap.get(candidate.id) ?? null)) return false
+
     return true
   })
 }
@@ -184,6 +190,98 @@ function isSmokingDealbreaker(aSmoking: string | null | undefined, bSmoking: str
   if (aSmoking === 'dealbreaker' && (bSmoking === 'yes' || bSmoking === 'sometimes')) return true
   if (bSmoking === 'dealbreaker' && (aSmoking === 'yes' || aSmoking === 'sometimes')) return true
   return false
+}
+
+// --- Politics hard filter (V2-T2) ---
+// 3-way, not boolean: homogamy.politics_importance in {none, prefer, strong}.
+//   strong -> bidirectional hard filter at a gap of MORE THAN 2 steps
+//   prefer -> logged only at launch, never filters (Charles: "save this for the
+//             people who really care / testing")
+//   none   -> no effect
+// Either side missing a position never filters — importance without a position
+// is meaningful (Q22 is skippable while Q23 is still asked), it just can't filter.
+
+export const POLITICS_GAP_THRESHOLD = 2
+
+export function politicsGap(
+  a: ReaderTraitsRow | null | undefined,
+  b: ReaderTraitsRow | null | undefined,
+): number | null {
+  const pa = a?.homogamy?.politics_position
+  const pb = b?.homogamy?.politics_position
+  if (pa == null || pb == null) return null
+  return Math.abs(pa - pb)
+}
+
+export function isPoliticsDealbreaker(
+  a: ReaderTraitsRow | null | undefined,
+  b: ReaderTraitsRow | null | undefined,
+): boolean {
+  const gap = politicsGap(a, b)
+  if (gap == null || gap <= POLITICS_GAP_THRESHOLD) return false
+
+  const importances = [a?.homogamy?.politics_importance, b?.homogamy?.politics_importance]
+  if (importances.includes('strong')) return true
+
+  if (importances.includes('prefer')) {
+    // Logged, deliberately no effect at launch.
+    console.info('[politics] tier-2 gap not filtered', { gap, a: a?.user_id, b: b?.user_id })
+  }
+  return false
+}
+
+// --- Reader traits + quiz responses (migration 023) ---
+
+export async function saveReaderTraits(
+  traits: Omit<ReaderTraitsRow, 'completed_at'> & { completed_at?: string },
+): Promise<ReaderTraitsRow> {
+  const { data, error } = await db()
+    .from('reader_traits')
+    .upsert(traits, { onConflict: 'user_id' })
+    .select()
+    .single()
+  if (error) throw error
+  return data as ReaderTraitsRow
+}
+
+export async function getReaderTraits(userId: string): Promise<ReaderTraitsRow | null> {
+  const { data, error } = await db()
+    .from('reader_traits')
+    .select()
+    .eq('user_id', userId)
+    .maybeSingle()
+  if (error) throw error
+  return (data as ReaderTraitsRow) ?? null
+}
+
+export async function getReaderTraitsForUsers(userIds: string[]): Promise<Map<string, ReaderTraitsRow>> {
+  const map = new Map<string, ReaderTraitsRow>()
+  if (userIds.length === 0) return map
+  const { data, error } = await db().from('reader_traits').select().in('user_id', userIds)
+  if (error) throw error
+  for (const row of (data ?? []) as ReaderTraitsRow[]) map.set(row.user_id, row)
+  return map
+}
+
+export async function saveQuizResponses(
+  rows: Omit<QuizResponseRow, 'id' | 'created_at'>[],
+): Promise<number> {
+  if (rows.length === 0) return 0
+  const { error } = await db()
+    .from('quiz_responses')
+    .upsert(rows, { onConflict: 'user_id,item_id,instrument_version' })
+  if (error) throw error
+  return rows.length
+}
+
+export async function getQuizResponses(userId: string): Promise<QuizResponseRow[]> {
+  const { data, error } = await db()
+    .from('quiz_responses')
+    .select()
+    .eq('user_id', userId)
+    .order('item_id')
+  if (error) throw error
+  return (data ?? []) as QuizResponseRow[]
 }
 
 export async function saveCalibrationVote(voterId: string, targetId: string, vote: boolean): Promise<void> {
