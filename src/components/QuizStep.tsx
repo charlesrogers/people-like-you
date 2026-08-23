@@ -64,12 +64,17 @@ export default function QuizStep({
   const itemShownAtRef = useRef<number>(0)
   const blockStartedAtRef = useRef<number>(0)
   const completedRef = useRef(false)
+  // +1 forward, -1 backward. Block cards only auto-advance going forward —
+  // otherwise Back lands on a card that bounces you forward again, and you can
+  // never navigate back across a block boundary.
+  const dirRef = useRef(1)
 
   const [q19Text, setQ19Text] = useState('')
   const q19TranscriptRef = useRef<string | null>(null)
   const q19AudioUrlRef = useRef<string | null>(null)
   const [q19Recording, setQ19Recording] = useState(false)
   const [q19Seconds, setQ19Seconds] = useState(0)
+  const q19SecondsRef = useRef(0)
   const [q19Status, setQ19Status] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
 
   const screen = SCREENS[idx]
@@ -117,6 +122,7 @@ export default function QuizStep({
   }, [])
 
   const advance = useCallback(() => {
+    dirRef.current = 1
     const next = idx + 1
     const target = SCREENS[next]
     if (!target) return
@@ -136,6 +142,7 @@ export default function QuizStep({
   }, [idx, flush, go])
 
   const back = useCallback(() => {
+    dirRef.current = -1
     if (idx > 0) go(idx - 1)
   }, [idx, go])
 
@@ -190,6 +197,9 @@ export default function QuizStep({
   // Block cards are zero-tap: they auto-advance, or the user taps through sooner.
   useEffect(() => {
     if (screen?.kind !== 'card') return
+    // Arrived here via Back: sit still and let the user read/tap, so Back can
+    // actually cross the block boundary.
+    if (dirRef.current < 0) return
     const t = window.setTimeout(advance, CARD_AUTO_ADVANCE_MS)
     return () => window.clearTimeout(t)
   }, [screen, advance])
@@ -197,6 +207,7 @@ export default function QuizStep({
   // ─── Q19 audio ───────────────────────────────────────────────────────────
 
   const recorderRef = useRef<MediaRecorder | null>(null)
+  const recStartedAtRef = useRef<number>(0)
   const chunksRef = useRef<Blob[]>([])
   const streamRef = useRef<MediaStream | null>(null)
   const tickRef = useRef<number | null>(null)
@@ -228,26 +239,33 @@ export default function QuizStep({
       rec.onstop = () => {
         stream.getTracks().forEach(t => t.stop())
         const blob = new Blob(chunksRef.current, { type: mimeType })
-        if (blob.size > 0) void uploadQ19(blob, mimeType)
+        const secs = Math.max(1, Math.round((performance.now() - recStartedAtRef.current) / 1000))
+        q19SecondsRef.current = secs
+        if (blob.size > 0) void uploadQ19(blob, mimeType, secs)
         // Do not block advance on transcription — it runs while the user
-        // answers Q20-Q23 (~30s of one-tap items).
-        advance()
+        // answers Q20-Q23 (~30s of one-tap items). answer() records the response
+        // row too, so an audio Q19 is not invisible to item analytics.
+        answer('Q19', null)
       }
       rec.start()
       setQ19Recording(true)
       setQ19Seconds(0)
+      q19SecondsRef.current = 0
+      recStartedAtRef.current = performance.now()
       tickRef.current = window.setInterval(() => {
         setQ19Seconds(s => {
-          if (s + 1 >= Q19_AUDIO_CAP_S) stopQ19()
-          return s + 1
+          const next = s + 1
+          q19SecondsRef.current = next
+          if (next >= Q19_AUDIO_CAP_S) stopQ19()
+          return next
         })
       }, 1000)
     } catch {
       setQ19Status('error')
     }
-  }, [advance, stopQ19])
+  }, [answer, stopQ19])
 
-  const uploadQ19 = useCallback(async (blob: Blob, mimeType: string) => {
+  const uploadQ19 = useCallback(async (blob: Blob, mimeType: string, seconds: number) => {
     setQ19Status('saving')
     const ext = mimeType.includes('mp4') ? 'm4a' : 'webm'
 
@@ -258,7 +276,7 @@ export default function QuizStep({
     memoForm.append('userId', userId)
     memoForm.append('promptId', Q19_PROMPT_ID)
     memoForm.append('dayNumber', '0')
-    memoForm.append('durationSeconds', String(q19Seconds))
+    memoForm.append('durationSeconds', String(seconds))
     memoForm.append('promptSource', 'fished')
     memoForm.append('promptSeed', JSON.stringify({ itemId: 'Q19', optionIndex: -1 }))
 
@@ -282,7 +300,7 @@ export default function QuizStep({
     } catch {
       setQ19Status('error')
     }
-  }, [userId, q19Seconds])
+  }, [userId])
 
   useEffect(() => () => {
     if (tickRef.current) window.clearInterval(tickRef.current)
