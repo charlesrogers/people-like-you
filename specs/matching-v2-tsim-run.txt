@@ -833,3 +833,27 @@ ACCEPTANCE SUMMARY
 ==============================================================================
 
 total runtime 40s
+
+################ COHORT SCALING (150 cohorts/config) ################
+HOW MANY PEOPLE / HOW LONG  (MDE in pp on a 20% baseline, alpha=.05, 80% power)
+====================================================================================================
+                          config  readers  days  events  pos3_%  angle_MDE_pp  pos3_MDE_pp
+50 people, 6wk  (planned launch)       50    42    2054    12.5          8.05         9.36
+     50 people, 12wk (just wait)       50    84    2189    12.7          7.67         8.94
+    50 people, 26wk (wait a lot)       50   182    2192    12.8          7.73         8.91
+                 100 people, 6wk      100    42    4200    12.5          5.46         6.33
+                 150 people, 6wk      150    42    6300    12.5          4.37         5.04
+                 200 people, 6wk      200    42    8400    12.5          3.80         4.35
+                100 people, 12wk      100    84    8262    12.6          3.75         4.34
+    100 people, 6wk, WOMAN-FIRST       50    42    2100    12.4          7.91         9.24
+   100 people, 6wk, K~{.1,.2,.7}      100    42    4200    12.3          5.40         6.28
+
+Targets: angle main effect needs ~7.5pp @2250 | H4 position-3 predicted +2-8pp | H1/H2 interaction MDE = 2.2x the angle MDE
+
+################ INTERACTION MDE BY COHORT SIZE (80 fits/config) ################
+=== segment x angle INTERACTION MDE, measured (not extrapolated) ===
+         config  n_fits  main_MDE_pp  interaction_MDE_pp  ratio
+ 50 people, 6wk      80        11.87               18.09   1.44
+100 people, 6wk      80         7.92               11.72   1.42
+150 people, 6wk      80         6.44                9.46   1.41
+200 people, 6wk      80         5.49                8.05   1.42

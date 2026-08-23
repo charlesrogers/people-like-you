@@ -134,13 +134,43 @@ realised power.
 
 - **H3** (interest-led beats character-led overall) is the best-powered: detectable at **+5.4pp** by the Phase-R exit gate of 1,200 events… only if the true effect is that large. At the 1,200-event exit gate the lead MDE is +7.58pp.
 - **H4** (position-3 drift, +2–8pp) is **underpowered across the whole range**: MDE +8.75pp at 2,250 events, +5.96pp at 4,500. Most of the pre-registered interval is undetectable. Either widen the predicted magnitude, register it as descriptive-only, or accept it reads out at 4,500+ events.
-- **H1 and H2 are reader-segment × angle interactions** (high-O → `self_expansion`/`i_sharing`; high-E → `i_sharing`, low-E → `comfort`). Measured directly (`--stage h12`, 100 cohorts, 50/50 reader segment, `fire ~ angle * segment + lead + position`, median interaction SE 0.2996):
+- **H1 and H2 are reader-segment × angle interactions** (high-O → `self_expansion`/`i_sharing`; high-E → `i_sharing`, low-E → `comfort`). Measured directly (`--stage h12`; and §5b below across cohort sizes): the interaction MDE is **+18.09pp at launch size** — larger than the entire 20% baseline fire rate. **H1/H2 cannot be tested at launch cohort size.** Reclassify as exploratory.
 
-  | | N = 2,250 | N = 4,500 | N = 9,000 |
-  |---|---|---|---|
-  | Segment × angle interaction MDE | **+16.66pp** (OR 2.31) | **+11.16pp** (OR 1.81) | **+7.56pp** (OR 1.52) |
+## 5b. Does waiting fix it? No — the candidate pool binds, not the calendar
 
-  That is **2.2× the main-effect MDE at the same N**. **H1 and H2 cannot be tested at launch cohort size** — an interaction would have to be larger than the entire baseline fire rate to register. Reclassify them as exploratory, powered for a ≥9,000-event cohort, not as launch hypotheses.
+Realistic pool modelling (a cohort of M people gives each reader M/2 opposite-gender candidates;
+1 pitch/reader/day; 150 cohorts per row):
+
+| Cohort | Window | Events | Angle main-effect MDE | Position-3 MDE | Segment×angle MDE |
+|---|---|---|---|---|---|
+| **50 people** | 6 wk | 2,054 | +8.05pp | +9.36pp | +18.09pp |
+| 50 people | 12 wk | **2,189** | +7.67pp | +8.94pp | — |
+| 50 people | 26 wk | **2,192** | +7.73pp | +8.91pp | — |
+| 100 people | 6 wk | 4,200 | +5.46pp | +6.33pp | +11.72pp |
+| 150 people | 6 wk | 6,300 | +4.37pp | +5.04pp | +9.46pp |
+| 200 people | 6 wk | 8,400 | +3.80pp | +4.35pp | +8.05pp |
+| 100 people | 12 wk | 8,262 | +3.75pp | +4.34pp | — |
+| 100 people, **woman-first** | 6 wk | 2,100 | +7.91pp | +9.24pp | — |
+
+**At 50 people, calendar time is worthless.** Going from 6 weeks to 26 weeks adds 138 events (+6.7%)
+and moves the angle MDE by 0.3pp. Each reader has only 25 opposite-gender candidates and burns
+through them in roughly six weeks (measured: 23.5 of 25 pairs consumed by day 42; **25.0 of 25 — the
+entire pool — by day 84**, after which nothing further can happen except limited cooled-pool re-entry).
+Above ~100 people
+the 1-pitch-per-day cap binds instead of the pool, and time starts working linearly again —
+100 people × 12 weeks ≈ 200 people × 6 weeks.
+
+**`WOMAN_FIRST_SEQUENCING` costs a doubling of the cohort**: 100 people with the flag on produces the
+same 2,100 events as 50 people symmetric.
+
+**A lever that does NOT work**: shifting `k_assigned` toward 3 (`K ~ {.1, .2, .7}`) to harvest more
+position-3 events. Measured at 100 people: position-3 share 12.3% vs 12.5%, position-3 MDE 6.28pp vs
+6.33pp — no change. Sequences terminate on fire or hard pass before reaching position 3 regardless of
+what K says, so the K distribution does not control the position-3 sample. Leave K at {.2, .3, .5}.
+
+**Family-wise error is not a sample-size problem at all.** The 23.6% rate in §4 is a false-positive
+rate: each contrast is calibrated at 5% at every N, so testing six of them yields ~23% at 2,000
+events and ~23% at 200,000. No cohort size fixes it — only the procedure does.
 
 ## 6. Sensitivity — no hard-pass truncation (500 cohorts)
 
