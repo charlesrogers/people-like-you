@@ -1,9 +1,9 @@
-# D-QD1 — Reader Instrument, Battery v1.0-rc3
+# D-QD1 — Reader Instrument, Battery v1.0-rc4
 
 **Supersedes** `matching_algo-v2.md` §4.1–§4.3 (items and copy). Structure, storage and envelope from the brief still bind.
 **Voice:** dry stems + warm-sincere framing copy (Charles, 2026-08-22 — Q1 answer **b**).
 **Research basis:** `specs/matching-v2-questionnaire-research.md`. **Three-voice draft it was chosen from:** `specs/matching-v2-questionnaire-batteries.md`.
-**Status:** release candidate 3. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
+**Status:** release candidate 4. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
 
 ---
 
@@ -87,9 +87,9 @@ Consequences, binding on every item below:
 
 ### Block 2 — Wired · *"Now, how you're built."*
 
-**Q4 · `T-O1` · O** — *replaces the restaurant item; ordering off-menu indexes habit, not openness to ideas*
-> **A conversation gets weird and abstract.**
-> I steer us back to something real · I'll follow it for a bit · this is my favourite part of the night · I'm the one who took it there
+**Q4 · `T-O1` · O** — *third attempt. A behavioural report on last night, not a disposition toward a class of situation.*
+> **It's 1am. You're still up because:**
+> the show kept autoplaying · I lost track of time · I went looking for one fact two hours ago · I've got an idea and I'm not putting it down
 
 **Q5 · `T-O2` · O** *(frequency anchor)* · **seeds a prompt**
 > **Last time you were out of your depth on purpose:**
@@ -111,9 +111,9 @@ Consequences, binding on every item below:
 > **You're meeting someone at 7.**
 > I'm there at 6:50 · I'm there at 7 · 7:05, and I texted · 7:15, but I have a story
 
-**Q10 · `T-A1` · A** · **seeds a prompt**
-> **Someone you love is having a bad day. You:**
-> get practical — what do you need · share what I'd do, or what helped me · make them laugh · say nothing useful and stay anyway
+**Q10 · `T-A1` · A** · **seeds a prompt** — *rewritten: the old version sorted people by support style, which costs nobody anything and therefore measures nothing (see `tasks/lessons.md` 2026-08-23). Agreeableness shows up where candour and loyalty are in tension.*
+> **Your closest friend is getting back together with the ex. Again.**
+> I say exactly what I think · I say it once, then I'm supportive · I ask questions until they hear themselves · I keep my mouth shut and stay close
 
 **Q11 · `T-N1` · N**
 > **You sent a text an hour ago. Nothing back.**
@@ -197,7 +197,7 @@ Audio: upload → existing `/api/transcribe` (gpt-4o-mini-transcribe, whisper-1 
 | Q7 | E | H2 angle prior (`i_sharing` vs `comfort`) | no — deliberately |
 | Q8 | E | H2 angle prior | no — deliberately |
 | Q9 | C | milieu pace | **yes** — "but I have a story" is an explicit invitation |
-| Q10 | A | `comfort` angle prior | **yes** |
+| Q10 | A | `comfort` angle prior | **yes** — fishes the time they had to say a hard thing to someone they love |
 | Q11 | N | exploratory `comfort` prior | no — deliberately |
 | Q12 | N | exploratory | no — too close to a regret to fish safely |
 | Q13 | milieu + C | milieu | **yes** |
@@ -240,4 +240,5 @@ The close is load-bearing: D7 forbids showing the reader their own pitch, which 
 4. Milieu function §9 input keys change from `M1–M8` to the ids here. The travel item is gone; Q6 replaces it and carries both O and milieu.
 5. **V2-T2 scope grows**: Q19 audio capture, upload, transcription hand-off, moderation, audio storage column.
 6. Politics importance is 3-way (`H2b ∈ {none, prefer, strong}`), not boolean — schema and `applyHardFilters` change; **U16** must test all three tiers and that tier 2 never filters.
-7. **D-QD4 must handle Q14 option 6** ("never once thought about it") with a non-object prompt — never "tell us about your place."
+7. **Item design rules now binding on any future revision** (from `tasks/lessons.md`, 2026-08-23): every stem carries at least two concrete particulars — time, place, object, number, or a specific second person; if "in general" can be prefixed to it, it is not an item. Options are behaviours, not attitudes. Every option set has a named cost — four flavours of the same virtue is not an item.
+8. **D-QD4 must handle Q14 option 6** ("never once thought about it") with a non-object prompt — never "tell us about your place."
