@@ -1,4 +1,4 @@
--- 023_matching_v2_quiz.sql — V2-T1
+-- 024_matching_v2_quiz.sql — V2-T1
 -- Reader instrument (battery v1.0 / instrument_version 'B-1.0') storage.
 -- Spec: specs/farmout-v2-quiz-build.md section 2, matching_algo-v2.md section 10.
 --
