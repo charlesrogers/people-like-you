@@ -310,6 +310,12 @@ create table pitch_taste_votes (
 - **Phase T**: Thompson sampling over angles per reader-segment, exploration floor ε = 0.15 **(SV)**. Not built at launch — do not build it speculatively.
 - **Analysis model** (offline, `scripts/matching_v2_analysis.py`, python + statsmodels — runs anywhere with a DB dump, not in the app):
   `fire ~ angle + content_lead + position + pickiness + (1|reader) + (1|candidate)` — mixed-effects logistic. Report ORs with CIs by angle/lead; position coefficient = the measured "3rd-pitch drift".
+- **Fitter recipe — BINDING** (T-SIM validated 2026-08-22, `specs/matching-v2-tsim-results.md` §3; the naive single-fitter approach fails in opposite directions — `fit_map` manufactures position drift out of nothing (−1.79pp under a true null, 8.6% FPR) by collapsing the reader variance component; `fit_vb` under-covers CIs at 80% vs 95% nominal):
+  1. Point estimates → `fit_vb`
+  2. Standard errors, CIs, contrasts → `fit_map`
+  3. `pickiness` and any between-reader covariate → logistic GLM with **reader-cluster-robust** SEs
+  4. Variance components → `fit_vb`, descriptive only
+  With this recipe, injected +5.00pp position drift recovers at +5.19pp and all S1–S4 gates pass.
 - **Admin surface** (extend `/admin`): raw fire-rate table by angle × lead × position with counts + Wilson CIs; guardrail table photo-interest-given-fire by angle; swap-rate by angle (thin-data monitor). Raw rates only in-app — the model runs offline.
 - **Guardrail (pre-registered):** an angle with top-quartile fire rate and bottom-quartile photo-interest-given-fire is flagged clickbait — surfaced, not auto-acted.
 

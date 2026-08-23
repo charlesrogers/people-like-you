@@ -68,14 +68,23 @@ Three failure classes, three defenses:
 
 **Acceptance criteria:**
 - S1 **Recovery**: over 200 simulated cohorts, the analysis model's 95% CIs cover each true β ≥ 90% of the time, and the +10pp angle is detected (CI excludes 0) in ≥ 80% of runs.
-- S2 **Confound separation**: with position drift injected, angle estimates stay unbiased (mean absolute bias < 1pp) — proves randomized order + position term actually decorrelate the confound. **This is the direct answer to Charles's C12 concern; if S2 fails, the design is wrong — stop and redesign, do not launch.**
+- S2 **Confound separation** (formulation validated 2026-08-22): run the identical design with drift ON and OFF (≥2,000 cohorts each) and **difference the angle estimates** — the differential isolates confound leakage from the estimator's own shrinkage. Pass = all angle-contrast differentials inside Monte-Carlo error of zero. Never verdict a threshold that sits inside the MC interval — report INCONCLUSIVE and add cohorts. **This is the direct answer to Charles's C12 concern; if S2 fails, the design is wrong — stop and redesign, do not launch.** *(RESULT: PASSED 2026-08-22 — leakage ≤0.044pp vs MC interval ±0.409pp; see `specs/matching-v2-tsim-results.md`.)*
 - S3 **Null safety**: with all true effects 0, false-positive rate on angle contrasts ≤ 5–7%.
 - S4 **Power honesty**: report the minimal detectable effect at 1,200 / 2,250 / 4,500 events; write the realized numbers into the pre-registration (no invented thresholds).
 
 ## 5. Experiment pre-registration (before launch, growth-cockpit API per global rules)
 
+**Realised MDEs (T-SIM S4, 2026-08-22 — two-sided α=.05, 80% power, pp on a 20% baseline; these numbers go into the registration, not estimates):**
+
+| term | N=1,200 | N=2,250 | N=4,500 |
+|---|---|---|---|
+| angle contrast (vs ref) | +10.62 | +7.46 | +5.11 |
+| content lead | +7.58 | +5.37 | +3.70 |
+| position-3 drift | +12.50 | +8.75 | +5.96 |
+| segment × angle interaction | — | +16.66 | +11.16 (+7.56 at N=9,000) |
+
 Two separate registrations:
-- **E-STYLE**: metric = fire rate by angle/lead (source unwired — registers with warning, readout pends); hypotheses, directional **(all SV, from decision-memo F4)**: H1 high-O readers → `self_expansion`/`i_sharing` lift; H2 high-E → `i_sharing` lift, low-E → `comfort` lift; H3 interest-led beats character-led overall; H4 position-3 drift exists (+2–8pp). Window: 6 weeks (D1 cohort). Guardrail: photo-interest-given-fire by angle (clickbait detector).
+- **E-STYLE**: metric = fire rate by angle/lead (source unwired — registers with warning, readout pends). Hypotheses **(classification pending Charles's T1–T3 answers, 2026-08-22)**: H1 high-O readers → `self_expansion`/`i_sharing` lift and H2 high-E → `i_sharing` / low-E → `comfort` — *proposed: exploratory only; interaction MDE +16.7pp at launch volume is untestable*. H3 interest-led beats character-led overall — confirmatory (best-powered term). H4 position-3 drift — *proposed: descriptive-only nuisance parameter*. Multiplicity — *proposed*: confirmatory gate = joint 3-df Wald on angle (6.6% realised FPR); pairwise contrasts Holm-corrected, secondary (uncorrected family-wise FPR is 23.6%). Window: 6 weeks (D1 cohort). Guardrail: photo-interest-given-fire by angle (clickbait detector).
 - **E-MILIEU**: treatment = MILIEU_WEIGHT 0.1 vs the logged counterfactual ranking; metric = fire rate on milieu-boosted picks vs counterfactual picks; honest framing: observational at this N, logged for later validation; kill switch = flag to 0.
 
 ## 6. Guardrails & monitoring (live)
