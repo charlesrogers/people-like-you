@@ -1,9 +1,9 @@
-# D-QD1 — Reader Instrument, Battery v1.0-rc2
+# D-QD1 — Reader Instrument, Battery v1.0-rc3
 
 **Supersedes** `matching_algo-v2.md` §4.1–§4.3 (items and copy). Structure, storage and envelope from the brief still bind.
 **Voice:** dry stems + warm-sincere framing copy (Charles, 2026-08-22 — Q1 answer **b**).
 **Research basis:** `specs/matching-v2-questionnaire-research.md`. **Three-voice draft it was chosen from:** `specs/matching-v2-questionnaire-batteries.md`.
-**Status:** release candidate 2. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
+**Status:** release candidate 3. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
 
 ---
 
@@ -79,69 +79,71 @@ Consequences, binding on every item below:
 
 **Q2 · `M2` · milieu + E**
 > **Group chat, your role**
-> mostly reads, occasionally devastates · asks the real question · voice-note monologuist · sends the memes · makes the plans
+> mostly reads, occasionally devastates · asks the question that stops the thread · voice notes. long ones. · sole supplier of memes · makes the plans nobody else was going to make
 
 **Q3 · `M3` · milieu + E**
 > **Wedding, 10pm**
-> home already, no regrets · the good conversation at the side table · running the sparkler exit · dance floor since song one
+> already home, shoes off · the good conversation at the side table · outside, running the sparkler exit · dance floor, since song one
 
 ### Block 2 — Wired · *"Now, how you're built."*
 
-**Q4 · `T-O1` · O** — *replaces the "plan changes an hour out" item*
-> **A restaurant you've been to before. The menu arrives.**
-> the usual, obviously · the usual, after reading the whole menu · never the same thing twice · whatever I've never heard of
+**Q4 · `T-O1` · O** — *replaces the restaurant item; ordering off-menu indexes habit, not openness to ideas*
+> **A conversation gets weird and abstract.**
+> I steer us back to something real · I'll follow it for a bit · this is my favourite part of the night · I'm the one who took it there
 
-**Q5 · `T-O2` · O** *(frequency anchor)*
+**Q5 · `T-O2` · O** *(frequency anchor)* · **seeds a prompt**
 > **Last time you were out of your depth on purpose:**
 > this month · this year · a few years back · honestly, I like knowing what I'm doing
 
-**Q6 · `T-O3` · O + milieu** — *replaces both the unclear "handed something" item and the travel item*
+**Q6 · `T-O3` · O + milieu** · **seeds a prompt**
 > **A free Saturday in a city you don't know:**
-> the three things everyone says to do · whatever's within a few blocks · I walk until something happens · I ask someone who lives there and go do that
+> I'm not missing the must-see things · whatever's within a few blocks · I walk until something happens · I ask someone who lives there and go do that
 
-**Q7 · `T-E1` · E** — *replaces "three days of people"*
+**Q7 · `T-E1` · E**
 > **The party's good. You've been there three hours.**
-> I left an hour ago · I'm in the long goodbye · second wind · I'm deciding where everyone goes next
+> actually, I left an hour ago · I'm in the long goodbye · second wind · I'm deciding where everyone goes next
 
-**Q8 · `T-E2` · E** — *replaces "party, you know one person"*
+**Q8 · `T-E2` · E**
 > **Your phone rings. No text first.**
-> I do not answer phone calls · I answer for maybe four people · I answer, but I'm bracing · I'm glad someone called
+> I don't answer the phone. Ever. · I answer for maybe four people · I answer, but I'm bracing · I'm glad someone called
 
-**Q9 · `T-C1` · C** — *replaces "the calendar"* · **no polarity randomisation**
+**Q9 · `T-C1` · C** · **no polarity randomisation** · **seeds a prompt**
 > **You're meeting someone at 7.**
-> I'm there at 6:50 · I'm there at 7 · 7:05, and I texted · 7:15, and I did not text
+> I'm there at 6:50 · I'm there at 7 · 7:05, and I texted · 7:15, but I have a story
 
-**Q10 · `T-A1` · A** — *"fix it" removed*
+**Q10 · `T-A1` · A** · **seeds a prompt**
 > **Someone you love is having a bad day. You:**
-> get practical — what do you need · tell them about the time it happened to you · make them laugh · say nothing useful and stay anyway
+> get practical — what do you need · share what I'd do, or what helped me · make them laugh · say nothing useful and stay anyway
 
-**Q11 · `T-N1` · N** — *replaces "conversation that mattered"*
+**Q11 · `T-N1` · N**
 > **You sent a text an hour ago. Nothing back.**
-> nothing, they're busy · I've reread what I sent · I've reread it and drafted the follow-up · I've decided what it means
+> nothing, they're busy · I've reread what I sent · I've reread it and drafted the follow-up · I know exactly what it means
 
-**Q12 · `T-N2` · N** — *replaces "something goes sideways"*
+**Q12 · `T-N2` · N**
 > **The thing you said years ago that you still think about:**
-> doesn't exist · exists, surfaces rarely · surfaces more than I'd like · I could tell you the exact room
+> I don't have one of those · I have one, it surfaces rarely · it surfaces more than I'd like · I could tell you the exact room
 
 ### Block 3 — Actual life · *"What your weeks actually look like."*
 
-**Q13 · `M4` · milieu + C**
+**Q13 · `M4` · milieu + C** · **seeds a prompt**
 > **Your last three Saturdays, honestly:**
 > outside before most people were up · nothing on the calendar, and that was the point · elbow-deep in something I was making or fixing · at someone's kitchen table too long · working, and not entirely mad about it
 
-**Q14 · `M7` · milieu · story fisher** — *new*
+**Q14 · `M7` · milieu · **the story-fishing item*** · **seeds a prompt**
 > **The thing in your place a guest always asks about:**
-> a plant situation that got out of hand · an instrument · the books · something I made · honestly nothing — it's very clean
+> the art · a chair I overpaid for · the gear — bike, skis, clubs · an instrument · something I made · nothing, and I've never once thought about it
 
-**Q15 · `M8` · milieu + A**
+> Option 6 exists so that indifference to a living space reads as a preference, not a deficiency (Charles, 2026-08-23: "it's just not a priority for many guys... so we don't highlight it"). It routes to a **non-object prompt** in D-QD4 — never "tell us about your place."
+
+**Q15 · `M8` · milieu + A** · **seeds a prompt**
 > **A gift from you looks like:**
 > something that makes them laugh in the room · something I made · the thing they mentioned once, months ago · a day out, not an object
 
 ### Block 4 — How you talk · *"How you come across."*
 
 **Q16 · `M5` · register**
-> **How someone can tell you like them:**
-> I start making fun of them → *playful* · I get deadpan and hope they catch it → *playful* · I just tell them → *earnest* · I show up for things → *earnest*
+> **The tell that you like someone:**
+> the teasing starts → *playful* · the jokes get weirdly specific → *playful* · I say it out loud, probably too early → *earnest* · I start showing up → *earnest*
 
 **Q17 · `CS1` · register tiebreak (used only when Q16 is missing)**
 > **First conversation you'd want:**
@@ -153,7 +155,7 @@ Consequences, binding on every item below:
 
 ### Block 5 — One thing
 
-**Q19 · `M9` · free response · `[skip]` · text ≤120 chars OR audio ≤30 s**
+**Q19 · `M9` · free response · `[skip]` · text ≤120 chars OR audio ≤30 s** · **seeds the prompt verbatim**
 > **What do you nerd out on?**
 > text placeholder: *specific beats impressive* · audio affordance: *or say it — 30 seconds*
 
@@ -165,7 +167,7 @@ Audio: upload → existing `/api/transcribe` (gpt-4o-mini-transcribe, whisper-1 
 > **Education:**
 > high school · some college · bachelor's · grad school or beyond
 
-**Q21 · `H3` · milieu (H3 term)** — *reframed: "building a family" is incoherent for a single person; the construct is forward orientation, not present-tense construction*
+**Q21 · `H3` · milieu (H3 term)** · **seeds a prompt**
 > **The next five years, honestly:**
 > my work gets serious · my life gets full — people, a house, all of it · both, and I know how that sounds · I've stopped making five-year plans
 
@@ -184,33 +186,35 @@ Audio: upload → existing `/api/transcribe` (gpt-4o-mini-transcribe, whisper-1 
 
 ## 3. Per-item rationale — **what it steers** (revised N3)
 
-| id | construct | what it steers | story it fishes |
+| id | construct | what it steers | seeds a voice prompt? |
 |---|---|---|---|
-| Q1 | milieu tribe | milieu match term | the tribe story — and "a completely different person" fishes the reinvention story, the strongest prompt in the set |
-| Q2 | milieu + E | milieu · E prior | — |
-| Q3 | milieu + E | milieu · E prior | the wedding/party story |
-| Q4 | O | H1 angle prior (`self_expansion`) | — |
-| Q5 | O | H1 angle prior | the out-of-my-depth story |
-| Q6 | O + milieu | H1 angle prior · milieu | the trip that went sideways or perfectly |
-| Q7 | E | H2 angle prior (`i_sharing` vs `comfort`) | — |
-| Q8 | E | H2 angle prior | — |
-| Q9 | C | milieu pace | — |
-| Q10 | A | `comfort` angle prior | how they show up for people |
-| Q11 | N | exploratory `comfort` prior | — |
-| Q12 | N | exploratory | — |
-| Q13 | milieu + C | milieu | the Saturday story — highest-yield prompt seed after Q19 |
-| Q14 | milieu | milieu | **the object story** — the reason this item exists |
-| Q15 | milieu + A | milieu | the best gift they ever gave |
-| Q16 | register | §6.4 register (playful/earnest) | — |
-| Q17 | register tiebreak | §6.4 | — |
-| Q18 | conversation role | logged; later pairing analysis | — |
-| Q19 | free response | — | **everything.** Templated verbatim into the prompt |
-| Q20 | education | milieu eduAdjacency | — |
-| Q21 | forward orientation | milieu H3 term | — |
-| Q22 | politics | milieu politics gap · filter input | — |
-| Q23 | politics importance | hard filter (tier 3 only) | — |
+| Q1 | milieu tribe | milieu match term | **yes** — and "a completely different person" fishes the reinvention story, the strongest prompt in the set |
+| Q2 | milieu + E | milieu · E prior | no |
+| Q3 | milieu + E | milieu · E prior | **yes** |
+| Q4 | O | H1 angle prior (`self_expansion`) | no — deliberately |
+| Q5 | O | H1 angle prior | **yes** |
+| Q6 | O + milieu | H1 angle prior · milieu | **yes** |
+| Q7 | E | H2 angle prior (`i_sharing` vs `comfort`) | no — deliberately |
+| Q8 | E | H2 angle prior | no — deliberately |
+| Q9 | C | milieu pace | **yes** — "but I have a story" is an explicit invitation |
+| Q10 | A | `comfort` angle prior | **yes** |
+| Q11 | N | exploratory `comfort` prior | no — deliberately |
+| Q12 | N | exploratory | no — too close to a regret to fish safely |
+| Q13 | milieu + C | milieu | **yes** |
+| Q14 | milieu | milieu | **yes** — this is the item's entire justification |
+| Q15 | milieu + A | milieu | **yes** |
+| Q16 | register | §6.4 register (playful/earnest) | no |
+| Q17 | register tiebreak | §6.4 | no |
+| Q18 | conversation role | logged; later pairing analysis | no |
+| Q19 | free response | — | **yes — verbatim** |
+| Q20 | education | milieu eduAdjacency | no |
+| Q21 | forward orientation | milieu H3 term | **yes** |
+| Q22 | politics | milieu politics gap · filter input | no |
+| Q23 | politics importance | hard filter (tier 3 only) | no |
 
-**Audit:** 7 of 23 items directly seed a voice prompt; the rest steer an angle prior, the register, or the milieu term. Nothing in the battery exists to be quoted. Q18 steers nothing at launch and is the standing cut candidate (Charles: keep for now).
+**11 of 23 seed a voice prompt.** The nine trait items that don't (Q4, Q7, Q8, Q11, Q12, Q16–Q18) are silent on purpose: fishing a story off "your phone rings" would tell the user that item was load-bearing, which is the mechanics-leak trap (trap 6). Latent measures work best when the person doesn't know they were measured. Q12 is additionally withheld because the honest answer is usually a regret, and fishing for it is a tonal mistake in onboarding.
+
+Q18 steers nothing at launch and remains the standing cut candidate (Charles: keep for now).
 
 ---
 
@@ -236,3 +240,4 @@ The close is load-bearing: D7 forbids showing the reader their own pitch, which 
 4. Milieu function §9 input keys change from `M1–M8` to the ids here. The travel item is gone; Q6 replaces it and carries both O and milieu.
 5. **V2-T2 scope grows**: Q19 audio capture, upload, transcription hand-off, moderation, audio storage column.
 6. Politics importance is 3-way (`H2b ∈ {none, prefer, strong}`), not boolean — schema and `applyHardFilters` change; **U16** must test all three tiers and that tier 2 never filters.
+7. **D-QD4 must handle Q14 option 6** ("never once thought about it") with a non-object prompt — never "tell us about your place."
