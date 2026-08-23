@@ -1,9 +1,9 @@
-# D-QD1 — Reader Instrument, Battery v1.0-rc4
+# D-QD1 — Reader Instrument, Battery v1.0-rc5
 
 **Supersedes** `matching_algo-v2.md` §4.1–§4.3 (items and copy). Structure, storage and envelope from the brief still bind.
 **Voice:** dry stems + warm-sincere framing copy (Charles, 2026-08-22 — Q1 answer **b**).
 **Research basis:** `specs/matching-v2-questionnaire-research.md`. **Three-voice draft it was chosen from:** `specs/matching-v2-questionnaire-batteries.md`.
-**Status:** release candidate 4. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
+**Status:** release candidate 5. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
 
 ---
 
@@ -78,12 +78,12 @@ Consequences, binding on every item below:
 > theatre kid · jock · honor-roll grinder · the one organizing the hang · happily unaffiliated · a completely different person
 
 **Q2 · `M2` · milieu + E**
-> **Group chat, your role**
-> mostly reads, occasionally devastates · asks the question that stops the thread · voice notes. long ones. · sole supplier of memes · makes the plans nobody else was going to make
+> **Someone in the group chat says "wait, are we actually doing this?"**
+> I make the call · I ask what time and who's driving · I send a meme · I'm three minutes into a voice note · I read it and said nothing
 
 **Q3 · `M3` · milieu + E**
-> **Wedding, 10pm**
-> already home, shoes off · the good conversation at the side table · outside, running the sparkler exit · dance floor, since song one
+> **Wedding reception, 10pm.**
+> already home, shoes off · at a side table, deep in the actual conversation · outside, handing out sparklers · on the dance floor since the first song
 
 ### Block 2 — Wired · *"Now, how you're built."*
 
@@ -92,12 +92,12 @@ Consequences, binding on every item below:
 > the show kept autoplaying · I lost track of time · I went looking for one fact two hours ago · I've got an idea and I'm not putting it down
 
 **Q5 · `T-O2` · O** *(frequency anchor)* · **seeds a prompt**
-> **Last time you were out of your depth on purpose:**
-> this month · this year · a few years back · honestly, I like knowing what I'm doing
+> **Last thing you said yes to with no idea what you were doing:**
+> that was this month · sometime this year · a few years back · I like knowing what I'm doing
 
 **Q6 · `T-O3` · O + milieu** · **seeds a prompt**
-> **A free Saturday in a city you don't know:**
-> I'm not missing the must-see things · whatever's within a few blocks · I walk until something happens · I ask someone who lives there and go do that
+> **One free day in a city you've never been to.**
+> I'm not missing the must-see things · whatever's near where I'm staying · I walk until something happens · I ask someone who lives there and go do that
 
 **Q7 · `T-E1` · E**
 > **The party's good. You've been there three hours.**
@@ -105,7 +105,7 @@ Consequences, binding on every item below:
 
 **Q8 · `T-E2` · E**
 > **Your phone rings. No text first.**
-> I don't answer the phone. Ever. · I answer for maybe four people · I answer, but I'm bracing · I'm glad someone called
+> I don't answer the phone. Ever. · I let it go and text back "everything ok?" · I answer, bracing · I'm delighted — it's been ages
 
 **Q9 · `T-C1` · C** · **no polarity randomisation** · **seeds a prompt**
 > **You're meeting someone at 7.**
@@ -119,9 +119,9 @@ Consequences, binding on every item below:
 > **You sent a text an hour ago. Nothing back.**
 > nothing, they're busy · I've reread what I sent · I've reread it and drafted the follow-up · I know exactly what it means
 
-**Q12 · `T-N2` · N**
-> **The thing you said years ago that you still think about:**
-> I don't have one of those · I have one, it surfaces rarely · it surfaces more than I'd like · I could tell you the exact room
+**Q12 · `T-N2` · N** — *swapped: the old version was a second rumination item four screens from Q11. This covers anticipatory anxiety instead, which broadens N rather than repeating it.*
+> **Someone says "can I give you some feedback?"**
+> my stomach drops · I brace, then I'm fine · sure, go ahead · I asked for it, that's why I'm here
 
 ### Block 3 — Actual life · *"What your weeks actually look like."*
 
@@ -136,22 +136,22 @@ Consequences, binding on every item below:
 > Option 6 exists so that indifference to a living space reads as a preference, not a deficiency (Charles, 2026-08-23: "it's just not a priority for many guys... so we don't highlight it"). It routes to a **non-object prompt** in D-QD4 — never "tell us about your place."
 
 **Q15 · `M8` · milieu + A** · **seeds a prompt**
-> **A gift from you looks like:**
-> something that makes them laugh in the room · something I made · the thing they mentioned once, months ago · a day out, not an object
+> **Their birthday, and you got it exactly right. What was it?**
+> something that made them laugh out loud · something I made · the thing they mentioned once, months ago · not a thing at all — a day
 
 ### Block 4 — How you talk · *"How you come across."*
 
 **Q16 · `M5` · register**
 > **The tell that you like someone:**
-> the teasing starts → *playful* · the jokes get weirdly specific → *playful* · I say it out loud, probably too early → *earnest* · I start showing up → *earnest*
+> the teasing starts → *playful* · the jokes get weirdly specific → *playful* · I say it out loud, probably too early → *earnest* · I start showing up for things → *earnest*
 
 **Q17 · `CS1` · register tiebreak (used only when Q16 is missing)**
-> **First conversation you'd want:**
-> banter that finds depth → *playful* · depth that finds jokes → *earnest*
+> **The first good conversation you'd want:**
+> we're joking, then suddenly we're not → *playful* · we're deep, then suddenly we're laughing → *earnest*
 
 **Q18 · `CS2` · logged**
-> **In conversation, more:**
-> the storyteller · the question-asker · genuinely depends who I'm with
+> **Dinner with someone you just met goes well. Afterwards:**
+> they know more about me · I know more about them · honestly, about even
 
 ### Block 5 — One thing
 
@@ -199,7 +199,7 @@ Audio: upload → existing `/api/transcribe` (gpt-4o-mini-transcribe, whisper-1 
 | Q9 | C | milieu pace | **yes** — "but I have a story" is an explicit invitation |
 | Q10 | A | `comfort` angle prior | **yes** — fishes the time they had to say a hard thing to someone they love |
 | Q11 | N | exploratory `comfort` prior | no — deliberately |
-| Q12 | N | exploratory | no — too close to a regret to fish safely |
+| Q12 | N | exploratory (anticipatory anxiety) | no — deliberately |
 | Q13 | milieu + C | milieu | **yes** |
 | Q14 | milieu | milieu | **yes** — this is the item's entire justification |
 | Q15 | milieu + A | milieu | **yes** |
@@ -212,7 +212,7 @@ Audio: upload → existing `/api/transcribe` (gpt-4o-mini-transcribe, whisper-1 
 | Q22 | politics | milieu politics gap · filter input | no |
 | Q23 | politics importance | hard filter (tier 3 only) | no |
 
-**11 of 23 seed a voice prompt.** The nine trait items that don't (Q4, Q7, Q8, Q11, Q12, Q16–Q18) are silent on purpose: fishing a story off "your phone rings" would tell the user that item was load-bearing, which is the mechanics-leak trap (trap 6). Latent measures work best when the person doesn't know they were measured. Q12 is additionally withheld because the honest answer is usually a regret, and fishing for it is a tonal mistake in onboarding.
+**11 of 23 seed a voice prompt.** The nine trait items that don't (Q4, Q7, Q8, Q11, Q12, Q16–Q18) are silent on purpose: fishing a story off "your phone rings" would tell the user that item was load-bearing, which is the mechanics-leak trap (trap 6). Latent measures work best when the person doesn't know they were measured. Q12 was rewritten in rc5 to cover anticipatory anxiety rather than rumination; the old version repeated Q11's facet four screens later.
 
 Q18 steers nothing at launch and remains the standing cut candidate (Charles: keep for now).
 
