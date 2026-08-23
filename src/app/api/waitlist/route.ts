@@ -23,6 +23,17 @@ function normalizePhone(raw: unknown): string | null {
   return null
 }
 
+// International phones (country-page signups): digits including the country code.
+// E.164 allows 8–15 digits; we can't validate per-country plans, so bounds are the check.
+function normalizeIntlPhone(raw: unknown): string | null {
+  const d = String(raw ?? '').replace(/\D/g, '')
+  return d.length >= 8 && d.length <= 15 ? d : null
+}
+
+// Countries the organic pages capture for. Anything else is rejected rather than
+// stored free-form — the pages only ever send these codes.
+const INTL_COUNTRIES = new Set(['MX', 'BR', 'PH', 'PE', 'CL', 'AR', 'GT', 'EC', 'NG'])
+
 // zip_locations stores "New york" / "Beverly hills" — fix the casing for display.
 function titleCase(s: string | null): string | null {
   if (!s) return s
@@ -93,7 +104,41 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { phone, zipcode, ref, source } = await req.json()
+    const { phone, zipcode, ref, source, country } = await req.json()
+
+    // ── International branch (organic country pages): phone + country, no ZIP/metro. ──
+    if (country && country !== 'US') {
+      if (!INTL_COUNTRIES.has(String(country))) {
+        return NextResponse.json({ error: 'Unsupported country.' }, { status: 400 })
+      }
+      const intl_normalized = normalizeIntlPhone(phone)
+      if (!intl_normalized) {
+        return NextResponse.json({ error: 'Please enter a valid phone number with country code.' }, { status: 400 })
+      }
+      const db = createServerClient()
+      const { data: existing } = await db.from('waitlist')
+        .select('created_at, metro_key, referral_code')
+        .eq('phone_normalized', intl_normalized).single()
+      if (existing) {
+        return NextResponse.json({ ok: true, alreadyJoined: true, referralCode: existing.referral_code })
+      }
+      const referral_code = makeReferralCode()
+      const { error } = await db.from('waitlist').insert({
+        phone: String(phone).trim(),
+        phone_normalized: intl_normalized,
+        country: String(country),
+        referral_code,
+        referred_by: ref ? String(ref).trim() : null,
+        source: source ? String(source).slice(0, 120) : null,
+      })
+      if (error) {
+        console.error('Waitlist intl insert error:', error)
+        return NextResponse.json({ error: 'Could not join the waitlist. Please try again.' }, { status: 500 })
+      }
+      // No position/countdown: those are per-US-metro concepts. The page shows a
+      // simple confirmation + referral link.
+      return NextResponse.json({ ok: true, referralCode: referral_code })
+    }
 
     const phone_normalized = normalizePhone(phone)
     if (!phone_normalized) {

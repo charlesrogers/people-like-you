@@ -1,0 +1,138 @@
+[
+ {
+  "slug": "salt-lake-city",
+  "cbsa": "41620",
+  "short": "Salt Lake City",
+  "name": "Salt Lake City, UT",
+  "cong": 1476,
+  "adherents": 653868,
+  "pct": 52,
+  "rankAdherents": 1,
+  "rankPct": 7,
+  "pool": {
+   "total": 169697,
+   "men": 94903,
+   "women": 74794,
+   "vintage": "ACS 2023 5-year"
+  }
+ },
+ {
+  "slug": "provo-orem",
+  "cbsa": "39340",
+  "short": "Provo–Orem",
+  "name": "Provo-Orem, UT",
+  "cong": 1356,
+  "adherents": 554604,
+  "pct": 82.6,
+  "rankAdherents": 2,
+  "rankPct": 1,
+  "pool": {
+   "total": 88092,
+   "men": 49959,
+   "women": 38133,
+   "vintage": "ACS 2023 5-year"
+  }
+ },
+ {
+  "slug": "phoenix",
+  "cbsa": "38060",
+  "short": "Phoenix",
+  "name": "Phoenix-Mesa-Chandler, AZ",
+  "cong": 617,
+  "adherents": 301196,
+  "pct": 6.2,
+  "rankAdherents": 4,
+  "rankPct": 44,
+  "pool": {
+   "total": 691293,
+   "men": 379282,
+   "women": 312011,
+   "vintage": "ACS 2023 5-year"
+  }
+ },
+ {
+  "slug": "boise",
+  "cbsa": "14260",
+  "short": "Boise",
+  "name": "Boise City, ID",
+  "cong": 265,
+  "adherents": 115016,
+  "pct": 15,
+  "rankAdherents": 8,
+  "rankPct": 21,
+  "pool": {
+   "total": 89916,
+   "men": 50807,
+   "women": 39109,
+   "vintage": "ACS 2023 5-year"
+  }
+ },
+ {
+  "slug": "washington-dc",
+  "cbsa": "47900",
+  "short": "Washington, DC",
+  "name": "Washington-Arlington-Alexandria, DC-VA-MD-WV",
+  "cong": 134,
+  "adherents": 72147,
+  "pct": 1.1,
+  "rankAdherents": 17,
+  "rankPct": 372,
+  "pool": {
+   "total": 898116,
+   "men": 466362,
+   "women": 431754,
+   "vintage": "ACS 2023 5-year"
+  }
+ },
+ {
+  "slug": "new-york",
+  "cbsa": "35620",
+  "short": "New York City",
+  "name": "New York-Newark-Jersey City, NY-NJ-PA",
+  "cong": 107,
+  "adherents": 62194,
+  "pct": 0.3,
+  "rankAdherents": 21,
+  "rankPct": 854,
+  "pool": {
+   "total": 2982294,
+   "men": 1542179,
+   "women": 1440115,
+   "vintage": "ACS 2023 5-year"
+  }
+ },
+ {
+  "slug": "rexburg",
+  "cbsa": "39940",
+  "short": "Rexburg",
+  "name": "Rexburg, ID",
+  "cong": 97,
+  "adherents": 35114,
+  "pct": 53,
+  "rankAdherents": 25,
+  "rankPct": 6,
+  "pool": {
+   "total": 11770,
+   "men": 6243,
+   "women": 5527,
+   "vintage": "ACS 2023 5-year"
+  }
+ },
+ {
+  "slug": "philadelphia",
+  "cbsa": "37980",
+  "short": "Philadelphia",
+  "name": "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",
+  "cong": 37,
+  "adherents": 18600,
+  "pct": 0.3,
+  "rankAdherents": 53,
+  "rankPct": 856,
+  "pool": {
+   "total": 933405,
+   "men": 478647,
+   "women": 454758,
+   "vintage": "ACS 2024 5-year"
+  }
+ }
+]

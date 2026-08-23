@@ -9,6 +9,9 @@ const LINKS = [
   { href: '/faq', label: 'FAQ' },
   { href: '/welcome', label: 'How it works' },
   { href: '/thesis', label: 'Why we built this' },
+  // Neutral anchor text on purpose: this footer renders on the Meta ad landing page,
+  // where the community must never be named (launch-plan §5). The page it links to may.
+  { href: '/lds-singles', label: 'Cities' },
   { href: '/privacy', label: 'Privacy' },
   { href: '/terms', label: 'Terms' },
 ]

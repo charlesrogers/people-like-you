@@ -1,0 +1,9098 @@
+{
+ "top25Pct": [
+  {
+   "cbsa": "39340",
+   "name": "Provo-Orem, UT",
+   "micro": false,
+   "cong": 1356,
+   "adherents": 554604,
+   "pct": 82.6,
+   "rankAdherents": 2,
+   "rankPct": 1
+  },
+  {
+   "cbsa": "30860",
+   "name": "Logan, UT-ID",
+   "micro": false,
+   "cong": 276,
+   "adherents": 113846,
+   "pct": 77.3,
+   "rankAdherents": 9,
+   "rankPct": 2
+  },
+  {
+   "cbsa": "41100",
+   "name": "St. George, UT",
+   "micro": false,
+   "cong": 284,
+   "adherents": 116156,
+   "pct": 64.4,
+   "rankAdherents": 7,
+   "rankPct": 3
+  },
+  {
+   "cbsa": "36260",
+   "name": "Ogden-Clearfield, UT",
+   "micro": false,
+   "cong": 1083,
+   "adherents": 442947,
+   "pct": 63.7,
+   "rankAdherents": 3,
+   "rankPct": 4
+  },
+  {
+   "cbsa": "26820",
+   "name": "Idaho Falls, ID",
+   "micro": false,
+   "cong": 213,
+   "adherents": 92507,
+   "pct": 58.8,
+   "rankAdherents": 13,
+   "rankPct": 5
+  },
+  {
+   "cbsa": "41620",
+   "name": "Salt Lake City, UT",
+   "micro": false,
+   "cong": 1476,
+   "adherents": 653868,
+   "pct": 52,
+   "rankAdherents": 1,
+   "rankPct": 7
+  },
+  {
+   "cbsa": "38540",
+   "name": "Pocatello, ID",
+   "micro": false,
+   "cong": 92,
+   "adherents": 33742,
+   "pct": 35.6,
+   "rankAdherents": 27,
+   "rankPct": 15
+  },
+  {
+   "cbsa": "46300",
+   "name": "Twin Falls, ID",
+   "micro": false,
+   "cong": 62,
+   "adherents": 26970,
+   "pct": 23.6,
+   "rankAdherents": 37,
+   "rankPct": 18
+  },
+  {
+   "cbsa": "14260",
+   "name": "Boise City, ID",
+   "micro": false,
+   "cong": 265,
+   "adherents": 115016,
+   "pct": 15,
+   "rankAdherents": 8,
+   "rankPct": 21
+  },
+  {
+   "cbsa": "22140",
+   "name": "Farmington, NM",
+   "micro": false,
+   "cong": 24,
+   "adherents": 12936,
+   "pct": 10.6,
+   "rankAdherents": 70,
+   "rankPct": 24
+  },
+  {
+   "cbsa": "28420",
+   "name": "Kennewick-Richland, WA",
+   "micro": false,
+   "cong": 60,
+   "adherents": 31500,
+   "pct": 10.4,
+   "rankAdherents": 30,
+   "rankPct": 26
+  },
+  {
+   "cbsa": "22380",
+   "name": "Flagstaff, AZ",
+   "micro": false,
+   "cong": 30,
+   "adherents": 13530,
+   "pct": 9.3,
+   "rankAdherents": 67,
+   "rankPct": 33
+  },
+  {
+   "cbsa": "43420",
+   "name": "Sierra Vista-Douglas, AZ",
+   "micro": false,
+   "cong": 24,
+   "adherents": 10824,
+   "pct": 8.6,
+   "rankAdherents": 78,
+   "rankPct": 35
+  },
+  {
+   "cbsa": "47460",
+   "name": "Walla Walla, WA",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4200,
+   "pct": 6.7,
+   "rankAdherents": 172,
+   "rankPct": 41
+  },
+  {
+   "cbsa": "38060",
+   "name": "Phoenix-Mesa-Chandler, AZ",
+   "micro": false,
+   "cong": 617,
+   "adherents": 301196,
+   "pct": 6.2,
+   "rankAdherents": 4,
+   "rankPct": 44
+  },
+  {
+   "cbsa": "16180",
+   "name": "Carson City, NV",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3612,
+   "pct": 6.2,
+   "rankAdherents": 194,
+   "rankPct": 46
+  },
+  {
+   "cbsa": "16220",
+   "name": "Casper, WY",
+   "micro": false,
+   "cong": 11,
+   "adherents": 4752,
+   "pct": 5.9,
+   "rankAdherents": 153,
+   "rankPct": 48
+  },
+  {
+   "cbsa": "29820",
+   "name": "Las Vegas-Henderson-Paradise, NV",
+   "micro": false,
+   "cong": 237,
+   "adherents": 132329,
+   "pct": 5.8,
+   "rankAdherents": 6,
+   "rankPct": 53
+  },
+  {
+   "cbsa": "44060",
+   "name": "Spokane-Spokane Valley, WA",
+   "micro": false,
+   "cong": 64,
+   "adherents": 33600,
+   "pct": 5.7,
+   "rankAdherents": 28,
+   "rankPct": 55
+  },
+  {
+   "cbsa": "24300",
+   "name": "Grand Junction, CO",
+   "micro": false,
+   "cong": 17,
+   "adherents": 8428,
+   "pct": 5.4,
+   "rankAdherents": 100,
+   "rankPct": 59
+  },
+  {
+   "cbsa": "13740",
+   "name": "Billings, MT",
+   "micro": false,
+   "cong": 19,
+   "adherents": 9557,
+   "pct": 5.2,
+   "rankAdherents": 92,
+   "rankPct": 63
+  },
+  {
+   "cbsa": "48300",
+   "name": "Wenatchee, WA",
+   "micro": false,
+   "cong": 12,
+   "adherents": 6300,
+   "pct": 5.2,
+   "rankAdherents": 125,
+   "rankPct": 64
+  },
+  {
+   "cbsa": "11260",
+   "name": "Anchorage, AK",
+   "micro": false,
+   "cong": 40,
+   "adherents": 20360,
+   "pct": 5.1,
+   "rankAdherents": 45,
+   "rankPct": 66
+  },
+  {
+   "cbsa": "17660",
+   "name": "Coeur d'Alene, ID",
+   "micro": false,
+   "cong": 20,
+   "adherents": 8700,
+   "pct": 5.1,
+   "rankAdherents": 97,
+   "rankPct": 67
+  },
+  {
+   "cbsa": "24500",
+   "name": "Great Falls, MT",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4024,
+   "pct": 4.8,
+   "rankAdherents": 181,
+   "rankPct": 70
+  }
+ ],
+ "diaspora": [
+  {
+   "cbsa": "38060",
+   "name": "Phoenix-Mesa-Chandler, AZ",
+   "micro": false,
+   "cong": 617,
+   "adherents": 301196,
+   "pct": 6.2,
+   "rankAdherents": 4,
+   "rankPct": 44
+  },
+  {
+   "cbsa": "31080",
+   "name": "Los Angeles-Long Beach-Anaheim, CA",
+   "micro": false,
+   "cong": 314,
+   "adherents": 198134,
+   "pct": 1.5,
+   "rankAdherents": 5,
+   "rankPct": 262
+  },
+  {
+   "cbsa": "29820",
+   "name": "Las Vegas-Henderson-Paradise, NV",
+   "micro": false,
+   "cong": 237,
+   "adherents": 132329,
+   "pct": 5.8,
+   "rankAdherents": 6,
+   "rankPct": 53
+  },
+  {
+   "cbsa": "40140",
+   "name": "Riverside-San Bernardino-Ontario, CA",
+   "micro": false,
+   "cong": 172,
+   "adherents": 108532,
+   "pct": 2.4,
+   "rankAdherents": 10,
+   "rankPct": 154
+  },
+  {
+   "cbsa": "19100",
+   "name": "Dallas-Fort Worth-Arlington, TX",
+   "micro": false,
+   "cong": 199,
+   "adherents": 105071,
+   "pct": 1.4,
+   "rankAdherents": 11,
+   "rankPct": 293
+  },
+  {
+   "cbsa": "42660",
+   "name": "Seattle-Tacoma-Bellevue, WA",
+   "micro": false,
+   "cong": 184,
+   "adherents": 104512,
+   "pct": 2.6,
+   "rankAdherents": 12,
+   "rankPct": 133
+  },
+  {
+   "cbsa": "26420",
+   "name": "Houston-The Woodlands-Sugar Land, TX",
+   "micro": false,
+   "cong": 162,
+   "adherents": 85938,
+   "pct": 1.2,
+   "rankAdherents": 14,
+   "rankPct": 342
+  },
+  {
+   "cbsa": "38900",
+   "name": "Portland-Vancouver-Hillsboro, OR-WA",
+   "micro": false,
+   "cong": 151,
+   "adherents": 83481,
+   "pct": 3.3,
+   "rankAdherents": 15,
+   "rankPct": 109
+  },
+  {
+   "cbsa": "40900",
+   "name": "Sacramento-Roseville-Folsom, CA",
+   "micro": false,
+   "cong": 120,
+   "adherents": 75384,
+   "pct": 3.1,
+   "rankAdherents": 16,
+   "rankPct": 114
+  },
+  {
+   "cbsa": "47900",
+   "name": "Washington-Arlington-Alexandria, DC-VA-MD-WV",
+   "micro": false,
+   "cong": 134,
+   "adherents": 72147,
+   "pct": 1.1,
+   "rankAdherents": 17,
+   "rankPct": 372
+  },
+  {
+   "cbsa": "41860",
+   "name": "San Francisco-Oakland-Berkeley, CA",
+   "micro": false,
+   "cong": 112,
+   "adherents": 70288,
+   "pct": 1.5,
+   "rankAdherents": 18,
+   "rankPct": 267
+  },
+  {
+   "cbsa": "41740",
+   "name": "San Diego-Chula Vista-Carlsbad, CA",
+   "micro": false,
+   "cong": 108,
+   "adherents": 68148,
+   "pct": 2.1,
+   "rankAdherents": 19,
+   "rankPct": 176
+  },
+  {
+   "cbsa": "19740",
+   "name": "Denver-Aurora-Lakewood, CO",
+   "micro": false,
+   "cong": 119,
+   "adherents": 63656,
+   "pct": 2.1,
+   "rankAdherents": 20,
+   "rankPct": 169
+  },
+  {
+   "cbsa": "35620",
+   "name": "New York-Newark-Jersey City, NY-NJ-PA",
+   "micro": false,
+   "cong": 107,
+   "adherents": 62194,
+   "pct": 0.3,
+   "rankAdherents": 21,
+   "rankPct": 854
+  },
+  {
+   "cbsa": "12060",
+   "name": "Atlanta-Sandy Springs-Alpharetta, GA",
+   "micro": false,
+   "cong": 87,
+   "adherents": 49952,
+   "pct": 0.8,
+   "rankAdherents": 22,
+   "rankPct": 568
+  }
+ ],
+ "all": [
+  {
+   "cbsa": "41620",
+   "name": "Salt Lake City, UT",
+   "micro": false,
+   "cong": 1476,
+   "adherents": 653868,
+   "pct": 52,
+   "rankAdherents": 1,
+   "rankPct": 7
+  },
+  {
+   "cbsa": "39340",
+   "name": "Provo-Orem, UT",
+   "micro": false,
+   "cong": 1356,
+   "adherents": 554604,
+   "pct": 82.6,
+   "rankAdherents": 2,
+   "rankPct": 1
+  },
+  {
+   "cbsa": "36260",
+   "name": "Ogden-Clearfield, UT",
+   "micro": false,
+   "cong": 1083,
+   "adherents": 442947,
+   "pct": 63.7,
+   "rankAdherents": 3,
+   "rankPct": 4
+  },
+  {
+   "cbsa": "38060",
+   "name": "Phoenix-Mesa-Chandler, AZ",
+   "micro": false,
+   "cong": 617,
+   "adherents": 301196,
+   "pct": 6.2,
+   "rankAdherents": 4,
+   "rankPct": 44
+  },
+  {
+   "cbsa": "31080",
+   "name": "Los Angeles-Long Beach-Anaheim, CA",
+   "micro": false,
+   "cong": 314,
+   "adherents": 198134,
+   "pct": 1.5,
+   "rankAdherents": 5,
+   "rankPct": 262
+  },
+  {
+   "cbsa": "29820",
+   "name": "Las Vegas-Henderson-Paradise, NV",
+   "micro": false,
+   "cong": 237,
+   "adherents": 132329,
+   "pct": 5.8,
+   "rankAdherents": 6,
+   "rankPct": 53
+  },
+  {
+   "cbsa": "41100",
+   "name": "St. George, UT",
+   "micro": false,
+   "cong": 284,
+   "adherents": 116156,
+   "pct": 64.4,
+   "rankAdherents": 7,
+   "rankPct": 3
+  },
+  {
+   "cbsa": "14260",
+   "name": "Boise City, ID",
+   "micro": false,
+   "cong": 265,
+   "adherents": 115016,
+   "pct": 15,
+   "rankAdherents": 8,
+   "rankPct": 21
+  },
+  {
+   "cbsa": "30860",
+   "name": "Logan, UT-ID",
+   "micro": false,
+   "cong": 276,
+   "adherents": 113846,
+   "pct": 77.3,
+   "rankAdherents": 9,
+   "rankPct": 2
+  },
+  {
+   "cbsa": "40140",
+   "name": "Riverside-San Bernardino-Ontario, CA",
+   "micro": false,
+   "cong": 172,
+   "adherents": 108532,
+   "pct": 2.4,
+   "rankAdherents": 10,
+   "rankPct": 154
+  },
+  {
+   "cbsa": "19100",
+   "name": "Dallas-Fort Worth-Arlington, TX",
+   "micro": false,
+   "cong": 199,
+   "adherents": 105071,
+   "pct": 1.4,
+   "rankAdherents": 11,
+   "rankPct": 293
+  },
+  {
+   "cbsa": "42660",
+   "name": "Seattle-Tacoma-Bellevue, WA",
+   "micro": false,
+   "cong": 184,
+   "adherents": 104512,
+   "pct": 2.6,
+   "rankAdherents": 12,
+   "rankPct": 133
+  },
+  {
+   "cbsa": "26820",
+   "name": "Idaho Falls, ID",
+   "micro": false,
+   "cong": 213,
+   "adherents": 92507,
+   "pct": 58.8,
+   "rankAdherents": 13,
+   "rankPct": 5
+  },
+  {
+   "cbsa": "26420",
+   "name": "Houston-The Woodlands-Sugar Land, TX",
+   "micro": false,
+   "cong": 162,
+   "adherents": 85938,
+   "pct": 1.2,
+   "rankAdherents": 14,
+   "rankPct": 342
+  },
+  {
+   "cbsa": "38900",
+   "name": "Portland-Vancouver-Hillsboro, OR-WA",
+   "micro": false,
+   "cong": 151,
+   "adherents": 83481,
+   "pct": 3.3,
+   "rankAdherents": 15,
+   "rankPct": 109
+  },
+  {
+   "cbsa": "40900",
+   "name": "Sacramento-Roseville-Folsom, CA",
+   "micro": false,
+   "cong": 120,
+   "adherents": 75384,
+   "pct": 3.1,
+   "rankAdherents": 16,
+   "rankPct": 114
+  },
+  {
+   "cbsa": "47900",
+   "name": "Washington-Arlington-Alexandria, DC-VA-MD-WV",
+   "micro": false,
+   "cong": 134,
+   "adherents": 72147,
+   "pct": 1.1,
+   "rankAdherents": 17,
+   "rankPct": 372
+  },
+  {
+   "cbsa": "41860",
+   "name": "San Francisco-Oakland-Berkeley, CA",
+   "micro": false,
+   "cong": 112,
+   "adherents": 70288,
+   "pct": 1.5,
+   "rankAdherents": 18,
+   "rankPct": 267
+  },
+  {
+   "cbsa": "41740",
+   "name": "San Diego-Chula Vista-Carlsbad, CA",
+   "micro": false,
+   "cong": 108,
+   "adherents": 68148,
+   "pct": 2.1,
+   "rankAdherents": 19,
+   "rankPct": 176
+  },
+  {
+   "cbsa": "19740",
+   "name": "Denver-Aurora-Lakewood, CO",
+   "micro": false,
+   "cong": 119,
+   "adherents": 63656,
+   "pct": 2.1,
+   "rankAdherents": 20,
+   "rankPct": 169
+  },
+  {
+   "cbsa": "35620",
+   "name": "New York-Newark-Jersey City, NY-NJ-PA",
+   "micro": false,
+   "cong": 107,
+   "adherents": 62194,
+   "pct": 0.3,
+   "rankAdherents": 21,
+   "rankPct": 854
+  },
+  {
+   "cbsa": "12060",
+   "name": "Atlanta-Sandy Springs-Alpharetta, GA",
+   "micro": false,
+   "cong": 87,
+   "adherents": 49952,
+   "pct": 0.8,
+   "rankAdherents": 22,
+   "rankPct": 568
+  },
+  {
+   "cbsa": "46520",
+   "name": "Urban Honolulu, HI",
+   "micro": false,
+   "cong": 77,
+   "adherents": 41888,
+   "pct": 4.1,
+   "rankAdherents": 23,
+   "rankPct": 86
+  },
+  {
+   "cbsa": "28140",
+   "name": "Kansas City, MO-KS",
+   "micro": false,
+   "cong": 64,
+   "adherents": 36065,
+   "pct": 1.6,
+   "rankAdherents": 24,
+   "rankPct": 223
+  },
+  {
+   "cbsa": "39940",
+   "name": "Rexburg, ID",
+   "micro": true,
+   "cong": 97,
+   "adherents": 35114,
+   "pct": 53,
+   "rankAdherents": 25,
+   "rankPct": 6
+  },
+  {
+   "cbsa": "41700",
+   "name": "San Antonio-New Braunfels, TX",
+   "micro": false,
+   "cong": 66,
+   "adherents": 34652,
+   "pct": 1.4,
+   "rankAdherents": 26,
+   "rankPct": 300
+  },
+  {
+   "cbsa": "38540",
+   "name": "Pocatello, ID",
+   "micro": false,
+   "cong": 92,
+   "adherents": 33742,
+   "pct": 35.6,
+   "rankAdherents": 27,
+   "rankPct": 15
+  },
+  {
+   "cbsa": "44060",
+   "name": "Spokane-Spokane Valley, WA",
+   "micro": false,
+   "cong": 64,
+   "adherents": 33600,
+   "pct": 5.7,
+   "rankAdherents": 28,
+   "rankPct": 55
+  },
+  {
+   "cbsa": "16980",
+   "name": "Chicago-Naperville-Elgin, IL-IN-WI",
+   "micro": false,
+   "cong": 65,
+   "adherents": 33104,
+   "pct": 0.3,
+   "rankAdherents": 29,
+   "rankPct": 846
+  },
+  {
+   "cbsa": "28420",
+   "name": "Kennewick-Richland, WA",
+   "micro": false,
+   "cong": 60,
+   "adherents": 31500,
+   "pct": 10.4,
+   "rankAdherents": 30,
+   "rankPct": 26
+  },
+  {
+   "cbsa": "33100",
+   "name": "Miami-Fort Lauderdale-Pompano Beach, FL",
+   "micro": false,
+   "cong": 48,
+   "adherents": 30816,
+   "pct": 0.5,
+   "rankAdherents": 31,
+   "rankPct": 768
+  },
+  {
+   "cbsa": "46060",
+   "name": "Tucson, AZ",
+   "micro": false,
+   "cong": 61,
+   "adherents": 29656,
+   "pct": 2.8,
+   "rankAdherents": 32,
+   "rankPct": 126
+  },
+  {
+   "cbsa": "12420",
+   "name": "Austin-Round Rock-Georgetown, TX",
+   "micro": false,
+   "cong": 56,
+   "adherents": 29549,
+   "pct": 1.3,
+   "rankAdherents": 33,
+   "rankPct": 311
+  },
+  {
+   "cbsa": "25720",
+   "name": "Heber, UT",
+   "micro": true,
+   "cong": 86,
+   "adherents": 29326,
+   "pct": 38,
+   "rankAdherents": 34,
+   "rankPct": 12
+  },
+  {
+   "cbsa": "43320",
+   "name": "Show Low, AZ",
+   "micro": true,
+   "cong": 65,
+   "adherents": 29315,
+   "pct": 27.5,
+   "rankAdherents": 35,
+   "rankPct": 17
+  },
+  {
+   "cbsa": "41940",
+   "name": "San Jose-Sunnyvale-Santa Clara, CA",
+   "micro": false,
+   "cong": 45,
+   "adherents": 28251,
+   "pct": 1.4,
+   "rankAdherents": 36,
+   "rankPct": 284
+  },
+  {
+   "cbsa": "46300",
+   "name": "Twin Falls, ID",
+   "micro": false,
+   "cong": 62,
+   "adherents": 26970,
+   "pct": 23.6,
+   "rankAdherents": 37,
+   "rankPct": 18
+  },
+  {
+   "cbsa": "16260",
+   "name": "Cedar City, UT",
+   "micro": true,
+   "cong": 75,
+   "adherents": 25575,
+   "pct": 44.6,
+   "rankAdherents": 38,
+   "rankPct": 10
+  },
+  {
+   "cbsa": "36740",
+   "name": "Orlando-Kissimmee-Sanford, FL",
+   "micro": false,
+   "cong": 40,
+   "adherents": 24629,
+   "pct": 0.9,
+   "rankAdherents": 39,
+   "rankPct": 478
+  },
+  {
+   "cbsa": "10740",
+   "name": "Albuquerque, NM",
+   "micro": false,
+   "cong": 45,
+   "adherents": 24355,
+   "pct": 2.7,
+   "rankAdherents": 40,
+   "rankPct": 130
+  },
+  {
+   "cbsa": "14460",
+   "name": "Boston-Cambridge-Newton, MA-NH",
+   "micro": false,
+   "cong": 47,
+   "adherents": 22929,
+   "pct": 0.5,
+   "rankAdherents": 41,
+   "rankPct": 788
+  },
+  {
+   "cbsa": "13940",
+   "name": "Blackfoot, ID",
+   "micro": true,
+   "cong": 70,
+   "adherents": 22820,
+   "pct": 47.5,
+   "rankAdherents": 42,
+   "rankPct": 9
+  },
+  {
+   "cbsa": "17820",
+   "name": "Colorado Springs, CO",
+   "micro": false,
+   "cong": 46,
+   "adherents": 22719,
+   "pct": 3,
+   "rankAdherents": 43,
+   "rankPct": 118
+  },
+  {
+   "cbsa": "12540",
+   "name": "Bakersfield, CA",
+   "micro": false,
+   "cong": 37,
+   "adherents": 21571,
+   "pct": 2.4,
+   "rankAdherents": 44,
+   "rankPct": 152
+  },
+  {
+   "cbsa": "11260",
+   "name": "Anchorage, AK",
+   "micro": false,
+   "cong": 40,
+   "adherents": 20360,
+   "pct": 5.1,
+   "rankAdherents": 45,
+   "rankPct": 66
+  },
+  {
+   "cbsa": "33460",
+   "name": "Minneapolis-St. Paul-Bloomington, MN-WI",
+   "micro": false,
+   "cong": 40,
+   "adherents": 19901,
+   "pct": 0.5,
+   "rankAdherents": 46,
+   "rankPct": 749
+  },
+  {
+   "cbsa": "41180",
+   "name": "St. Louis, MO-IL",
+   "micro": false,
+   "cong": 38,
+   "adherents": 19824,
+   "pct": 0.7,
+   "rankAdherents": 47,
+   "rankPct": 676
+  },
+  {
+   "cbsa": "23420",
+   "name": "Fresno, CA",
+   "micro": false,
+   "cong": 34,
+   "adherents": 19822,
+   "pct": 2,
+   "rankAdherents": 48,
+   "rankPct": 183
+  },
+  {
+   "cbsa": "37100",
+   "name": "Oxnard-Thousand Oaks-Ventura, CA",
+   "micro": false,
+   "cong": 34,
+   "adherents": 19822,
+   "pct": 2.3,
+   "rankAdherents": 49,
+   "rankPct": 156
+  },
+  {
+   "cbsa": "16740",
+   "name": "Charlotte-Concord-Gastonia, NC-SC",
+   "micro": false,
+   "cong": 35,
+   "adherents": 19713,
+   "pct": 0.7,
+   "rankAdherents": 50,
+   "rankPct": 644
+  },
+  {
+   "cbsa": "39900",
+   "name": "Reno, NV",
+   "micro": false,
+   "cong": 38,
+   "adherents": 19608,
+   "pct": 4,
+   "rankAdherents": 51,
+   "rankPct": 89
+  },
+  {
+   "cbsa": "36420",
+   "name": "Oklahoma City, OK",
+   "micro": false,
+   "cong": 31,
+   "adherents": 18819,
+   "pct": 1.3,
+   "rankAdherents": 52,
+   "rankPct": 308
+  },
+  {
+   "cbsa": "37980",
+   "name": "Philadelphia-Camden-Wilmington, PA-NJ-DE-MD",
+   "micro": false,
+   "cong": 37,
+   "adherents": 18600,
+   "pct": 0.3,
+   "rankAdherents": 53,
+   "rankPct": 856
+  },
+  {
+   "cbsa": "34980",
+   "name": "Nashville-Davidson--Murfreesboro--Franklin, TN",
+   "micro": false,
+   "cong": 35,
+   "adherents": 17455,
+   "pct": 0.9,
+   "rankAdherents": 54,
+   "rankPct": 518
+  },
+  {
+   "cbsa": "39580",
+   "name": "Raleigh-Cary, NC",
+   "micro": false,
+   "cong": 30,
+   "adherents": 17327,
+   "pct": 1.2,
+   "rankAdherents": 55,
+   "rankPct": 335
+  },
+  {
+   "cbsa": "15420",
+   "name": "Burley, ID",
+   "micro": true,
+   "cong": 52,
+   "adherents": 16952,
+   "pct": 36.6,
+   "rankAdherents": 56,
+   "rankPct": 14
+  },
+  {
+   "cbsa": "27260",
+   "name": "Jacksonville, FL",
+   "micro": false,
+   "cong": 27,
+   "adherents": 16684,
+   "pct": 1,
+   "rankAdherents": 57,
+   "rankPct": 407
+  },
+  {
+   "cbsa": "12580",
+   "name": "Baltimore-Columbia-Towson, MD",
+   "micro": false,
+   "cong": 30,
+   "adherents": 16412,
+   "pct": 0.6,
+   "rankAdherents": 58,
+   "rankPct": 733
+  },
+  {
+   "cbsa": "41420",
+   "name": "Salem, OR",
+   "micro": false,
+   "cong": 32,
+   "adherents": 16384,
+   "pct": 3.8,
+   "rankAdherents": 59,
+   "rankPct": 95
+  },
+  {
+   "cbsa": "18140",
+   "name": "Columbus, OH",
+   "micro": false,
+   "cong": 30,
+   "adherents": 16080,
+   "pct": 0.8,
+   "rankAdherents": 60,
+   "rankPct": 635
+  },
+  {
+   "cbsa": "45300",
+   "name": "Tampa-St. Petersburg-Clearwater, FL",
+   "micro": false,
+   "cong": 26,
+   "adherents": 15994,
+   "pct": 0.5,
+   "rankAdherents": 61,
+   "rankPct": 765
+  },
+  {
+   "cbsa": "26900",
+   "name": "Indianapolis-Carmel-Anderson, IN",
+   "micro": false,
+   "cong": 30,
+   "adherents": 15420,
+   "pct": 0.7,
+   "rankAdherents": 62,
+   "rankPct": 652
+  },
+  {
+   "cbsa": "36540",
+   "name": "Omaha-Council Bluffs, NE-IA",
+   "micro": false,
+   "cong": 30,
+   "adherents": 15382,
+   "pct": 1.6,
+   "rankAdherents": 63,
+   "rankPct": 235
+  },
+  {
+   "cbsa": "46860",
+   "name": "Vernal, UT",
+   "micro": true,
+   "cong": 50,
+   "adherents": 15350,
+   "pct": 43.1,
+   "rankAdherents": 64,
+   "rankPct": 11
+  },
+  {
+   "cbsa": "19820",
+   "name": "Detroit-Warren-Dearborn, MI",
+   "micro": false,
+   "cong": 27,
+   "adherents": 14571,
+   "pct": 0.3,
+   "rankAdherents": 65,
+   "rankPct": 849
+  },
+  {
+   "cbsa": "22660",
+   "name": "Fort Collins, CO",
+   "micro": false,
+   "cong": 29,
+   "adherents": 14376,
+   "pct": 4,
+   "rankAdherents": 66,
+   "rankPct": 88
+  },
+  {
+   "cbsa": "22380",
+   "name": "Flagstaff, AZ",
+   "micro": false,
+   "cong": 30,
+   "adherents": 13530,
+   "pct": 9.3,
+   "rankAdherents": 67,
+   "rankPct": 33
+  },
+  {
+   "cbsa": "17140",
+   "name": "Cincinnati, OH-KY-IN",
+   "micro": false,
+   "cong": 25,
+   "adherents": 13245,
+   "pct": 0.6,
+   "rankAdherents": 68,
+   "rankPct": 729
+  },
+  {
+   "cbsa": "22220",
+   "name": "Fayetteville-Springdale-Rogers, AR",
+   "micro": false,
+   "cong": 25,
+   "adherents": 13167,
+   "pct": 2.4,
+   "rankAdherents": 69,
+   "rankPct": 149
+  },
+  {
+   "cbsa": "22140",
+   "name": "Farmington, NM",
+   "micro": false,
+   "cong": 24,
+   "adherents": 12936,
+   "pct": 10.6,
+   "rankAdherents": 70,
+   "rankPct": 24
+  },
+  {
+   "cbsa": "47260",
+   "name": "Virginia Beach-Norfolk-Newport News, VA-NC",
+   "micro": false,
+   "cong": 26,
+   "adherents": 12746,
+   "pct": 0.7,
+   "rankAdherents": 71,
+   "rankPct": 670
+  },
+  {
+   "cbsa": "33700",
+   "name": "Modesto, CA",
+   "micro": false,
+   "cong": 21,
+   "adherents": 12243,
+   "pct": 2.2,
+   "rankAdherents": 72,
+   "rankPct": 166
+  },
+  {
+   "cbsa": "40060",
+   "name": "Richmond, VA",
+   "micro": false,
+   "cong": 25,
+   "adherents": 12218,
+   "pct": 0.9,
+   "rankAdherents": 73,
+   "rankPct": 471
+  },
+  {
+   "cbsa": "46140",
+   "name": "Tulsa, OK",
+   "micro": false,
+   "cong": 21,
+   "adherents": 12089,
+   "pct": 1.2,
+   "rankAdherents": 74,
+   "rankPct": 346
+  },
+  {
+   "cbsa": "40940",
+   "name": "Safford, AZ",
+   "micro": true,
+   "cong": 35,
+   "adherents": 11830,
+   "pct": 30.7,
+   "rankAdherents": 75,
+   "rankPct": 16
+  },
+  {
+   "cbsa": "44700",
+   "name": "Stockton, CA",
+   "micro": false,
+   "cong": 20,
+   "adherents": 11660,
+   "pct": 1.5,
+   "rankAdherents": 76,
+   "rankPct": 264
+  },
+  {
+   "cbsa": "39150",
+   "name": "Prescott Valley-Prescott, AZ",
+   "micro": false,
+   "cong": 24,
+   "adherents": 10824,
+   "pct": 4.6,
+   "rankAdherents": 77,
+   "rankPct": 75
+  },
+  {
+   "cbsa": "43420",
+   "name": "Sierra Vista-Douglas, AZ",
+   "micro": false,
+   "cong": 24,
+   "adherents": 10824,
+   "pct": 8.6,
+   "rankAdherents": 78,
+   "rankPct": 35
+  },
+  {
+   "cbsa": "21660",
+   "name": "Eugene-Springfield, OR",
+   "micro": false,
+   "cong": 21,
+   "adherents": 10752,
+   "pct": 2.8,
+   "rankAdherents": 79,
+   "rankPct": 127
+  },
+  {
+   "cbsa": "14740",
+   "name": "Bremerton-Silverdale-Port Orchard, WA",
+   "micro": false,
+   "cong": 20,
+   "adherents": 10500,
+   "pct": 3.8,
+   "rankAdherents": 80,
+   "rankPct": 93
+  },
+  {
+   "cbsa": "46700",
+   "name": "Vallejo, CA",
+   "micro": false,
+   "cong": 18,
+   "adherents": 10494,
+   "pct": 2.3,
+   "rankAdherents": 81,
+   "rankPct": 158
+  },
+  {
+   "cbsa": "32580",
+   "name": "McAllen-Edinburg-Mission, TX",
+   "micro": false,
+   "cong": 21,
+   "adherents": 10374,
+   "pct": 1.2,
+   "rankAdherents": 82,
+   "rankPct": 345
+  },
+  {
+   "cbsa": "21340",
+   "name": "El Paso, TX",
+   "micro": false,
+   "cong": 21,
+   "adherents": 10291,
+   "pct": 1.2,
+   "rankAdherents": 83,
+   "rankPct": 349
+  },
+  {
+   "cbsa": "25900",
+   "name": "Hilo, HI",
+   "micro": true,
+   "cong": 19,
+   "adherents": 10281,
+   "pct": 5.1,
+   "rankAdherents": 84,
+   "rankPct": 65
+  },
+  {
+   "cbsa": "21740",
+   "name": "Evanston, WY",
+   "micro": true,
+   "cong": 26,
+   "adherents": 10114,
+   "pct": 49.5,
+   "rankAdherents": 85,
+   "rankPct": 8
+  },
+  {
+   "cbsa": "31140",
+   "name": "Louisville/Jefferson County, KY-IN",
+   "micro": false,
+   "cong": 19,
+   "adherents": 10079,
+   "pct": 0.8,
+   "rankAdherents": 86,
+   "rankPct": 603
+  },
+  {
+   "cbsa": "17900",
+   "name": "Columbia, SC",
+   "micro": false,
+   "cong": 16,
+   "adherents": 9853,
+   "pct": 1.2,
+   "rankAdherents": 87,
+   "rankPct": 347
+  },
+  {
+   "cbsa": "36620",
+   "name": "Ontario, OR-ID",
+   "micro": true,
+   "cong": 25,
+   "adherents": 9818,
+   "pct": 17.2,
+   "rankAdherents": 88,
+   "rankPct": 19
+  },
+  {
+   "cbsa": "48620",
+   "name": "Wichita, KS",
+   "micro": false,
+   "cong": 17,
+   "adherents": 9685,
+   "pct": 1.5,
+   "rankAdherents": 89,
+   "rankPct": 265
+  },
+  {
+   "cbsa": "32820",
+   "name": "Memphis, TN-MS-AR",
+   "micro": false,
+   "cong": 18,
+   "adherents": 9627,
+   "pct": 0.7,
+   "rankAdherents": 90,
+   "rankPct": 662
+  },
+  {
+   "cbsa": "34180",
+   "name": "Moses Lake, WA",
+   "micro": true,
+   "cong": 22,
+   "adherents": 9614,
+   "pct": 9.7,
+   "rankAdherents": 91,
+   "rankPct": 31
+  },
+  {
+   "cbsa": "13740",
+   "name": "Billings, MT",
+   "micro": false,
+   "cong": 19,
+   "adherents": 9557,
+   "pct": 5.2,
+   "rankAdherents": 92,
+   "rankPct": 63
+  },
+  {
+   "cbsa": "49420",
+   "name": "Yakima, WA",
+   "micro": false,
+   "cong": 18,
+   "adherents": 9450,
+   "pct": 3.7,
+   "rankAdherents": 93,
+   "rankPct": 98
+  },
+  {
+   "cbsa": "24540",
+   "name": "Greeley, CO",
+   "micro": false,
+   "cong": 19,
+   "adherents": 9419,
+   "pct": 2.9,
+   "rankAdherents": 94,
+   "rankPct": 124
+  },
+  {
+   "cbsa": "17020",
+   "name": "Chico, CA",
+   "micro": false,
+   "cong": 16,
+   "adherents": 9328,
+   "pct": 4.4,
+   "rankAdherents": 95,
+   "rankPct": 81
+  },
+  {
+   "cbsa": "38300",
+   "name": "Pittsburgh, PA",
+   "micro": false,
+   "cong": 17,
+   "adherents": 8705,
+   "pct": 0.4,
+   "rankAdherents": 96,
+   "rankPct": 836
+  },
+  {
+   "cbsa": "17660",
+   "name": "Coeur d'Alene, ID",
+   "micro": false,
+   "cong": 20,
+   "adherents": 8700,
+   "pct": 5.1,
+   "rankAdherents": 97,
+   "rankPct": 67
+  },
+  {
+   "cbsa": "21220",
+   "name": "Elko, NV",
+   "micro": true,
+   "cong": 20,
+   "adherents": 8643,
+   "pct": 15.6,
+   "rankAdherents": 98,
+   "rankPct": 20
+  },
+  {
+   "cbsa": "17460",
+   "name": "Cleveland-Elyria, OH",
+   "micro": false,
+   "cong": 16,
+   "adherents": 8639,
+   "pct": 0.4,
+   "rankAdherents": 99,
+   "rankPct": 810
+  },
+  {
+   "cbsa": "24300",
+   "name": "Grand Junction, CO",
+   "micro": false,
+   "cong": 17,
+   "adherents": 8428,
+   "pct": 5.4,
+   "rankAdherents": 100,
+   "rankPct": 59
+  },
+  {
+   "cbsa": "40380",
+   "name": "Rochester, NY",
+   "micro": false,
+   "cong": 14,
+   "adherents": 8290,
+   "pct": 0.8,
+   "rankAdherents": 101,
+   "rankPct": 628
+  },
+  {
+   "cbsa": "32780",
+   "name": "Medford, OR",
+   "micro": false,
+   "cong": 16,
+   "adherents": 8192,
+   "pct": 3.7,
+   "rankAdherents": 102,
+   "rankPct": 99
+  },
+  {
+   "cbsa": "42200",
+   "name": "Santa Maria-Santa Barbara, CA",
+   "micro": false,
+   "cong": 14,
+   "adherents": 8162,
+   "pct": 1.8,
+   "rankAdherents": 103,
+   "rankPct": 198
+  },
+  {
+   "cbsa": "47300",
+   "name": "Visalia, CA",
+   "micro": false,
+   "cong": 14,
+   "adherents": 8162,
+   "pct": 1.7,
+   "rankAdherents": 104,
+   "rankPct": 213
+  },
+  {
+   "cbsa": "44180",
+   "name": "Springfield, MO",
+   "micro": false,
+   "cong": 16,
+   "adherents": 8022,
+   "pct": 1.7,
+   "rankAdherents": 105,
+   "rankPct": 217
+  },
+  {
+   "cbsa": "39220",
+   "name": "Price, UT",
+   "micro": true,
+   "cong": 25,
+   "adherents": 7675,
+   "pct": 37.6,
+   "rankAdherents": 106,
+   "rankPct": 13
+  },
+  {
+   "cbsa": "29420",
+   "name": "Lake Havasu City-Kingman, AZ",
+   "micro": false,
+   "cong": 17,
+   "adherents": 7667,
+   "pct": 3.6,
+   "rankAdherents": 107,
+   "rankPct": 101
+  },
+  {
+   "cbsa": "27980",
+   "name": "Kahului-Wailuku-Lahaina, HI",
+   "micro": false,
+   "cong": 14,
+   "adherents": 7616,
+   "pct": 4.6,
+   "rankAdherents": 108,
+   "rankPct": 74
+  },
+  {
+   "cbsa": "12260",
+   "name": "Augusta-Richmond County, GA-SC",
+   "micro": false,
+   "cong": 13,
+   "adherents": 7592,
+   "pct": 1.2,
+   "rankAdherents": 109,
+   "rankPct": 327
+  },
+  {
+   "cbsa": "28660",
+   "name": "Killeen-Temple, TX",
+   "micro": false,
+   "cong": 15,
+   "adherents": 7410,
+   "pct": 1.6,
+   "rankAdherents": 110,
+   "rankPct": 245
+  },
+  {
+   "cbsa": "36500",
+   "name": "Olympia-Lacey-Tumwater, WA",
+   "micro": false,
+   "cong": 14,
+   "adherents": 7350,
+   "pct": 2.5,
+   "rankAdherents": 111,
+   "rankPct": 142
+  },
+  {
+   "cbsa": "12940",
+   "name": "Baton Rouge, LA",
+   "micro": false,
+   "cong": 12,
+   "adherents": 7114,
+   "pct": 0.8,
+   "rankAdherents": 112,
+   "rankPct": 571
+  },
+  {
+   "cbsa": "19430",
+   "name": "Dayton-Kettering, OH",
+   "micro": false,
+   "cong": 14,
+   "adherents": 7100,
+   "pct": 0.9,
+   "rankAdherents": 113,
+   "rankPct": 524
+  },
+  {
+   "cbsa": "26620",
+   "name": "Huntsville, AL",
+   "micro": false,
+   "cong": 13,
+   "adherents": 7051,
+   "pct": 1.4,
+   "rankAdherents": 114,
+   "rankPct": 277
+  },
+  {
+   "cbsa": "42220",
+   "name": "Santa Rosa-Petaluma, CA",
+   "micro": false,
+   "cong": 12,
+   "adherents": 6996,
+   "pct": 1.4,
+   "rankAdherents": 115,
+   "rankPct": 280
+  },
+  {
+   "cbsa": "49700",
+   "name": "Yuba City, CA",
+   "micro": false,
+   "cong": 12,
+   "adherents": 6996,
+   "pct": 3.9,
+   "rankAdherents": 116,
+   "rankPct": 91
+  },
+  {
+   "cbsa": "28940",
+   "name": "Knoxville, TN",
+   "micro": false,
+   "cong": 14,
+   "adherents": 6828,
+   "pct": 0.8,
+   "rankAdherents": 117,
+   "rankPct": 610
+  },
+  {
+   "cbsa": "16700",
+   "name": "Charleston-North Charleston, SC",
+   "micro": false,
+   "cong": 11,
+   "adherents": 6670,
+   "pct": 0.8,
+   "rankAdherents": 118,
+   "rankPct": 553
+  },
+  {
+   "cbsa": "37860",
+   "name": "Pensacola-Ferry Pass-Brent, FL",
+   "micro": false,
+   "cong": 11,
+   "adherents": 6512,
+   "pct": 1.3,
+   "rankAdherents": 119,
+   "rankPct": 317
+  },
+  {
+   "cbsa": "22180",
+   "name": "Fayetteville, NC",
+   "micro": false,
+   "cong": 12,
+   "adherents": 6508,
+   "pct": 1.3,
+   "rankAdherents": 120,
+   "rankPct": 324
+  },
+  {
+   "cbsa": "25840",
+   "name": "Hermiston-Pendleton, OR",
+   "micro": true,
+   "cong": 15,
+   "adherents": 6476,
+   "pct": 7,
+   "rankAdherents": 121,
+   "rankPct": 38
+  },
+  {
+   "cbsa": "13820",
+   "name": "Birmingham-Hoover, AL",
+   "micro": false,
+   "cong": 12,
+   "adherents": 6466,
+   "pct": 0.6,
+   "rankAdherents": 122,
+   "rankPct": 730
+  },
+  {
+   "cbsa": "39820",
+   "name": "Redding, CA",
+   "micro": false,
+   "cong": 11,
+   "adherents": 6413,
+   "pct": 3.5,
+   "rankAdherents": 123,
+   "rankPct": 103
+  },
+  {
+   "cbsa": "41500",
+   "name": "Salinas, CA",
+   "micro": false,
+   "cong": 11,
+   "adherents": 6413,
+   "pct": 1.5,
+   "rankAdherents": 124,
+   "rankPct": 271
+  },
+  {
+   "cbsa": "48300",
+   "name": "Wenatchee, WA",
+   "micro": false,
+   "cong": 12,
+   "adherents": 6300,
+   "pct": 5.2,
+   "rankAdherents": 125,
+   "rankPct": 64
+  },
+  {
+   "cbsa": "13140",
+   "name": "Beaumont-Port Arthur, TX",
+   "micro": false,
+   "cong": 13,
+   "adherents": 6258,
+   "pct": 1.6,
+   "rankAdherents": 126,
+   "rankPct": 241
+  },
+  {
+   "cbsa": "19780",
+   "name": "Des Moines-West Des Moines, IA",
+   "micro": false,
+   "cong": 13,
+   "adherents": 6230,
+   "pct": 0.9,
+   "rankAdherents": 127,
+   "rankPct": 516
+  },
+  {
+   "cbsa": "40540",
+   "name": "Rock Springs, WY",
+   "micro": true,
+   "cong": 16,
+   "adherents": 6224,
+   "pct": 14.7,
+   "rankAdherents": 128,
+   "rankPct": 22
+  },
+  {
+   "cbsa": "35380",
+   "name": "New Orleans-Metairie, LA",
+   "micro": false,
+   "cong": 11,
+   "adherents": 6127,
+   "pct": 0.5,
+   "rankAdherents": 129,
+   "rankPct": 779
+  },
+  {
+   "cbsa": "30460",
+   "name": "Lexington-Fayette, KY",
+   "micro": false,
+   "cong": 12,
+   "adherents": 6120,
+   "pct": 1.2,
+   "rankAdherents": 130,
+   "rankPct": 350
+  },
+  {
+   "cbsa": "18880",
+   "name": "Crestview-Fort Walton Beach-Destin, FL",
+   "micro": false,
+   "cong": 10,
+   "adherents": 6020,
+   "pct": 2.1,
+   "rankAdherents": 131,
+   "rankPct": 174
+  },
+  {
+   "cbsa": "20500",
+   "name": "Durham-Chapel Hill, NC",
+   "micro": false,
+   "cong": 12,
+   "adherents": 5970,
+   "pct": 0.9,
+   "rankAdherents": 132,
+   "rankPct": 482
+  },
+  {
+   "cbsa": "30780",
+   "name": "Little Rock-North Little Rock-Conway, AR",
+   "micro": false,
+   "cong": 11,
+   "adherents": 5922,
+   "pct": 0.8,
+   "rankAdherents": 133,
+   "rankPct": 594
+  },
+  {
+   "cbsa": "35840",
+   "name": "North Port-Sarasota-Bradenton, FL",
+   "micro": false,
+   "cong": 10,
+   "adherents": 5920,
+   "pct": 0.7,
+   "rankAdherents": 134,
+   "rankPct": 669
+  },
+  {
+   "cbsa": "37340",
+   "name": "Palm Bay-Melbourne-Titusville, FL",
+   "micro": false,
+   "cong": 10,
+   "adherents": 5920,
+   "pct": 1,
+   "rankAdherents": 135,
+   "rankPct": 437
+  },
+  {
+   "cbsa": "33340",
+   "name": "Milwaukee-Waukesha, WI",
+   "micro": false,
+   "cong": 13,
+   "adherents": 5865,
+   "pct": 0.4,
+   "rankAdherents": 136,
+   "rankPct": 831
+  },
+  {
+   "cbsa": "49740",
+   "name": "Yuma, AZ",
+   "micro": false,
+   "cong": 13,
+   "adherents": 5863,
+   "pct": 2.9,
+   "rankAdherents": 137,
+   "rankPct": 123
+  },
+  {
+   "cbsa": "13380",
+   "name": "Bellingham, WA",
+   "micro": false,
+   "cong": 11,
+   "adherents": 5775,
+   "pct": 2.5,
+   "rankAdherents": 138,
+   "rankPct": 140
+  },
+  {
+   "cbsa": "10540",
+   "name": "Albany-Lebanon, OR",
+   "micro": false,
+   "cong": 11,
+   "adherents": 5632,
+   "pct": 4.4,
+   "rankAdherents": 139,
+   "rankPct": 82
+  },
+  {
+   "cbsa": "29740",
+   "name": "Las Cruces, NM",
+   "micro": false,
+   "cong": 10,
+   "adherents": 5390,
+   "pct": 2.5,
+   "rankAdherents": 140,
+   "rankPct": 145
+  },
+  {
+   "cbsa": "29460",
+   "name": "Lakeland-Winter Haven, FL",
+   "micro": false,
+   "cong": 9,
+   "adherents": 5328,
+   "pct": 0.7,
+   "rankAdherents": 141,
+   "rankPct": 650
+  },
+  {
+   "cbsa": "45220",
+   "name": "Tallahassee, FL",
+   "micro": false,
+   "cong": 9,
+   "adherents": 5328,
+   "pct": 1.4,
+   "rankAdherents": 142,
+   "rankPct": 290
+  },
+  {
+   "cbsa": "34580",
+   "name": "Mount Vernon-Anacortes, WA",
+   "micro": false,
+   "cong": 10,
+   "adherents": 5250,
+   "pct": 4.1,
+   "rankAdherents": 143,
+   "rankPct": 87
+  },
+  {
+   "cbsa": "42020",
+   "name": "San Luis Obispo-Paso Robles, CA",
+   "micro": false,
+   "cong": 9,
+   "adherents": 5247,
+   "pct": 1.9,
+   "rankAdherents": 144,
+   "rankPct": 193
+  },
+  {
+   "cbsa": "24660",
+   "name": "Greensboro-High Point, NC",
+   "micro": false,
+   "cong": 10,
+   "adherents": 5172,
+   "pct": 0.7,
+   "rankAdherents": 145,
+   "rankPct": 695
+  },
+  {
+   "cbsa": "13460",
+   "name": "Bend, OR",
+   "micro": false,
+   "cong": 10,
+   "adherents": 5120,
+   "pct": 2.6,
+   "rankAdherents": 146,
+   "rankPct": 135
+  },
+  {
+   "cbsa": "33540",
+   "name": "Missoula, MT",
+   "micro": false,
+   "cong": 10,
+   "adherents": 5036,
+   "pct": 4.3,
+   "rankAdherents": 147,
+   "rankPct": 83
+  },
+  {
+   "cbsa": "14580",
+   "name": "Bozeman, MT",
+   "micro": true,
+   "cong": 10,
+   "adherents": 5030,
+   "pct": 4.2,
+   "rankAdherents": 148,
+   "rankPct": 84
+  },
+  {
+   "cbsa": "15180",
+   "name": "Brownsville-Harlingen, TX",
+   "micro": false,
+   "cong": 10,
+   "adherents": 4940,
+   "pct": 1.2,
+   "rankAdherents": 149,
+   "rankPct": 352
+  },
+  {
+   "cbsa": "19660",
+   "name": "Deltona-Daytona Beach-Ormond Beach, FL",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4836,
+   "pct": 0.7,
+   "rankAdherents": 150,
+   "rankPct": 658
+  },
+  {
+   "cbsa": "23540",
+   "name": "Gainesville, FL",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4836,
+   "pct": 1.4,
+   "rankAdherents": 151,
+   "rankPct": 281
+  },
+  {
+   "cbsa": "25540",
+   "name": "Hartford-East Hartford-Middletown, CT",
+   "micro": false,
+   "cong": 11,
+   "adherents": 4811,
+   "pct": 0.4,
+   "rankAdherents": 152,
+   "rankPct": 815
+  },
+  {
+   "cbsa": "16220",
+   "name": "Casper, WY",
+   "micro": false,
+   "cong": 11,
+   "adherents": 4752,
+   "pct": 5.9,
+   "rankAdherents": 153,
+   "rankPct": 48
+  },
+  {
+   "cbsa": "16940",
+   "name": "Cheyenne, WY",
+   "micro": false,
+   "cong": 11,
+   "adherents": 4752,
+   "pct": 4.7,
+   "rankAdherents": 154,
+   "rankPct": 71
+  },
+  {
+   "cbsa": "15980",
+   "name": "Cape Coral-Fort Myers, FL",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4736,
+   "pct": 0.6,
+   "rankAdherents": 155,
+   "rankPct": 715
+  },
+  {
+   "cbsa": "24340",
+   "name": "Grand Rapids-Kentwood, MI",
+   "micro": false,
+   "cong": 9,
+   "adherents": 4653,
+   "pct": 0.4,
+   "rankAdherents": 156,
+   "rankPct": 804
+  },
+  {
+   "cbsa": "16860",
+   "name": "Chattanooga, TN-GA",
+   "micro": false,
+   "cong": 9,
+   "adherents": 4643,
+   "pct": 0.8,
+   "rankAdherents": 157,
+   "rankPct": 562
+  },
+  {
+   "cbsa": "17300",
+   "name": "Clarksville, TN-KY",
+   "micro": false,
+   "cong": 9,
+   "adherents": 4588,
+   "pct": 1.4,
+   "rankAdherents": 158,
+   "rankPct": 279
+  },
+  {
+   "cbsa": "37740",
+   "name": "Payson, AZ",
+   "micro": true,
+   "cong": 12,
+   "adherents": 4512,
+   "pct": 8.5,
+   "rankAdherents": 159,
+   "rankPct": 36
+  },
+  {
+   "cbsa": "15380",
+   "name": "Buffalo-Cheektowaga, NY",
+   "micro": false,
+   "cong": 7,
+   "adherents": 4504,
+   "pct": 0.4,
+   "rankAdherents": 160,
+   "rankPct": 822
+  },
+  {
+   "cbsa": "31540",
+   "name": "Madison, WI",
+   "micro": false,
+   "cong": 10,
+   "adherents": 4476,
+   "pct": 0.7,
+   "rankAdherents": 161,
+   "rankPct": 700
+  },
+  {
+   "cbsa": "17780",
+   "name": "College Station-Bryan, TX",
+   "micro": false,
+   "cong": 9,
+   "adherents": 4446,
+   "pct": 1.7,
+   "rankAdherents": 162,
+   "rankPct": 221
+  },
+  {
+   "cbsa": "31180",
+   "name": "Lubbock, TX",
+   "micro": false,
+   "cong": 9,
+   "adherents": 4446,
+   "pct": 1.4,
+   "rankAdherents": 163,
+   "rankPct": 291
+  },
+  {
+   "cbsa": "25740",
+   "name": "Helena, MT",
+   "micro": true,
+   "cong": 9,
+   "adherents": 4443,
+   "pct": 5.3,
+   "rankAdherents": 164,
+   "rankPct": 60
+  },
+  {
+   "cbsa": "28180",
+   "name": "Kapaa, HI",
+   "micro": true,
+   "cong": 8,
+   "adherents": 4352,
+   "pct": 5.9,
+   "rankAdherents": 165,
+   "rankPct": 49
+  },
+  {
+   "cbsa": "23700",
+   "name": "Gallup, NM",
+   "micro": true,
+   "cong": 8,
+   "adherents": 4312,
+   "pct": 5.9,
+   "rankAdherents": 166,
+   "rankPct": 51
+  },
+  {
+   "cbsa": "27140",
+   "name": "Jackson, MS",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4260,
+   "pct": 0.7,
+   "rankAdherents": 167,
+   "rankPct": 663
+  },
+  {
+   "cbsa": "39300",
+   "name": "Providence-Warwick, RI-MA",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4259,
+   "pct": 0.3,
+   "rankAdherents": 168,
+   "rankPct": 864
+  },
+  {
+   "cbsa": "21820",
+   "name": "Fairbanks, AK",
+   "micro": false,
+   "cong": 10,
+   "adherents": 4240,
+   "pct": 4.4,
+   "rankAdherents": 169,
+   "rankPct": 79
+  },
+  {
+   "cbsa": "30700",
+   "name": "Lincoln, NE",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4200,
+   "pct": 1.2,
+   "rankAdherents": 170,
+   "rankPct": 331
+  },
+  {
+   "cbsa": "31020",
+   "name": "Longview, WA",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4200,
+   "pct": 3.8,
+   "rankAdherents": 171,
+   "rankPct": 94
+  },
+  {
+   "cbsa": "47460",
+   "name": "Walla Walla, WA",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4200,
+   "pct": 6.7,
+   "rankAdherents": 172,
+   "rankPct": 41
+  },
+  {
+   "cbsa": "30980",
+   "name": "Longview, TX",
+   "micro": false,
+   "cong": 9,
+   "adherents": 4159,
+   "pct": 1.5,
+   "rankAdherents": 173,
+   "rankPct": 273
+  },
+  {
+   "cbsa": "34940",
+   "name": "Naples-Marco Island, FL",
+   "micro": false,
+   "cong": 7,
+   "adherents": 4144,
+   "pct": 1.1,
+   "rankAdherents": 174,
+   "rankPct": 381
+  },
+  {
+   "cbsa": "24420",
+   "name": "Grants Pass, OR",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4096,
+   "pct": 4.6,
+   "rankAdherents": 175,
+   "rankPct": 73
+  },
+  {
+   "cbsa": "28900",
+   "name": "Klamath Falls, OR",
+   "micro": true,
+   "cong": 8,
+   "adherents": 4096,
+   "pct": 5.9,
+   "rankAdherents": 176,
+   "rankPct": 52
+  },
+  {
+   "cbsa": "40700",
+   "name": "Roseburg, OR",
+   "micro": true,
+   "cong": 8,
+   "adherents": 4096,
+   "pct": 3.7,
+   "rankAdherents": 177,
+   "rankPct": 97
+  },
+  {
+   "cbsa": "42100",
+   "name": "Santa Cruz-Watsonville, CA",
+   "micro": false,
+   "cong": 7,
+   "adherents": 4081,
+   "pct": 1.5,
+   "rankAdherents": 178,
+   "rankPct": 258
+  },
+  {
+   "cbsa": "14860",
+   "name": "Bridgeport-Stamford-Norwalk, CT",
+   "micro": false,
+   "cong": 9,
+   "adherents": 4059,
+   "pct": 0.4,
+   "rankAdherents": 179,
+   "rankPct": 807
+  },
+  {
+   "cbsa": "18580",
+   "name": "Corpus Christi, TX",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4034,
+   "pct": 1,
+   "rankAdherents": 180,
+   "rankPct": 452
+  },
+  {
+   "cbsa": "24500",
+   "name": "Great Falls, MT",
+   "micro": false,
+   "cong": 8,
+   "adherents": 4024,
+   "pct": 4.8,
+   "rankAdherents": 181,
+   "rankPct": 70
+  },
+  {
+   "cbsa": "28060",
+   "name": "Kalispell, MT",
+   "micro": true,
+   "cong": 8,
+   "adherents": 4024,
+   "pct": 3.9,
+   "rankAdherents": 182,
+   "rankPct": 92
+  },
+  {
+   "cbsa": "23940",
+   "name": "Gillette, WY",
+   "micro": true,
+   "cong": 8,
+   "adherents": 4015,
+   "pct": 6.6,
+   "rankAdherents": 183,
+   "rankPct": 42
+  },
+  {
+   "cbsa": "27900",
+   "name": "Joplin, MO",
+   "micro": false,
+   "cong": 8,
+   "adherents": 3906,
+   "pct": 2.2,
+   "rankAdherents": 184,
+   "rankPct": 168
+  },
+  {
+   "cbsa": "27220",
+   "name": "Jackson, WY-ID",
+   "micro": true,
+   "cong": 11,
+   "adherents": 3904,
+   "pct": 11.2,
+   "rankAdherents": 185,
+   "rankPct": 23
+  },
+  {
+   "cbsa": "40180",
+   "name": "Riverton, WY",
+   "micro": true,
+   "cong": 10,
+   "adherents": 3890,
+   "pct": 9.9,
+   "rankAdherents": 186,
+   "rankPct": 30
+  },
+  {
+   "cbsa": "29620",
+   "name": "Lansing-East Lansing, MI",
+   "micro": false,
+   "cong": 8,
+   "adherents": 3878,
+   "pct": 0.7,
+   "rankAdherents": 187,
+   "rankPct": 668
+  },
+  {
+   "cbsa": "22900",
+   "name": "Fort Smith, AR-OK",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3876,
+   "pct": 1.6,
+   "rankAdherents": 188,
+   "rankPct": 236
+  },
+  {
+   "cbsa": "11100",
+   "name": "Amarillo, TX",
+   "micro": false,
+   "cong": 8,
+   "adherents": 3829,
+   "pct": 1.4,
+   "rankAdherents": 189,
+   "rankPct": 282
+  },
+  {
+   "cbsa": "38860",
+   "name": "Portland-South Portland, ME",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3729,
+   "pct": 0.7,
+   "rankAdherents": 190,
+   "rankPct": 686
+  },
+  {
+   "cbsa": "34820",
+   "name": "Myrtle Beach-Conway-North Myrtle Beach, SC-NC",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3726,
+   "pct": 0.8,
+   "rankAdherents": 191,
+   "rankPct": 623
+  },
+  {
+   "cbsa": "10580",
+   "name": "Albany-Schenectady-Troy, NY",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3688,
+   "pct": 0.4,
+   "rankAdherents": 192,
+   "rankPct": 813
+  },
+  {
+   "cbsa": "49180",
+   "name": "Winston-Salem, NC",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3656,
+   "pct": 0.5,
+   "rankAdherents": 193,
+   "rankPct": 748
+  },
+  {
+   "cbsa": "16180",
+   "name": "Carson City, NV",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3612,
+   "pct": 6.2,
+   "rankAdherents": 194,
+   "rankPct": 46
+  },
+  {
+   "cbsa": "22280",
+   "name": "Fernley, NV",
+   "micro": true,
+   "cong": 7,
+   "adherents": 3612,
+   "pct": 6.1,
+   "rankAdherents": 195,
+   "rankPct": 47
+  },
+  {
+   "cbsa": "25060",
+   "name": "Gulfport-Biloxi, MS",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3610,
+   "pct": 0.9,
+   "rankAdherents": 196,
+   "rankPct": 531
+  },
+  {
+   "cbsa": "35300",
+   "name": "New Haven-Milford, CT",
+   "micro": false,
+   "cong": 8,
+   "adherents": 3608,
+   "pct": 0.4,
+   "rankAdherents": 197,
+   "rankPct": 809
+  },
+  {
+   "cbsa": "40220",
+   "name": "Roanoke, VA",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3608,
+   "pct": 1.1,
+   "rankAdherents": 198,
+   "rankPct": 362
+  },
+  {
+   "cbsa": "24860",
+   "name": "Greenville-Anderson, SC",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3593,
+   "pct": 0.4,
+   "rankAdherents": 199,
+   "rankPct": 821
+  },
+  {
+   "cbsa": "39100",
+   "name": "Poughkeepsie-Newburgh-Middletown, NY",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3582,
+   "pct": 0.5,
+   "rankAdherents": 200,
+   "rankPct": 763
+  },
+  {
+   "cbsa": "45060",
+   "name": "Syracuse, NY",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3533,
+   "pct": 0.5,
+   "rankAdherents": 201,
+   "rankPct": 750
+  },
+  {
+   "cbsa": "17860",
+   "name": "Columbia, MO",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3528,
+   "pct": 1.7,
+   "rankAdherents": 202,
+   "rankPct": 220
+  },
+  {
+   "cbsa": "21700",
+   "name": "Eureka-Arcata, CA",
+   "micro": true,
+   "cong": 6,
+   "adherents": 3498,
+   "pct": 2.6,
+   "rankAdherents": 203,
+   "rankPct": 137
+  },
+  {
+   "cbsa": "37220",
+   "name": "Pahrump, NV",
+   "micro": true,
+   "cong": 9,
+   "adherents": 3483,
+   "pct": 6.8,
+   "rankAdherents": 204,
+   "rankPct": 40
+  },
+  {
+   "cbsa": "31740",
+   "name": "Manhattan, KS",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3473,
+   "pct": 2.6,
+   "rankAdherents": 205,
+   "rankPct": 134
+  },
+  {
+   "cbsa": "39380",
+   "name": "Pueblo, CO",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3470,
+   "pct": 2.1,
+   "rankAdherents": 206,
+   "rankPct": 177
+  },
+  {
+   "cbsa": "33260",
+   "name": "Midland, TX",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3458,
+   "pct": 2,
+   "rankAdherents": 207,
+   "rankPct": 180
+  },
+  {
+   "cbsa": "40340",
+   "name": "Rochester, MN",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3409,
+   "pct": 1.5,
+   "rankAdherents": 208,
+   "rankPct": 259
+  },
+  {
+   "cbsa": "25620",
+   "name": "Hattiesburg, MS",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3390,
+   "pct": 2,
+   "rankAdherents": 209,
+   "rankPct": 181
+  },
+  {
+   "cbsa": "25180",
+   "name": "Hagerstown-Martinsburg, MD-WV",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3300,
+   "pct": 1.1,
+   "rankAdherents": 210,
+   "rankPct": 376
+  },
+  {
+   "cbsa": "10900",
+   "name": "Allentown-Bethlehem-Easton, PA-NJ",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3275,
+   "pct": 0.4,
+   "rankAdherents": 211,
+   "rankPct": 826
+  },
+  {
+   "cbsa": "17980",
+   "name": "Columbus, GA-AL",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3232,
+   "pct": 1,
+   "rankAdherents": 212,
+   "rankPct": 432
+  },
+  {
+   "cbsa": "49340",
+   "name": "Worcester, MA-CT",
+   "micro": false,
+   "cong": 7,
+   "adherents": 3232,
+   "pct": 0.3,
+   "rankAdherents": 213,
+   "rankPct": 851
+  },
+  {
+   "cbsa": "42340",
+   "name": "Savannah, GA",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3196,
+   "pct": 0.8,
+   "rankAdherents": 214,
+   "rankPct": 598
+  },
+  {
+   "cbsa": "11700",
+   "name": "Asheville, NC",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3163,
+   "pct": 0.7,
+   "rankAdherents": 215,
+   "rankPct": 687
+  },
+  {
+   "cbsa": "43340",
+   "name": "Shreveport-Bossier City, LA",
+   "micro": false,
+   "cong": 5,
+   "adherents": 3161,
+   "pct": 0.8,
+   "rankAdherents": 216,
+   "rankPct": 585
+  },
+  {
+   "cbsa": "36020",
+   "name": "Oak Harbor, WA",
+   "micro": true,
+   "cong": 6,
+   "adherents": 3150,
+   "pct": 3.6,
+   "rankAdherents": 217,
+   "rankPct": 100
+  },
+  {
+   "cbsa": "11460",
+   "name": "Ann Arbor, MI",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3102,
+   "pct": 0.8,
+   "rankAdherents": 218,
+   "rankPct": 555
+  },
+  {
+   "cbsa": "29540",
+   "name": "Lancaster, PA",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3102,
+   "pct": 0.6,
+   "rankAdherents": 219,
+   "rankPct": 739
+  },
+  {
+   "cbsa": "49620",
+   "name": "York-Hanover, PA",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3102,
+   "pct": 0.7,
+   "rankAdherents": 220,
+   "rankPct": 685
+  },
+  {
+   "cbsa": "18700",
+   "name": "Corvallis, OR",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3072,
+   "pct": 3.2,
+   "rankAdherents": 221,
+   "rankPct": 110
+  },
+  {
+   "cbsa": "25940",
+   "name": "Hilton Head Island-Bluffton, SC",
+   "micro": false,
+   "cong": 5,
+   "adherents": 3026,
+   "pct": 1.4,
+   "rankAdherents": 222,
+   "rankPct": 287
+  },
+  {
+   "cbsa": "42540",
+   "name": "Scranton--Wilkes-Barre, PA",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3016,
+   "pct": 0.5,
+   "rankAdherents": 223,
+   "rankPct": 751
+  },
+  {
+   "cbsa": "26980",
+   "name": "Iowa City, IA",
+   "micro": false,
+   "cong": 6,
+   "adherents": 3006,
+   "pct": 1.7,
+   "rankAdherents": 224,
+   "rankPct": 214
+  },
+  {
+   "cbsa": "10420",
+   "name": "Akron, OH",
+   "micro": false,
+   "cong": 6,
+   "adherents": 2996,
+   "pct": 0.4,
+   "rankAdherents": 225,
+   "rankPct": 805
+  },
+  {
+   "cbsa": "19340",
+   "name": "Davenport-Moline-Rock Island, IA-IL",
+   "micro": false,
+   "cong": 6,
+   "adherents": 2976,
+   "pct": 0.8,
+   "rankAdherents": 226,
+   "rankPct": 614
+  },
+  {
+   "cbsa": "25420",
+   "name": "Harrisburg-Carlisle, PA",
+   "micro": false,
+   "cong": 6,
+   "adherents": 2973,
+   "pct": 0.5,
+   "rankAdherents": 227,
+   "rankPct": 767
+  },
+  {
+   "cbsa": "46340",
+   "name": "Tyler, TX",
+   "micro": false,
+   "cong": 6,
+   "adherents": 2964,
+   "pct": 1.3,
+   "rankAdherents": 228,
+   "rankPct": 319
+  },
+  {
+   "cbsa": "33860",
+   "name": "Montgomery, AL",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2949,
+   "pct": 0.8,
+   "rankAdherents": 229,
+   "rankPct": 624
+  },
+  {
+   "cbsa": "48900",
+   "name": "Wilmington, NC",
+   "micro": false,
+   "cong": 6,
+   "adherents": 2940,
+   "pct": 1,
+   "rankAdherents": 230,
+   "rankPct": 412
+  },
+  {
+   "cbsa": "34300",
+   "name": "Mountain Home, ID",
+   "micro": true,
+   "cong": 9,
+   "adherents": 2934,
+   "pct": 10.2,
+   "rankAdherents": 231,
+   "rankPct": 28
+  },
+  {
+   "cbsa": "24060",
+   "name": "Glenwood Springs, CO",
+   "micro": true,
+   "cong": 6,
+   "adherents": 2931,
+   "pct": 3.7,
+   "rankAdherents": 232,
+   "rankPct": 96
+  },
+  {
+   "cbsa": "44660",
+   "name": "Stillwater, OK",
+   "micro": true,
+   "cong": 5,
+   "adherents": 2925,
+   "pct": 3.6,
+   "rankAdherents": 233,
+   "rankPct": 102
+  },
+  {
+   "cbsa": "20940",
+   "name": "El Centro, CA",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2915,
+   "pct": 1.6,
+   "rankAdherents": 234,
+   "rankPct": 227
+  },
+  {
+   "cbsa": "25260",
+   "name": "Hanford-Corcoran, CA",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2915,
+   "pct": 1.9,
+   "rankAdherents": 235,
+   "rankPct": 188
+  },
+  {
+   "cbsa": "31460",
+   "name": "Madera, CA",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2915,
+   "pct": 1.9,
+   "rankAdherents": 236,
+   "rankPct": 192
+  },
+  {
+   "cbsa": "32900",
+   "name": "Merced, CA",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2915,
+   "pct": 1,
+   "rankAdherents": 237,
+   "rankPct": 409
+  },
+  {
+   "cbsa": "39780",
+   "name": "Red Bluff, CA",
+   "micro": true,
+   "cong": 5,
+   "adherents": 2915,
+   "pct": 4.4,
+   "rankAdherents": 238,
+   "rankPct": 80
+  },
+  {
+   "cbsa": "16300",
+   "name": "Cedar Rapids, IA",
+   "micro": false,
+   "cong": 6,
+   "adherents": 2838,
+   "pct": 1,
+   "rankAdherents": 239,
+   "rankPct": 413
+  },
+  {
+   "cbsa": "29660",
+   "name": "Laramie, WY",
+   "micro": true,
+   "cong": 7,
+   "adherents": 2723,
+   "pct": 7.3,
+   "rankAdherents": 240,
+   "rankPct": 37
+  },
+  {
+   "cbsa": "21980",
+   "name": "Fallon, NV",
+   "micro": true,
+   "cong": 7,
+   "adherents": 2709,
+   "pct": 10.6,
+   "rankAdherents": 241,
+   "rankPct": 25
+  },
+  {
+   "cbsa": "29260",
+   "name": "La Grande, OR",
+   "micro": true,
+   "cong": 7,
+   "adherents": 2688,
+   "pct": 10.3,
+   "rankAdherents": 242,
+   "rankPct": 27
+  },
+  {
+   "cbsa": "37900",
+   "name": "Peoria, IL",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2688,
+   "pct": 0.7,
+   "rankAdherents": 243,
+   "rankPct": 693
+  },
+  {
+   "cbsa": "10140",
+   "name": "Aberdeen, WA",
+   "micro": true,
+   "cong": 5,
+   "adherents": 2625,
+   "pct": 3.5,
+   "rankAdherents": 244,
+   "rankPct": 105
+  },
+  {
+   "cbsa": "16500",
+   "name": "Centralia, WA",
+   "micro": true,
+   "cong": 5,
+   "adherents": 2625,
+   "pct": 3.2,
+   "rankAdherents": 245,
+   "rankPct": 111
+  },
+  {
+   "cbsa": "38820",
+   "name": "Port Angeles, WA",
+   "micro": true,
+   "cong": 5,
+   "adherents": 2625,
+   "pct": 3.4,
+   "rankAdherents": 246,
+   "rankPct": 107
+  },
+  {
+   "cbsa": "39420",
+   "name": "Pullman, WA",
+   "micro": true,
+   "cong": 5,
+   "adherents": 2625,
+   "pct": 5.5,
+   "rankAdherents": 247,
+   "rankPct": 56
+  },
+  {
+   "cbsa": "31700",
+   "name": "Manchester-Nashua, NH",
+   "micro": false,
+   "cong": 6,
+   "adherents": 2616,
+   "pct": 0.6,
+   "rankAdherents": 248,
+   "rankPct": 717
+  },
+  {
+   "cbsa": "28700",
+   "name": "Kingsport-Bristol, TN-VA",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2586,
+   "pct": 0.8,
+   "rankAdherents": 249,
+   "rankPct": 550
+  },
+  {
+   "cbsa": "33940",
+   "name": "Montrose, CO",
+   "micro": true,
+   "cong": 7,
+   "adherents": 2581,
+   "pct": 5.4,
+   "rankAdherents": 250,
+   "rankPct": 58
+  },
+  {
+   "cbsa": "39660",
+   "name": "Rapid City, SD",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2580,
+   "pct": 1.9,
+   "rankAdherents": 251,
+   "rankPct": 194
+  },
+  {
+   "cbsa": "30300",
+   "name": "Lewiston, ID-WA",
+   "micro": false,
+   "cong": 6,
+   "adherents": 2554,
+   "pct": 4,
+   "rankAdherents": 252,
+   "rankPct": 90
+  },
+  {
+   "cbsa": "16580",
+   "name": "Champaign-Urbana, IL",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2520,
+   "pct": 1.1,
+   "rankAdherents": 253,
+   "rankPct": 369
+  },
+  {
+   "cbsa": "29200",
+   "name": "Lafayette-West Lafayette, IN",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2515,
+   "pct": 1.1,
+   "rankAdherents": 254,
+   "rankPct": 374
+  },
+  {
+   "cbsa": "14500",
+   "name": "Boulder, CO",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2479,
+   "pct": 0.7,
+   "rankAdherents": 255,
+   "rankPct": 638
+  },
+  {
+   "cbsa": "20420",
+   "name": "Durango, CO",
+   "micro": true,
+   "cong": 5,
+   "adherents": 2479,
+   "pct": 4.5,
+   "rankAdherents": 256,
+   "rankPct": 77
+  },
+  {
+   "cbsa": "29700",
+   "name": "Laredo, TX",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2470,
+   "pct": 0.9,
+   "rankAdherents": 257,
+   "rankPct": 473
+  },
+  {
+   "cbsa": "33740",
+   "name": "Monroe, LA",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2470,
+   "pct": 1.2,
+   "rankAdherents": 258,
+   "rankPct": 344
+  },
+  {
+   "cbsa": "47380",
+   "name": "Waco, TX",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2470,
+   "pct": 0.9,
+   "rankAdherents": 259,
+   "rankPct": 508
+  },
+  {
+   "cbsa": "21780",
+   "name": "Evansville, IN-KY",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2426,
+   "pct": 0.8,
+   "rankAdherents": 260,
+   "rankPct": 619
+  },
+  {
+   "cbsa": "26580",
+   "name": "Huntington-Ashland, WV-KY-OH",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2384,
+   "pct": 0.7,
+   "rankAdherents": 261,
+   "rankPct": 696
+  },
+  {
+   "cbsa": "13980",
+   "name": "Blacksburg-Christiansburg, VA",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2337,
+   "pct": 1.4,
+   "rankAdherents": 262,
+   "rankPct": 286
+  },
+  {
+   "cbsa": "46540",
+   "name": "Utica-Rome, NY",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2303,
+   "pct": 0.8,
+   "rankAdherents": 263,
+   "rankPct": 600
+  },
+  {
+   "cbsa": "16820",
+   "name": "Charlottesville, VA",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2296,
+   "pct": 1,
+   "rankAdherents": 264,
+   "rankPct": 410
+  },
+  {
+   "cbsa": "30100",
+   "name": "Lebanon, NH-VT",
+   "micro": true,
+   "cong": 5,
+   "adherents": 2284,
+   "pct": 1,
+   "rankAdherents": 265,
+   "rankPct": 411
+  },
+  {
+   "cbsa": "34140",
+   "name": "Moscow, ID",
+   "micro": true,
+   "cong": 7,
+   "adherents": 2282,
+   "pct": 5.8,
+   "rankAdherents": 266,
+   "rankPct": 54
+  },
+  {
+   "cbsa": "45780",
+   "name": "Toledo, OH",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2269,
+   "pct": 0.4,
+   "rankAdherents": 267,
+   "rankPct": 845
+  },
+  {
+   "cbsa": "43900",
+   "name": "Spartanburg, SC",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2256,
+   "pct": 0.7,
+   "rankAdherents": 268,
+   "rankPct": 681
+  },
+  {
+   "cbsa": "16620",
+   "name": "Charleston, WV",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2255,
+   "pct": 0.9,
+   "rankAdherents": 269,
+   "rankPct": 525
+  },
+  {
+   "cbsa": "34060",
+   "name": "Morgantown, WV",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2255,
+   "pct": 1.6,
+   "rankAdherents": 270,
+   "rankPct": 230
+  },
+  {
+   "cbsa": "35980",
+   "name": "Norwich-New London, CT",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2255,
+   "pct": 0.8,
+   "rankAdherents": 271,
+   "rankPct": 551
+  },
+  {
+   "cbsa": "25200",
+   "name": "Hailey, ID",
+   "micro": true,
+   "cong": 7,
+   "adherents": 2246,
+   "pct": 8.9,
+   "rankAdherents": 272,
+   "rankPct": 34
+  },
+  {
+   "cbsa": "25860",
+   "name": "Hickory-Lenoir-Morganton, NC",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2228,
+   "pct": 0.6,
+   "rankAdherents": 273,
+   "rankPct": 724
+  },
+  {
+   "cbsa": "36100",
+   "name": "Ocala, FL",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2172,
+   "pct": 0.6,
+   "rankAdherents": 274,
+   "rankPct": 731
+  },
+  {
+   "cbsa": "37460",
+   "name": "Panama City, FL",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2172,
+   "pct": 1.2,
+   "rankAdherents": 275,
+   "rankPct": 329
+  },
+  {
+   "cbsa": "49020",
+   "name": "Winchester, VA-WV",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2160,
+   "pct": 1.5,
+   "rankAdherents": 276,
+   "rankPct": 256
+  },
+  {
+   "cbsa": "29940",
+   "name": "Lawrence, KS",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2152,
+   "pct": 1.8,
+   "rankAdherents": 277,
+   "rankPct": 199
+  },
+  {
+   "cbsa": "45820",
+   "name": "Topeka, KS",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2152,
+   "pct": 0.9,
+   "rankAdherents": 278,
+   "rankPct": 475
+  },
+  {
+   "cbsa": "46020",
+   "name": "Truckee-Grass Valley, CA",
+   "micro": true,
+   "cong": 4,
+   "adherents": 2136,
+   "pct": 2.1,
+   "rankAdherents": 279,
+   "rankPct": 175
+  },
+  {
+   "cbsa": "44140",
+   "name": "Springfield, MA",
+   "micro": false,
+   "cong": 5,
+   "adherents": 2102,
+   "pct": 0.3,
+   "rankAdherents": 280,
+   "rankPct": 855
+  },
+  {
+   "cbsa": "31340",
+   "name": "Lynchburg, VA",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2091,
+   "pct": 0.8,
+   "rankAdherents": 281,
+   "rankPct": 590
+  },
+  {
+   "cbsa": "43620",
+   "name": "Sioux Falls, SD",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2075,
+   "pct": 0.7,
+   "rankAdherents": 282,
+   "rankPct": 637
+  },
+  {
+   "cbsa": "12020",
+   "name": "Athens-Clarke County, GA",
+   "micro": false,
+   "cong": 4,
+   "adherents": 2068,
+   "pct": 1,
+   "rankAdherents": 283,
+   "rankPct": 449
+  },
+  {
+   "cbsa": "33500",
+   "name": "Minot, ND",
+   "micro": true,
+   "cong": 4,
+   "adherents": 2024,
+   "pct": 2.6,
+   "rankAdherents": 284,
+   "rankPct": 131
+  },
+  {
+   "cbsa": "10460",
+   "name": "Alamogordo, NM",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1976,
+   "pct": 2.9,
+   "rankAdherents": 285,
+   "rankPct": 121
+  },
+  {
+   "cbsa": "16100",
+   "name": "Carlsbad-Artesia, NM",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1976,
+   "pct": 3.2,
+   "rankAdherents": 286,
+   "rankPct": 113
+  },
+  {
+   "cbsa": "36830",
+   "name": "Othello, WA",
+   "micro": true,
+   "cong": 5,
+   "adherents": 1965,
+   "pct": 9.5,
+   "rankAdherents": 287,
+   "rankPct": 32
+  },
+  {
+   "cbsa": "34340",
+   "name": "Mount Airy, NC",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1960,
+   "pct": 2.7,
+   "rankAdherents": 288,
+   "rankPct": 128
+  },
+  {
+   "cbsa": "41760",
+   "name": "Sandpoint, ID",
+   "micro": true,
+   "cong": 6,
+   "adherents": 1956,
+   "pct": 4.2,
+   "rankAdherents": 289,
+   "rankPct": 85
+  },
+  {
+   "cbsa": "13780",
+   "name": "Binghamton, NY",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1946,
+   "pct": 0.8,
+   "rankAdherents": 290,
+   "rankPct": 601
+  },
+  {
+   "cbsa": "43260",
+   "name": "Sheridan, WY",
+   "micro": true,
+   "cong": 5,
+   "adherents": 1945,
+   "pct": 6.3,
+   "rankAdherents": 291,
+   "rankPct": 43
+  },
+  {
+   "cbsa": "45000",
+   "name": "Susanville, CA",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1940,
+   "pct": 5.9,
+   "rankAdherents": 292,
+   "rankPct": 50
+  },
+  {
+   "cbsa": "43220",
+   "name": "Shelton, WA",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1924,
+   "pct": 2.9,
+   "rankAdherents": 293,
+   "rankPct": 120
+  },
+  {
+   "cbsa": "39740",
+   "name": "Reading, PA",
+   "micro": false,
+   "cong": 4,
+   "adherents": 1896,
+   "pct": 0.4,
+   "rankAdherents": 294,
+   "rankPct": 798
+  },
+  {
+   "cbsa": "40420",
+   "name": "Rockford, IL",
+   "micro": false,
+   "cong": 4,
+   "adherents": 1890,
+   "pct": 0.6,
+   "rankAdherents": 295,
+   "rankPct": 741
+  },
+  {
+   "cbsa": "11180",
+   "name": "Ames, IA",
+   "micro": false,
+   "cong": 4,
+   "adherents": 1878,
+   "pct": 1.5,
+   "rankAdherents": 296,
+   "rankPct": 263
+  },
+  {
+   "cbsa": "18300",
+   "name": "Coos Bay, OR",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1876,
+   "pct": 2.9,
+   "rankAdherents": 297,
+   "rankPct": 122
+  },
+  {
+   "cbsa": "38940",
+   "name": "Port St. Lucie, FL",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1876,
+   "pct": 0.4,
+   "rankAdherents": 298,
+   "rankPct": 824
+  },
+  {
+   "cbsa": "14020",
+   "name": "Bloomington, IN",
+   "micro": false,
+   "cong": 4,
+   "adherents": 1844,
+   "pct": 1.1,
+   "rankAdherents": 299,
+   "rankPct": 361
+  },
+  {
+   "cbsa": "22800",
+   "name": "Fort Madison-Keokuk, IA-IL-MO",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1842,
+   "pct": 3.2,
+   "rankAdherents": 300,
+   "rankPct": 112
+  },
+  {
+   "cbsa": "48780",
+   "name": "Williston, ND",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1840,
+   "pct": 4.5,
+   "rankAdherents": 301,
+   "rankPct": 76
+  },
+  {
+   "cbsa": "10180",
+   "name": "Abilene, TX",
+   "micro": false,
+   "cong": 4,
+   "adherents": 1812,
+   "pct": 1,
+   "rankAdherents": 302,
+   "rankPct": 414
+  },
+  {
+   "cbsa": "36220",
+   "name": "Odessa, TX",
+   "micro": false,
+   "cong": 4,
+   "adherents": 1812,
+   "pct": 1.1,
+   "rankAdherents": 303,
+   "rankPct": 384
+  },
+  {
+   "cbsa": "41660",
+   "name": "San Angelo, TX",
+   "micro": false,
+   "cong": 4,
+   "adherents": 1812,
+   "pct": 1.5,
+   "rankAdherents": 304,
+   "rankPct": 268
+  },
+  {
+   "cbsa": "48660",
+   "name": "Wichita Falls, TX",
+   "micro": false,
+   "cong": 4,
+   "adherents": 1812,
+   "pct": 1.2,
+   "rankAdherents": 305,
+   "rankPct": 337
+  },
+  {
+   "cbsa": "21580",
+   "name": "Española, NM",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1796,
+   "pct": 4.4,
+   "rankAdherents": 306,
+   "rankPct": 78
+  },
+  {
+   "cbsa": "29180",
+   "name": "Lafayette, LA",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1779,
+   "pct": 0.4,
+   "rankAdherents": 307,
+   "rankPct": 832
+  },
+  {
+   "cbsa": "20100",
+   "name": "Dover, DE",
+   "micro": false,
+   "cong": 4,
+   "adherents": 1772,
+   "pct": 1,
+   "rankAdherents": 308,
+   "rankPct": 438
+  },
+  {
+   "cbsa": "20020",
+   "name": "Dothan, AL",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1751,
+   "pct": 1.2,
+   "rankAdherents": 309,
+   "rankPct": 357
+  },
+  {
+   "cbsa": "23820",
+   "name": "Gardnerville Ranchos, NV",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1720,
+   "pct": 3.5,
+   "rankAdherents": 310,
+   "rankPct": 104
+  },
+  {
+   "cbsa": "49080",
+   "name": "Winnemucca, NV",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1720,
+   "pct": 10,
+   "rankAdherents": 311,
+   "rankPct": 29
+  },
+  {
+   "cbsa": "14540",
+   "name": "Bowling Green, KY",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1710,
+   "pct": 1,
+   "rankAdherents": 312,
+   "rankPct": 454
+  },
+  {
+   "cbsa": "21060",
+   "name": "Elizabethtown-Fort Knox, KY",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1710,
+   "pct": 1.1,
+   "rankAdherents": 313,
+   "rankPct": 383
+  },
+  {
+   "cbsa": "35440",
+   "name": "Newport, OR",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1704,
+   "pct": 3.4,
+   "rankAdherents": 314,
+   "rankPct": 108
+  },
+  {
+   "cbsa": "24580",
+   "name": "Green Bay, WI",
+   "micro": false,
+   "cong": 4,
+   "adherents": 1696,
+   "pct": 0.5,
+   "rankAdherents": 315,
+   "rankPct": 762
+  },
+  {
+   "cbsa": "18500",
+   "name": "Corning, NY",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1689,
+   "pct": 1.8,
+   "rankAdherents": 316,
+   "rankPct": 201
+  },
+  {
+   "cbsa": "36300",
+   "name": "Ogdensburg-Massena, NY",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1689,
+   "pct": 1.6,
+   "rankAdherents": 317,
+   "rankPct": 247
+  },
+  {
+   "cbsa": "36460",
+   "name": "Olean, NY",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1689,
+   "pct": 2.2,
+   "rankAdherents": 318,
+   "rankPct": 167
+  },
+  {
+   "cbsa": "27940",
+   "name": "Juneau, AK",
+   "micro": true,
+   "cong": 4,
+   "adherents": 1684,
+   "pct": 5.2,
+   "rankAdherents": 319,
+   "rankPct": 62
+  },
+  {
+   "cbsa": "28580",
+   "name": "Key West, FL",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1629,
+   "pct": 2,
+   "rankAdherents": 320,
+   "rankPct": 182
+  },
+  {
+   "cbsa": "37260",
+   "name": "Palatka, FL",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1629,
+   "pct": 2.2,
+   "rankAdherents": 321,
+   "rankPct": 164
+  },
+  {
+   "cbsa": "12300",
+   "name": "Augusta-Waterville, ME",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1623,
+   "pct": 1.3,
+   "rankAdherents": 322,
+   "rankPct": 310
+  },
+  {
+   "cbsa": "12620",
+   "name": "Bangor, ME",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1623,
+   "pct": 1.1,
+   "rankAdherents": 323,
+   "rankPct": 393
+  },
+  {
+   "cbsa": "12780",
+   "name": "Bartlesville, OK",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1608,
+   "pct": 3.1,
+   "rankAdherents": 324,
+   "rankPct": 116
+  },
+  {
+   "cbsa": "21420",
+   "name": "Enid, OK",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1608,
+   "pct": 2.6,
+   "rankAdherents": 325,
+   "rankPct": 138
+  },
+  {
+   "cbsa": "30020",
+   "name": "Lawton, OK",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1608,
+   "pct": 1.3,
+   "rankAdherents": 326,
+   "rankPct": 318
+  },
+  {
+   "cbsa": "17340",
+   "name": "Clearlake, CA",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1602,
+   "pct": 2.4,
+   "rankAdherents": 327,
+   "rankPct": 155
+  },
+  {
+   "cbsa": "18260",
+   "name": "Cookeville, TN",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1602,
+   "pct": 1.4,
+   "rankAdherents": 328,
+   "rankPct": 285
+  },
+  {
+   "cbsa": "27740",
+   "name": "Johnson City, TN",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1602,
+   "pct": 0.8,
+   "rankAdherents": 329,
+   "rankPct": 617
+  },
+  {
+   "cbsa": "34900",
+   "name": "Napa, CA",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1602,
+   "pct": 1.2,
+   "rankAdherents": 330,
+   "rankPct": 356
+  },
+  {
+   "cbsa": "46380",
+   "name": "Ukiah, CA",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1602,
+   "pct": 1.7,
+   "rankAdherents": 331,
+   "rankPct": 211
+  },
+  {
+   "cbsa": "27620",
+   "name": "Jefferson City, MO",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1596,
+   "pct": 1.1,
+   "rankAdherents": 332,
+   "rankPct": 394
+  },
+  {
+   "cbsa": "23060",
+   "name": "Fort Wayne, IN",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1593,
+   "pct": 0.4,
+   "rankAdherents": 333,
+   "rankPct": 827
+  },
+  {
+   "cbsa": "20060",
+   "name": "Douglas, GA",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1551,
+   "pct": 3,
+   "rankAdherents": 334,
+   "rankPct": 117
+  },
+  {
+   "cbsa": "23580",
+   "name": "Gainesville, GA",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1551,
+   "pct": 0.8,
+   "rankAdherents": 335,
+   "rankPct": 625
+  },
+  {
+   "cbsa": "47580",
+   "name": "Warner Robins, GA",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1551,
+   "pct": 0.8,
+   "rankAdherents": 336,
+   "rankPct": 581
+  },
+  {
+   "cbsa": "20260",
+   "name": "Duluth, MN-WI",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1543,
+   "pct": 0.5,
+   "rankAdherents": 337,
+   "rankPct": 753
+  },
+  {
+   "cbsa": "13900",
+   "name": "Bismarck, ND",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1522,
+   "pct": 1.1,
+   "rankAdherents": 338,
+   "rankPct": 367
+  },
+  {
+   "cbsa": "12220",
+   "name": "Auburn-Opelika, AL",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1521,
+   "pct": 0.9,
+   "rankAdherents": 339,
+   "rankPct": 522
+  },
+  {
+   "cbsa": "19300",
+   "name": "Daphne-Fairhope-Foley, AL",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1521,
+   "pct": 0.7,
+   "rankAdherents": 340,
+   "rankPct": 703
+  },
+  {
+   "cbsa": "33660",
+   "name": "Mobile, AL",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1521,
+   "pct": 0.4,
+   "rankAdherents": 341,
+   "rankPct": 842
+  },
+  {
+   "cbsa": "46220",
+   "name": "Tuscaloosa, AL",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1521,
+   "pct": 0.6,
+   "rankAdherents": 342,
+   "rankPct": 738
+  },
+  {
+   "cbsa": "22020",
+   "name": "Fargo, ND-MN",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1518,
+   "pct": 0.6,
+   "rankAdherents": 343,
+   "rankPct": 725
+  },
+  {
+   "cbsa": "45940",
+   "name": "Trenton-Princeton, NJ",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1509,
+   "pct": 0.4,
+   "rankAdherents": 344,
+   "rankPct": 819
+  },
+  {
+   "cbsa": "47220",
+   "name": "Vineland-Bridgeton, NJ",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1509,
+   "pct": 1,
+   "rankAdherents": 345,
+   "rankPct": 436
+  },
+  {
+   "cbsa": "40740",
+   "name": "Roswell, NM",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1482,
+   "pct": 2.3,
+   "rankAdherents": 346,
+   "rankPct": 161
+  },
+  {
+   "cbsa": "42140",
+   "name": "Santa Fe, NM",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1482,
+   "pct": 1,
+   "rankAdherents": 347,
+   "rankPct": 451
+  },
+  {
+   "cbsa": "15500",
+   "name": "Burlington, NC",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1470,
+   "pct": 0.9,
+   "rankAdherents": 348,
+   "rankPct": 539
+  },
+  {
+   "cbsa": "24140",
+   "name": "Goldsboro, NC",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1470,
+   "pct": 1.3,
+   "rankAdherents": 349,
+   "rankPct": 323
+  },
+  {
+   "cbsa": "24780",
+   "name": "Greenville, NC",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1470,
+   "pct": 0.9,
+   "rankAdherents": 350,
+   "rankPct": 534
+  },
+  {
+   "cbsa": "27340",
+   "name": "Jacksonville, NC",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1470,
+   "pct": 0.7,
+   "rankAdherents": 351,
+   "rankPct": 664
+  },
+  {
+   "cbsa": "38240",
+   "name": "Pinehurst-Southern Pines, NC",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1470,
+   "pct": 1.5,
+   "rankAdherents": 352,
+   "rankPct": 269
+  },
+  {
+   "cbsa": "16540",
+   "name": "Chambersburg-Waynesboro, PA",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1422,
+   "pct": 0.9,
+   "rankAdherents": 353,
+   "rankPct": 486
+  },
+  {
+   "cbsa": "20700",
+   "name": "East Stroudsburg, PA",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1422,
+   "pct": 0.8,
+   "rankAdherents": 354,
+   "rankPct": 549
+  },
+  {
+   "cbsa": "28020",
+   "name": "Kalamazoo-Portage, MI",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1422,
+   "pct": 0.5,
+   "rankAdherents": 355,
+   "rankPct": 747
+  },
+  {
+   "cbsa": "44300",
+   "name": "State College, PA",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1422,
+   "pct": 0.9,
+   "rankAdherents": 356,
+   "rankPct": 497
+  },
+  {
+   "cbsa": "15940",
+   "name": "Canton-Massillon, OH",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1413,
+   "pct": 0.4,
+   "rankAdherents": 357,
+   "rankPct": 844
+  },
+  {
+   "cbsa": "14010",
+   "name": "Bloomington, IL",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1386,
+   "pct": 0.8,
+   "rankAdherents": 358,
+   "rankPct": 580
+  },
+  {
+   "cbsa": "14700",
+   "name": "Branson, MO",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1386,
+   "pct": 2.5,
+   "rankAdherents": 359,
+   "rankPct": 143
+  },
+  {
+   "cbsa": "22780",
+   "name": "Fort Leonard Wood, MO",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1386,
+   "pct": 2.6,
+   "rankAdherents": 360,
+   "rankPct": 136
+  },
+  {
+   "cbsa": "18020",
+   "name": "Columbus, IN",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1383,
+   "pct": 1.7,
+   "rankAdherents": 361,
+   "rankPct": 218
+  },
+  {
+   "cbsa": "21140",
+   "name": "Elkhart-Goshen, IN",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1383,
+   "pct": 0.7,
+   "rankAdherents": 362,
+   "rankPct": 694
+  },
+  {
+   "cbsa": "34620",
+   "name": "Muncie, IN",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1383,
+   "pct": 1.2,
+   "rankAdherents": 363,
+   "rankPct": 330
+  },
+  {
+   "cbsa": "43780",
+   "name": "South Bend-Mishawaka, IN-MI",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1383,
+   "pct": 0.4,
+   "rankAdherents": 364,
+   "rankPct": 806
+  },
+  {
+   "cbsa": "47940",
+   "name": "Waterloo-Cedar Falls, IA",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1377,
+   "pct": 0.8,
+   "rankAdherents": 365,
+   "rankPct": 570
+  },
+  {
+   "cbsa": "43300",
+   "name": "Sherman-Denison, TX",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1359,
+   "pct": 1,
+   "rankAdherents": 366,
+   "rankPct": 422
+  },
+  {
+   "cbsa": "25500",
+   "name": "Harrisonburg, VA",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1353,
+   "pct": 1,
+   "rankAdherents": 367,
+   "rankPct": 426
+  },
+  {
+   "cbsa": "19700",
+   "name": "Deming, NM",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1347,
+   "pct": 5.3,
+   "rankAdherents": 368,
+   "rankPct": 61
+  },
+  {
+   "cbsa": "24380",
+   "name": "Grants, NM",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1347,
+   "pct": 5,
+   "rankAdherents": 369,
+   "rankPct": 68
+  },
+  {
+   "cbsa": "31060",
+   "name": "Los Alamos, NM",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1347,
+   "pct": 6.9,
+   "rankAdherents": 370,
+   "rankPct": 39
+  },
+  {
+   "cbsa": "43500",
+   "name": "Silver City, NM",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1347,
+   "pct": 4.8,
+   "rankAdherents": 371,
+   "rankPct": 69
+  },
+  {
+   "cbsa": "27060",
+   "name": "Ithaca, NY",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1332,
+   "pct": 1.3,
+   "rankAdherents": 372,
+   "rankPct": 322
+  },
+  {
+   "cbsa": "28740",
+   "name": "Kingston, NY",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1332,
+   "pct": 0.7,
+   "rankAdherents": 373,
+   "rankPct": 651
+  },
+  {
+   "cbsa": "48060",
+   "name": "Watertown-Fort Drum, NY",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1332,
+   "pct": 1.1,
+   "rankAdherents": 374,
+   "rankPct": 365
+  },
+  {
+   "cbsa": "21260",
+   "name": "Ellensburg, WA",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1311,
+   "pct": 3,
+   "rankAdherents": 375,
+   "rankPct": 119
+  },
+  {
+   "cbsa": "25220",
+   "name": "Hammond, LA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1284,
+   "pct": 1,
+   "rankAdherents": 376,
+   "rankPct": 445
+  },
+  {
+   "cbsa": "42700",
+   "name": "Sebring-Avon Park, FL",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1284,
+   "pct": 1.3,
+   "rankAdherents": 377,
+   "rankPct": 320
+  },
+  {
+   "cbsa": "11820",
+   "name": "Astoria, OR",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1278,
+   "pct": 3.1,
+   "rankAdherents": 378,
+   "rankPct": 115
+  },
+  {
+   "cbsa": "15060",
+   "name": "Brookings, OR",
+   "micro": true,
+   "cong": 3,
+   "adherents": 1278,
+   "pct": 5.5,
+   "rankAdherents": 379,
+   "rankPct": 57
+  },
+  {
+   "cbsa": "36780",
+   "name": "Oshkosh-Neenah, WI",
+   "micro": false,
+   "cong": 3,
+   "adherents": 1272,
+   "pct": 0.7,
+   "rankAdherents": 380,
+   "rankPct": 645
+  },
+  {
+   "cbsa": "22500",
+   "name": "Florence, SC",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1232,
+   "pct": 0.6,
+   "rankAdherents": 381,
+   "rankPct": 719
+  },
+  {
+   "cbsa": "24020",
+   "name": "Glens Falls, NY",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1228,
+   "pct": 1,
+   "rankAdherents": 382,
+   "rankPct": 444
+  },
+  {
+   "cbsa": "19140",
+   "name": "Dalton, GA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1222,
+   "pct": 0.9,
+   "rankAdherents": 383,
+   "rankPct": 542
+  },
+  {
+   "cbsa": "46660",
+   "name": "Valdosta, GA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1222,
+   "pct": 0.8,
+   "rankAdherents": 384,
+   "rankPct": 563
+  },
+  {
+   "cbsa": "23460",
+   "name": "Gadsden, AL",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1198,
+   "pct": 1.2,
+   "rankAdherents": 385,
+   "rankPct": 358
+  },
+  {
+   "cbsa": "24220",
+   "name": "Grand Forks, ND-MN",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1196,
+   "pct": 1.1,
+   "rankAdherents": 386,
+   "rankPct": 360
+  },
+  {
+   "cbsa": "15680",
+   "name": "California-Lexington Park, MD",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1180,
+   "pct": 1,
+   "rankAdherents": 387,
+   "rankPct": 408
+  },
+  {
+   "cbsa": "40080",
+   "name": "Richmond-Berea, KY",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1170,
+   "pct": 1.1,
+   "rankAdherents": 388,
+   "rankPct": 385
+  },
+  {
+   "cbsa": "31300",
+   "name": "Lumberton, NC",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1158,
+   "pct": 1,
+   "rankAdherents": 389,
+   "rankPct": 430
+  },
+  {
+   "cbsa": "35100",
+   "name": "New Bern, NC",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1158,
+   "pct": 0.9,
+   "rankAdherents": 390,
+   "rankPct": 456
+  },
+  {
+   "cbsa": "15260",
+   "name": "Brunswick, GA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1128,
+   "pct": 1,
+   "rankAdherents": 391,
+   "rankPct": 429
+  },
+  {
+   "cbsa": "31420",
+   "name": "Macon-Bibb County, GA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1128,
+   "pct": 0.5,
+   "rankAdherents": 392,
+   "rankPct": 778
+  },
+  {
+   "cbsa": "12980",
+   "name": "Battle Creek, MI",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1120,
+   "pct": 0.8,
+   "rankAdherents": 393,
+   "rankPct": 554
+  },
+  {
+   "cbsa": "21500",
+   "name": "Erie, PA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1120,
+   "pct": 0.4,
+   "rankAdherents": 394,
+   "rankPct": 811
+  },
+  {
+   "cbsa": "22420",
+   "name": "Flint, MI",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1120,
+   "pct": 0.3,
+   "rankAdherents": 395,
+   "rankPct": 860
+  },
+  {
+   "cbsa": "23900",
+   "name": "Gettysburg, PA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1120,
+   "pct": 1.1,
+   "rankAdherents": 396,
+   "rankPct": 388
+  },
+  {
+   "cbsa": "35660",
+   "name": "Niles, MI",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1120,
+   "pct": 0.7,
+   "rankAdherents": 397,
+   "rankPct": 654
+  },
+  {
+   "cbsa": "29300",
+   "name": "LaGrange, GA-AL",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1117,
+   "pct": 1.1,
+   "rankAdherents": 398,
+   "rankPct": 390
+  },
+  {
+   "cbsa": "17220",
+   "name": "Clarksburg, WV",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1102,
+   "pct": 1.2,
+   "rankAdherents": 399,
+   "rankPct": 339
+  },
+  {
+   "cbsa": "21900",
+   "name": "Fairmont, WV",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1102,
+   "pct": 2,
+   "rankAdherents": 400,
+   "rankPct": 184
+  },
+  {
+   "cbsa": "19500",
+   "name": "Decatur, IL",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1092,
+   "pct": 1.1,
+   "rankAdherents": 401,
+   "rankPct": 401
+  },
+  {
+   "cbsa": "41140",
+   "name": "St. Joseph, MO-KS",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1092,
+   "pct": 0.9,
+   "rankAdherents": 402,
+   "rankPct": 498
+  },
+  {
+   "cbsa": "44100",
+   "name": "Springfield, IL",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1092,
+   "pct": 0.5,
+   "rankAdherents": 403,
+   "rankPct": 756
+  },
+  {
+   "cbsa": "33140",
+   "name": "Michigan City-La Porte, IN",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1090,
+   "pct": 1,
+   "rankAdherents": 404,
+   "rankPct": 440
+  },
+  {
+   "cbsa": "45460",
+   "name": "Terre Haute, IN",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1090,
+   "pct": 0.6,
+   "rankAdherents": 405,
+   "rankPct": 727
+  },
+  {
+   "cbsa": "29380",
+   "name": "Lake City, FL",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1086,
+   "pct": 1.6,
+   "rankAdherents": 406,
+   "rankPct": 246
+  },
+  {
+   "cbsa": "43580",
+   "name": "Sioux City, IA-NE-SD",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1086,
+   "pct": 0.7,
+   "rankAdherents": 407,
+   "rankPct": 657
+  },
+  {
+   "cbsa": "45500",
+   "name": "Texarkana, TX-AR",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1070,
+   "pct": 0.7,
+   "rankAdherents": 408,
+   "rankPct": 655
+  },
+  {
+   "cbsa": "43760",
+   "name": "Sonora, CA",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1068,
+   "pct": 1.9,
+   "rankAdherents": 409,
+   "rankPct": 187
+  },
+  {
+   "cbsa": "14140",
+   "name": "Bluefield, WV-VA",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1066,
+   "pct": 1,
+   "rankAdherents": 410,
+   "rankPct": 423
+  },
+  {
+   "cbsa": "19060",
+   "name": "Cumberland, MD-WV",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1050,
+   "pct": 1.1,
+   "rankAdherents": 411,
+   "rankPct": 380
+  },
+  {
+   "cbsa": "46180",
+   "name": "Tupelo, MS",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1044,
+   "pct": 0.6,
+   "rankAdherents": 412,
+   "rankPct": 706
+  },
+  {
+   "cbsa": "27600",
+   "name": "Jefferson, GA",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1034,
+   "pct": 1.4,
+   "rankAdherents": 413,
+   "rankPct": 297
+  },
+  {
+   "cbsa": "45900",
+   "name": "Traverse City, MI",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1034,
+   "pct": 0.7,
+   "rankAdherents": 414,
+   "rankPct": 688
+  },
+  {
+   "cbsa": "48180",
+   "name": "Waycross, GA",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1034,
+   "pct": 1.8,
+   "rankAdherents": 415,
+   "rankPct": 196
+  },
+  {
+   "cbsa": "12700",
+   "name": "Barnstable Town, MA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1032,
+   "pct": 0.5,
+   "rankAdherents": 416,
+   "rankPct": 793
+  },
+  {
+   "cbsa": "41540",
+   "name": "Salisbury, MD-DE",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1027,
+   "pct": 0.2,
+   "rankAdherents": 417,
+   "rankPct": 865
+  },
+  {
+   "cbsa": "27180",
+   "name": "Jackson, TN",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1012,
+   "pct": 0.6,
+   "rankAdherents": 418,
+   "rankPct": 740
+  },
+  {
+   "cbsa": "46100",
+   "name": "Tullahoma-Manchester, TN",
+   "micro": true,
+   "cong": 2,
+   "adherents": 1012,
+   "pct": 0.9,
+   "rankAdherents": 419,
+   "rankPct": 457
+  },
+  {
+   "cbsa": "27500",
+   "name": "Janesville-Beloit, WI",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1004,
+   "pct": 0.6,
+   "rankAdherents": 420,
+   "rankPct": 722
+  },
+  {
+   "cbsa": "15540",
+   "name": "Burlington-South Burlington, VT",
+   "micro": false,
+   "cong": 2,
+   "adherents": 1000,
+   "pct": 0.4,
+   "rankAdherents": 421,
+   "rankPct": 797
+  },
+  {
+   "cbsa": "23980",
+   "name": "Glasgow, KY",
+   "micro": true,
+   "cong": 2,
+   "adherents": 990,
+   "pct": 1.8,
+   "rankAdherents": 422,
+   "rankPct": 200
+  },
+  {
+   "cbsa": "22860",
+   "name": "Fort Polk South, LA",
+   "micro": true,
+   "cong": 2,
+   "adherents": 988,
+   "pct": 2,
+   "rankAdherents": 423,
+   "rankPct": 179
+  },
+  {
+   "cbsa": "26020",
+   "name": "Hobbs, NM",
+   "micro": true,
+   "cong": 2,
+   "adherents": 988,
+   "pct": 1.3,
+   "rankAdherents": 424,
+   "rankPct": 307
+  },
+  {
+   "cbsa": "19260",
+   "name": "Danville, VA",
+   "micro": true,
+   "cong": 2,
+   "adherents": 984,
+   "pct": 1,
+   "rankAdherents": 425,
+   "rankPct": 453
+  },
+  {
+   "cbsa": "44420",
+   "name": "Staunton, VA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 984,
+   "pct": 0.8,
+   "rankAdherents": 426,
+   "rankPct": 602
+  },
+  {
+   "cbsa": "28820",
+   "name": "Kinston, NC",
+   "micro": true,
+   "cong": 2,
+   "adherents": 980,
+   "pct": 1.8,
+   "rankAdherents": 427,
+   "rankPct": 205
+  },
+  {
+   "cbsa": "33980",
+   "name": "Morehead City, NC",
+   "micro": true,
+   "cong": 2,
+   "adherents": 980,
+   "pct": 1.4,
+   "rankAdherents": 428,
+   "rankPct": 274
+  },
+  {
+   "cbsa": "41820",
+   "name": "Sanford, NC",
+   "micro": true,
+   "cong": 2,
+   "adherents": 980,
+   "pct": 1.5,
+   "rankAdherents": 429,
+   "rankPct": 249
+  },
+  {
+   "cbsa": "38620",
+   "name": "Ponca City, OK",
+   "micro": true,
+   "cong": 2,
+   "adherents": 974,
+   "pct": 2.2,
+   "rankAdherents": 430,
+   "rankPct": 163
+  },
+  {
+   "cbsa": "41060",
+   "name": "St. Cloud, MN",
+   "micro": false,
+   "cong": 2,
+   "adherents": 974,
+   "pct": 0.5,
+   "rankAdherents": 431,
+   "rankPct": 775
+  },
+  {
+   "cbsa": "12900",
+   "name": "Batesville, AR",
+   "micro": true,
+   "cong": 2,
+   "adherents": 972,
+   "pct": 1.8,
+   "rankAdherents": 432,
+   "rankPct": 210
+  },
+  {
+   "cbsa": "40780",
+   "name": "Russellville, AR",
+   "micro": true,
+   "cong": 2,
+   "adherents": 972,
+   "pct": 1.2,
+   "rankAdherents": 433,
+   "rankPct": 355
+  },
+  {
+   "cbsa": "42620",
+   "name": "Searcy, AR",
+   "micro": true,
+   "cong": 2,
+   "adherents": 972,
+   "pct": 1.3,
+   "rankAdherents": 434,
+   "rankPct": 321
+  },
+  {
+   "cbsa": "33220",
+   "name": "Midland, MI",
+   "micro": false,
+   "cong": 2,
+   "adherents": 948,
+   "pct": 1.1,
+   "rankAdherents": 435,
+   "rankPct": 368
+  },
+  {
+   "cbsa": "18180",
+   "name": "Concord, NH",
+   "micro": true,
+   "cong": 2,
+   "adherents": 946,
+   "pct": 0.6,
+   "rankAdherents": 436,
+   "rankPct": 721
+  },
+  {
+   "cbsa": "11540",
+   "name": "Appleton, WI",
+   "micro": false,
+   "cong": 2,
+   "adherents": 926,
+   "pct": 0.4,
+   "rankAdherents": 437,
+   "rankPct": 825
+  },
+  {
+   "cbsa": "18900",
+   "name": "Crossville, TN",
+   "micro": true,
+   "cong": 2,
+   "adherents": 926,
+   "pct": 1.5,
+   "rankAdherents": 438,
+   "rankPct": 255
+  },
+  {
+   "cbsa": "39500",
+   "name": "Quincy, IL-MO",
+   "micro": true,
+   "cong": 2,
+   "adherents": 924,
+   "pct": 1.2,
+   "rankAdherents": 439,
+   "rankPct": 338
+  },
+  {
+   "cbsa": "12120",
+   "name": "Atmore, AL",
+   "micro": true,
+   "cong": 2,
+   "adherents": 922,
+   "pct": 2.5,
+   "rankAdherents": 440,
+   "rankPct": 141
+  },
+  {
+   "cbsa": "37120",
+   "name": "Ozark, AL",
+   "micro": true,
+   "cong": 2,
+   "adherents": 922,
+   "pct": 1.9,
+   "rankAdherents": 441,
+   "rankPct": 190
+  },
+  {
+   "cbsa": "19860",
+   "name": "Dickinson, ND",
+   "micro": true,
+   "cong": 2,
+   "adherents": 920,
+   "pct": 2.7,
+   "rankAdherents": 442,
+   "rankPct": 129
+  },
+  {
+   "cbsa": "20220",
+   "name": "Dubuque, IA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 918,
+   "pct": 0.9,
+   "rankAdherents": 443,
+   "rankPct": 472
+  },
+  {
+   "cbsa": "12740",
+   "name": "Barre, VT",
+   "micro": true,
+   "cong": 2,
+   "adherents": 916,
+   "pct": 1.5,
+   "rankAdherents": 444,
+   "rankPct": 253
+  },
+  {
+   "cbsa": "20580",
+   "name": "Eagle Pass, TX",
+   "micro": true,
+   "cong": 2,
+   "adherents": 906,
+   "pct": 1.6,
+   "rankAdherents": 445,
+   "rankPct": 243
+  },
+  {
+   "cbsa": "24180",
+   "name": "Granbury, TX",
+   "micro": true,
+   "cong": 2,
+   "adherents": 906,
+   "pct": 1.5,
+   "rankAdherents": 446,
+   "rankPct": 270
+  },
+  {
+   "cbsa": "26660",
+   "name": "Huntsville, TX",
+   "micro": true,
+   "cong": 2,
+   "adherents": 906,
+   "pct": 1.2,
+   "rankAdherents": 447,
+   "rankPct": 348
+  },
+  {
+   "cbsa": "31260",
+   "name": "Lufkin, TX",
+   "micro": true,
+   "cong": 2,
+   "adherents": 906,
+   "pct": 1,
+   "rankAdherents": 448,
+   "rankPct": 402
+  },
+  {
+   "cbsa": "34860",
+   "name": "Nacogdoches, TX",
+   "micro": true,
+   "cong": 2,
+   "adherents": 906,
+   "pct": 1.4,
+   "rankAdherents": 449,
+   "rankPct": 288
+  },
+  {
+   "cbsa": "40100",
+   "name": "Rio Grande City-Roma, TX",
+   "micro": true,
+   "cong": 2,
+   "adherents": 906,
+   "pct": 1.4,
+   "rankAdherents": 450,
+   "rankPct": 294
+  },
+  {
+   "cbsa": "20780",
+   "name": "Edwards, CO",
+   "micro": true,
+   "cong": 2,
+   "adherents": 905,
+   "pct": 1.6,
+   "rankAdherents": 451,
+   "rankPct": 225
+  },
+  {
+   "cbsa": "34660",
+   "name": "Murray, KY",
+   "micro": true,
+   "cong": 2,
+   "adherents": 900,
+   "pct": 2.4,
+   "rankAdherents": 452,
+   "rankPct": 148
+  },
+  {
+   "cbsa": "17580",
+   "name": "Clovis, NM",
+   "micro": true,
+   "cong": 2,
+   "adherents": 898,
+   "pct": 1.9,
+   "rankAdherents": 453,
+   "rankPct": 195
+  },
+  {
+   "cbsa": "38780",
+   "name": "Portales, NM",
+   "micro": true,
+   "cong": 2,
+   "adherents": 898,
+   "pct": 4.7,
+   "rankAdherents": 454,
+   "rankPct": 72
+  },
+  {
+   "cbsa": "45340",
+   "name": "Taos, NM",
+   "micro": true,
+   "cong": 2,
+   "adherents": 898,
+   "pct": 2.6,
+   "rankAdherents": 455,
+   "rankPct": 132
+  },
+  {
+   "cbsa": "22060",
+   "name": "Faribault-Northfield, MN",
+   "micro": true,
+   "cong": 2,
+   "adherents": 892,
+   "pct": 1.3,
+   "rankAdherents": 456,
+   "rankPct": 306
+  },
+  {
+   "cbsa": "35820",
+   "name": "North Platte, NE",
+   "micro": true,
+   "cong": 2,
+   "adherents": 874,
+   "pct": 2.4,
+   "rankAdherents": 457,
+   "rankPct": 146
+  },
+  {
+   "cbsa": "42420",
+   "name": "Scottsbluff, NE",
+   "micro": true,
+   "cong": 2,
+   "adherents": 874,
+   "pct": 2.3,
+   "rankAdherents": 458,
+   "rankPct": 159
+  },
+  {
+   "cbsa": "49660",
+   "name": "Youngstown-Warren-Boardman, OH-PA",
+   "micro": false,
+   "cong": 2,
+   "adherents": 856,
+   "pct": 0.2,
+   "rankAdherents": 459,
+   "rankPct": 869
+  },
+  {
+   "cbsa": "39260",
+   "name": "Prineville, OR",
+   "micro": true,
+   "cong": 2,
+   "adherents": 852,
+   "pct": 3.4,
+   "rankAdherents": 460,
+   "rankPct": 106
+  },
+  {
+   "cbsa": "49220",
+   "name": "Wisconsin Rapids-Marshfield, WI",
+   "micro": true,
+   "cong": 2,
+   "adherents": 848,
+   "pct": 1.1,
+   "rankAdherents": 461,
+   "rankPct": 364
+  },
+  {
+   "cbsa": "15580",
+   "name": "Butte-Silver Bow, MT",
+   "micro": true,
+   "cong": 2,
+   "adherents": 840,
+   "pct": 2.4,
+   "rankAdherents": 462,
+   "rankPct": 151
+  },
+  {
+   "cbsa": "28860",
+   "name": "Kirksville, MO",
+   "micro": true,
+   "cong": 2,
+   "adherents": 840,
+   "pct": 2.9,
+   "rankAdherents": 463,
+   "rankPct": 125
+  },
+  {
+   "cbsa": "40620",
+   "name": "Rolla, MO",
+   "micro": true,
+   "cong": 2,
+   "adherents": 840,
+   "pct": 1.9,
+   "rankAdherents": 464,
+   "rankPct": 189
+  },
+  {
+   "cbsa": "48460",
+   "name": "West Plains, MO",
+   "micro": true,
+   "cong": 2,
+   "adherents": 840,
+   "pct": 2.1,
+   "rankAdherents": 465,
+   "rankPct": 172
+  },
+  {
+   "cbsa": "26540",
+   "name": "Huntington, IN",
+   "micro": true,
+   "cong": 2,
+   "adherents": 838,
+   "pct": 2.3,
+   "rankAdherents": 466,
+   "rankPct": 160
+  },
+  {
+   "cbsa": "17540",
+   "name": "Clinton, IA",
+   "micro": true,
+   "cong": 2,
+   "adherents": 836,
+   "pct": 1.8,
+   "rankAdherents": 467,
+   "rankPct": 202
+  },
+  {
+   "cbsa": "15860",
+   "name": "Cañon City, CO",
+   "micro": true,
+   "cong": 2,
+   "adherents": 822,
+   "pct": 1.7,
+   "rankAdherents": 468,
+   "rankPct": 219
+  },
+  {
+   "cbsa": "19620",
+   "name": "Del Rio, TX",
+   "micro": true,
+   "cong": 2,
+   "adherents": 822,
+   "pct": 1.7,
+   "rankAdherents": 469,
+   "rankPct": 212
+  },
+  {
+   "cbsa": "18780",
+   "name": "Craig, CO",
+   "micro": true,
+   "cong": 2,
+   "adherents": 821,
+   "pct": 6.2,
+   "rankAdherents": 470,
+   "rankPct": 45
+  },
+  {
+   "cbsa": "43020",
+   "name": "Shawano, WI",
+   "micro": true,
+   "cong": 2,
+   "adherents": 772,
+   "pct": 1.7,
+   "rankAdherents": 471,
+   "rankPct": 215
+  },
+  {
+   "cbsa": "35700",
+   "name": "Nogales, AZ",
+   "micro": true,
+   "cong": 2,
+   "adherents": 752,
+   "pct": 1.6,
+   "rankAdherents": 472,
+   "rankPct": 239
+  },
+  {
+   "cbsa": "13620",
+   "name": "Berlin, NH",
+   "micro": true,
+   "cong": 2,
+   "adherents": 728,
+   "pct": 2.3,
+   "rankAdherents": 473,
+   "rankPct": 157
+  },
+  {
+   "cbsa": "44940",
+   "name": "Sumter, SC",
+   "micro": false,
+   "cong": 1,
+   "adherents": 616,
+   "pct": 0.5,
+   "rankAdherents": 474,
+   "rankPct": 794
+  },
+  {
+   "cbsa": "27460",
+   "name": "Jamestown-Dunkirk-Fredonia, NY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 614,
+   "pct": 0.5,
+   "rankAdherents": 475,
+   "rankPct": 780
+  },
+  {
+   "cbsa": "13220",
+   "name": "Beckley, WV",
+   "micro": false,
+   "cong": 1,
+   "adherents": 602,
+   "pct": 0.5,
+   "rankAdherents": 476,
+   "rankPct": 758
+  },
+  {
+   "cbsa": "48540",
+   "name": "Wheeling, WV-OH",
+   "micro": false,
+   "cong": 1,
+   "adherents": 602,
+   "pct": 0.4,
+   "rankAdherents": 477,
+   "rankPct": 802
+  },
+  {
+   "cbsa": "10780",
+   "name": "Alexandria, LA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 593,
+   "pct": 0.4,
+   "rankAdherents": 478,
+   "rankPct": 818
+  },
+  {
+   "cbsa": "26380",
+   "name": "Houma-Thibodaux, LA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 593,
+   "pct": 0.3,
+   "rankAdherents": 479,
+   "rankPct": 858
+  },
+  {
+   "cbsa": "29340",
+   "name": "Lake Charles, LA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 593,
+   "pct": 0.3,
+   "rankAdherents": 480,
+   "rankPct": 863
+  },
+  {
+   "cbsa": "26140",
+   "name": "Homosassa Springs, FL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 592,
+   "pct": 0.4,
+   "rankAdherents": 481,
+   "rankPct": 823
+  },
+  {
+   "cbsa": "39460",
+   "name": "Punta Gorda, FL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 592,
+   "pct": 0.3,
+   "rankAdherents": 482,
+   "rankPct": 853
+  },
+  {
+   "cbsa": "42680",
+   "name": "Sebastian-Vero Beach, FL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 592,
+   "pct": 0.4,
+   "rankAdherents": 483,
+   "rankPct": 834
+  },
+  {
+   "cbsa": "45540",
+   "name": "The Villages, FL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 592,
+   "pct": 0.5,
+   "rankAdherents": 484,
+   "rankPct": 791
+  },
+  {
+   "cbsa": "30340",
+   "name": "Lewiston-Auburn, ME",
+   "micro": false,
+   "cong": 1,
+   "adherents": 590,
+   "pct": 0.5,
+   "rankAdherents": 485,
+   "rankPct": 752
+  },
+  {
+   "cbsa": "10500",
+   "name": "Albany, GA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 564,
+   "pct": 0.4,
+   "rankAdherents": 486,
+   "rankPct": 828
+  },
+  {
+   "cbsa": "23500",
+   "name": "Gaffney, SC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 564,
+   "pct": 1,
+   "rankAdherents": 487,
+   "rankPct": 421
+  },
+  {
+   "cbsa": "23860",
+   "name": "Georgetown, SC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 564,
+   "pct": 0.9,
+   "rankAdherents": 488,
+   "rankPct": 510
+  },
+  {
+   "cbsa": "24940",
+   "name": "Greenwood, SC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 564,
+   "pct": 0.8,
+   "rankAdherents": 489,
+   "rankPct": 577
+  },
+  {
+   "cbsa": "36700",
+   "name": "Orangeburg, SC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 564,
+   "pct": 0.7,
+   "rankAdherents": 490,
+   "rankPct": 691
+  },
+  {
+   "cbsa": "42860",
+   "name": "Seneca, SC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 564,
+   "pct": 0.7,
+   "rankAdherents": 491,
+   "rankPct": 667
+  },
+  {
+   "cbsa": "12180",
+   "name": "Auburn, NY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 563,
+   "pct": 0.7,
+   "rankAdherents": 492,
+   "rankPct": 646
+  },
+  {
+   "cbsa": "12860",
+   "name": "Batavia, NY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 563,
+   "pct": 1,
+   "rankAdherents": 493,
+   "rankPct": 447
+  },
+  {
+   "cbsa": "21300",
+   "name": "Elmira, NY",
+   "micro": false,
+   "cong": 1,
+   "adherents": 563,
+   "pct": 0.7,
+   "rankAdherents": 494,
+   "rankPct": 692
+  },
+  {
+   "cbsa": "24100",
+   "name": "Gloversville, NY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 563,
+   "pct": 1.1,
+   "rankAdherents": 495,
+   "rankPct": 396
+  },
+  {
+   "cbsa": "26460",
+   "name": "Hudson, NY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 563,
+   "pct": 0.9,
+   "rankAdherents": 496,
+   "rankPct": 485
+  },
+  {
+   "cbsa": "31660",
+   "name": "Malone, NY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 563,
+   "pct": 1.2,
+   "rankAdherents": 497,
+   "rankPct": 351
+  },
+  {
+   "cbsa": "36580",
+   "name": "Oneonta, NY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 563,
+   "pct": 1,
+   "rankAdherents": 498,
+   "rankPct": 448
+  },
+  {
+   "cbsa": "38460",
+   "name": "Plattsburgh, NY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 563,
+   "pct": 0.7,
+   "rankAdherents": 499,
+   "rankPct": 674
+  },
+  {
+   "cbsa": "11500",
+   "name": "Anniston-Oxford, AL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 553,
+   "pct": 0.5,
+   "rankAdherents": 500,
+   "rankPct": 782
+  },
+  {
+   "cbsa": "19460",
+   "name": "Decatur, AL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 553,
+   "pct": 0.4,
+   "rankAdherents": 501,
+   "rankPct": 843
+  },
+  {
+   "cbsa": "22520",
+   "name": "Florence-Muscle Shoals, AL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 553,
+   "pct": 0.4,
+   "rankAdherents": 502,
+   "rankPct": 837
+  },
+  {
+   "cbsa": "37620",
+   "name": "Parkersburg-Vienna, WV",
+   "micro": false,
+   "cong": 1,
+   "adherents": 551,
+   "pct": 0.6,
+   "rankAdherents": 503,
+   "rankPct": 720
+  },
+  {
+   "cbsa": "12100",
+   "name": "Atlantic City-Hammonton, NJ",
+   "micro": false,
+   "cong": 1,
+   "adherents": 549,
+   "pct": 0.2,
+   "rankAdherents": 504,
+   "rankPct": 868
+  },
+  {
+   "cbsa": "36660",
+   "name": "Opelousas, LA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 543,
+   "pct": 0.7,
+   "rankAdherents": 505,
+   "rankPct": 699
+  },
+  {
+   "cbsa": "30940",
+   "name": "London, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 540,
+   "pct": 0.4,
+   "rankAdherents": 506,
+   "rankPct": 840
+  },
+  {
+   "cbsa": "36980",
+   "name": "Owensboro, KY",
+   "micro": false,
+   "cong": 1,
+   "adherents": 540,
+   "pct": 0.4,
+   "rankAdherents": 507,
+   "rankPct": 796
+  },
+  {
+   "cbsa": "26740",
+   "name": "Hutchinson, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 538,
+   "pct": 0.9,
+   "rankAdherents": 508,
+   "rankPct": 527
+  },
+  {
+   "cbsa": "41460",
+   "name": "Salina, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 538,
+   "pct": 0.9,
+   "rankAdherents": 509,
+   "rankPct": 502
+  },
+  {
+   "cbsa": "11620",
+   "name": "Ardmore, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 536,
+   "pct": 0.9,
+   "rankAdherents": 510,
+   "rankPct": 477
+  },
+  {
+   "cbsa": "34780",
+   "name": "Muskogee, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 536,
+   "pct": 0.8,
+   "rankAdherents": 511,
+   "rankPct": 583
+  },
+  {
+   "cbsa": "40580",
+   "name": "Rocky Mount, NC",
+   "micro": false,
+   "cong": 1,
+   "adherents": 535,
+   "pct": 0.4,
+   "rankAdherents": 512,
+   "rankPct": 833
+  },
+  {
+   "cbsa": "27860",
+   "name": "Jonesboro, AR",
+   "micro": false,
+   "cong": 1,
+   "adherents": 530,
+   "pct": 0.4,
+   "rankAdherents": 513,
+   "rankPct": 816
+  },
+  {
+   "cbsa": "11020",
+   "name": "Altoona, PA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.4,
+   "rankAdherents": 514,
+   "rankPct": 808
+  },
+  {
+   "cbsa": "13020",
+   "name": "Bay City, MI",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.5,
+   "rankAdherents": 515,
+   "rankPct": 772
+  },
+  {
+   "cbsa": "15660",
+   "name": "Calhoun, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.9,
+   "rankAdherents": 516,
+   "rankPct": 499
+  },
+  {
+   "cbsa": "20140",
+   "name": "Dublin, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.8,
+   "rankAdherents": 517,
+   "rankPct": 592
+  },
+  {
+   "cbsa": "25980",
+   "name": "Hinesville, GA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.6,
+   "rankAdherents": 518,
+   "rankPct": 709
+  },
+  {
+   "cbsa": "26090",
+   "name": "Holland, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.4,
+   "rankAdherents": 519,
+   "rankPct": 803
+  },
+  {
+   "cbsa": "27100",
+   "name": "Jackson, MI",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.3,
+   "rankAdherents": 520,
+   "rankPct": 852
+  },
+  {
+   "cbsa": "27780",
+   "name": "Johnstown, PA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.4,
+   "rankAdherents": 521,
+   "rankPct": 820
+  },
+  {
+   "cbsa": "30140",
+   "name": "Lebanon, PA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.4,
+   "rankAdherents": 522,
+   "rankPct": 839
+  },
+  {
+   "cbsa": "33300",
+   "name": "Milledgeville, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 1,
+   "rankAdherents": 523,
+   "rankPct": 431
+  },
+  {
+   "cbsa": "33780",
+   "name": "Monroe, MI",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.3,
+   "rankAdherents": 524,
+   "rankPct": 848
+  },
+  {
+   "cbsa": "34740",
+   "name": "Muskegon, MI",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.3,
+   "rankAdherents": 525,
+   "rankPct": 857
+  },
+  {
+   "cbsa": "39060",
+   "name": "Pottsville, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.4,
+   "rankAdherents": 526,
+   "rankPct": 838
+  },
+  {
+   "cbsa": "40660",
+   "name": "Rome, GA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.5,
+   "rankAdherents": 527,
+   "rankPct": 755
+  },
+  {
+   "cbsa": "40980",
+   "name": "Saginaw, MI",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.3,
+   "rankAdherents": 528,
+   "rankPct": 861
+  },
+  {
+   "cbsa": "41220",
+   "name": "St. Marys, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.9,
+   "rankAdherents": 529,
+   "rankPct": 458
+  },
+  {
+   "cbsa": "44340",
+   "name": "Statesboro, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.6,
+   "rankAdherents": 530,
+   "rankPct": 707
+  },
+  {
+   "cbsa": "48700",
+   "name": "Williamsport, PA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 517,
+   "pct": 0.5,
+   "rankAdherents": 531,
+   "rankPct": 792
+  },
+  {
+   "cbsa": "30620",
+   "name": "Lima, OH",
+   "micro": false,
+   "cong": 1,
+   "adherents": 513,
+   "pct": 0.5,
+   "rankAdherents": 532,
+   "rankPct": 769
+  },
+  {
+   "cbsa": "31900",
+   "name": "Mansfield, OH",
+   "micro": false,
+   "cong": 1,
+   "adherents": 513,
+   "pct": 0.4,
+   "rankAdherents": 533,
+   "rankPct": 812
+  },
+  {
+   "cbsa": "41400",
+   "name": "Salem, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 513,
+   "pct": 0.5,
+   "rankAdherents": 534,
+   "rankPct": 766
+  },
+  {
+   "cbsa": "44220",
+   "name": "Springfield, OH",
+   "micro": false,
+   "cong": 1,
+   "adherents": 513,
+   "pct": 0.4,
+   "rankAdherents": 535,
+   "rankPct": 830
+  },
+  {
+   "cbsa": "48260",
+   "name": "Weirton-Steubenville, WV-OH",
+   "micro": false,
+   "cong": 1,
+   "adherents": 513,
+   "pct": 0.4,
+   "rankAdherents": 536,
+   "rankPct": 800
+  },
+  {
+   "cbsa": "49300",
+   "name": "Wooster, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 513,
+   "pct": 0.4,
+   "rankAdherents": 537,
+   "rankPct": 799
+  },
+  {
+   "cbsa": "10700",
+   "name": "Albertville, AL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 507,
+   "pct": 0.5,
+   "rankAdherents": 538,
+   "rankPct": 760
+  },
+  {
+   "cbsa": "10760",
+   "name": "Alexander City, AL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 507,
+   "pct": 1,
+   "rankAdherents": 539,
+   "rankPct": 435
+  },
+  {
+   "cbsa": "18980",
+   "name": "Cullman, AL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 507,
+   "pct": 0.6,
+   "rankAdherents": 540,
+   "rankPct": 732
+  },
+  {
+   "cbsa": "21460",
+   "name": "Enterprise, AL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 507,
+   "pct": 0.9,
+   "rankAdherents": 541,
+   "rankPct": 455
+  },
+  {
+   "cbsa": "22840",
+   "name": "Fort Payne, AL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 507,
+   "pct": 0.7,
+   "rankAdherents": 542,
+   "rankPct": 672
+  },
+  {
+   "cbsa": "27530",
+   "name": "Jasper, AL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 507,
+   "pct": 0.8,
+   "rankAdherents": 543,
+   "rankPct": 611
+  },
+  {
+   "cbsa": "42460",
+   "name": "Scottsboro, AL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 507,
+   "pct": 1,
+   "rankAdherents": 544,
+   "rankPct": 446
+  },
+  {
+   "cbsa": "45180",
+   "name": "Talladega-Sylacauga, AL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 507,
+   "pct": 0.6,
+   "rankAdherents": 545,
+   "rankPct": 718
+  },
+  {
+   "cbsa": "17420",
+   "name": "Cleveland, TN",
+   "micro": false,
+   "cong": 1,
+   "adherents": 506,
+   "pct": 0.4,
+   "rankAdherents": 546,
+   "rankPct": 814
+  },
+  {
+   "cbsa": "34100",
+   "name": "Morristown, TN",
+   "micro": false,
+   "cong": 1,
+   "adherents": 506,
+   "pct": 0.4,
+   "rankAdherents": 547,
+   "rankPct": 841
+  },
+  {
+   "cbsa": "16060",
+   "name": "Carbondale-Marion, IL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 504,
+   "pct": 0.4,
+   "rankAdherents": 548,
+   "rankPct": 829
+  },
+  {
+   "cbsa": "28100",
+   "name": "Kankakee, IL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 504,
+   "pct": 0.5,
+   "rankAdherents": 549,
+   "rankPct": 787
+  },
+  {
+   "cbsa": "36837",
+   "name": "Ottawa, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 504,
+   "pct": 0.3,
+   "rankAdherents": 550,
+   "rankPct": 847
+  },
+  {
+   "cbsa": "36140",
+   "name": "Ocean City, NJ",
+   "micro": false,
+   "cong": 1,
+   "adherents": 503,
+   "pct": 0.5,
+   "rankAdherents": 551,
+   "rankPct": 754
+  },
+  {
+   "cbsa": "19220",
+   "name": "Danville, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 495,
+   "pct": 0.9,
+   "rankAdherents": 552,
+   "rankPct": 496
+  },
+  {
+   "cbsa": "23180",
+   "name": "Frankfort, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 495,
+   "pct": 0.7,
+   "rankAdherents": 553,
+   "rankPct": 702
+  },
+  {
+   "cbsa": "37140",
+   "name": "Paducah, KY-IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 495,
+   "pct": 0.5,
+   "rankAdherents": 554,
+   "rankPct": 770
+  },
+  {
+   "cbsa": "43700",
+   "name": "Somerset, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 495,
+   "pct": 0.8,
+   "rankAdherents": 555,
+   "rankPct": 627
+  },
+  {
+   "cbsa": "10620",
+   "name": "Albemarle, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 490,
+   "pct": 0.8,
+   "rankAdherents": 556,
+   "rankPct": 604
+  },
+  {
+   "cbsa": "14380",
+   "name": "Boone, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 490,
+   "pct": 0.9,
+   "rankAdherents": 557,
+   "rankPct": 493
+  },
+  {
+   "cbsa": "19000",
+   "name": "Cullowhee, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 490,
+   "pct": 0.9,
+   "rankAdherents": 558,
+   "rankPct": 541
+  },
+  {
+   "cbsa": "21020",
+   "name": "Elizabeth City, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 490,
+   "pct": 0.9,
+   "rankAdherents": 559,
+   "rankPct": 484
+  },
+  {
+   "cbsa": "22580",
+   "name": "Forest City, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 490,
+   "pct": 0.8,
+   "rankAdherents": 560,
+   "rankPct": 629
+  },
+  {
+   "cbsa": "35900",
+   "name": "North Wilkesboro, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 490,
+   "pct": 0.7,
+   "rankAdherents": 561,
+   "rankPct": 641
+  },
+  {
+   "cbsa": "40260",
+   "name": "Roanoke Rapids, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 490,
+   "pct": 0.7,
+   "rankAdherents": 562,
+   "rankPct": 642
+  },
+  {
+   "cbsa": "43140",
+   "name": "Shelby, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 490,
+   "pct": 0.5,
+   "rankAdherents": 563,
+   "rankPct": 773
+  },
+  {
+   "cbsa": "48980",
+   "name": "Wilson, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 490,
+   "pct": 0.6,
+   "rankAdherents": 564,
+   "rankPct": 716
+  },
+  {
+   "cbsa": "31860",
+   "name": "Mankato, MN",
+   "micro": false,
+   "cong": 1,
+   "adherents": 487,
+   "pct": 0.5,
+   "rankAdherents": 565,
+   "rankPct": 786
+  },
+  {
+   "cbsa": "26300",
+   "name": "Hot Springs, AR",
+   "micro": false,
+   "cong": 1,
+   "adherents": 486,
+   "pct": 0.5,
+   "rankAdherents": 566,
+   "rankPct": 776
+  },
+  {
+   "cbsa": "38220",
+   "name": "Pine Bluff, AR",
+   "micro": false,
+   "cong": 1,
+   "adherents": 486,
+   "pct": 0.6,
+   "rankAdherents": 567,
+   "rankPct": 742
+  },
+  {
+   "cbsa": "24260",
+   "name": "Grand Island, NE",
+   "micro": false,
+   "cong": 1,
+   "adherents": 481,
+   "pct": 0.6,
+   "rankAdherents": 568,
+   "rankPct": 712
+  },
+  {
+   "cbsa": "28260",
+   "name": "Kearney, NE",
+   "micro": true,
+   "cong": 1,
+   "adherents": 481,
+   "pct": 0.8,
+   "rankAdherents": 569,
+   "rankPct": 547
+  },
+  {
+   "cbsa": "18060",
+   "name": "Columbus, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 478,
+   "pct": 0.8,
+   "rankAdherents": 570,
+   "rankPct": 579
+  },
+  {
+   "cbsa": "29860",
+   "name": "Laurel, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 478,
+   "pct": 0.6,
+   "rankAdherents": 571,
+   "rankPct": 736
+  },
+  {
+   "cbsa": "32940",
+   "name": "Meridian, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 478,
+   "pct": 0.5,
+   "rankAdherents": 572,
+   "rankPct": 774
+  },
+  {
+   "cbsa": "37060",
+   "name": "Oxford, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 478,
+   "pct": 0.9,
+   "rankAdherents": 573,
+   "rankPct": 540
+  },
+  {
+   "cbsa": "38100",
+   "name": "Picayune, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 478,
+   "pct": 0.9,
+   "rankAdherents": 574,
+   "rankPct": 545
+  },
+  {
+   "cbsa": "44260",
+   "name": "Starkville, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 478,
+   "pct": 0.8,
+   "rankAdherents": 575,
+   "rankPct": 613
+  },
+  {
+   "cbsa": "38340",
+   "name": "Pittsfield, MA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 476,
+   "pct": 0.4,
+   "rankAdherents": 576,
+   "rankPct": 835
+  },
+  {
+   "cbsa": "10300",
+   "name": "Adrian, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.5,
+   "rankAdherents": 577,
+   "rankPct": 781
+  },
+  {
+   "cbsa": "14100",
+   "name": "Bloomsburg-Berwick, PA",
+   "micro": false,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.6,
+   "rankAdherents": 578,
+   "rankPct": 735
+  },
+  {
+   "cbsa": "20180",
+   "name": "DuBois, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.6,
+   "rankAdherents": 579,
+   "rankPct": 728
+  },
+  {
+   "cbsa": "26860",
+   "name": "Indiana, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.6,
+   "rankAdherents": 580,
+   "rankPct": 737
+  },
+  {
+   "cbsa": "31940",
+   "name": "Marinette, WI-MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.7,
+   "rankAdherents": 581,
+   "rankPct": 656
+  },
+  {
+   "cbsa": "32100",
+   "name": "Marquette, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.7,
+   "rankAdherents": 582,
+   "rankPct": 666
+  },
+  {
+   "cbsa": "34380",
+   "name": "Mount Pleasant, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.7,
+   "rankAdherents": 583,
+   "rankPct": 649
+  },
+  {
+   "cbsa": "35260",
+   "name": "New Castle, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.6,
+   "rankAdherents": 584,
+   "rankPct": 745
+  },
+  {
+   "cbsa": "36340",
+   "name": "Oil City, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.9,
+   "rankAdherents": 585,
+   "rankPct": 462
+  },
+  {
+   "cbsa": "42380",
+   "name": "Sayre, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.8,
+   "rankAdherents": 586,
+   "rankPct": 596
+  },
+  {
+   "cbsa": "43740",
+   "name": "Somerset, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.6,
+   "rankAdherents": 587,
+   "rankPct": 705
+  },
+  {
+   "cbsa": "44780",
+   "name": "Sturgis, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.8,
+   "rankAdherents": 588,
+   "rankPct": 609
+  },
+  {
+   "cbsa": "44980",
+   "name": "Sunbury, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 474,
+   "pct": 0.5,
+   "rankAdherents": 589,
+   "rankPct": 761
+  },
+  {
+   "cbsa": "11740",
+   "name": "Ashland, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.9,
+   "rankAdherents": 590,
+   "rankPct": 500
+  },
+  {
+   "cbsa": "11780",
+   "name": "Ashtabula, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.5,
+   "rankAdherents": 591,
+   "rankPct": 777
+  },
+  {
+   "cbsa": "11900",
+   "name": "Athens, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.8,
+   "rankAdherents": 592,
+   "rankPct": 631
+  },
+  {
+   "cbsa": "17060",
+   "name": "Chillicothe, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.6,
+   "rankAdherents": 593,
+   "rankPct": 723
+  },
+  {
+   "cbsa": "22300",
+   "name": "Findlay, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.6,
+   "rankAdherents": 594,
+   "rankPct": 710
+  },
+  {
+   "cbsa": "23380",
+   "name": "Fremont, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.8,
+   "rankAdherents": 595,
+   "rankPct": 587
+  },
+  {
+   "cbsa": "24820",
+   "name": "Greenville, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.9,
+   "rankAdherents": 596,
+   "rankPct": 489
+  },
+  {
+   "cbsa": "31930",
+   "name": "Marietta, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.8,
+   "rankAdherents": 597,
+   "rankPct": 599
+  },
+  {
+   "cbsa": "32020",
+   "name": "Marion, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.7,
+   "rankAdherents": 598,
+   "rankPct": 661
+  },
+  {
+   "cbsa": "34540",
+   "name": "Mount Vernon, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.8,
+   "rankAdherents": 599,
+   "rankPct": 636
+  },
+  {
+   "cbsa": "35420",
+   "name": "New Philadelphia-Dover, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.5,
+   "rankAdherents": 600,
+   "rankPct": 764
+  },
+  {
+   "cbsa": "38580",
+   "name": "Point Pleasant, WV-OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.9,
+   "rankAdherents": 601,
+   "rankPct": 536
+  },
+  {
+   "cbsa": "39020",
+   "name": "Portsmouth, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.6,
+   "rankAdherents": 602,
+   "rankPct": 708
+  },
+  {
+   "cbsa": "41780",
+   "name": "Sandusky, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.6,
+   "rankAdherents": 603,
+   "rankPct": 713
+  },
+  {
+   "cbsa": "45660",
+   "name": "Tiffin, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.9,
+   "rankAdherents": 604,
+   "rankPct": 544
+  },
+  {
+   "cbsa": "49780",
+   "name": "Zanesville, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 471,
+   "pct": 0.5,
+   "rankAdherents": 605,
+   "rankPct": 746
+  },
+  {
+   "cbsa": "11940",
+   "name": "Athens, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 463,
+   "pct": 0.9,
+   "rankAdherents": 606,
+   "rankPct": 528
+  },
+  {
+   "cbsa": "20740",
+   "name": "Eau Claire, WI",
+   "micro": false,
+   "cong": 1,
+   "adherents": 463,
+   "pct": 0.3,
+   "rankAdherents": 607,
+   "rankPct": 862
+  },
+  {
+   "cbsa": "22540",
+   "name": "Fond du Lac, WI",
+   "micro": false,
+   "cong": 1,
+   "adherents": 463,
+   "pct": 0.4,
+   "rankAdherents": 608,
+   "rankPct": 795
+  },
+  {
+   "cbsa": "24620",
+   "name": "Greeneville, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 463,
+   "pct": 0.7,
+   "rankAdherents": 609,
+   "rankPct": 698
+  },
+  {
+   "cbsa": "29100",
+   "name": "La Crosse-Onalaska, WI-MN",
+   "micro": false,
+   "cong": 1,
+   "adherents": 463,
+   "pct": 0.3,
+   "rankAdherents": 610,
+   "rankPct": 850
+  },
+  {
+   "cbsa": "39540",
+   "name": "Racine, WI",
+   "micro": false,
+   "cong": 1,
+   "adherents": 463,
+   "pct": 0.2,
+   "rankAdherents": 611,
+   "rankPct": 867
+  },
+  {
+   "cbsa": "42940",
+   "name": "Sevierville, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 463,
+   "pct": 0.5,
+   "rankAdherents": 612,
+   "rankPct": 785
+  },
+  {
+   "cbsa": "43100",
+   "name": "Sheboygan, WI",
+   "micro": false,
+   "cong": 1,
+   "adherents": 463,
+   "pct": 0.4,
+   "rankAdherents": 613,
+   "rankPct": 817
+  },
+  {
+   "cbsa": "48140",
+   "name": "Wausau-Weston, WI",
+   "micro": false,
+   "cong": 1,
+   "adherents": 463,
+   "pct": 0.3,
+   "rankAdherents": 614,
+   "rankPct": 859
+  },
+  {
+   "cbsa": "48580",
+   "name": "Whitewater, WI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 463,
+   "pct": 0.4,
+   "rankAdherents": 615,
+   "rankPct": 801
+  },
+  {
+   "cbsa": "16020",
+   "name": "Cape Girardeau, MO-IL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 462,
+   "pct": 0.5,
+   "rankAdherents": 616,
+   "rankPct": 784
+  },
+  {
+   "cbsa": "16660",
+   "name": "Charleston-Mattoon, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 462,
+   "pct": 0.8,
+   "rankAdherents": 617,
+   "rankPct": 584
+  },
+  {
+   "cbsa": "19180",
+   "name": "Danville, IL",
+   "micro": false,
+   "cong": 1,
+   "adherents": 462,
+   "pct": 0.6,
+   "rankAdherents": 618,
+   "rankPct": 714
+  },
+  {
+   "cbsa": "22100",
+   "name": "Farmington, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 462,
+   "pct": 0.7,
+   "rankAdherents": 619,
+   "rankPct": 680
+  },
+  {
+   "cbsa": "38740",
+   "name": "Poplar Bluff, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 462,
+   "pct": 0.9,
+   "rankAdherents": 620,
+   "rankPct": 521
+  },
+  {
+   "cbsa": "40300",
+   "name": "Rochelle, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 462,
+   "pct": 0.9,
+   "rankAdherents": 621,
+   "rankPct": 504
+  },
+  {
+   "cbsa": "44580",
+   "name": "Sterling, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 462,
+   "pct": 0.8,
+   "rankAdherents": 622,
+   "rankPct": 559
+  },
+  {
+   "cbsa": "47660",
+   "name": "Warrensburg, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 462,
+   "pct": 0.9,
+   "rankAdherents": 623,
+   "rankPct": 543
+  },
+  {
+   "cbsa": "27540",
+   "name": "Jasper, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 461,
+   "pct": 0.8,
+   "rankAdherents": 624,
+   "rankPct": 564
+  },
+  {
+   "cbsa": "29020",
+   "name": "Kokomo, IN",
+   "micro": false,
+   "cong": 1,
+   "adherents": 461,
+   "pct": 0.6,
+   "rankAdherents": 625,
+   "rankPct": 744
+  },
+  {
+   "cbsa": "31980",
+   "name": "Marion, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 461,
+   "pct": 0.7,
+   "rankAdherents": 626,
+   "rankPct": 679
+  },
+  {
+   "cbsa": "39980",
+   "name": "Richmond, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 461,
+   "pct": 0.7,
+   "rankAdherents": 627,
+   "rankPct": 678
+  },
+  {
+   "cbsa": "47700",
+   "name": "Warsaw, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 461,
+   "pct": 0.6,
+   "rankAdherents": 628,
+   "rankPct": 734
+  },
+  {
+   "cbsa": "40860",
+   "name": "Rutland, VT",
+   "micro": true,
+   "cong": 1,
+   "adherents": 458,
+   "pct": 0.8,
+   "rankAdherents": 629,
+   "rankPct": 630
+  },
+  {
+   "cbsa": "10860",
+   "name": "Alice, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 453,
+   "pct": 0.9,
+   "rankAdherents": 630,
+   "rankPct": 470
+  },
+  {
+   "cbsa": "11980",
+   "name": "Athens, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 453,
+   "pct": 0.6,
+   "rankAdherents": 631,
+   "rankPct": 743
+  },
+  {
+   "cbsa": "18620",
+   "name": "Corsicana, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 453,
+   "pct": 0.9,
+   "rankAdherents": 632,
+   "rankPct": 538
+  },
+  {
+   "cbsa": "28500",
+   "name": "Kerrville, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 453,
+   "pct": 0.9,
+   "rankAdherents": 633,
+   "rankPct": 537
+  },
+  {
+   "cbsa": "37300",
+   "name": "Palestine, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 453,
+   "pct": 0.8,
+   "rankAdherents": 634,
+   "rankPct": 606
+  },
+  {
+   "cbsa": "47020",
+   "name": "Victoria, TX",
+   "micro": false,
+   "cong": 1,
+   "adherents": 453,
+   "pct": 0.5,
+   "rankAdherents": 635,
+   "rankPct": 790
+  },
+  {
+   "cbsa": "32300",
+   "name": "Martinsville, VA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 451,
+   "pct": 0.7,
+   "rankAdherents": 636,
+   "rankPct": 677
+  },
+  {
+   "cbsa": "45860",
+   "name": "Torrington, CT",
+   "micro": true,
+   "cong": 1,
+   "adherents": 451,
+   "pct": 0.2,
+   "rankAdherents": 637,
+   "rankPct": 866
+  },
+  {
+   "cbsa": "14660",
+   "name": "Brainerd, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 446,
+   "pct": 0.5,
+   "rankAdherents": 638,
+   "rankPct": 789
+  },
+  {
+   "cbsa": "49100",
+   "name": "Winona, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 446,
+   "pct": 0.9,
+   "rankAdherents": 639,
+   "rankPct": 501
+  },
+  {
+   "cbsa": "12660",
+   "name": "Baraboo, WI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 424,
+   "pct": 0.6,
+   "rankAdherents": 640,
+   "rankPct": 704
+  },
+  {
+   "cbsa": "13180",
+   "name": "Beaver Dam, WI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 424,
+   "pct": 0.5,
+   "rankAdherents": 641,
+   "rankPct": 783
+  },
+  {
+   "cbsa": "31820",
+   "name": "Manitowoc, WI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 424,
+   "pct": 0.5,
+   "rankAdherents": 642,
+   "rankPct": 759
+  },
+  {
+   "cbsa": "38420",
+   "name": "Platteville, WI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 424,
+   "pct": 0.8,
+   "rankAdherents": 643,
+   "rankPct": 573
+  },
+  {
+   "cbsa": "44620",
+   "name": "Stevens Point, WI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 424,
+   "pct": 0.6,
+   "rankAdherents": 644,
+   "rankPct": 726
+  },
+  {
+   "cbsa": "48020",
+   "name": "Watertown-Fort Atkinson, WI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 424,
+   "pct": 0.5,
+   "rankAdherents": 645,
+   "rankPct": 771
+  },
+  {
+   "cbsa": "35140",
+   "name": "Newberry, SC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 411,
+   "pct": 1.1,
+   "rankAdherents": 646,
+   "rankPct": 386
+  },
+  {
+   "cbsa": "46420",
+   "name": "Union, SC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 411,
+   "pct": 1.5,
+   "rankAdherents": 647,
+   "rankPct": 257
+  },
+  {
+   "cbsa": "18660",
+   "name": "Cortland, NY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 410,
+   "pct": 0.9,
+   "rankAdherents": 648,
+   "rankPct": 519
+  },
+  {
+   "cbsa": "42900",
+   "name": "Seneca Falls, NY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 410,
+   "pct": 1.2,
+   "rankAdherents": 649,
+   "rankPct": 341
+  },
+  {
+   "cbsa": "21180",
+   "name": "Elkins, WV",
+   "micro": true,
+   "cong": 1,
+   "adherents": 401,
+   "pct": 1.4,
+   "rankAdherents": 650,
+   "rankPct": 276
+  },
+  {
+   "cbsa": "34350",
+   "name": "Mount Gay-Shamrock, WV",
+   "micro": true,
+   "cong": 1,
+   "adherents": 401,
+   "pct": 1.2,
+   "rankAdherents": 651,
+   "rankPct": 333
+  },
+  {
+   "cbsa": "28300",
+   "name": "Keene, NH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 400,
+   "pct": 0.5,
+   "rankAdherents": 652,
+   "rankPct": 757
+  },
+  {
+   "cbsa": "29060",
+   "name": "Laconia, NH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 400,
+   "pct": 0.6,
+   "rankAdherents": 653,
+   "rankPct": 711
+  },
+  {
+   "cbsa": "11580",
+   "name": "Arcadia, FL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 395,
+   "pct": 1.2,
+   "rankAdherents": 654,
+   "rankPct": 354
+  },
+  {
+   "cbsa": "14220",
+   "name": "Bogalusa, LA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 395,
+   "pct": 0.9,
+   "rankAdherents": 655,
+   "rankPct": 529
+  },
+  {
+   "cbsa": "27660",
+   "name": "Jennings, LA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 395,
+   "pct": 1.2,
+   "rankAdherents": 656,
+   "rankPct": 336
+  },
+  {
+   "cbsa": "33380",
+   "name": "Minden, LA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 395,
+   "pct": 1.1,
+   "rankAdherents": 657,
+   "rankPct": 392
+  },
+  {
+   "cbsa": "34020",
+   "name": "Morgan City, LA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 395,
+   "pct": 0.8,
+   "rankAdherents": 658,
+   "rankPct": 589
+  },
+  {
+   "cbsa": "35060",
+   "name": "Natchitoches, LA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 395,
+   "pct": 1.1,
+   "rankAdherents": 659,
+   "rankPct": 399
+  },
+  {
+   "cbsa": "36380",
+   "name": "Okeechobee, FL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 395,
+   "pct": 1,
+   "rankAdherents": 660,
+   "rankPct": 428
+  },
+  {
+   "cbsa": "40820",
+   "name": "Ruston, LA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 395,
+   "pct": 0.8,
+   "rankAdherents": 661,
+   "rankPct": 574
+  },
+  {
+   "cbsa": "48100",
+   "name": "Wauchula, FL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 395,
+   "pct": 1.6,
+   "rankAdherents": 662,
+   "rankPct": 244
+  },
+  {
+   "cbsa": "11860",
+   "name": "Atchison, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 2.4,
+   "rankAdherents": 663,
+   "rankPct": 150
+  },
+  {
+   "cbsa": "17700",
+   "name": "Coffeyville, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 1.2,
+   "rankAdherents": 664,
+   "rankPct": 328
+  },
+  {
+   "cbsa": "19980",
+   "name": "Dodge City, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 1.1,
+   "rankAdherents": 665,
+   "rankPct": 366
+  },
+  {
+   "cbsa": "21380",
+   "name": "Emporia, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 1.1,
+   "rankAdherents": 666,
+   "rankPct": 373
+  },
+  {
+   "cbsa": "23780",
+   "name": "Garden City, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 0.9,
+   "rankAdherents": 667,
+   "rankPct": 480
+  },
+  {
+   "cbsa": "24460",
+   "name": "Great Bend, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 1.5,
+   "rankAdherents": 668,
+   "rankPct": 252
+  },
+  {
+   "cbsa": "25700",
+   "name": "Hays, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 1.4,
+   "rankAdherents": 669,
+   "rankPct": 301
+  },
+  {
+   "cbsa": "30580",
+   "name": "Liberal, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 1.8,
+   "rankAdherents": 670,
+   "rankPct": 203
+  },
+  {
+   "cbsa": "36840",
+   "name": "Ottawa, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 1.5,
+   "rankAdherents": 671,
+   "rankPct": 261
+  },
+  {
+   "cbsa": "37660",
+   "name": "Parsons, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 1.9,
+   "rankAdherents": 672,
+   "rankPct": 186
+  },
+  {
+   "cbsa": "38260",
+   "name": "Pittsburg, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 1,
+   "rankAdherents": 673,
+   "rankPct": 420
+  },
+  {
+   "cbsa": "49060",
+   "name": "Winfield, KS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 391,
+   "pct": 1.1,
+   "rankAdherents": 674,
+   "rankPct": 370
+  },
+  {
+   "cbsa": "10220",
+   "name": "Ada, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 390,
+   "pct": 1,
+   "rankAdherents": 675,
+   "rankPct": 416
+  },
+  {
+   "cbsa": "11060",
+   "name": "Altus, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 390,
+   "pct": 1.6,
+   "rankAdherents": 676,
+   "rankPct": 242
+  },
+  {
+   "cbsa": "20340",
+   "name": "Duncan, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 390,
+   "pct": 0.9,
+   "rankAdherents": 677,
+   "rankPct": 487
+  },
+  {
+   "cbsa": "20460",
+   "name": "Durant, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 390,
+   "pct": 0.8,
+   "rankAdherents": 678,
+   "rankPct": 548
+  },
+  {
+   "cbsa": "25100",
+   "name": "Guymon, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 390,
+   "pct": 1.8,
+   "rankAdherents": 679,
+   "rankPct": 197
+  },
+  {
+   "cbsa": "32540",
+   "name": "McAlester, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 390,
+   "pct": 0.9,
+   "rankAdherents": 680,
+   "rankPct": 506
+  },
+  {
+   "cbsa": "33060",
+   "name": "Miami, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 390,
+   "pct": 1.3,
+   "rankAdherents": 681,
+   "rankPct": 313
+  },
+  {
+   "cbsa": "45140",
+   "name": "Tahlequah, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 390,
+   "pct": 0.8,
+   "rankAdherents": 682,
+   "rankPct": 560
+  },
+  {
+   "cbsa": "48220",
+   "name": "Weatherford, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 390,
+   "pct": 1.4,
+   "rankAdherents": 683,
+   "rankPct": 296
+  },
+  {
+   "cbsa": "49260",
+   "name": "Woodward, OK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 390,
+   "pct": 1.6,
+   "rankAdherents": 684,
+   "rankPct": 229
+  },
+  {
+   "cbsa": "18860",
+   "name": "Crescent City, CA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 388,
+   "pct": 1.4,
+   "rankAdherents": 685,
+   "rankPct": 289
+  },
+  {
+   "cbsa": "11140",
+   "name": "Americus, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 1.1,
+   "rankAdherents": 686,
+   "rankPct": 382
+  },
+  {
+   "cbsa": "12460",
+   "name": "Bainbridge, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 1.3,
+   "rankAdherents": 687,
+   "rankPct": 315
+  },
+  {
+   "cbsa": "16340",
+   "name": "Cedartown, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 0.9,
+   "rankAdherents": 688,
+   "rankPct": 517
+  },
+  {
+   "cbsa": "18380",
+   "name": "Cordele, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 1.9,
+   "rankAdherents": 689,
+   "rankPct": 191
+  },
+  {
+   "cbsa": "18460",
+   "name": "Cornelia, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 0.8,
+   "rankAdherents": 690,
+   "rankPct": 572
+  },
+  {
+   "cbsa": "27700",
+   "name": "Jesup, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 1.2,
+   "rankAdherents": 691,
+   "rankPct": 326
+  },
+  {
+   "cbsa": "34220",
+   "name": "Moultrie, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 0.8,
+   "rankAdherents": 692,
+   "rankPct": 569
+  },
+  {
+   "cbsa": "45580",
+   "name": "Thomaston, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 1.4,
+   "rankAdherents": 693,
+   "rankPct": 299
+  },
+  {
+   "cbsa": "45620",
+   "name": "Thomasville, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 0.8,
+   "rankAdherents": 694,
+   "rankPct": 567
+  },
+  {
+   "cbsa": "45700",
+   "name": "Tifton, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 0.9,
+   "rankAdherents": 695,
+   "rankPct": 488
+  },
+  {
+   "cbsa": "47080",
+   "name": "Vidalia, GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 376,
+   "pct": 1.1,
+   "rankAdherents": 696,
+   "rankPct": 397
+  },
+  {
+   "cbsa": "10100",
+   "name": "Aberdeen, SD",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 0.9,
+   "rankAdherents": 697,
+   "rankPct": 523
+  },
+  {
+   "cbsa": "15100",
+   "name": "Brookings, SD",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 1.1,
+   "rankAdherents": 698,
+   "rankPct": 389
+  },
+  {
+   "cbsa": "21640",
+   "name": "Eufaula, AL-GA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 1.3,
+   "rankAdherents": 699,
+   "rankPct": 304
+  },
+  {
+   "cbsa": "26700",
+   "name": "Huron, SD",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 1.8,
+   "rankAdherents": 700,
+   "rankPct": 206
+  },
+  {
+   "cbsa": "33580",
+   "name": "Mitchell, SD",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 1.6,
+   "rankAdherents": 701,
+   "rankPct": 240
+  },
+  {
+   "cbsa": "38180",
+   "name": "Pierre, SD",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 1.8,
+   "rankAdherents": 702,
+   "rankPct": 204
+  },
+  {
+   "cbsa": "42820",
+   "name": "Selma, AL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 1,
+   "rankAdherents": 703,
+   "rankPct": 450
+  },
+  {
+   "cbsa": "45980",
+   "name": "Troy, AL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 1.1,
+   "rankAdherents": 704,
+   "rankPct": 378
+  },
+  {
+   "cbsa": "46820",
+   "name": "Vermillion, SD",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 2.5,
+   "rankAdherents": 705,
+   "rankPct": 144
+  },
+  {
+   "cbsa": "47980",
+   "name": "Watertown, SD",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 1.1,
+   "rankAdherents": 706,
+   "rankPct": 391
+  },
+  {
+   "cbsa": "49460",
+   "name": "Yankton, SD",
+   "micro": true,
+   "cong": 1,
+   "adherents": 369,
+   "pct": 1.6,
+   "rankAdherents": 707,
+   "rankPct": 237
+  },
+  {
+   "cbsa": "27420",
+   "name": "Jamestown, ND",
+   "micro": true,
+   "cong": 1,
+   "adherents": 368,
+   "pct": 1.7,
+   "rankAdherents": 708,
+   "rankPct": 216
+  },
+  {
+   "cbsa": "47420",
+   "name": "Wahpeton, ND-MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 368,
+   "pct": 1.6,
+   "rankAdherents": 709,
+   "rankPct": 233
+  },
+  {
+   "cbsa": "12680",
+   "name": "Bardstown, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 360,
+   "pct": 0.8,
+   "rankAdherents": 710,
+   "rankPct": 620
+  },
+  {
+   "cbsa": "15820",
+   "name": "Campbellsville, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 360,
+   "pct": 1,
+   "rankAdherents": 711,
+   "rankPct": 441
+  },
+  {
+   "cbsa": "16420",
+   "name": "Central City, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 360,
+   "pct": 1.2,
+   "rankAdherents": 712,
+   "rankPct": 353
+  },
+  {
+   "cbsa": "31580",
+   "name": "Madisonville, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 360,
+   "pct": 0.8,
+   "rankAdherents": 713,
+   "rankPct": 593
+  },
+  {
+   "cbsa": "32460",
+   "name": "Mayfield, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 360,
+   "pct": 1,
+   "rankAdherents": 714,
+   "rankPct": 433
+  },
+  {
+   "cbsa": "32500",
+   "name": "Maysville, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 360,
+   "pct": 2.1,
+   "rankAdherents": 715,
+   "rankPct": 173
+  },
+  {
+   "cbsa": "34460",
+   "name": "Mount Sterling, KY",
+   "micro": true,
+   "cong": 1,
+   "adherents": 360,
+   "pct": 0.8,
+   "rankAdherents": 716,
+   "rankPct": 622
+  },
+  {
+   "cbsa": "29780",
+   "name": "Las Vegas, NM",
+   "micro": true,
+   "cong": 1,
+   "adherents": 359,
+   "pct": 1.1,
+   "rankAdherents": 717,
+   "rankPct": 363
+  },
+  {
+   "cbsa": "40760",
+   "name": "Ruidoso, NM",
+   "micro": true,
+   "cong": 1,
+   "adherents": 359,
+   "pct": 1.8,
+   "rankAdherents": 718,
+   "rankPct": 207
+  },
+  {
+   "cbsa": "14820",
+   "name": "Brevard, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 357,
+   "pct": 1.1,
+   "rankAdherents": 719,
+   "rankPct": 387
+  },
+  {
+   "cbsa": "25780",
+   "name": "Henderson, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 357,
+   "pct": 0.8,
+   "rankAdherents": 720,
+   "rankPct": 552
+  },
+  {
+   "cbsa": "28620",
+   "name": "Kill Devil Hills, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 357,
+   "pct": 1,
+   "rankAdherents": 721,
+   "rankPct": 443
+  },
+  {
+   "cbsa": "29900",
+   "name": "Laurinburg, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 357,
+   "pct": 1,
+   "rankAdherents": 722,
+   "rankPct": 406
+  },
+  {
+   "cbsa": "32000",
+   "name": "Marion, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 357,
+   "pct": 0.8,
+   "rankAdherents": 723,
+   "rankPct": 586
+  },
+  {
+   "cbsa": "40460",
+   "name": "Rockingham, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 357,
+   "pct": 0.8,
+   "rankAdherents": 724,
+   "rankPct": 558
+  },
+  {
+   "cbsa": "47820",
+   "name": "Washington, NC",
+   "micro": true,
+   "cong": 1,
+   "adherents": 357,
+   "pct": 0.8,
+   "rankAdherents": 725,
+   "rankPct": 588
+  },
+  {
+   "cbsa": "11660",
+   "name": "Arkadelphia, AR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 354,
+   "pct": 1.7,
+   "rankAdherents": 726,
+   "rankPct": 222
+  },
+  {
+   "cbsa": "14180",
+   "name": "Blytheville, AR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 354,
+   "pct": 0.9,
+   "rankAdherents": 727,
+   "rankPct": 526
+  },
+  {
+   "cbsa": "15780",
+   "name": "Camden, AR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 354,
+   "pct": 1.3,
+   "rankAdherents": 728,
+   "rankPct": 312
+  },
+  {
+   "cbsa": "20980",
+   "name": "El Dorado, AR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 354,
+   "pct": 0.9,
+   "rankAdherents": 729,
+   "rankPct": 492
+  },
+  {
+   "cbsa": "25460",
+   "name": "Harrison, AR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 354,
+   "pct": 0.8,
+   "rankAdherents": 730,
+   "rankPct": 591
+  },
+  {
+   "cbsa": "25760",
+   "name": "Helena-West Helena, AR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 354,
+   "pct": 2.1,
+   "rankAdherents": 731,
+   "rankPct": 170
+  },
+  {
+   "cbsa": "26260",
+   "name": "Hope, AR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 354,
+   "pct": 1.2,
+   "rankAdherents": 732,
+   "rankPct": 325
+  },
+  {
+   "cbsa": "31620",
+   "name": "Magnolia, AR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 354,
+   "pct": 1.6,
+   "rankAdherents": 733,
+   "rankPct": 248
+  },
+  {
+   "cbsa": "34260",
+   "name": "Mountain Home, AR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 354,
+   "pct": 0.9,
+   "rankAdherents": 734,
+   "rankPct": 546
+  },
+  {
+   "cbsa": "37500",
+   "name": "Paragould, AR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 354,
+   "pct": 0.8,
+   "rankAdherents": 735,
+   "rankPct": 615
+  },
+  {
+   "cbsa": "13100",
+   "name": "Beatrice, NE",
+   "micro": true,
+   "cong": 1,
+   "adherents": 350,
+   "pct": 1.6,
+   "rankAdherents": 736,
+   "rankPct": 228
+  },
+  {
+   "cbsa": "18100",
+   "name": "Columbus, NE",
+   "micro": true,
+   "cong": 1,
+   "adherents": 350,
+   "pct": 1,
+   "rankAdherents": 737,
+   "rankPct": 417
+  },
+  {
+   "cbsa": "23340",
+   "name": "Fremont, NE",
+   "micro": true,
+   "cong": 1,
+   "adherents": 350,
+   "pct": 0.9,
+   "rankAdherents": 738,
+   "rankPct": 461
+  },
+  {
+   "cbsa": "25580",
+   "name": "Hastings, NE",
+   "micro": true,
+   "cong": 1,
+   "adherents": 350,
+   "pct": 1.1,
+   "rankAdherents": 739,
+   "rankPct": 377
+  },
+  {
+   "cbsa": "30420",
+   "name": "Lexington, NE",
+   "micro": true,
+   "cong": 1,
+   "adherents": 350,
+   "pct": 1.3,
+   "rankAdherents": 740,
+   "rankPct": 303
+  },
+  {
+   "cbsa": "35740",
+   "name": "Norfolk, NE",
+   "micro": true,
+   "cong": 1,
+   "adherents": 350,
+   "pct": 0.7,
+   "rankAdherents": 741,
+   "rankPct": 665
+  },
+  {
+   "cbsa": "15020",
+   "name": "Brookhaven, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 348,
+   "pct": 1,
+   "rankAdherents": 742,
+   "rankPct": 427
+  },
+  {
+   "cbsa": "18420",
+   "name": "Corinth, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 348,
+   "pct": 1,
+   "rankAdherents": 743,
+   "rankPct": 424
+  },
+  {
+   "cbsa": "24740",
+   "name": "Greenville, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 348,
+   "pct": 0.8,
+   "rankAdherents": 744,
+   "rankPct": 612
+  },
+  {
+   "cbsa": "24900",
+   "name": "Greenwood, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 348,
+   "pct": 0.9,
+   "rankAdherents": 745,
+   "rankPct": 490
+  },
+  {
+   "cbsa": "32620",
+   "name": "McComb, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 348,
+   "pct": 0.9,
+   "rankAdherents": 746,
+   "rankPct": 535
+  },
+  {
+   "cbsa": "35020",
+   "name": "Natchez, MS-LA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 348,
+   "pct": 0.7,
+   "rankAdherents": 747,
+   "rankPct": 660
+  },
+  {
+   "cbsa": "46980",
+   "name": "Vicksburg, MS",
+   "micro": true,
+   "cong": 1,
+   "adherents": 348,
+   "pct": 0.8,
+   "rankAdherents": 748,
+   "rankPct": 608
+  },
+  {
+   "cbsa": "10940",
+   "name": "Alma, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.8,
+   "rankAdherents": 749,
+   "rankPct": 561
+  },
+  {
+   "cbsa": "10980",
+   "name": "Alpena, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 1.2,
+   "rankAdherents": 750,
+   "rankPct": 343
+  },
+  {
+   "cbsa": "13660",
+   "name": "Big Rapids, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.9,
+   "rankAdherents": 751,
+   "rankPct": 530
+  },
+  {
+   "cbsa": "15620",
+   "name": "Cadillac, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.7,
+   "rankAdherents": 752,
+   "rankPct": 671
+  },
+  {
+   "cbsa": "17740",
+   "name": "Coldwater, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.8,
+   "rankAdherents": 753,
+   "rankPct": 621
+  },
+  {
+   "cbsa": "21540",
+   "name": "Escanaba, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.9,
+   "rankAdherents": 754,
+   "rankPct": 467
+  },
+  {
+   "cbsa": "25880",
+   "name": "Hillsdale, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.8,
+   "rankAdherents": 755,
+   "rankPct": 632
+  },
+  {
+   "cbsa": "26340",
+   "name": "Houghton, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.9,
+   "rankAdherents": 756,
+   "rankPct": 520
+  },
+  {
+   "cbsa": "26500",
+   "name": "Huntingdon, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.8,
+   "rankAdherents": 757,
+   "rankPct": 605
+  },
+  {
+   "cbsa": "27020",
+   "name": "Iron Mountain, MI-WI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 1.1,
+   "rankAdherents": 758,
+   "rankPct": 371
+  },
+  {
+   "cbsa": "30260",
+   "name": "Lewisburg, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.8,
+   "rankAdherents": 759,
+   "rankPct": 582
+  },
+  {
+   "cbsa": "30820",
+   "name": "Lock Haven, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.9,
+   "rankAdherents": 760,
+   "rankPct": 479
+  },
+  {
+   "cbsa": "41260",
+   "name": "St. Marys, PA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 1.1,
+   "rankAdherents": 761,
+   "rankPct": 379
+  },
+  {
+   "cbsa": "42300",
+   "name": "Sault Ste. Marie, MI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 345,
+   "pct": 0.9,
+   "rankAdherents": 762,
+   "rankPct": 464
+  },
+  {
+   "cbsa": "13340",
+   "name": "Bellefontaine, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 342,
+   "pct": 0.7,
+   "rankAdherents": 763,
+   "rankPct": 643
+  },
+  {
+   "cbsa": "15340",
+   "name": "Bucyrus-Galion, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 342,
+   "pct": 0.8,
+   "rankAdherents": 764,
+   "rankPct": 576
+  },
+  {
+   "cbsa": "15740",
+   "name": "Cambridge, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 342,
+   "pct": 0.9,
+   "rankAdherents": 765,
+   "rankPct": 509
+  },
+  {
+   "cbsa": "18740",
+   "name": "Coshocton, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 342,
+   "pct": 0.9,
+   "rankAdherents": 766,
+   "rankPct": 468
+  },
+  {
+   "cbsa": "27160",
+   "name": "Jackson, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 342,
+   "pct": 1,
+   "rankAdherents": 767,
+   "rankPct": 404
+  },
+  {
+   "cbsa": "47540",
+   "name": "Wapakoneta, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 342,
+   "pct": 0.7,
+   "rankAdherents": 768,
+   "rankPct": 648
+  },
+  {
+   "cbsa": "48940",
+   "name": "Wilmington, OH",
+   "micro": true,
+   "cong": 1,
+   "adherents": 342,
+   "pct": 0.8,
+   "rankAdherents": 769,
+   "rankPct": 575
+  },
+  {
+   "cbsa": "26220",
+   "name": "Hood River, OR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 341,
+   "pct": 1.4,
+   "rankAdherents": 770,
+   "rankPct": 283
+  },
+  {
+   "cbsa": "45520",
+   "name": "The Dalles, OR",
+   "micro": true,
+   "cong": 1,
+   "adherents": 341,
+   "pct": 1.3,
+   "rankAdherents": 771,
+   "rankPct": 316
+  },
+  {
+   "cbsa": "28540",
+   "name": "Ketchikan, AK",
+   "micro": true,
+   "cong": 1,
+   "adherents": 339,
+   "pct": 2.4,
+   "rankAdherents": 772,
+   "rankPct": 147
+  },
+  {
+   "cbsa": "19420",
+   "name": "Dayton, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 337,
+   "pct": 1,
+   "rankAdherents": 773,
+   "rankPct": 415
+  },
+  {
+   "cbsa": "20540",
+   "name": "Dyersburg, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 337,
+   "pct": 0.9,
+   "rankAdherents": 774,
+   "rankPct": 483
+  },
+  {
+   "cbsa": "29980",
+   "name": "Lawrenceburg, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 337,
+   "pct": 0.8,
+   "rankAdherents": 775,
+   "rankPct": 626
+  },
+  {
+   "cbsa": "30280",
+   "name": "Lewisburg, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 337,
+   "pct": 1,
+   "rankAdherents": 776,
+   "rankPct": 434
+  },
+  {
+   "cbsa": "32660",
+   "name": "McMinnville, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 337,
+   "pct": 0.8,
+   "rankAdherents": 777,
+   "rankPct": 566
+  },
+  {
+   "cbsa": "35460",
+   "name": "Newport, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 337,
+   "pct": 0.9,
+   "rankAdherents": 778,
+   "rankPct": 465
+  },
+  {
+   "cbsa": "37540",
+   "name": "Paris, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 337,
+   "pct": 1,
+   "rankAdherents": 779,
+   "rankPct": 405
+  },
+  {
+   "cbsa": "43180",
+   "name": "Shelbyville, TN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 337,
+   "pct": 0.7,
+   "rankAdherents": 780,
+   "rankPct": 690
+  },
+  {
+   "cbsa": "16460",
+   "name": "Centralia, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 0.9,
+   "rankAdherents": 781,
+   "rankPct": 507
+  },
+  {
+   "cbsa": "20820",
+   "name": "Effingham, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 1,
+   "rankAdherents": 782,
+   "rankPct": 442
+  },
+  {
+   "cbsa": "23300",
+   "name": "Freeport, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 0.8,
+   "rankAdherents": 783,
+   "rankPct": 633
+  },
+  {
+   "cbsa": "23660",
+   "name": "Galesburg, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 0.7,
+   "rankAdherents": 784,
+   "rankPct": 689
+  },
+  {
+   "cbsa": "25300",
+   "name": "Hannibal, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 0.9,
+   "rankAdherents": 785,
+   "rankPct": 532
+  },
+  {
+   "cbsa": "27300",
+   "name": "Jacksonville, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 0.9,
+   "rankAdherents": 786,
+   "rankPct": 511
+  },
+  {
+   "cbsa": "30060",
+   "name": "Lebanon, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 0.9,
+   "rankAdherents": 787,
+   "rankPct": 469
+  },
+  {
+   "cbsa": "31380",
+   "name": "Macomb, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 1.2,
+   "rankAdherents": 788,
+   "rankPct": 332
+  },
+  {
+   "cbsa": "32180",
+   "name": "Marshall, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 1.4,
+   "rankAdherents": 789,
+   "rankPct": 275
+  },
+  {
+   "cbsa": "32340",
+   "name": "Maryville, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 1.6,
+   "rankAdherents": 790,
+   "rankPct": 238
+  },
+  {
+   "cbsa": "33020",
+   "name": "Mexico, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 1.3,
+   "rankAdherents": 791,
+   "rankPct": 302
+  },
+  {
+   "cbsa": "33620",
+   "name": "Moberly, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 1.4,
+   "rankAdherents": 792,
+   "rankPct": 298
+  },
+  {
+   "cbsa": "34500",
+   "name": "Mount Vernon, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 0.9,
+   "rankAdherents": 793,
+   "rankPct": 494
+  },
+  {
+   "cbsa": "38700",
+   "name": "Pontiac, IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 0.9,
+   "rankAdherents": 794,
+   "rankPct": 463
+  },
+  {
+   "cbsa": "42740",
+   "name": "Sedalia, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 0.8,
+   "rankAdherents": 795,
+   "rankPct": 607
+  },
+  {
+   "cbsa": "43460",
+   "name": "Sikeston, MO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 336,
+   "pct": 0.9,
+   "rankAdherents": 796,
+   "rankPct": 515
+  },
+  {
+   "cbsa": "11420",
+   "name": "Angola, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 1,
+   "rankAdherents": 797,
+   "rankPct": 439
+  },
+  {
+   "cbsa": "13260",
+   "name": "Bedford, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 0.7,
+   "rankAdherents": 798,
+   "rankPct": 639
+  },
+  {
+   "cbsa": "18220",
+   "name": "Connersville, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 1.4,
+   "rankAdherents": 799,
+   "rankPct": 278
+  },
+  {
+   "cbsa": "18820",
+   "name": "Crawfordsville, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 0.9,
+   "rankAdherents": 800,
+   "rankPct": 514
+  },
+  {
+   "cbsa": "19540",
+   "name": "Decatur, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 0.9,
+   "rankAdherents": 801,
+   "rankPct": 466
+  },
+  {
+   "cbsa": "28340",
+   "name": "Kendallville, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 0.7,
+   "rankAdherents": 802,
+   "rankPct": 673
+  },
+  {
+   "cbsa": "30900",
+   "name": "Logansport, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 0.9,
+   "rankAdherents": 803,
+   "rankPct": 512
+  },
+  {
+   "cbsa": "31500",
+   "name": "Madison, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 1,
+   "rankAdherents": 804,
+   "rankPct": 419
+  },
+  {
+   "cbsa": "35220",
+   "name": "New Castle, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 0.7,
+   "rankAdherents": 805,
+   "rankPct": 682
+  },
+  {
+   "cbsa": "35860",
+   "name": "North Vernon, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 1.2,
+   "rankAdherents": 806,
+   "rankPct": 340
+  },
+  {
+   "cbsa": "38500",
+   "name": "Plymouth, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 0.7,
+   "rankAdherents": 807,
+   "rankPct": 653
+  },
+  {
+   "cbsa": "42500",
+   "name": "Scottsburg, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 1.4,
+   "rankAdherents": 808,
+   "rankPct": 295
+  },
+  {
+   "cbsa": "47180",
+   "name": "Vincennes, IN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 335,
+   "pct": 0.9,
+   "rankAdherents": 809,
+   "rankPct": 474
+  },
+  {
+   "cbsa": "15460",
+   "name": "Burlington, IA-IL",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 0.7,
+   "rankAdherents": 810,
+   "rankPct": 647
+  },
+  {
+   "cbsa": "16140",
+   "name": "Carroll, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 1.6,
+   "rankAdherents": 811,
+   "rankPct": 231
+  },
+  {
+   "cbsa": "21840",
+   "name": "Fairfield, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 2.1,
+   "rankAdherents": 812,
+   "rankPct": 171
+  },
+  {
+   "cbsa": "22700",
+   "name": "Fort Dodge, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 0.9,
+   "rankAdherents": 813,
+   "rankPct": 495
+  },
+  {
+   "cbsa": "32260",
+   "name": "Marshalltown, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 0.8,
+   "rankAdherents": 814,
+   "rankPct": 557
+  },
+  {
+   "cbsa": "32380",
+   "name": "Mason City, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 0.7,
+   "rankAdherents": 815,
+   "rankPct": 697
+  },
+  {
+   "cbsa": "34700",
+   "name": "Muscatine, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 0.8,
+   "rankAdherents": 816,
+   "rankPct": 618
+  },
+  {
+   "cbsa": "36820",
+   "name": "Oskaloosa, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 1.5,
+   "rankAdherents": 817,
+   "rankPct": 260
+  },
+  {
+   "cbsa": "36900",
+   "name": "Ottumwa, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 0.9,
+   "rankAdherents": 818,
+   "rankPct": 460
+  },
+  {
+   "cbsa": "37800",
+   "name": "Pella, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 1,
+   "rankAdherents": 819,
+   "rankPct": 425
+  },
+  {
+   "cbsa": "43980",
+   "name": "Spencer, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 2,
+   "rankAdherents": 820,
+   "rankPct": 178
+  },
+  {
+   "cbsa": "44740",
+   "name": "Storm Lake, IA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 334,
+   "pct": 1.6,
+   "rankAdherents": 821,
+   "rankPct": 232
+  },
+  {
+   "cbsa": "13540",
+   "name": "Bennington, VT",
+   "micro": true,
+   "cong": 1,
+   "adherents": 333,
+   "pct": 0.9,
+   "rankAdherents": 822,
+   "rankPct": 505
+  },
+  {
+   "cbsa": "11380",
+   "name": "Andrews, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.8,
+   "rankAdherents": 823,
+   "rankPct": 209
+  },
+  {
+   "cbsa": "13060",
+   "name": "Bay City, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.9,
+   "rankAdherents": 824,
+   "rankPct": 491
+  },
+  {
+   "cbsa": "13300",
+   "name": "Beeville, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.1,
+   "rankAdherents": 825,
+   "rankPct": 395
+  },
+  {
+   "cbsa": "13700",
+   "name": "Big Spring, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.9,
+   "rankAdherents": 826,
+   "rankPct": 459
+  },
+  {
+   "cbsa": "14300",
+   "name": "Bonham, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.9,
+   "rankAdherents": 827,
+   "rankPct": 476
+  },
+  {
+   "cbsa": "14420",
+   "name": "Borger, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.6,
+   "rankAdherents": 828,
+   "rankPct": 234
+  },
+  {
+   "cbsa": "14780",
+   "name": "Brenham, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.9,
+   "rankAdherents": 829,
+   "rankPct": 481
+  },
+  {
+   "cbsa": "15220",
+   "name": "Brownwood, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.9,
+   "rankAdherents": 830,
+   "rankPct": 533
+  },
+  {
+   "cbsa": "20300",
+   "name": "Dumas, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.5,
+   "rankAdherents": 831,
+   "rankPct": 250
+  },
+  {
+   "cbsa": "20900",
+   "name": "El Campo, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.8,
+   "rankAdherents": 832,
+   "rankPct": 595
+  },
+  {
+   "cbsa": "23240",
+   "name": "Fredericksburg, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.2,
+   "rankAdherents": 833,
+   "rankPct": 334
+  },
+  {
+   "cbsa": "23620",
+   "name": "Gainesville, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.8,
+   "rankAdherents": 834,
+   "rankPct": 597
+  },
+  {
+   "cbsa": "25820",
+   "name": "Hereford, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.8,
+   "rankAdherents": 835,
+   "rankPct": 208
+  },
+  {
+   "cbsa": "28780",
+   "name": "Kingsville, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1,
+   "rankAdherents": 836,
+   "rankPct": 403
+  },
+  {
+   "cbsa": "33420",
+   "name": "Mineral Wells, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.2,
+   "rankAdherents": 837,
+   "rankPct": 359
+  },
+  {
+   "cbsa": "34420",
+   "name": "Mount Pleasant, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.8,
+   "rankAdherents": 838,
+   "rankPct": 634
+  },
+  {
+   "cbsa": "37420",
+   "name": "Pampa, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.5,
+   "rankAdherents": 839,
+   "rankPct": 266
+  },
+  {
+   "cbsa": "37580",
+   "name": "Paris, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.7,
+   "rankAdherents": 840,
+   "rankPct": 701
+  },
+  {
+   "cbsa": "37780",
+   "name": "Pecos, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 2.2,
+   "rankAdherents": 841,
+   "rankPct": 165
+  },
+  {
+   "cbsa": "38380",
+   "name": "Plainview, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1,
+   "rankAdherents": 842,
+   "rankPct": 418
+  },
+  {
+   "cbsa": "38920",
+   "name": "Port Lavaca, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.6,
+   "rankAdherents": 843,
+   "rankPct": 224
+  },
+  {
+   "cbsa": "40530",
+   "name": "Rockport, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.4,
+   "rankAdherents": 844,
+   "rankPct": 292
+  },
+  {
+   "cbsa": "43660",
+   "name": "Snyder, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.9,
+   "rankAdherents": 845,
+   "rankPct": 185
+  },
+  {
+   "cbsa": "44500",
+   "name": "Stephenville, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.8,
+   "rankAdherents": 846,
+   "rankPct": 616
+  },
+  {
+   "cbsa": "44860",
+   "name": "Sulphur Springs, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 0.9,
+   "rankAdherents": 847,
+   "rankPct": 503
+  },
+  {
+   "cbsa": "45020",
+   "name": "Sweetwater, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 2.2,
+   "rankAdherents": 848,
+   "rankPct": 162
+  },
+  {
+   "cbsa": "46620",
+   "name": "Uvalde, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 1.3,
+   "rankAdherents": 849,
+   "rankPct": 305
+  },
+  {
+   "cbsa": "46900",
+   "name": "Vernon, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 2.6,
+   "rankAdherents": 850,
+   "rankPct": 139
+  },
+  {
+   "cbsa": "49820",
+   "name": "Zapata, TX",
+   "micro": true,
+   "cong": 1,
+   "adherents": 329,
+   "pct": 2.4,
+   "rankAdherents": 851,
+   "rankPct": 153
+  },
+  {
+   "cbsa": "13720",
+   "name": "Big Stone Gap, VA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 328,
+   "pct": 0.8,
+   "rankAdherents": 852,
+   "rankPct": 565
+  },
+  {
+   "cbsa": "14720",
+   "name": "Breckenridge, CO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 327,
+   "pct": 1.1,
+   "rankAdherents": 853,
+   "rankPct": 398
+  },
+  {
+   "cbsa": "22820",
+   "name": "Fort Morgan, CO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 327,
+   "pct": 1.1,
+   "rankAdherents": 854,
+   "rankPct": 375
+  },
+  {
+   "cbsa": "44540",
+   "name": "Sterling, CO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 327,
+   "pct": 1.5,
+   "rankAdherents": 855,
+   "rankPct": 254
+  },
+  {
+   "cbsa": "44460",
+   "name": "Steamboat Springs, CO",
+   "micro": true,
+   "cong": 1,
+   "adherents": 326,
+   "pct": 1.3,
+   "rankAdherents": 856,
+   "rankPct": 309
+  },
+  {
+   "cbsa": "10660",
+   "name": "Albert Lea, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 1.1,
+   "rankAdherents": 857,
+   "rankPct": 400
+  },
+  {
+   "cbsa": "10820",
+   "name": "Alexandria, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 0.8,
+   "rankAdherents": 858,
+   "rankPct": 556
+  },
+  {
+   "cbsa": "12380",
+   "name": "Austin, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 0.8,
+   "rankAdherents": 859,
+   "rankPct": 578
+  },
+  {
+   "cbsa": "13420",
+   "name": "Bemidji, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 0.7,
+   "rankAdherents": 860,
+   "rankPct": 675
+  },
+  {
+   "cbsa": "21860",
+   "name": "Fairmont, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 1.6,
+   "rankAdherents": 861,
+   "rankPct": 226
+  },
+  {
+   "cbsa": "24330",
+   "name": "Grand Rapids, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 0.7,
+   "rankAdherents": 862,
+   "rankPct": 659
+  },
+  {
+   "cbsa": "26780",
+   "name": "Hutchinson, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 0.9,
+   "rankAdherents": 863,
+   "rankPct": 513
+  },
+  {
+   "cbsa": "32140",
+   "name": "Marshall, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 1.3,
+   "rankAdherents": 864,
+   "rankPct": 314
+  },
+  {
+   "cbsa": "39860",
+   "name": "Red Wing, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 0.7,
+   "rankAdherents": 865,
+   "rankPct": 683
+  },
+  {
+   "cbsa": "48820",
+   "name": "Willmar, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 0.7,
+   "rankAdherents": 866,
+   "rankPct": 640
+  },
+  {
+   "cbsa": "49380",
+   "name": "Worthington, MN",
+   "micro": true,
+   "cong": 1,
+   "adherents": 325,
+   "pct": 1.5,
+   "rankAdherents": 867,
+   "rankPct": 272
+  },
+  {
+   "cbsa": "47240",
+   "name": "Vineyard Haven, MA",
+   "micro": true,
+   "cong": 1,
+   "adherents": 317,
+   "pct": 1.5,
+   "rankAdherents": 868,
+   "rankPct": 251
+  },
+  {
+   "cbsa": "32860",
+   "name": "Menomonie, WI",
+   "micro": true,
+   "cong": 1,
+   "adherents": 309,
+   "pct": 0.7,
+   "rankAdherents": 869,
+   "rankPct": 684
+  }
+ ]
+}
