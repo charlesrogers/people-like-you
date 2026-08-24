@@ -2,7 +2,9 @@ export interface PromptDef {
   id: string
   text: string
   helpText: string
-  exampleAnswer: string
+  /** Absent on prompts fished from quiz answers — a worked example there steers
+   *  the person away from their own story (voice-prompt-map spec §1). */
+  exampleAnswer?: string
   tier: 'self_expansion' | 'i_sharing' | 'admiration' | 'comfort' | 'fun'
   category: string
 }
