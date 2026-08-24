@@ -241,5 +241,16 @@ export function replaceSelectedPrompt(
   return bank ? withHelp({ ...bank, source: 'bank' }) : null
 }
 
+/**
+ * The genuinely personalised prompts for this reader: the nerd-out plus up to
+ * MAX_FISHED fished from their quiz answers. These lead the picker's list —
+ * `selectVoicePrompts` also pads with bank prompts, which must NOT be pinned to
+ * the top, so the picker takes this narrower set instead.
+ */
+export function personalisedPrompts(answers: QuizAnswers, excludeIds: string[] = []): SelectedPrompt[] {
+  return selectVoicePrompts(answers, 6, excludeIds)
+    .filter(p => p.source === 'fished' || p.id === NERD_OUT.id)
+}
+
 /** 38 fished prompts across the 8 seeding items, plus the nerd-out. */
 export const MAP_PROMPT_COUNT = Object.keys(FISHED_PROMPTS).length + 1

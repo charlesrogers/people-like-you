@@ -6,9 +6,11 @@ import { apiFetch } from '@/lib/api-client'
 import posthog from 'posthog-js'
 import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
-import { getOnboardingPrompts, getRandomPrompt, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
+import PromptPicker from '@/components/PromptPicker'
+import ProfileCompletion from '@/components/ProfileCompletion'
+import { getProfileCompletion, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
 import QuizStep, { type QuizResult } from '@/components/QuizStep'
-import { selectVoicePrompts, replaceSelectedPrompt, type SelectedPrompt } from '@/lib/voice-prompt-map'
+import { personalisedPrompts, type SelectedPrompt } from '@/lib/voice-prompt-map'
 import { canonicalIndex } from '@/lib/quiz-scoring'
 import { FRAMING as QUIZ_FRAMING } from '@/lib/quiz-battery'
 import { computePersonalityReveal } from '@/lib/personality-reveal'
@@ -84,13 +86,16 @@ function OnboardingContent() {
   const [zipcode, setZipcode] = useState('')
 
   // Step 2: Voice recordings — stores server-confirmed memo IDs (not blobs)
-  const [prompts, setPrompts] = useState<SelectedPrompt[]>(
-    () => getOnboardingPrompts(6).map(p => ({ ...p, source: 'bank' as const })))
+  // The user picks which prompt to answer; `activePrompt` is the one open on
+  // the recorder, null when the picker is showing.
+  // Prompts fished from this reader's quiz answers. They lead the picker's list.
+  const [fishedPrompts, setFishedPrompts] = useState<SelectedPrompt[]>([])
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number | null>>({})
   const [cameFromQuiz, setCameFromQuiz] = useState(false)
-  const skippedPromptIdsRef = useRef<string[]>([])
   const [recordings, setRecordings] = useState<Map<string, { memoId: string; duration: number }>>(new Map())
-  const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0)
+  const [activePrompt, setActivePrompt] = useState<PromptDef | null>(null)
+  const [passedPromptIds, setPassedPromptIds] = useState<string[]>([])
+  const [justRecorded, setJustRecorded] = useState<PromptDef | null>(null)
 
   // Step 3: Hard prefs (dealbreakers only)
   const [ageMin, setAgeMin] = useState(21)
@@ -157,25 +162,28 @@ function OnboardingContent() {
   }, [])
 
   // N2/D-QD7: which prompt each user actually saw, and whether the quiz aimed it.
+  // N2/D-QD7: fires when a prompt is actually opened on the recorder, which
+  // under the picker is the moment the reader chose it.
   useEffect(() => {
-    if (step !== 'voice') return
-    const p = prompts[currentVoiceIndex]
-    if (!p) return
+    if (step !== 'voice' || !activePrompt) return
+    const fished = fishedPrompts.find(f => f.id === activePrompt.id)
     posthog.capture('voice_prompt_shown', {
-      prompt_id: p.id,
-      source: p.source,
-      seed_item: p.seed?.itemId ?? null,
-      seed_option: p.seed?.optionIndex ?? null,
+      prompt_id: activePrompt.id,
+      source: fished?.source ?? 'bank',
+      seed_item: fished?.seed?.itemId ?? null,
+      seed_option: fished?.seed?.optionIndex ?? null,
     })
-  }, [step, currentVoiceIndex, prompts])
+  }, [step, activePrompt, fishedPrompts])
 
   const stepIndex = STEPS.indexOf(step)
   const progress = ((stepIndex + 1) / STEPS.length) * 100
 
-  const handleRecordingComplete = async (prompt: SelectedPrompt, blob: Blob, duration: number) => {
+  const handleRecordingComplete = async (prompt: PromptDef, blob: Blob, duration: number) => {
     if (!userId) throw new Error('Session expired. Please refresh and try again.')
 
     const promptId = prompt.id
+    // Bank prompts carry no seed; fished ones do (D-QD7 per-item story yield).
+    const fished = fishedPrompts.find(f => f.id === promptId)
     const formData = new FormData()
     const ext = blob.type.includes('mp4') || blob.type.includes('m4a') ? 'm4a' : 'webm'
     formData.append('audio', blob, `${promptId}.${ext}`)
@@ -183,8 +191,8 @@ function OnboardingContent() {
     formData.append('promptId', promptId)
     formData.append('dayNumber', '0')
     formData.append('durationSeconds', String(duration))
-    formData.append('promptSource', prompt.source)
-    if (prompt.seed) formData.append('promptSeed', JSON.stringify(prompt.seed))
+    formData.append('promptSource', fished?.source ?? 'bank')
+    if (fished?.seed) formData.append('promptSeed', JSON.stringify(fished.seed))
 
     const res = await apiFetch('/api/voice-memo', { method: 'POST', body: formData })
     const data = await res.json()
@@ -197,17 +205,11 @@ function OnboardingContent() {
     })
   }
 
+  // Backing out of a prompt returns to the picker and retires that prompt for
+  // the session, so "show me different ones" never loops the same list.
   const handleSkipPrompt = (promptId: string) => {
-    const replacement = replaceSelectedPrompt(
-      prompts, promptId, quizAnswers, skippedPromptIdsRef.current)
-    skippedPromptIdsRef.current = [...skippedPromptIdsRef.current, promptId]
-    if (replacement) {
-      setPrompts(prev => prev.map(p => p.id === promptId ? replacement : p))
-    } else {
-      // Fished and bank both exhausted — fall back to today's behaviour.
-      const fallback = getRandomPrompt(prompts.map(p => p.id))
-      if (fallback) setPrompts(prev => prev.map(p => p.id === promptId ? { ...fallback, source: 'bank' } : p))
-    }
+    setPassedPromptIds(prev => prev.includes(promptId) ? prev : [...prev, promptId])
+    setActivePrompt(null)
   }
 
   // The quiz aims the mic: answers select up to 3 fished prompts for the voice step.
@@ -220,7 +222,7 @@ function OnboardingContent() {
     }
     setQuizAnswers(canonical)
     setCameFromQuiz(true)
-    setPrompts(selectVoicePrompts(canonical, 6))
+    setFishedPrompts(personalisedPrompts(canonical))
     setStep('voice')
   }
 
@@ -230,7 +232,10 @@ function OnboardingContent() {
       ? otpCode.length === 6
       : signupPhone.replace(/\D/g, '').length >= 10)
   const canProceedBasics = firstName && gender && birthYear && zipcode
-  const canProceedVoice = recordings.size >= 2
+  // The voice step is skippable by design — but the profile stays incomplete
+  // until every angle has a story behind it (see getProfileCompletion).
+  const canProceedVoice = true
+  const voiceCompletion = getProfileCompletion(answeredPromptIds)
   const canProceedPrefs = faithImportance && kids
   const canProceedPhotos = photoFiles.length >= 1
 
@@ -669,103 +674,81 @@ function OnboardingContent() {
           </div>
         )}
 
-        {/* Step 2: Voice Recordings — one card at a time */}
         {step === 'quiz' && userId && (
           <QuizStep userId={userId} onComplete={handleQuizComplete} />
         )}
 
+        {/* Step 2: Voice Recordings — pick a prompt, then record it */}
         {step === 'voice' && (
           <div>
             <h1 className="text-[22px] font-bold leading-snug text-stone-900">
               {cameFromQuiz ? QUIZ_FRAMING.close : 'Tell us about yourself'}
             </h1>
             <p className="mt-2 text-sm text-stone-500">
-              Just talk like you&rsquo;re telling a friend. Record at least 2.
+              Pick whichever one you actually have a story for. Just talk like you&rsquo;re telling a friend.
             </p>
 
-            {/* Progress */}
-            <div className="mt-4 flex items-center gap-3">
-              <div className="flex gap-1.5">
-                {prompts.map((p, i) => (
-                  <div
-                    key={p.id}
-                    className={`h-2 w-8 rounded-full transition-all duration-300 ${
-                      recordings.has(p.id) ? 'bg-emerald-500' :
-                      i === currentVoiceIndex ? 'bg-stone-900' :
-                      'bg-stone-200'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-stone-400 font-medium">
-                {recordings.size} recorded
-              </span>
+            <div className="mt-4">
+              <ProfileCompletion answeredPromptIds={answeredPromptIds} compact />
             </div>
 
-            {/* Single card with slide animation */}
-            <div className="mt-6 relative overflow-hidden">
-              <div
-                key={prompts[currentVoiceIndex]?.id}
-                className="animate-slide-in"
-              >
-                {prompts[currentVoiceIndex] && !recordings.has(prompts[currentVoiceIndex].id) && (
+            <div className="mt-6">
+              {justRecorded && (
+                <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+                  <p className="text-base font-medium text-emerald-700">Got it &#10003;</p>
+                  <p className="mt-1 text-sm text-emerald-600">{justRecorded.short}</p>
+                </div>
+              )}
+
+              {activePrompt ? (
+                <div key={activePrompt.id} className="animate-slide-in">
                   <VoiceRecorder
-                    promptId={prompts[currentVoiceIndex].id}
-                    promptText={prompts[currentVoiceIndex].text}
-                    helpText={prompts[currentVoiceIndex].helpText}
-                    exampleAnswer={prompts[currentVoiceIndex].exampleAnswer}
-                    onSkip={() => handleSkipPrompt(prompts[currentVoiceIndex].id)}
+                    promptId={activePrompt.id}
+                    promptText={activePrompt.text}
+                    helpText={activePrompt.helpText}
+                    exampleAnswer={activePrompt.exampleAnswer}
+                    onSkip={() => handleSkipPrompt(activePrompt.id)}
                     onRecordingComplete={async (blob, duration) => {
-                      await handleRecordingComplete(prompts[currentVoiceIndex], blob, duration)
-                      // Auto-advance to next unrecorded prompt after a beat
+                      await handleRecordingComplete(activePrompt, blob, duration)
+                      setJustRecorded(activePrompt)
                       setTimeout(() => {
-                        const nextUnrecorded = prompts.findIndex((p, i) => i > currentVoiceIndex && !recordings.has(p.id))
-                        if (nextUnrecorded !== -1) {
-                          setCurrentVoiceIndex(nextUnrecorded)
-                        } else {
-                          const firstUnrecorded = prompts.findIndex(p => !recordings.has(p.id) && p.id !== prompts[currentVoiceIndex].id)
-                          if (firstUnrecorded !== -1) {
-                            setCurrentVoiceIndex(firstUnrecorded)
-                          }
-                        }
+                        setActivePrompt(null)
+                        setTimeout(() => setJustRecorded(null), 2500)
                       }, 600)
                     }}
                   />
-                )}
-
-                {prompts[currentVoiceIndex] && recordings.has(prompts[currentVoiceIndex].id) && (
-                  <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
-                    <p className="text-lg font-medium text-emerald-700">Got it! ✓</p>
-                    <p className="mt-1 text-sm text-emerald-600">{prompts[currentVoiceIndex].text}</p>
-                  </div>
-                )}
-              </div>
-
-            </div>
-
-            {/* Navigation dots */}
-            <div className="mt-6 flex items-center justify-center gap-2">
-              {prompts.map((p, i) => (
-                <button
-                  key={p.id}
-                  onClick={() => setCurrentVoiceIndex(i)}
-                  className={`h-3 w-3 rounded-full transition-all ${
-                    recordings.has(p.id) ? 'bg-emerald-500' :
-                    i === currentVoiceIndex ? 'bg-stone-900 scale-125' :
-                    'bg-stone-200 hover:bg-stone-300'
-                  }`}
+                  <button
+                    type="button"
+                    onClick={() => setActivePrompt(null)}
+                    className="mt-3 w-full rounded-lg px-4 py-2 text-sm text-stone-500 transition-colors hover:text-stone-800"
+                  >
+                    Pick a different one
+                  </button>
+                </div>
+              ) : (
+                <PromptPicker
+                  answeredPromptIds={answeredPromptIds}
+                  passedIds={passedPromptIds}
+                  personalised={fishedPrompts}
+                  onPick={(p) => { setJustRecorded(null); setActivePrompt(p) }}
+                  onPassAll={(shownIds) =>
+                    setPassedPromptIds(prev => [...prev, ...shownIds.filter(id => !prev.includes(id))])
+                  }
                 />
-              ))}
+              )}
             </div>
 
-            {/* Continue early */}
-            {recordings.size >= 2 && (
-              <p className="mt-4 text-center text-xs text-stone-400">
-                {recordings.size >= 2 && recordings.size < prompts.length && (
-                  <span>You can continue now, or record more for better matches.</span>
-                )}
-              </p>
+            {!activePrompt && (
+              <div className="mt-6">
+                <ProfileCompletion answeredPromptIds={answeredPromptIds} />
+              </div>
             )}
+
+            <p className="mt-4 text-center text-xs text-stone-400">
+              {voiceCompletion.isComplete
+                ? 'All four covered. You can keep going or move on.'
+                : 'You can skip this and finish it later — your profile stays incomplete until you do.'}
+            </p>
           </div>
         )}
 
@@ -1258,15 +1241,14 @@ function OnboardingContent() {
                           <button
                             key={p.id}
                             onClick={() => {
-                              // Go back to voice step with this specific prompt
-                              setPrompts([{ ...p, source: 'bank' }])
-                              setCurrentVoiceIndex(0)
+                              // Go back to the voice step with this prompt open
+                              setActivePrompt(p)
                               setShowMoreQuestions(false)
                               setStep('voice')
                             }}
                             className="block w-full text-left rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 transition hover:bg-stone-50"
                           >
-                            <span className="font-medium">{p.text}</span>
+                            <span className="font-medium">{p.short}</span>
                             <span className="mt-1 block text-xs text-stone-400">{p.helpText}</span>
                           </button>
                         ))}
@@ -1274,14 +1256,13 @@ function OnboardingContent() {
                           <button
                             key={p.id}
                             onClick={() => {
-                              setPrompts([{ ...p, source: 'bank' }])
-                              setCurrentVoiceIndex(0)
+                              setActivePrompt(p)
                               setShowMoreQuestions(false)
                               setStep('voice')
                             }}
                             className="block w-full text-left rounded-xl border border-dashed border-stone-200 px-4 py-3 text-sm text-stone-500 transition hover:bg-stone-50"
                           >
-                            <span>{p.text}</span>
+                            <span>{p.short}</span>
                           </button>
                         ))}
                       </div>
