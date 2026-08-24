@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import ArticleShell, { Paras, SectionHeading } from '@/components/seo/ArticleShell'
+import ArticleShell, { HeroCopy, Paras, SectionHeading } from '@/components/seo/ArticleShell'
+import WaitlistForm from '@/components/WaitlistForm'
 import { METRO_CONTENT } from '@/content/metro-pages'
 import { COUNTRY_CONTENT } from '@/content/country-pages'
 import metros from '@/data/seo-metros.json'
@@ -46,13 +47,20 @@ function CardList({ items }: { items: { href: string; title: string; sub: string
 
 export default function Page() {
   return (
-    <ArticleShell backHref="/" backLabel="People Like You">
-      <h1 className="mt-8 text-3xl font-bold tracking-tight text-stone-900">
-        LDS singles, by the numbers
-      </h1>
+    <ArticleShell
+      hero={
+        <>
+          <HeroCopy
+            h1="LDS singles, by the numbers"
+            hook="A matchmaker, not another swipe app: one real introduction a day, with the reason you two would work. Join the list — or find your city below."
+          />
+          <WaitlistForm source="seo-hub" />
+        </>
+      }
+    >
       <Paras
         paras={[
-          `People Like You is a matchmaker — one real introduction a day, with the reason you two would work. These pages are our honest, sourced guides to the Latter-day Saint dating market: what the community actually looks like where you live, how people actually meet there, and the problem with each market that nobody says out loud.`,
+          `These are our honest, sourced guides to the Latter-day Saint dating market: what the community actually looks like where you live, how people actually meet there, and the problem with each market that nobody says out loud.`,
         ]}
       />
       <SectionHeading>United States, by metro</SectionHeading>

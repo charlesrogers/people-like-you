@@ -68,15 +68,15 @@ export default function IntlWaitlistForm({ country, campaign, strings: s }: {
 
   if (result) {
     return (
-      <div className="mt-12 rounded-2xl border border-stone-200 bg-white p-6">
-        <p className="text-lg font-bold text-stone-900">🎉 {s.successTitle}</p>
-        <p className="mt-2 text-base leading-7 text-stone-600">{s.successBody}</p>
-        <p className="mt-4 text-xs font-bold uppercase tracking-wide text-stone-400">{s.shareLabel}</p>
-        <div className="mt-2 flex items-center gap-2 rounded-xl border border-stone-200 bg-stone-50 p-2">
-          <span className="flex-1 truncate px-2 text-sm text-stone-500">{shareUrl}</span>
+      <div className="mt-8 rounded-3xl bg-white p-5 text-[var(--dark)] shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+        <p className="text-lg font-extrabold tracking-tight">🎉 {s.successTitle}</p>
+        <p className="mt-2 text-sm text-[var(--dark)]/70">{s.successBody}</p>
+        <p className="mt-4 text-[11px] font-bold uppercase tracking-wide text-[var(--dark)]/40">{s.shareLabel}</p>
+        <div className="mt-2 flex items-center gap-2 rounded-xl border border-black/10 bg-white p-2">
+          <span className="flex-1 truncate px-2 text-sm text-[var(--dark)]/60">{shareUrl}</span>
           <button
             onClick={() => navigator.clipboard.writeText(shareUrl).then(() => setCopied(true)).catch(() => {})}
-            className="rounded-lg bg-stone-900 px-4 py-2 text-sm font-semibold text-white"
+            className="rounded-lg bg-[var(--dark)] px-4 py-2 text-sm font-semibold text-white"
           >
             {copied ? s.copied : 'Copy'}
           </button>
@@ -86,27 +86,29 @@ export default function IntlWaitlistForm({ country, campaign, strings: s }: {
   }
 
   return (
-    <form onSubmit={submit} className="mt-12 rounded-2xl border border-stone-200 bg-white p-6">
-      <p className="text-lg font-bold text-stone-900">{s.title}</p>
-      <p className="mt-2 text-base leading-7 text-stone-600">{s.body}</p>
+    <form onSubmit={submit} className="mt-8 rounded-3xl bg-white p-5 text-[var(--dark)] shadow-[0_8px_30px_rgba(0,0,0,0.08)]">
+      <p className="text-lg font-extrabold tracking-tight">{s.title}</p>
+      <p className="mt-2 text-sm text-[var(--dark)]/70">{s.body}</p>
+      <label htmlFor="wl-intl-phone" className="sr-only">{s.placeholder}</label>
       <input
+        id="wl-intl-phone"
         type="tel"
         required
         autoComplete="tel"
         value={phone}
         onChange={e => setPhone(e.target.value)}
         placeholder={s.placeholder}
-        className="mt-4 w-full rounded-xl border border-stone-200 px-4 py-3 text-base outline-none focus:border-stone-900"
+        className="mt-4 w-full rounded-xl border border-black/10 px-4 py-3 text-base outline-none focus:border-[var(--dark)]"
       />
       {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
       <button
         type="submit"
         disabled={submitting}
-        className="mt-4 w-full rounded-full bg-stone-900 px-6 py-3.5 text-base font-bold text-white transition hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
+        className="mt-4 w-full rounded-full bg-[var(--dark)] px-6 py-4 text-base font-bold text-white transition hover:scale-[1.02] active:scale-95 disabled:opacity-50 disabled:hover:scale-100"
       >
         {submitting ? s.saving : s.button}
       </button>
-      <p className="mt-3 text-center text-[11px] text-stone-400">{s.privacy}</p>
+      <p className="mt-3 text-center text-[11px] text-[var(--dark)]/40">{s.privacy}</p>
     </form>
   )
 }

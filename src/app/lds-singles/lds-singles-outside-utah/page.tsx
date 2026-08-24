@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import ArticleShell, { Paras, SectionHeading, WaitlistCta, SourceNote } from '@/components/seo/ArticleShell'
+import ArticleShell, { HeroCopy, Paras, SectionHeading, WaitlistCta, SourceNote } from '@/components/seo/ArticleShell'
+import WaitlistForm from '@/components/WaitlistForm'
 import { METRO_CONTENT } from '@/content/metro-pages'
 import rankings from '@/data/seo-rankings.json'
 import metros from '@/data/seo-metros.json'
@@ -16,10 +17,16 @@ const PAGE_BY_CBSA = new Map(metros.map(m => [m.cbsa, m.slug]))
 
 export default function Page() {
   return (
-    <ArticleShell>
-      <h1 className="mt-8 text-3xl font-bold tracking-tight text-stone-900">
-        Where LDS singles actually live outside Utah
-      </h1>
+    <ArticleShell
+      crumb={{ href: '/lds-singles', label: 'All cities & countries' }}
+      hero={
+        <>
+          <HeroCopy h1="Where LDS singles actually live outside Utah" hook="Your metro's LDS community is bigger than it feels — it just can't find itself. One real introduction a day, with the reason attached." />
+          <WaitlistForm source="seo-ranking-outside-utah" />
+        </>
+      }
+    >
+      
       <Paras
         paras={[
           `Ask anyone where America's Latter-day Saints live and you'll hear "Utah." Here's what the 2020 U.S. Religion Census actually shows: Los Angeles has more members than Boise. Phoenix has more than triple Rexburg. Dallas, Seattle, and Houston each hold LDS communities the size of a mid-sized Utah city — they're just invisible inside metros of millions.`,
@@ -74,10 +81,9 @@ export default function Page() {
         <li><Link className="font-semibold text-stone-900 underline underline-offset-4" href="/lds-singles/lds-congregations-by-metro">All 869 U.S. metros, ranked</Link></li>
       </ul>
       <WaitlistCta
-        slug="ranking-outside-utah"
         title="This is the market we built for"
         body="People Like You finds the compatible people your metro is hiding and introduces you — one real introduction a day, with the reason attached. Each metro opens once enough people nearby join."
-        button="Join the waitlist"
+        button="Join the waitlist ↑"
       />
       <SourceNote>
         Source: 2020 U.S. Religion Census, Religious Congregations &amp; Membership Study

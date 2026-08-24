@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import ArticleShell, { Paras, SectionHeading, WaitlistCta, SourceNote } from '@/components/seo/ArticleShell'
+import ArticleShell, { HeroCopy, Paras, SectionHeading, WaitlistCta, SourceNote } from '@/components/seo/ArticleShell'
+import WaitlistForm from '@/components/WaitlistForm'
 import { COUNTRY_CONTENT } from '@/content/country-pages'
 import countryData from '@/data/seo-countries.json'
 
@@ -28,10 +29,16 @@ const PAGE_LINKS: Record<string, string> = {
 export default function Page() {
   const current = new Map(countryData.countries.map(c => [c.en, c.members]))
   return (
-    <ArticleShell>
-      <h1 className="mt-8 text-3xl font-bold tracking-tight text-stone-900">
-        The countries with the most Latter-day Saints
-      </h1>
+    <ArticleShell
+      crumb={{ href: '/lds-singles', label: 'All cities & countries' }}
+      hero={
+        <>
+          <HeroCopy h1="The countries with the most Latter-day Saints" hook="A matchmaker, not another swipe app: one real introduction a day, with the reason you two would work." />
+          <WaitlistForm source="seo-ranking-countries" />
+        </>
+      }
+    >
+      
       <Paras
         paras={[
           `The Church of Jesus Christ of Latter-day Saints counts over 17 million members worldwide, and most of them are not in the United States. The table below is the top 30 countries by official membership (2023 statistics, the most recent full ranking the Church has published), with each country's 2019 rank for comparison.`,
@@ -100,10 +107,9 @@ export default function Page() {
         ))}
       </ul>
       <WaitlistCta
-        slug="ranking-countries"
         title="In the United States?"
         body="People Like You is live on the waitlist in U.S. metros now — one real introduction a day, with the reason you two would work."
-        button="Join the waitlist"
+        button="Join the waitlist ↑"
       />
       <SourceNote>
         Top-30 ranking: official 2023 statistics as published by Church News (&ldquo;Countries with

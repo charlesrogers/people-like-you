@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import ArticleShell, { Paras, SectionHeading, WaitlistCta, SourceNote } from '@/components/seo/ArticleShell'
+import ArticleShell, { HeroCopy, Paras, SectionHeading, WaitlistCta, SourceNote } from '@/components/seo/ArticleShell'
+import WaitlistForm from '@/components/WaitlistForm'
 import { METRO_CONTENT } from '@/content/metro-pages'
 import rankings from '@/data/seo-rankings.json'
 import metros from '@/data/seo-metros.json'
@@ -18,10 +19,16 @@ const PAGE_BY_CBSA = new Map(metros.map(m => [m.cbsa, m.slug]))
 
 export default function Page() {
   return (
-    <ArticleShell>
-      <h1 className="mt-8 text-3xl font-bold tracking-tight text-stone-900">
-        The 25 most Latter-day Saint metros in America
-      </h1>
+    <ArticleShell
+      crumb={{ href: '/lds-singles', label: 'All cities & countries' }}
+      hero={
+        <>
+          <HeroCopy h1="The 25 most Latter-day Saint metros in America" hook="One real introduction a day, with the reason you two would work — wherever your metro ranks." />
+          <WaitlistForm source="seo-ranking-most-lds-metros" />
+        </>
+      }
+    >
+      
       <Paras
         paras={[
           `Ranked by share of population, from the 2020 U.S. Religion Census — the standard academic count of religious congregations and adherents in the United States. Provo–Orem leads the country at 82.6%, the highest share of any metro for any single religious body in America.`,
@@ -77,10 +84,9 @@ export default function Page() {
         <li><Link className="font-semibold text-stone-900 underline underline-offset-4" href="/lds-singles/countries-with-most-latter-day-saints">The countries with the most Latter-day Saints</Link></li>
       </ul>
       <WaitlistCta
-        slug="ranking-most-lds-metros"
         title="Dating where you live"
         body="People Like You is a matchmaker — one real introduction a day, with the reason you two would work. Each metro opens once enough people nearby join the waitlist."
-        button="Join the waitlist"
+        button="Join the waitlist ↑"
       />
       <SourceNote>
         Source: 2020 U.S. Religion Census, Religious Congregations &amp; Membership Study
