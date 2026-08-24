@@ -1,5 +1,14 @@
 # Brief — Reader Archetypes & Content Calibration
 
+> ## ⛔ SUPERSEDED 2026-08-24 — read `specs/research-pitch-demand-findings.md` first
+> The commissioned research came back against this brief's central proposal. Headline: **the variance is in craft, not in targeting.** Illustrative decomposition — reader propensity ~76%, card craft ~19%, framing main effect ~3%, reader×content interaction ~1%; and at 50 readers / ~1,200 events the interaction MDE (OR ≈ 2.24) sits above the literature-calibrated effect (OR ≈ 1.67), so anything "detected" would be ~3× inflated (Type-M).
+>
+> **Withdrawn:** §3's asset-preference taste-step redesign. The taste step stays a **style + pickiness** instrument exactly as `matching_algo-v2.md` §5 originally specced it. `asset_priors` is not built.
+> **Downgraded:** §4's `content_targeting` factor — **logged only**, not randomised. A realistic effect needs ~3,400+ events.
+> **Unsupported:** the eight-asset taxonomy as a *reader classifier*, and the Anne/Jessica claim. The sharpest evidence against the latter is Sparks et al. (2020): possessing someone else's stated ideals predicted romantic interest as well as possessing their own — good qualities are good for everyone. Charles's scepticism was the correct position.
+> **Survives:** §5 (verbatim quote treatment — now *strengthened*, via warranting theory), §6 (the witness asset, still the only thing a person can't self-claim), §7 (SES via education × occupation, rural/urban from ZIP), §8 (A/B the fished prompts against the bank).
+> The eight assets survive **generation-side**, as a writer's checklist and as logging tags on pitch_events — never as something we score a reader on.
+
 **Commissioned by Charles 2026-08-23.** Kicks off the work of deciding what a "reader archetype" is in PLY, whether content calibration beats style calibration, and what we bank at launch to find out.
 **Origin:** the Anne/Jessica problem — *"how do we pitch Dane to Anne (FIT, fashion, urbane) so she's salivating AND pitch the same Dane to Jessica (gourmand, doesn't care about fashion)?"*
 **Companions:** `specs/matching-v2-story-elicitation.md` (the eight story assets) · `matching_algo-v2.md` §5–§6 (taste step + style matrix) · `specs/matching-v2-decision-memo.md` §1 F1–F4.
