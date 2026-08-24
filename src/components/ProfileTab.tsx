@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react'
 import ProfileCompleteness from './ProfileCompleteness'
 import VoiceRecorder from './VoiceRecorder'
 import { computePersonalityReveal, type PersonalityReveal } from '@/lib/personality-reveal'
-import { getTargetedPrompts, QUESTION_BANK, type PromptDef } from '@/lib/prompts'
+import { getTargetedPrompts, getPromptText, type PromptDef } from '@/lib/prompts'
 
 interface VoiceMemo {
   id: string
@@ -23,7 +23,6 @@ interface ProfileTabProps {
   onMemoRecorded: () => void
 }
 
-const promptTextMap = new Map(QUESTION_BANK.map(q => [q.id, q.text]))
 
 export default function ProfileTab({ userId, composite, memos, onMemoRecorded }: ProfileTabProps) {
   const [reveal, setReveal] = useState<PersonalityReveal | null>(null)
@@ -222,7 +221,7 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-stone-700">
-                  {promptTextMap.get(memo.prompt_id)?.slice(0, 60) || memo.prompt_id}...
+                  {getPromptText(memo.prompt_id)?.slice(0, 60) || memo.prompt_id}...
                 </span>
                 <span className="text-[10px] text-stone-400">
                   {memo.transcript?.split(/\s+/).filter(Boolean).length || 0} words
