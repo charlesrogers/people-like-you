@@ -25,9 +25,13 @@ function normalizePhone(raw: unknown): string | null {
 
 // International phones (country-page signups): digits including the country code.
 // E.164 allows 8–15 digits; we can't validate per-country plans, so bounds are the check.
-function normalizeIntlPhone(raw: unknown): string | null {
+// The dedupe key is namespaced with the ISO country ("NG:8012345678") — US keys are bare
+// 10-digit strings, and a Nigerian mobile typed without its leading 0 is ALSO 10 digits
+// (70x/80x/90x prefixes overlap US area codes, including 801), so an unprefixed key
+// could dedupe against a US signup and hand back someone else's referral code.
+function normalizeIntlPhone(raw: unknown, country: string): string | null {
   const d = String(raw ?? '').replace(/\D/g, '')
-  return d.length >= 8 && d.length <= 15 ? d : null
+  return d.length >= 8 && d.length <= 15 ? `${country}:${d}` : null
 }
 
 // Countries the organic pages capture for. Anything else is rejected rather than
@@ -44,9 +48,11 @@ type DB = ReturnType<typeof createServerClient>
 
 /** Live position within the signup's metro (or global if metro unresolved), after referral jumps. */
 async function computePosition(db: DB, row: { created_at: string; metro_key: string | null; referral_code: string }) {
-  // Signup order within the same cohort (metro, or global when unassigned).
+  // Signup order within the same cohort (metro, or global when unassigned). The
+  // unassigned cohort excludes international rows (country set, metro always NULL) so
+  // intl signups don't inflate the queue position of US ZIPs that resolve to no metro.
   let idxQ = db.from('waitlist').select('id', { count: 'exact', head: true }).lte('created_at', row.created_at)
-  idxQ = row.metro_key ? idxQ.eq('metro_key', row.metro_key) : idxQ.is('metro_key', null)
+  idxQ = row.metro_key ? idxQ.eq('metro_key', row.metro_key) : idxQ.is('metro_key', null).is('country', null)
   const { count: signupIndex } = await idxQ
 
   // This signup's confirmed referrals.
@@ -111,7 +117,7 @@ export async function POST(req: NextRequest) {
       if (!INTL_COUNTRIES.has(String(country))) {
         return NextResponse.json({ error: 'Unsupported country.' }, { status: 400 })
       }
-      const intl_normalized = normalizeIntlPhone(phone)
+      const intl_normalized = normalizeIntlPhone(phone, String(country))
       if (!intl_normalized) {
         return NextResponse.json({ error: 'Please enter a valid phone number with country code.' }, { status: 400 })
       }
