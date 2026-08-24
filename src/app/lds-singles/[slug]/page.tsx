@@ -1,8 +1,9 @@
 import { notFound } from 'next/navigation'
 import ArticleShell, {
-  SectionHeading, Paras, StatsTable, FaqBlock, faqJsonLd, JsonLd, WaitlistCta, SourceNote,
+  HeroCopy, SectionHeading, Paras, StatsTable, FaqBlock, faqJsonLd, JsonLd, WaitlistCta, SourceNote,
 } from '@/components/seo/ArticleShell'
 import CountryArticle from '@/components/seo/CountryArticle'
+import WaitlistForm from '@/components/WaitlistForm'
 import { METRO_CONTENT } from '@/content/metro-pages'
 import { COUNTRY_CONTENT } from '@/content/country-pages'
 import metros from '@/data/seo-metros.json'
@@ -49,9 +50,16 @@ function MetroPage({ slug }: { slug: string }) {
   ]
   if (d.pool) rows.push(['Never-married residents 20–34 (all faiths)', fmt(d.pool.total)])
   return (
-    <ArticleShell>
+    <ArticleShell
+      crumb={{ href: '/lds-singles', label: 'All cities & countries' }}
+      hero={
+        <>
+          <HeroCopy h1={c.h1} hook={c.hook} />
+          <WaitlistForm source={`seo-metro-${slug}`} />
+        </>
+      }
+    >
       <JsonLd data={faqJsonLd(c.faq)} />
-      <h1 className="mt-8 text-3xl font-bold tracking-tight text-stone-900">{c.h1}</h1>
       <Paras paras={c.intro} />
       <SectionHeading>The numbers</SectionHeading>
       <StatsTable
@@ -68,10 +76,9 @@ function MetroPage({ slug }: { slug: string }) {
       <Paras paras={c.honest} />
       <FaqBlock faq={c.faq} heading="Common questions" />
       <WaitlistCta
-        slug={`metro-${slug}`}
         title="People Like You is coming here"
-        body="PLY is a matchmaker, not another swipe app: one real introduction a day, with the reason you two would work. Each metro opens once enough people nearby have joined — so joining from here is what moves this city up the list."
-        button="Join the waitlist"
+        body="One real introduction a day, with the reason you two would work. Each metro opens once enough people nearby have joined — joining from here is what moves this city up the list."
+        button="Join the waitlist ↑"
       />
       <SourceNote>
         Congregation and adherent figures are from the 2020 U.S. Religion Census (Religious
@@ -84,4 +91,3 @@ function MetroPage({ slug }: { slug: string }) {
     </ArticleShell>
   )
 }
-

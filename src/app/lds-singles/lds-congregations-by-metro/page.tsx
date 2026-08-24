@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import ArticleShell, { Paras, JsonLd, WaitlistCta, SourceNote } from '@/components/seo/ArticleShell'
+import ArticleShell, { HeroCopy, Paras, JsonLd, WaitlistCta, SourceNote } from '@/components/seo/ArticleShell'
+import WaitlistForm from '@/components/WaitlistForm'
 import { METRO_CONTENT } from '@/content/metro-pages'
 import rankings from '@/data/seo-rankings.json'
 import metros from '@/data/seo-metros.json'
@@ -29,11 +30,17 @@ const datasetJsonLd = {
 
 export default function Page() {
   return (
-    <ArticleShell>
+    <ArticleShell
+      crumb={{ href: '/lds-singles', label: 'All cities & countries' }}
+      hero={
+        <>
+          <HeroCopy h1="LDS congregations and members: every U.S. metro" hook="One real introduction a day, chosen on actual compatibility — in whichever of these 869 metros you call home." />
+          <WaitlistForm source="seo-ranking-all-metros" />
+        </>
+      }
+    >
       <JsonLd data={datasetJsonLd} />
-      <h1 className="mt-8 text-3xl font-bold tracking-tight text-stone-900">
-        LDS congregations and members: every U.S. metro
-      </h1>
+      
       <Paras
         paras={[
           `How many Latter-day Saints live in your metro? This is the complete answer for all 869 U.S. metropolitan and micropolitan areas — congregations, members, and share of population — from the 2020 U.S. Religion Census, ranked by membership. Congregations count all wards and branches; the census does not break out singles wards.`,
@@ -76,10 +83,9 @@ export default function Page() {
         </table>
       </div>
       <WaitlistCta
-        slug="ranking-all-metros"
         title="Single where you are?"
         body="People Like You is a matchmaker — one real introduction a day, chosen on actual compatibility, with the reason attached. Each metro opens once enough people nearby join the waitlist."
-        button="Join the waitlist"
+        button="Join the waitlist ↑"
       />
       <SourceNote>
         Source: 2020 U.S. Religion Census, Religious Congregations &amp; Membership Study
