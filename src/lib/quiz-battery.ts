@@ -1,9 +1,16 @@
-// AUTO-DERIVED FROM `specs/matching-v2-questionnaire-battery-v1.md` (rc6).
+// AUTO-DERIVED FROM `specs/matching-v2-questionnaire-battery-v1.md` (rc8).
 //
-// COPY IS FROZEN. Every stem, option and framing string below is byte-for-byte
-// identical to the spec — `src/lib/__tests__/quiz-copy-freeze.test.ts` asserts it
-// against the spec file itself and fails the build on any drift. If a string
-// reads wrong, raise it with Charles; do not edit it here.
+// COPY IS FROZEN — stems, option labels and emoji all ship byte-for-byte.
+// `src/lib/__tests__/quiz-copy-freeze.test.ts` asserts every string against the
+// spec file and fails the build on drift. Raise anything that reads wrong with
+// Charles; never edit it here.
+//
+// rc8 changes: 22 items (the nerd-out moved out of the quiz into the voice
+// step), no block-card interstitials, one emoji per option, and NO trait
+// double-scoring of milieu items — that was a spec error. An option set built so
+// no answer lands worse than its siblings cannot also be scored ordinally on a
+// desirable trait. C and A therefore ship with one indicator each, logged and
+// never reported as measurements.
 
 export const INSTRUMENT_VERSION = 'B-1.0'
 
@@ -11,379 +18,358 @@ export type Trait = 'O' | 'E' | 'C' | 'A' | 'N'
 export type Register = 'playful' | 'earnest'
 export type PoliticsImportance = 'none' | 'prefer' | 'strong'
 
+export interface QuizOption {
+  /** One emoji, content not decoration. Null on the politics items by design. */
+  emoji: string | null
+  label: string
+}
+
 export interface TraitScoring {
   trait: Trait
-  /**
-   * Per-option value on the 1-4 trait scale, index-aligned with `options` as
-   * listed here (i.e. before any polarity flip). Scoring un-flips first.
-   */
+  /** Per-option value on the 1-4 scale, index-aligned with `options` as listed. */
   values: number[]
 }
 
 export interface QuizItem {
   id: string
-  /** Spec code (M1, T-O1, H2b...) — kept so the battery stays traceable to the spec. */
   code: string
   block: number
   stem: string
-  options: string[]
+  options: QuizOption[]
   skippable: boolean
-  /**
-   * Straightline protection: the 9 trait items have their option order reversed
-   * for a random half of users, seeded per user so Back does not reshuffle.
-   * Q9 is exempt — its options are a clock and must stay in time order.
-   */
   polarityRandomised: boolean
   scoring: TraitScoring[]
-  /** Register indicator (Q16, Q17): per-option register, index-aligned. */
   register?: Register[]
-  kind: 'choice' | 'free'
+  /** Fine-print line under the options (Q22 only). */
+  sub?: string
 }
 
 export interface QuizBlock {
   block: number
-  /** Zero-tap block card shown before the block's items. Block 5 has none. */
-  card: string | null
+  name: string
+  /** House chart token used for this block's background tint. Null = plain background. */
+  tint: string | null
   items: string[]
 }
 
 export const QUIZ_ITEMS: QuizItem[] = [
   {
     id: "Q1", code: "M1", block: 1,
-    stem: "At seventeen you were, on the record…",
+    stem: "At seventeen, everyone knew you as:",
     options: [
-      "theatre kid",
-      "jock",
-      "honor-roll grinder",
-      "the one organizing the hang",
-      "happily unaffiliated",
-      "a completely different person",
+      { emoji: "🎭", label: "theatre kid" },
+      { emoji: "🏀", label: "jock" },
+      { emoji: "📚", label: "honor-roll grinder" },
+      { emoji: "📋", label: "the one organizing the hang" },
+      { emoji: "🎧", label: "happily unaffiliated" },
+      { emoji: "🦋", label: "a completely different person" },
     ],
     skippable: true, polarityRandomised: false,
     scoring: [],
-    kind: 'choice',
   },
   {
     id: "Q2", code: "M2", block: 1,
-    stem: "The group is picking a restaurant. Fourteen messages in.",
+    stem: "The group chat is picking a restaurant. Fourteen messages in.",
     options: [
-      "I've already picked it",
-      "I've sent three links and a walking distance",
-      "I said \"I'm easy\" and meant it",
-      "I sent a meme about how long this is taking",
-      "I muted it and I'll go wherever",
+      { emoji: "👑", label: "I've already picked it" },
+      { emoji: "🔗", label: "I've sent three links and a walking distance" },
+      { emoji: "🤷", label: "I said \"I'm easy\" and meant it" },
+      { emoji: "😂", label: "I sent a meme about how long this is taking" },
+      { emoji: "🔕", label: "I muted it and I'll go wherever" },
     ],
     skippable: false, polarityRandomised: false,
-    scoring: [{ trait: 'E', values: [4, 3, 2, 3, 1] }],  // nominal on this trait - explicit per-option values (SV)
-    kind: 'choice',
+    scoring: [],
   },
   {
     id: "Q3", code: "M3", block: 1,
-    stem: "Wedding reception, 10pm.",
+    stem: "It's 10pm at the wedding reception. Where are you?",
     options: [
-      "already home, shoes off",
-      "at a side table, deep in the actual conversation",
-      "outside, handing out sparklers",
-      "on the dance floor since the first song",
+      { emoji: "🏠", label: "already home, shoes off" },
+      { emoji: "💬", label: "at a side table, deep in the actual conversation" },
+      { emoji: "✨", label: "outside, handing out sparklers" },
+      { emoji: "🕺", label: "on the dance floor since the first song" },
     ],
     skippable: false, polarityRandomised: false,
-    scoring: [{ trait: 'E', values: [1.0, 2.0, 3.0, 4.0] }],  // as listed: low -> high
-    kind: 'choice',
+    scoring: [],
   },
   {
     id: "Q4", code: "T-O1", block: 2,
     stem: "It's 1am. You're still up because:",
     options: [
-      "the show kept autoplaying",
-      "I lost track of time",
-      "I went looking for one fact two hours ago",
-      "I've got an idea and I'm not putting it down",
+      { emoji: "📺", label: "the show kept autoplaying" },
+      { emoji: "🕐", label: "I lost track of time" },
+      { emoji: "🌀", label: "I'm down a Wikipedia rabbit hole" },
+      { emoji: "🔨", label: "I'm working on a project I can't put down" },
     ],
     skippable: false, polarityRandomised: true,
     scoring: [{ trait: 'O', values: [1.0, 2.0, 3.0, 4.0] }],  // as listed: low -> high
-    kind: 'choice',
   },
   {
     id: "Q5", code: "T-O2", block: 2,
-    stem: "Last thing you said yes to with no idea what you were doing:",
+    stem: "A friend says \"come to this thing with me, I can't really explain it.\"",
     options: [
-      "that was this month",
-      "sometime this year",
-      "a few years back",
-      "I like knowing what I'm doing",
+      { emoji: "❓", label: "what is it" },
+      { emoji: "📝", label: "I'll come if you tell me what it is" },
+      { emoji: "🕒", label: "what time" },
+      { emoji: "👟", label: "I'm already putting my shoes on" },
     ],
     skippable: false, polarityRandomised: true,
-    scoring: [{ trait: 'O', values: [4.0, 3.0, 2.0, 1.0] }],  // as listed: high -> low
-    kind: 'choice',
+    scoring: [{ trait: 'O', values: [1.0, 2.0, 3.0, 4.0] }],  // as listed: low -> high
   },
   {
     id: "Q6", code: "T-O3", block: 2,
     stem: "One free day in a city you've never been to.",
     options: [
-      "I'm not missing the must-see things",
-      "whatever's near where I'm staying",
-      "I walk until something happens",
-      "I ask someone who lives there and go do that",
+      { emoji: "📸", label: "I'm not missing the must-see things" },
+      { emoji: "📍", label: "whatever's near where I'm staying" },
+      { emoji: "🚶", label: "I walk until something happens" },
+      { emoji: "🗺️", label: "I ask someone who lives there and go do that" },
     ],
     skippable: false, polarityRandomised: true,
     scoring: [{ trait: 'O', values: [1.0, 2.0, 3.0, 4.0] }],  // as listed: low -> high
-    kind: 'choice',
   },
   {
     id: "Q7", code: "T-E1", block: 2,
     stem: "The party's good. You've been there three hours.",
     options: [
-      "actually, I left an hour ago",
-      "I'm in the long goodbye",
-      "second wind",
-      "I'm deciding where everyone goes next",
+      { emoji: "🚪", label: "actually, I left an hour ago" },
+      { emoji: "👋", label: "I'm in the long goodbye" },
+      { emoji: "⚡", label: "second wind" },
+      { emoji: "🚕", label: "I'm deciding where everyone goes next" },
     ],
     skippable: false, polarityRandomised: true,
     scoring: [{ trait: 'E', values: [1.0, 2.0, 3.0, 4.0] }],  // as listed: low -> high
-    kind: 'choice',
   },
   {
     id: "Q8", code: "T-E2", block: 2,
     stem: "Your phone rings. No text first.",
     options: [
-      "I don't answer the phone. Ever.",
-      "I let it go and text back \"everything ok?\"",
-      "I answer, bracing",
-      "I'm delighted — it's been ages",
+      { emoji: "📵", label: "I don't answer the phone. Ever." },
+      { emoji: "🔢", label: "I answer for maybe four people" },
+      { emoji: "😬", label: "I answer, bracing" },
+      { emoji: "☎️", label: "I'm delighted — it's been ages" },
     ],
     skippable: false, polarityRandomised: true,
     scoring: [{ trait: 'E', values: [1.0, 2.0, 3.0, 4.0] }],  // as listed: low -> high
-    kind: 'choice',
   },
   {
     id: "Q9", code: "T-C1", block: 2,
     stem: "You're meeting someone at 7.",
     options: [
-      "I'm there at 6:50",
-      "I'm there at 7",
-      "7:05, and I texted",
-      "7:15, but I have a story",
+      { emoji: "⏰", label: "I'm there at 6:50" },
+      { emoji: "🎯", label: "I'm there at 7" },
+      { emoji: "💬", label: "7:05, and I texted" },
+      { emoji: "🎪", label: "7:15, but I have a story" },
     ],
     skippable: false, polarityRandomised: false,
     scoring: [{ trait: 'C', values: [4.0, 3.0, 2.0, 1.0] }],  // as listed: high -> low
-    kind: 'choice',
   },
   {
     id: "Q10", code: "T-A1", block: 2,
     stem: "Your closest friend is getting back together with the ex. Again.",
     options: [
-      "I say exactly what I think",
-      "I say it once, then I'm supportive",
-      "I ask questions until they hear themselves",
-      "I keep my mouth shut and stay close",
+      { emoji: "🗣️", label: "I say exactly what I think" },
+      { emoji: "🤐", label: "I say it once, then I'm supportive" },
+      { emoji: "🎣", label: "I ask questions until they hear themselves" },
+      { emoji: "🤝", label: "I keep my mouth shut and stay close" },
     ],
     skippable: false, polarityRandomised: true,
     scoring: [{ trait: 'A', values: [1.0, 2.0, 3.0, 4.0] }],  // as listed: low -> high
-    kind: 'choice',
   },
   {
     id: "Q11", code: "T-N1", block: 2,
     stem: "You sent a text an hour ago. Nothing back.",
     options: [
-      "nothing, they're busy",
-      "I've reread what I sent",
-      "I've reread it and drafted the follow-up",
-      "I know exactly what it means",
+      { emoji: "🤷", label: "nothing, they're busy" },
+      { emoji: "👀", label: "I've reread what I sent" },
+      { emoji: "✍️", label: "I've reread it and drafted the follow-up" },
+      { emoji: "🔮", label: "I know exactly what it means" },
     ],
     skippable: false, polarityRandomised: true,
     scoring: [{ trait: 'N', values: [1.0, 2.0, 3.0, 4.0] }],  // as listed: low -> high
-    kind: 'choice',
   },
   {
     id: "Q12", code: "T-N2", block: 2,
     stem: "Someone says \"can I give you some feedback?\"",
     options: [
-      "my stomach drops",
-      "I brace, then I'm fine",
-      "sure, go ahead",
-      "I asked for it, that's why I'm here",
+      { emoji: "😰", label: "my stomach drops" },
+      { emoji: "😅", label: "I brace, then I'm fine" },
+      { emoji: "👍", label: "sure, go ahead" },
+      { emoji: "🙋", label: "I asked for it, that's why I'm here" },
     ],
     skippable: false, polarityRandomised: true,
     scoring: [{ trait: 'N', values: [4.0, 3.0, 2.0, 1.0] }],  // as listed: high -> low
-    kind: 'choice',
   },
   {
     id: "Q13", code: "M4", block: 3,
     stem: "Your last three Saturdays, honestly:",
     options: [
-      "outside before most people were up",
-      "nothing on the calendar, and that was the point",
-      "elbow-deep in something I was making or fixing",
-      "at someone's kitchen table too long",
-      "working, and not entirely mad about it",
+      { emoji: "🌄", label: "outside before most people were up" },
+      { emoji: "📖", label: "nothing on the calendar, and that was the point" },
+      { emoji: "🔧", label: "elbow-deep in something I was making or fixing" },
+      { emoji: "🍳", label: "at someone's kitchen table too long" },
+      { emoji: "💻", label: "working, and not entirely mad about it" },
     ],
     skippable: false, polarityRandomised: false,
-    scoring: [{ trait: 'C', values: [4, 1, 3, 2, 4] }],  // nominal on this trait - explicit per-option values (SV)
-    kind: 'choice',
+    scoring: [],
   },
   {
     id: "Q14", code: "M7", block: 3,
     stem: "The thing in your place a guest always asks about:",
     options: [
-      "the art",
-      "a chair I overpaid for",
-      "the gear — bike, skis, clubs",
-      "an instrument",
-      "something I made",
-      "nothing, and I've never once thought about it",
+      { emoji: "🖼️", label: "the art" },
+      { emoji: "🪑", label: "a chair I overpaid for" },
+      { emoji: "🚲", label: "the gear — bike, skis, clubs" },
+      { emoji: "🎸", label: "an instrument" },
+      { emoji: "🛠️", label: "something I made" },
+      { emoji: "🤷", label: "nothing, and I've never once thought about it" },
     ],
     skippable: false, polarityRandomised: false,
     scoring: [],
-    kind: 'choice',
   },
   {
     id: "Q15", code: "M8", block: 3,
-    stem: "It's their birthday. Your move:",
+    stem: "It's their birthday. Your gift:",
     options: [
-      "something that makes them laugh out loud",
-      "something I made",
-      "the thing they mentioned once, months ago",
-      "a day out, not an object",
-      "I'm not a gift person — I'll be there, though",
+      { emoji: "😂", label: "something that makes them laugh out loud" },
+      { emoji: "🎨", label: "something I made" },
+      { emoji: "🎁", label: "the thing they mentioned once, months ago" },
+      { emoji: "🎟️", label: "a day out, not an object" },
+      { emoji: "🫂", label: "I'm not a gift person — I'll be there, though" },
     ],
     skippable: false, polarityRandomised: false,
-    scoring: [{ trait: 'A', values: [3, 4, 4, 3, 2] }],  // nominal on this trait - explicit per-option values (SV)
-    kind: 'choice',
+    scoring: [],
   },
   {
     id: "Q16", code: "M5", block: 4,
     stem: "The tell that you like someone:",
     options: [
-      "the teasing starts",
-      "the jokes get weirdly specific",
-      "I say it out loud, probably too early",
-      "I start showing up for things",
+      { emoji: "😏", label: "the teasing starts" },
+      { emoji: "🃏", label: "the jokes get weirdly specific" },
+      { emoji: "📱", label: "memes. lots of memes." },
+      { emoji: "💬", label: "I say it out loud, probably too early" },
+      { emoji: "🚗", label: "I start showing up for things" },
     ],
     skippable: false, polarityRandomised: false,
     scoring: [],
-    register: ['playful', 'playful', 'earnest', 'earnest'],
-    kind: 'choice',
+    register: ['playful', 'playful', 'playful', 'earnest', 'earnest'],
   },
   {
     id: "Q17", code: "CS1", block: 4,
     stem: "Your friend just did something genuinely impressive. What you actually say:",
     options: [
-      "something that sounds like an insult",
-      "\"okay, that's actually incredible\"",
-      "I tell them properly, out loud",
-      "I tell everyone except them",
+      { emoji: "🥊", label: "something that sounds like an insult" },
+      { emoji: "🤯", label: "\"okay, that's actually incredible\"" },
+      { emoji: "🫶", label: "I tell them properly, out loud" },
+      { emoji: "📣", label: "I tell everyone except them" },
     ],
     skippable: false, polarityRandomised: false,
     scoring: [],
     register: ['playful', 'playful', 'earnest', 'earnest'],
-    kind: 'choice',
   },
   {
     id: "Q18", code: "CS2", block: 4,
     stem: "Dinner with someone you just met goes well. Afterwards:",
     options: [
-      "they know more about me",
-      "I know more about them",
-      "we found one thing we both care about and never left it",
-      "we argued about something for an hour",
-      "about even, honestly",
+      { emoji: "🎤", label: "they know more about me" },
+      { emoji: "👂", label: "I know more about them" },
+      { emoji: "🔥", label: "we found one thing we both care about and couldn't stop talking about it" },
+      { emoji: "⚔️", label: "we argued about something for an hour" },
+      { emoji: "⚖️", label: "about even, honestly" },
     ],
     skippable: false, polarityRandomised: false,
     scoring: [],
-    kind: 'choice',
   },
   {
-    id: 'Q19', code: 'M9', block: 5,
-    stem: "What do you nerd out on?",
-    options: [],
-    skippable: true, polarityRandomised: false, scoring: [], kind: 'free',
-  },
-  {
-    id: "Q20", code: "H1", block: 6,
+    id: "Q19", code: "H1", block: 5,
     stem: "Education:",
     options: [
-      "high school",
-      "some college",
-      "bachelor's",
-      "grad school or beyond",
+      { emoji: "🏫", label: "high school" },
+      { emoji: "📗", label: "some college" },
+      { emoji: "🎓", label: "bachelor's" },
+      { emoji: "🔬", label: "grad school or beyond" },
     ],
     skippable: false, polarityRandomised: false,
     scoring: [],
-    kind: 'choice',
   },
   {
-    id: "Q21", code: "H3", block: 6,
+    id: "Q20", code: "H3", block: 5,
     stem: "The next five years, honestly:",
     options: [
-      "my work gets serious",
-      "my life gets full — people, a house, all of it",
-      "both, and I know how that sounds",
-      "I've stopped making five-year plans",
+      { emoji: "📈", label: "my work gets serious" },
+      { emoji: "🏡", label: "my life gets full — people, a house, all of it" },
+      { emoji: "🎢", label: "both, and I know how that sounds" },
+      { emoji: "🤷", label: "I've stopped making five-year plans" },
     ],
     skippable: false, polarityRandomised: false,
     scoring: [],
-    kind: 'choice',
   },
   {
-    id: "Q22", code: "H2", block: 6,
+    id: "Q21", code: "H2", block: 5,
     stem: "Politically, roughly:",
     options: [
-      "progressive",
-      "lean progressive",
-      "somewhere in the middle",
-      "lean conservative",
-      "conservative",
-      "rather not say",
+      { emoji: null, label: "progressive" },
+      { emoji: null, label: "lean progressive" },
+      { emoji: null, label: "somewhere in the middle" },
+      { emoji: null, label: "lean conservative" },
+      { emoji: null, label: "conservative" },
+      { emoji: null, label: "rather not say" },
     ],
     skippable: true, polarityRandomised: false,
     scoring: [],
-    kind: 'choice',
   },
   {
-    id: "Q23", code: "H2b", block: 6,
+    id: "Q22", code: "H2b", block: 5,
     stem: "How much does this matter in someone you'd date?",
     options: [
-      "not really something I think about",
-      "I'd rather be close on it",
-      "honestly, I'd struggle with someone far from me",
+      { emoji: null, label: "not really something I think about" },
+      { emoji: null, label: "I'd rather be close on it" },
+      { emoji: null, label: "honestly, I'd struggle with someone far from me" },
     ],
     skippable: false, polarityRandomised: false,
     scoring: [],
-    kind: 'choice',
+    sub: "Only the last one narrows who you'll see.",
   },
 ]
 
 export const QUIZ_BLOCKS: QuizBlock[] = [
-  { block: 1, card: "Let's start with who you've been.", items: ['Q1', 'Q2', 'Q3'] },
-  { block: 2, card: "Now, how you're built.", items: ['Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12'] },
-  { block: 3, card: "What your weeks actually look like.", items: ['Q13', 'Q14', 'Q15'] },
-  { block: 4, card: "How you come across.", items: ['Q16', 'Q17', 'Q18'] },
-  { block: 5, card: null, items: ['Q19'] },
-  { block: 6, card: "A few plain ones, then you're done.", items: ['Q20', 'Q21', 'Q22', 'Q23'] },
+  { block: 1, name: "Identity", tint: "chart-1", items: ['Q1', 'Q2', 'Q3'] },
+  { block: 2, name: "Wired", tint: "chart-5", items: ['Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q9', 'Q10', 'Q11', 'Q12'] },
+  { block: 3, name: "Actual life", tint: "chart-2", items: ['Q13', 'Q14', 'Q15'] },
+  { block: 4, name: "How you talk", tint: "chart-3", items: ['Q16', 'Q17', 'Q18'] },
+  { block: 5, name: "Facts", tint: null, items: ['Q19', 'Q20', 'Q21', 'Q22'] },
 ]
 
-/** Framing copy, §4 of the battery spec. Frozen. */
+/** Framing copy, battery §2c. Block cards were removed in rc8. */
 export const FRAMING = {
   intro: "A few questions so we know how to introduce you. Nothing here is graded, and none of it is shown to anyone as a score.",
   honesty: "Answer as the person who'll actually be sitting across the table.",
   skip: "skip this one",
   close: "That's it. Next we'll ask you about a couple of things you just told us, and you get to answer out loud.",
-  q19TextPlaceholder: "specific beats impressive",
-  q19AudioAffordance: "or say it \u2014 30 seconds",
-  q23Sub: "Only the last one narrows who you'll see.",
 } as const
 
-/** The 11 items whose answers seed a fished voice prompt (D-QD4). */
-export const SEEDING_ITEMS: string[] = ['Q1', 'Q3', 'Q5', 'Q6', 'Q9', 'Q10', 'Q13', 'Q14', 'Q15', 'Q19', 'Q21']
+/** The nerd-out, moved out of the quiz into the voice step (battery §2b). */
+export const NERD_OUT_PROMPT = {
+  id: 'nerd_out',
+  text: 'What do you nerd out on?',
+  help: 'The small stuff is the good stuff — the more specific, the better.',
+} as const
 
-/** Q22 index -> politics position on a 0-4 left/right scale. Index 5 ("rather not say") is null. */
+/** Items whose answer seeds a fished voice prompt. */
+export const SEEDING_ITEMS: string[] = ['Q1', 'Q3', 'Q6', 'Q9', 'Q10', 'Q13', 'Q14', 'Q15']
+
+/** Q21 index -> politics position on a 0-4 scale. Index 5 ("rather not say") is null. */
 export const POLITICS_POSITION: (number | null)[] = [0, 1, 2, 3, 4, null]
 
-/** Q23 index -> importance tier. */
+/** Q22 index -> importance tier. */
 export const POLITICS_IMPORTANCE: PoliticsImportance[] = ['none', 'prefer', 'strong']
 
 export const ITEM_COUNT = QUIZ_ITEMS.length
 
 export function getItem(id: string): QuizItem | undefined {
   return QUIZ_ITEMS.find(i => i.id === id)
+}
+
+export function blockOf(itemId: string): QuizBlock | undefined {
+  return QUIZ_BLOCKS.find(b => b.items.includes(itemId))
 }

@@ -120,3 +120,25 @@ body {
   background-size: 256px;
   pointer-events: none;
 }
+
+/* ─── Quiz motion (D-QD5 §4) ─────────────────────────────────────────────── */
+@keyframes quiz-stem-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes quiz-card-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: none; }
+}
+.quiz-stem-in { animation: quiz-stem-in 220ms ease-out both; }
+.quiz-card-in { animation: quiz-card-in 200ms ease-out both; }
+
+/* Reduced motion: no translation, no stagger, crossfade only. The advance
+   timing is unchanged so the flow still feels the same. */
+@media (prefers-reduced-motion: reduce) {
+  @keyframes quiz-stem-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes quiz-card-in { from { opacity: 0; } to { opacity: 1; } }
+  .quiz-stem-in { animation: quiz-stem-in 100ms linear both; }
+  .quiz-card-in { animation: quiz-card-in 100ms linear both; animation-delay: 0ms !important; }
+  .quiz-screen { transition: opacity 100ms linear !important; transform: none !important; }
+}

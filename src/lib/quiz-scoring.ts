@@ -4,7 +4,7 @@
 import {
   QUIZ_ITEMS, getItem, INSTRUMENT_VERSION,
   POLITICS_POSITION, POLITICS_IMPORTANCE,
-  type Trait, type Register, type PoliticsImportance,
+  type Trait, type Register, type PoliticsImportance, type QuizOption,
 } from './quiz-battery'
 
 export interface QuizResponse {
@@ -53,7 +53,7 @@ export function isPolarityFlipped(userId: string, itemId: string): boolean {
 }
 
 /** The option list as the user sees it. */
-export function displayOptions(itemId: string, flipped: boolean): string[] {
+export function displayOptions(itemId: string, flipped: boolean): QuizOption[] {
   const item = getItem(itemId)
   if (!item) return []
   return flipped ? [...item.options].reverse() : item.options
@@ -79,9 +79,9 @@ function categorical(itemId: string, r: QuizResponse | undefined): Categorical |
   const item = getItem(itemId)
   if (!item) return null
   const idx = canonicalIndex(itemId, r.optionIndex, r.polarityFlipped)
-  const label = item.options[idx]
-  if (label == null) return null
-  return { index: idx, label }
+  const option = item.options[idx]
+  if (option == null) return null
+  return { index: idx, label: option.label }
 }
 
 /**
@@ -132,19 +132,12 @@ export function deriveRegister(responses: QuizResponse[]): Register {
   return playful > earnest ? 'playful' : 'earnest'
 }
 
-export interface ScoreOptions {
-  /** Q19 transcript or typed text. */
-  m9Text?: string | null
-  /** Storage path of the Q19 audio clip, when it was recorded rather than typed. */
-  m9AudioUrl?: string | null
-}
-
-export function scoreQuiz(responses: QuizResponse[], opts: ScoreOptions = {}): ReaderTraits {
+export function scoreQuiz(responses: QuizResponse[]): ReaderTraits {
   const byId = new Map(responses.map(r => [r.itemId, r]))
   const cat = (id: string) => categorical(id, byId.get(id))
 
-  const politicsCat = cat('Q22')
-  const importanceCat = cat('Q23')
+  const politicsCat = cat('Q21')
+  const importanceCat = cat('Q22')
 
   return {
     big5: scoreBig5(responses),
@@ -156,14 +149,12 @@ export function scoreQuiz(responses: QuizResponse[], opts: ScoreOptions = {}): R
       M7: cat('Q14'),
       M8: cat('Q15'),
       Q6: cat('Q6'),
-      m9_text: opts.m9Text ?? null,
-      m9_audio_url: opts.m9AudioUrl ?? null,
     },
     homogamy: {
-      education: cat('Q20'),
+      education: cat('Q19'),
       politics_position: politicsCat ? POLITICS_POSITION[politicsCat.index] ?? null : null,
       politics_importance: importanceCat ? POLITICS_IMPORTANCE[importanceCat.index] ?? null : null,
-      five_year: cat('Q21'),
+      five_year: cat('Q20'),
     },
     convo: {
       M5: cat('Q16'),

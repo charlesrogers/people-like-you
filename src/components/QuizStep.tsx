@@ -3,92 +3,85 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import posthog from 'posthog-js'
 import { apiFetch } from '@/lib/api-client'
-import {
-  QUIZ_ITEMS, QUIZ_BLOCKS, FRAMING, INSTRUMENT_VERSION, getItem,
-} from '@/lib/quiz-battery'
+import { QUIZ_ITEMS, QUIZ_BLOCKS, FRAMING, INSTRUMENT_VERSION, getItem, blockOf } from '@/lib/quiz-battery'
 import { isPolarityFlipped, displayOptions } from '@/lib/quiz-scoring'
 
-const CARD_AUTO_ADVANCE_MS = 1200
-const Q19_TEXT_CAP = 120
-const Q19_AUDIO_CAP_S = 30
-const Q19_PROMPT_ID = 'Q19_nerd_out'
-const TRANSITION_MS = 120
+// D-QD5 §4 — every timing is a starting value, but something must be specified
+// for each. Silence is what made the first build feel dead.
+const T_DIM = 90        // other options fade back
+const T_EXIT = 180      // screen starts leaving
+const T_ENTER = 340     // next screen enters
+const EXIT_MS = 160
+const STAGGER_MS = 40
+const CLOSE_HOLD_MS = 1200
 
 export interface QuizAnswer {
   optionIndex: number | null
   polarityFlipped: boolean
   responseMs: number | null
 }
-
 export interface QuizResult {
   answers: Record<string, QuizAnswer>
-  m9Text: string | null
-  m9AudioUrl: string | null
 }
 
-type Screen =
-  | { kind: 'intro' }
-  | { kind: 'card'; block: number; card: string }
-  | { kind: 'item'; itemId: string }
-  | { kind: 'close' }
+type Screen = { kind: 'intro' } | { kind: 'item'; itemId: string } | { kind: 'close' }
 
-const SCREENS: Screen[] = (() => {
-  const s: Screen[] = [{ kind: 'intro' }]
-  for (const b of QUIZ_BLOCKS) {
-    if (b.card) s.push({ kind: 'card', block: b.block, card: b.card })
-    for (const id of b.items) s.push({ kind: 'item', itemId: id })
-  }
-  s.push({ kind: 'close' })
-  return s
-})()
+const SCREENS: Screen[] = [
+  { kind: 'intro' },
+  ...QUIZ_ITEMS.map(i => ({ kind: 'item' as const, itemId: i.id })),
+  { kind: 'close' },
+]
+const TOTAL = QUIZ_ITEMS.length
 
-const TOTAL_ITEMS = QUIZ_ITEMS.length
-
-function itemsAnsweredBefore(index: number): number {
-  return SCREENS.slice(0, index).filter(s => s.kind === 'item').length
+// D-QD5 §5 — a background tint per block, barely perceptible screen-to-screen
+// and obvious across the flow. It is the only remaining signal that blocks
+// exist, now that the interstitials are gone.
+const TINTS: Record<number, string> = {
+  1: 'rgba(109, 92, 255, 0.055)',   // Identity
+  2: 'rgba(180, 92, 255, 0.055)',   // Wired
+  3: 'rgba(47, 191, 113, 0.055)',   // Actual life
+  4: 'rgba(224, 169, 47, 0.06)',    // How you talk
+  5: 'rgba(0, 0, 0, 0)',            // Facts — plain, the home stretch
 }
 
 export default function QuizStep({
-  userId,
-  onComplete,
+  userId, onComplete,
 }: {
   userId: string
   onComplete: (result: QuizResult) => void
 }) {
   const [idx, setIdx] = useState(0)
-  const [leaving, setLeaving] = useState(false)
-  const answersRef = useRef<Record<string, QuizAnswer>>({})
-  const [answerTick, setAnswerTick] = useState(0)   // re-render on answer change
-  const flushedRef = useRef<Set<number>>(new Set())
-  const startedAtRef = useRef<number>(0)
-  const itemShownAtRef = useRef<number>(0)
-  const blockStartedAtRef = useRef<number>(0)
-  const completedRef = useRef(false)
-  // +1 forward, -1 backward. Block cards only auto-advance going forward —
-  // otherwise Back lands on a card that bounces you forward again, and you can
-  // never navigate back across a block boundary.
-  const dirRef = useRef(1)
+  const [answers, setAnswers] = useState<Record<string, QuizAnswer>>({})
+  const [justPicked, setJustPicked] = useState<number | null>(null)
+  const [dim, setDim] = useState(false)
+  const [exiting, setExiting] = useState(false)
+  const [dir, setDir] = useState<1 | -1>(1)
+  const [filled, setFilled] = useState(0)
+  const [closing, setClosing] = useState(false)
 
-  const [q19Text, setQ19Text] = useState('')
-  const q19TranscriptRef = useRef<string | null>(null)
-  const q19AudioUrlRef = useRef<string | null>(null)
-  const [q19Recording, setQ19Recording] = useState(false)
-  const [q19Seconds, setQ19Seconds] = useState(0)
-  const q19SecondsRef = useRef(0)
-  const [q19Status, setQ19Status] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const answersRef = useRef<Record<string, QuizAnswer>>({})
+  const flushedRef = useRef<Set<number>>(new Set())
+  const startedAtRef = useRef(0)
+  const itemShownAtRef = useRef(0)
+  const completedRef = useRef(false)
+  const timers = useRef<number[]>([])
 
   const screen = SCREENS[idx]
+  const item = screen?.kind === 'item' ? getItem(screen.itemId) : undefined
+  const block = screen?.kind === 'item' ? blockOf(screen.itemId)?.block ?? 5 : 0
 
-  // Polarity is seeded on the user id, so Back never reshuffles an item.
   const flips = useMemo(() => {
     const m: Record<string, boolean> = {}
     for (const it of QUIZ_ITEMS) m[it.id] = isPolarityFlipped(userId, it.id)
     return m
   }, [userId])
 
-  // ─── Persistence ─────────────────────────────────────────────────────────
-  // Buffered: one POST per block card and one at the end. Never between items.
+  const after = (ms: number, fn: () => void) => {
+    timers.current.push(window.setTimeout(fn, ms))
+  }
+  useEffect(() => () => { timers.current.forEach(window.clearTimeout) }, [])
 
+  // ─── Persistence: buffered, one POST per block boundary and one at the end ──
   const flush = useCallback(async (itemIds: string[], complete: boolean) => {
     const responses = itemIds
       .filter(id => answersRef.current[id] !== undefined)
@@ -98,77 +91,87 @@ export default function QuizStep({
       await apiFetch('/api/quiz', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId,
-          responses,
-          complete,
-          m9Text: q19TranscriptRef.current,
-          m9AudioUrl: q19AudioUrlRef.current,
-        }),
+        body: JSON.stringify({ userId, responses, complete }),
       })
-    } catch {
-      // Never block the flow on a write; the final POST re-sends everything.
-    }
+    } catch { /* never block the flow; the final POST re-sends everything */ }
   }, [userId])
 
-  // ─── Navigation ──────────────────────────────────────────────────────────
-
-  const go = useCallback((next: number) => {
-    setLeaving(true)
-    window.setTimeout(() => {
+  // ─── Navigation ────────────────────────────────────────────────────────────
+  const goTo = useCallback((next: number, direction: 1 | -1) => {
+    setDir(direction)
+    setExiting(true)
+    after(EXIT_MS, () => {
       setIdx(next)
-      setLeaving(false)
-    }, TRANSITION_MS)
+      setExiting(false)
+      setDim(false)
+      setJustPicked(null)
+    })
   }, [])
 
-  const advance = useCallback(() => {
-    dirRef.current = 1
-    const next = idx + 1
+  const advanceFrom = useCallback((current: number) => {
+    const next = current + 1
     const target = SCREENS[next]
     if (!target) return
-
-    // Arriving at a block card flushes the block that just ended.
-    if (target.kind === 'card') {
-      const prior = QUIZ_BLOCKS.filter(b => b.block < target.block).flatMap(b => b.items)
-      if (prior.length > 0 && !flushedRef.current.has(target.block)) {
-        flushedRef.current.add(target.block)
-        const elapsed = Math.round(performance.now() - blockStartedAtRef.current)
-        posthog.capture('quiz_block_completed', { block: target.block - 1, elapsed_ms: elapsed })
-        void flush(prior, false)
+    const from = SCREENS[current]
+    if (from?.kind === 'item' && target.kind === 'item') {
+      const b1 = blockOf(from.itemId)?.block
+      const b2 = blockOf(target.itemId)?.block
+      if (b1 && b2 && b1 !== b2 && !flushedRef.current.has(b1)) {
+        flushedRef.current.add(b1)
+        posthog.capture('quiz_block_completed', { block: b1 })
+        void flush(QUIZ_BLOCKS.find(b => b.block === b1)!.items, false)
       }
-      blockStartedAtRef.current = performance.now()
     }
-    go(next)
-  }, [idx, flush, go])
+    goTo(next, 1)
+  }, [flush, goTo])
 
   const back = useCallback(() => {
-    dirRef.current = -1
-    if (idx > 0) go(idx - 1)
-  }, [idx, go])
+    if (idx > 0) {
+      setFilled(f => Math.max(0, f - 1))
+      goTo(idx - 1, -1)
+    }
+  }, [idx, goTo])
 
+  // ─── Answer → the core interaction (D-QD5 §4) ──────────────────────────────
   const answer = useCallback((itemId: string, displayedIndex: number | null) => {
-    answersRef.current[itemId] = {
+    if (exiting) return
+    const rec: QuizAnswer = {
       optionIndex: displayedIndex,
       polarityFlipped: flips[itemId] ?? false,
       responseMs: itemShownAtRef.current ? Math.round(performance.now() - itemShownAtRef.current) : null,
     }
-    setAnswerTick(t => t + 1)
+    answersRef.current[itemId] = rec
+    setAnswers(a => ({ ...a, [itemId]: rec }))
+    setJustPicked(displayedIndex)
     posthog.capture('quiz_item_answered', {
-      item_id: itemId,
-      option_index: displayedIndex,
-      polarity_flipped: flips[itemId] ?? false,
-      response_ms: answersRef.current[itemId].responseMs,
+      item_id: itemId, option_index: displayedIndex,
+      polarity_flipped: rec.polarityFlipped, response_ms: rec.responseMs,
       instrument_version: INSTRUMENT_VERSION,
     })
-    advance()
-  }, [advance, flips])
+    after(T_DIM, () => setDim(true))
+    // The dot fills as the screen leaves, so the reward lands with the tap.
+    after(T_EXIT, () => setFilled(f => Math.min(TOTAL, f + 1)))
+    after(T_EXIT, () => { setDir(1); setExiting(true) })
+    after(T_ENTER, () => {
+      setIdx(i => {
+        const next = i + 1
+        const from = SCREENS[i], target = SCREENS[next]
+        if (from?.kind === 'item' && target?.kind === 'item') {
+          const b1 = blockOf(from.itemId)?.block, b2 = blockOf(target.itemId)?.block
+          if (b1 && b2 && b1 !== b2 && !flushedRef.current.has(b1)) {
+            flushedRef.current.add(b1)
+            posthog.capture('quiz_block_completed', { block: b1 })
+            void flush(QUIZ_BLOCKS.find(b => b.block === b1)!.items, false)
+          }
+        }
+        return next
+      })
+      setExiting(false); setDim(false); setJustPicked(null)
+    })
+  }, [exiting, flips, flush])
 
-  // ─── Instrumentation ─────────────────────────────────────────────────────
-
-  useEffect(() => {
-    startedAtRef.current = performance.now()
-    blockStartedAtRef.current = performance.now()
-  }, [])
+  // ─── Instrumentation ───────────────────────────────────────────────────────
+  useEffect(() => { startedAtRef.current = performance.now() }, [])
 
   useEffect(() => {
     if (screen?.kind === 'item') {
@@ -188,323 +191,144 @@ export default function QuizStep({
       })
     }
     window.addEventListener('beforeunload', abandon)
-    return () => {
-      window.removeEventListener('beforeunload', abandon)
-      abandon()
-    }
+    return () => { window.removeEventListener('beforeunload', abandon); abandon() }
   }, [idx])
-
-  // Block cards are zero-tap: they auto-advance, or the user taps through sooner.
-  useEffect(() => {
-    if (screen?.kind !== 'card') return
-    // Arrived here via Back: sit still and let the user read/tap, so Back can
-    // actually cross the block boundary.
-    if (dirRef.current < 0) return
-    const t = window.setTimeout(advance, CARD_AUTO_ADVANCE_MS)
-    return () => window.clearTimeout(t)
-  }, [screen, advance])
-
-  // ─── Q19 audio ───────────────────────────────────────────────────────────
-
-  const recorderRef = useRef<MediaRecorder | null>(null)
-  const recStartedAtRef = useRef<number>(0)
-  const chunksRef = useRef<Blob[]>([])
-  const streamRef = useRef<MediaStream | null>(null)
-  const tickRef = useRef<number | null>(null)
-
-  const getMimeType = () => {
-    if (typeof MediaRecorder === 'undefined') return null
-    if (MediaRecorder.isTypeSupported('audio/mp4')) return 'audio/mp4'
-    if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) return 'audio/webm;codecs=opus'
-    if (MediaRecorder.isTypeSupported('audio/webm')) return 'audio/webm'
-    return null
-  }
-
-  const stopQ19 = useCallback(() => {
-    if (tickRef.current) { window.clearInterval(tickRef.current); tickRef.current = null }
-    recorderRef.current?.state === 'recording' && recorderRef.current.stop()
-    setQ19Recording(false)
-  }, [])
-
-  const startQ19 = useCallback(async () => {
-    const mimeType = getMimeType()
-    if (!mimeType) { setQ19Status('error'); return }
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      streamRef.current = stream
-      const rec = new MediaRecorder(stream, { mimeType })
-      recorderRef.current = rec
-      chunksRef.current = []
-      rec.ondataavailable = e => { if (e.data.size > 0) chunksRef.current.push(e.data) }
-      rec.onstop = () => {
-        stream.getTracks().forEach(t => t.stop())
-        const blob = new Blob(chunksRef.current, { type: mimeType })
-        const secs = Math.max(1, Math.round((performance.now() - recStartedAtRef.current) / 1000))
-        q19SecondsRef.current = secs
-        if (blob.size > 0) void uploadQ19(blob, mimeType, secs)
-        // Do not block advance on transcription — it runs while the user
-        // answers Q20-Q23 (~30s of one-tap items). answer() records the response
-        // row too, so an audio Q19 is not invisible to item analytics.
-        answer('Q19', null)
-      }
-      rec.start()
-      setQ19Recording(true)
-      setQ19Seconds(0)
-      q19SecondsRef.current = 0
-      recStartedAtRef.current = performance.now()
-      tickRef.current = window.setInterval(() => {
-        setQ19Seconds(s => {
-          const next = s + 1
-          q19SecondsRef.current = next
-          if (next >= Q19_AUDIO_CAP_S) stopQ19()
-          return next
-        })
-      }, 1000)
-    } catch {
-      setQ19Status('error')
-    }
-  }, [answer, stopQ19])
-
-  const uploadQ19 = useCallback(async (blob: Blob, mimeType: string, seconds: number) => {
-    setQ19Status('saving')
-    const ext = mimeType.includes('mp4') ? 'm4a' : 'webm'
-
-    // Storage: an ordinary voice memo, so it flows into extraction as story
-    // material and through the existing moderation path.
-    const memoForm = new FormData()
-    memoForm.append('audio', blob, `${Q19_PROMPT_ID}.${ext}`)
-    memoForm.append('userId', userId)
-    memoForm.append('promptId', Q19_PROMPT_ID)
-    memoForm.append('dayNumber', '0')
-    memoForm.append('durationSeconds', String(seconds))
-    memoForm.append('promptSource', 'fished')
-    memoForm.append('promptSeed', JSON.stringify({ itemId: 'Q19', optionIndex: -1 }))
-
-    // Transcript: needed by the voice step to template the Q19 prompt.
-    const txForm = new FormData()
-    txForm.append('audio', blob, `${Q19_PROMPT_ID}.${ext}`)
-    txForm.append('userId', userId)
-
-    try {
-      const [memoRes, txRes] = await Promise.all([
-        apiFetch('/api/voice-memo', { method: 'POST', body: memoForm }).then(r => r.json()).catch(() => null),
-        apiFetch('/api/transcribe', { method: 'POST', body: txForm }).then(r => r.json()).catch(() => null),
-      ])
-      if (memoRes?.id) q19AudioUrlRef.current = memoRes.id
-      if (txRes?.text) {
-        q19TranscriptRef.current = txRes.text
-        setQ19Status('saved')
-      } else {
-        setQ19Status(txRes?.error ? 'error' : 'saved')
-      }
-    } catch {
-      setQ19Status('error')
-    }
-  }, [userId])
-
-  useEffect(() => () => {
-    if (tickRef.current) window.clearInterval(tickRef.current)
-    streamRef.current?.getTracks().forEach(t => t.stop())
-  }, [])
-
-  // ─── Completion ──────────────────────────────────────────────────────────
 
   const finish = useCallback(async () => {
     completedRef.current = true
-    if (q19Text.trim()) q19TranscriptRef.current = q19Text.trim()
     posthog.capture('quiz_completed', {
       elapsed_ms: Math.round(performance.now() - startedAtRef.current),
       instrument_version: INSTRUMENT_VERSION,
     })
     await flush(QUIZ_ITEMS.map(i => i.id), true)
-    onComplete({
-      answers: answersRef.current,
-      m9Text: q19TranscriptRef.current,
-      m9AudioUrl: q19AudioUrlRef.current,
-    })
-  }, [flush, onComplete, q19Text])
+    onComplete({ answers: answersRef.current })
+  }, [flush, onComplete])
 
-  // ─── Render ──────────────────────────────────────────────────────────────
+  // Close screen: all dots fill left-to-right, then it moves on by itself.
+  useEffect(() => {
+    if (screen?.kind !== 'close' || closing) return
+    setClosing(true)
+    setFilled(TOTAL)
+    after(CLOSE_HOLD_MS, () => { void finish() })
+  }, [screen, closing, finish])
 
-  const answeredCount = itemsAnsweredBefore(idx)
-  const showProgress = screen?.kind === 'item' || screen?.kind === 'card'
-  const frame = `transition-all duration-100 ${leaving ? 'opacity-0 translate-y-1' : 'opacity-100 translate-y-0'}`
+  // ─── Render ────────────────────────────────────────────────────────────────
+  const screenClass = `quiz-screen transition-all duration-[160ms] ease-out ${
+    exiting ? `opacity-0 ${dir === 1 ? '-translate-x-6' : 'translate-x-6'}` : 'opacity-100 translate-x-0'
+  }`
+
+  const compact = (item?.options.length ?? 0) >= 6
 
   return (
-    <div>
-      {showProgress && (
-        <div className="mb-6" data-testid="quiz-progress">
-          <div className="flex items-center justify-between text-xs text-stone-400">
-            <span>{answeredCount} of {TOTAL_ITEMS}</span>
+    <div className="relative min-h-[560px]">
+      {/* Block tint — crossfades over 400ms, the only remaining signal blocks exist */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-x-6 -inset-y-8 -z-10 transition-colors duration-[400ms]"
+        style={{ backgroundColor: screen?.kind === 'item' ? TINTS[block] : 'rgba(0,0,0,0)' }}
+      />
+
+      {screen?.kind !== 'intro' && (
+        <div className="mb-8 flex items-center gap-3">
+          <div className="flex flex-1 items-end gap-1" data-testid="quiz-progress" aria-label={`${filled} of ${TOTAL}`}>
+            {QUIZ_ITEMS.map((it, i) => (
+              <span
+                key={it.id}
+                className={`flex-1 rounded-full transition-all duration-200 ${
+                  i < filled ? 'h-1 bg-stone-900'
+                  : i === filled ? 'h-1.5 bg-stone-900'
+                  : 'h-1 bg-stone-200'
+                }`}
+              />
+            ))}
           </div>
-          <div className="mt-2 h-1 rounded-full bg-stone-100">
-            <div
-              className="h-full rounded-full bg-stone-900 transition-all duration-300"
-              style={{ width: `${(answeredCount / TOTAL_ITEMS) * 100}%` }}
-            />
-          </div>
+          {idx > 0 && screen?.kind !== 'close' && (
+            <button
+              onClick={back}
+              aria-label="Back"
+              className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-stone-400 transition hover:bg-stone-100 hover:text-stone-700"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+            </button>
+          )}
         </div>
       )}
 
-      <div className={frame} style={{ minHeight: 380 }}>
+      <div className={screenClass} key={idx}>
         {screen?.kind === 'intro' && (
-          <div data-testid="quiz-intro">
-            <h1 className="text-2xl font-bold text-stone-900">A few questions</h1>
-            <p className="mt-4 text-sm text-stone-600">{FRAMING.intro}</p>
-            <p className="mt-3 text-sm text-stone-500">{FRAMING.honesty}</p>
+          <div className="pt-10 text-center" data-testid="quiz-intro">
+            <h1 className="text-[28px] font-bold leading-tight text-stone-900">A few questions</h1>
+            <p className="mx-auto mt-4 max-w-sm text-[15px] leading-relaxed text-stone-600">{FRAMING.intro}</p>
+            <p className="mx-auto mt-3 max-w-sm text-[13px] text-stone-400">{FRAMING.honesty}</p>
             <button
-              onClick={advance}
-              className="mt-8 w-full rounded-lg bg-stone-900 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
+              onClick={() => advanceFrom(0)}
+              className="mt-10 w-full rounded-2xl bg-stone-900 px-6 py-4 text-[15px] font-semibold text-white transition active:scale-[0.98]"
             >
               Start
             </button>
           </div>
         )}
 
-        {screen?.kind === 'card' && (
-          <button
-            onClick={advance}
-            data-testid={`quiz-card-${screen.block}`}
-            className="flex min-h-[380px] w-full items-center justify-center text-center"
-          >
-            <p className="text-xl font-medium text-stone-800">{screen.card}</p>
-          </button>
-        )}
+        {screen?.kind === 'item' && item && (
+          <div data-testid={`quiz-item-${item.id}`}>
+            <h2 className="quiz-stem-in text-[24px] font-semibold leading-[1.25] text-stone-900">
+              {item.stem}
+            </h2>
 
-        {screen?.kind === 'item' && screen.itemId !== 'Q19' && (
-          <ItemScreen
-            itemId={screen.itemId}
-            flipped={flips[screen.itemId] ?? false}
-            selected={answersRef.current[screen.itemId]?.optionIndex ?? null}
-            onAnswer={i => answer(screen.itemId, i)}
-            tick={answerTick}
-          />
-        )}
+            <div className="mt-7 flex flex-col gap-3">
+              {displayOptions(item.id, flips[item.id] ?? false).map((opt, i) => {
+                const chosen = justPicked === i || (justPicked === null && answers[item.id]?.optionIndex === i)
+                return (
+                  <button
+                    key={`${item.id}-${i}`}
+                    onClick={() => answer(item.id, i)}
+                    style={{ animationDelay: `${i * STAGGER_MS}ms` }}
+                    className={`quiz-card-in flex w-full items-center gap-3 rounded-xl border px-4 text-left transition-[opacity,background-color,border-color] duration-150 active:scale-[0.98] active:shadow-none ${
+                      compact ? 'min-h-[56px] py-2.5' : 'min-h-[64px] py-3'
+                    } ${
+                      chosen
+                        ? 'border-stone-900 bg-neon shadow-none'
+                        : 'border-stone-200 bg-white shadow-sm shadow-black/[0.04] hover:border-stone-300'
+                    } ${dim && !chosen ? 'opacity-40' : 'opacity-100'}`}
+                  >
+                    {opt.emoji && (
+                      <span
+                        className="w-7 shrink-0 text-center text-[22px] leading-none transition-transform duration-[120ms]"
+                        style={{ transform: chosen ? 'scale(1.15)' : 'scale(1)' }}
+                      >
+                        {opt.emoji}
+                      </span>
+                    )}
+                    <span className="text-[15px] font-medium leading-snug text-stone-800">{opt.label}</span>
+                  </button>
+                )
+              })}
+            </div>
 
-        {screen?.kind === 'item' && screen.itemId === 'Q19' && (
-          <div data-testid="quiz-item-Q19">
-            <p className="text-lg font-medium text-stone-900">{getItem('Q19')!.stem}</p>
+            {item.sub && <p className="mt-4 text-[12px] text-stone-400">{item.sub}</p>}
 
-            <div className="mt-6">
-              <textarea
-                value={q19Text}
-                onChange={e => setQ19Text(e.target.value.slice(0, Q19_TEXT_CAP))}
-                placeholder={FRAMING.q19TextPlaceholder}
-                rows={3}
-                disabled={q19Recording}
-                className="w-full resize-none rounded-lg border border-stone-200 px-4 py-3 text-sm text-stone-800 placeholder:text-stone-300 focus:border-stone-400 focus:outline-none"
-              />
-              <div className="mt-1 text-right text-xs text-stone-400" data-testid="q19-counter">
-                {q19Text.length}/{Q19_TEXT_CAP}
+            {item.skippable && (
+              <div className="mt-5 flex justify-center">
+                <button
+                  onClick={() => answer(item.id, null)}
+                  data-testid="quiz-skip"
+                  className="flex h-11 items-center px-4 text-[13px] text-stone-400 underline underline-offset-4 transition hover:text-stone-600"
+                >
+                  {FRAMING.skip}
+                </button>
               </div>
-            </div>
-
-            <div className="mt-4 flex flex-col items-center gap-2">
-              <p className="text-xs text-stone-400">{FRAMING.q19AudioAffordance}</p>
-              <button
-                onPointerDown={startQ19}
-                onPointerUp={stopQ19}
-                onPointerLeave={() => q19Recording && stopQ19()}
-                data-testid="q19-record"
-                className={`rounded-full px-6 py-3 text-sm font-medium transition ${
-                  q19Recording ? 'bg-red-500 text-white' : 'border border-stone-200 text-stone-600 hover:bg-stone-50'
-                }`}
-              >
-                {q19Recording ? `Recording ${q19Seconds}s — release to stop` : 'Hold to record'}
-              </button>
-            </div>
-
-            <button
-              onClick={() => answer('Q19', null)}
-              disabled={!q19Text.trim()}
-              className="mt-8 w-full rounded-lg bg-stone-900 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 disabled:opacity-40 active:translate-y-px"
-            >
-              Continue
-            </button>
+            )}
           </div>
         )}
 
         {screen?.kind === 'close' && (
-          <div data-testid="quiz-close">
-            <p className="text-lg font-medium text-stone-900">{FRAMING.close}</p>
-            {q19Status === 'saving' && (
-              <p className="mt-3 text-xs text-stone-400">Still saving your recording — you can keep going.</p>
-            )}
-            <button
-              onClick={finish}
-              className="mt-8 w-full rounded-lg bg-stone-900 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
-            >
-              Continue
-            </button>
+          <div className="pt-16 text-center" data-testid="quiz-close">
+            <p className="mx-auto max-w-sm text-[18px] font-medium leading-relaxed text-stone-900">
+              {FRAMING.close}
+            </p>
           </div>
         )}
       </div>
-
-      {/* Back is always available — auto-advance makes a mis-tap unrecoverable without it. */}
-      <div className="mt-8 flex items-center justify-between">
-        {idx > 0 ? (
-          <button onClick={back} className="text-sm text-stone-400 transition hover:text-stone-600">
-            Back
-          </button>
-        ) : <span />}
-
-        {screen?.kind === 'item' && getItem(screen.itemId)?.skippable && screen.itemId !== 'Q19' && (
-          <button
-            onClick={() => answer(screen.itemId, null)}
-            data-testid="quiz-skip"
-            className="text-sm text-stone-400 underline transition hover:text-stone-600"
-          >
-            {FRAMING.skip}
-          </button>
-        )}
-        {screen?.kind === 'item' && screen.itemId === 'Q19' && (
-          <button
-            onClick={() => answer('Q19', null)}
-            data-testid="quiz-skip"
-            className="text-sm text-stone-400 underline transition hover:text-stone-600"
-          >
-            {FRAMING.skip}
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
-
-function ItemScreen({
-  itemId, flipped, selected, onAnswer, tick,
-}: {
-  itemId: string
-  flipped: boolean
-  selected: number | null
-  onAnswer: (displayedIndex: number) => void
-  tick: number
-}) {
-  const item = getItem(itemId)!
-  const options = displayOptions(itemId, flipped)
-  void tick
-
-  return (
-    <div data-testid={`quiz-item-${itemId}`}>
-      <p className="text-lg font-medium leading-snug text-stone-900">{item.stem}</p>
-      <div className="mt-6 space-y-2.5">
-        {options.map((opt, i) => (
-          <button
-            key={`${itemId}-${i}`}
-            onClick={() => onAnswer(i)}
-            className={`w-full rounded-xl border px-4 py-3.5 text-left text-[15px] leading-snug transition active:translate-y-px ${
-              selected === i
-                ? 'border-stone-900 bg-stone-900 text-white'
-                : 'border-stone-200 bg-white text-stone-700 hover:border-stone-400 hover:bg-stone-50'
-            }`}
-          >
-            {opt}
-          </button>
-        ))}
-      </div>
-      {item.id === 'Q23' && (
-        <p className="mt-4 text-xs text-stone-400">{FRAMING.q23Sub}</p>
-      )}
     </div>
   )
 }

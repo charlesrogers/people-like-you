@@ -18,9 +18,7 @@ interface IncomingResponse {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json()
-    const { userId, complete, m9Text, m9AudioUrl } = body as {
-      userId?: string; complete?: boolean; m9Text?: string | null; m9AudioUrl?: string | null
-    }
+    const { userId, complete } = body as { userId?: string; complete?: boolean }
     const incoming: IncomingResponse[] = Array.isArray(body.responses) ? body.responses : []
 
     if (!userId) {
@@ -35,9 +33,9 @@ export async function POST(req: NextRequest) {
 
       let optionIndex: number | null = null
       if (typeof r.optionIndex === 'number' && Number.isInteger(r.optionIndex)) {
-        // Bounds-check against the item's own option list. Free-response items
-        // (Q19) have no options and always store null.
-        if (item.kind === 'choice' && r.optionIndex >= 0 && r.optionIndex < item.options.length) {
+        // Bounds-check against the item's own option list. Out-of-range and
+        // skipped both store null — never a midpoint.
+        if (r.optionIndex >= 0 && r.optionIndex < item.options.length) {
           optionIndex = r.optionIndex
         }
       }
@@ -75,10 +73,7 @@ export async function POST(req: NextRequest) {
       responseMs: r.response_ms,
     }))
 
-    const traits = scoreQuiz(all, {
-      m9Text: m9Text ?? null,
-      m9AudioUrl: m9AudioUrl ?? null,
-    })
+    const traits = scoreQuiz(all)
 
     await saveReaderTraits({
       user_id: userId,

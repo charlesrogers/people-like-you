@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
-import { QUIZ_ITEMS, QUIZ_BLOCKS, FRAMING, SEEDING_ITEMS } from '../quiz-battery'
+import { QUIZ_ITEMS, QUIZ_BLOCKS, FRAMING, SEEDING_ITEMS, NERD_OUT_PROMPT } from '../quiz-battery'
 import { FISHED_PROMPTS, MAP_PROMPT_COUNT } from '../voice-prompt-map'
 
 const battery = readFileSync('specs/matching-v2-questionnaire-battery-v1.md', 'utf-8')
@@ -9,29 +9,49 @@ const voiceMap = readFileSync('specs/matching-v2-voice-prompt-map.md', 'utf-8')
 // The copy is frozen: six review passes with Charles produced it. These tests fail
 // the build if any shipped string drifts from the spec by a single byte.
 describe('copy freeze — battery', () => {
-  it('ships exactly 23 items', () => {
-    expect(QUIZ_ITEMS).toHaveLength(23)
+  it('ships exactly 22 items — the nerd-out moved to the voice step', () => {
+    expect(QUIZ_ITEMS).toHaveLength(22)
     expect(QUIZ_ITEMS.map(i => i.id)).toEqual(
-      Array.from({ length: 23 }, (_, i) => `Q${i + 1}`))
+      Array.from({ length: 22 }, (_, i) => `Q${i + 1}`))
   })
 
-  it.each(QUIZ_ITEMS.map(i => [i.id, i] as const))('%s stem and options are byte-identical', (_id, item) => {
+  it.each(QUIZ_ITEMS.map(i => [i.id, i] as const))('%s stem, labels and emoji are byte-identical', (_id, item) => {
     expect(battery).toContain(item.stem)
-    for (const opt of item.options) expect(battery).toContain(opt)
+    for (const opt of item.options) {
+      expect(battery).toContain(opt.label)
+      if (opt.emoji) expect(battery).toContain(`${opt.emoji} ${opt.label}`)
+    }
+  })
+
+  it('every option carries one emoji, except the two politics items by design', () => {
+    for (const item of QUIZ_ITEMS) {
+      const expected = item.id === 'Q21' || item.id === 'Q22' ? null : 'string'
+      for (const opt of item.options) {
+        if (expected === null) expect(opt.emoji).toBeNull()
+        else expect(typeof opt.emoji).toBe('string')
+      }
+    }
+  })
+
+  it('the nerd-out copy is byte-identical and lives outside the quiz', () => {
+    expect(battery).toContain(NERD_OUT_PROMPT.text)
+    expect(battery).toContain(NERD_OUT_PROMPT.help)
+    expect(QUIZ_ITEMS.map(i => i.stem)).not.toContain(NERD_OUT_PROMPT.text)
   })
 
   it('framing copy is byte-identical', () => {
     for (const value of Object.values(FRAMING)) expect(battery).toContain(value)
   })
 
-  it('block cards are byte-identical and blocks are in spec order', () => {
-    expect(QUIZ_BLOCKS.map(b => b.block)).toEqual([1, 2, 3, 4, 5, 6])
-    expect(QUIZ_BLOCKS.find(b => b.block === 5)!.card).toBeNull()
-    for (const b of QUIZ_BLOCKS) if (b.card) expect(battery).toContain(b.card)
+  it('has five blocks and no interstitial cards (removed in rc8)', () => {
+    expect(QUIZ_BLOCKS.map(b => b.block)).toEqual([1, 2, 3, 4, 5])
+    expect(QUIZ_BLOCKS.flatMap(b => b.items)).toHaveLength(22)
+    // Facts is the home stretch: plain background, no tint.
+    expect(QUIZ_BLOCKS.find(b => b.block === 5)!.tint).toBeNull()
   })
 
-  it('skippable items are exactly Q1, Q19, Q22', () => {
-    expect(QUIZ_ITEMS.filter(i => i.skippable).map(i => i.id)).toEqual(['Q1', 'Q19', 'Q22'])
+  it('skippable items are exactly Q1 and Q21', () => {
+    expect(QUIZ_ITEMS.filter(i => i.skippable).map(i => i.id)).toEqual(['Q1', 'Q21'])
   })
 
   it('polarity randomisation covers Q4-Q12 except Q9', () => {
@@ -41,16 +61,16 @@ describe('copy freeze — battery', () => {
 })
 
 describe('copy freeze — voice prompt map', () => {
-  it('ships 47 prompts: 46 table entries + the Q19 template', () => {
-    expect(Object.keys(FISHED_PROMPTS)).toHaveLength(46)
-    expect(MAP_PROMPT_COUNT).toBe(47)
+  it('ships 38 fished prompts across the 8 seeding items, plus the nerd-out', () => {
+    expect(Object.keys(FISHED_PROMPTS)).toHaveLength(38)
+    expect(MAP_PROMPT_COUNT).toBe(39)
   })
 
   it.each(Object.entries(FISHED_PROMPTS))('%s prompt text is byte-identical', (_key, prompt) => {
     expect(voiceMap).toContain(prompt.text)
   })
 
-  it('11 items seed a prompt', () => {
-    expect(SEEDING_ITEMS).toHaveLength(11)
+  it('8 items seed a prompt', () => {
+    expect(SEEDING_ITEMS).toHaveLength(8)
   })
 })

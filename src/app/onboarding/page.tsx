@@ -86,7 +86,6 @@ function OnboardingContent() {
   const [prompts, setPrompts] = useState<SelectedPrompt[]>(
     () => getOnboardingPrompts(6).map(p => ({ ...p, source: 'bank' as const })))
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number | null>>({})
-  const [m9Text, setM9Text] = useState<string | null>(null)
   const skippedPromptIdsRef = useRef<string[]>([])
   const [recordings, setRecordings] = useState<Map<string, { memoId: string; duration: number }>>(new Map())
   const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0)
@@ -198,7 +197,7 @@ function OnboardingContent() {
 
   const handleSkipPrompt = (promptId: string) => {
     const replacement = replaceSelectedPrompt(
-      prompts, promptId, quizAnswers, m9Text, skippedPromptIdsRef.current)
+      prompts, promptId, quizAnswers, skippedPromptIdsRef.current)
     skippedPromptIdsRef.current = [...skippedPromptIdsRef.current, promptId]
     if (replacement) {
       setPrompts(prev => prev.map(p => p.id === promptId ? replacement : p))
@@ -218,8 +217,7 @@ function OnboardingContent() {
         : canonicalIndex(itemId, a.optionIndex, a.polarityFlipped)
     }
     setQuizAnswers(canonical)
-    setM9Text(result.m9Text)
-    setPrompts(selectVoicePrompts(canonical, result.m9Text, 6))
+    setPrompts(selectVoicePrompts(canonical, 6))
     setStep('voice')
   }
 
