@@ -10,6 +10,7 @@ import { getOnboardingPrompts, getRandomPrompt, getTargetedPrompts, type PromptD
 import QuizStep, { type QuizResult } from '@/components/QuizStep'
 import { selectVoicePrompts, replaceSelectedPrompt, type SelectedPrompt } from '@/lib/voice-prompt-map'
 import { canonicalIndex } from '@/lib/quiz-scoring'
+import { FRAMING as QUIZ_FRAMING } from '@/lib/quiz-battery'
 import { computePersonalityReveal } from '@/lib/personality-reveal'
 import { getSeedNarrativesForGender, ATTRIBUTE_TAGS, type SeedNarrative } from '@/lib/seed-narratives'
 
@@ -86,6 +87,7 @@ function OnboardingContent() {
   const [prompts, setPrompts] = useState<SelectedPrompt[]>(
     () => getOnboardingPrompts(6).map(p => ({ ...p, source: 'bank' as const })))
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number | null>>({})
+  const [cameFromQuiz, setCameFromQuiz] = useState(false)
   const skippedPromptIdsRef = useRef<string[]>([])
   const [recordings, setRecordings] = useState<Map<string, { memoId: string; duration: number }>>(new Map())
   const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0)
@@ -217,6 +219,7 @@ function OnboardingContent() {
         : canonicalIndex(itemId, a.optionIndex, a.polarityFlipped)
     }
     setQuizAnswers(canonical)
+    setCameFromQuiz(true)
     setPrompts(selectVoicePrompts(canonical, 6))
     setStep('voice')
   }
@@ -673,7 +676,9 @@ function OnboardingContent() {
 
         {step === 'voice' && (
           <div>
-            <h1 className="text-2xl font-bold text-stone-900">Tell us about yourself</h1>
+            <h1 className="text-[22px] font-bold leading-snug text-stone-900">
+              {cameFromQuiz ? QUIZ_FRAMING.close : 'Tell us about yourself'}
+            </h1>
             <p className="mt-2 text-sm text-stone-500">
               Just talk like you&rsquo;re telling a friend. Record at least 2.
             </p>

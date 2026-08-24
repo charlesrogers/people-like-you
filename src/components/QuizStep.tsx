@@ -13,7 +13,6 @@ const T_EXIT = 180      // screen starts leaving
 const T_ENTER = 340     // next screen enters
 const EXIT_MS = 160
 const STAGGER_MS = 40
-const CLOSE_HOLD_MS = 1200
 
 export interface QuizAnswer {
   optionIndex: number | null
@@ -24,12 +23,11 @@ export interface QuizResult {
   answers: Record<string, QuizAnswer>
 }
 
-type Screen = { kind: 'intro' } | { kind: 'item'; itemId: string } | { kind: 'close' }
+type Screen = { kind: 'intro' } | { kind: 'item'; itemId: string }
 
 const SCREENS: Screen[] = [
   { kind: 'intro' },
   ...QUIZ_ITEMS.map(i => ({ kind: 'item' as const, itemId: i.id })),
-  { kind: 'close' },
 ]
 const TOTAL = QUIZ_ITEMS.length
 
@@ -57,9 +55,9 @@ export default function QuizStep({
   const [exiting, setExiting] = useState(false)
   const [dir, setDir] = useState<1 | -1>(1)
   const [filled, setFilled] = useState(0)
-  const [closing, setClosing] = useState(false)
 
   const answersRef = useRef<Record<string, QuizAnswer>>({})
+  const finishRef = useRef<() => Promise<void>>(async () => {})
   const flushedRef = useRef<Set<number>>(new Set())
   const startedAtRef = useRef(0)
   const itemShownAtRef = useRef(0)
@@ -152,6 +150,13 @@ export default function QuizStep({
     // The dot fills as the screen leaves, so the reward lands with the tap.
     after(T_EXIT, () => setFilled(f => Math.min(TOTAL, f + 1)))
     after(T_EXIT, () => { setDir(1); setExiting(true) })
+
+    const isLast = idx >= SCREENS.length - 1
+    if (isLast) {
+      after(T_ENTER, () => { void finishRef.current() })
+      return
+    }
+
     after(T_ENTER, () => {
       setIdx(i => {
         const next = i + 1
@@ -168,7 +173,7 @@ export default function QuizStep({
       })
       setExiting(false); setDim(false); setJustPicked(null)
     })
-  }, [exiting, flips, flush])
+  }, [exiting, flips, flush, idx])
 
   // ─── Instrumentation ───────────────────────────────────────────────────────
   useEffect(() => { startedAtRef.current = performance.now() }, [])
@@ -204,13 +209,7 @@ export default function QuizStep({
     onComplete({ answers: answersRef.current })
   }, [flush, onComplete])
 
-  // Close screen: all dots fill left-to-right, then it moves on by itself.
-  useEffect(() => {
-    if (screen?.kind !== 'close' || closing) return
-    setClosing(true)
-    setFilled(TOTAL)
-    after(CLOSE_HOLD_MS, () => { void finish() })
-  }, [screen, closing, finish])
+  useEffect(() => { finishRef.current = finish }, [finish])
 
   // ─── Render ────────────────────────────────────────────────────────────────
   const screenClass = `quiz-screen transition-all duration-[160ms] ease-out ${
@@ -228,7 +227,7 @@ export default function QuizStep({
         style={{ backgroundColor: screen?.kind === 'item' ? TINTS[block] : 'rgba(0,0,0,0)' }}
       />
 
-      {screen?.kind !== 'intro' && (
+      {screen?.kind === 'item' && (
         <div className="mb-8 flex items-center gap-3">
           <div className="flex flex-1 items-end gap-1" data-testid="quiz-progress" aria-label={`${filled} of ${TOTAL}`}>
             {QUIZ_ITEMS.map((it, i) => (
@@ -242,7 +241,7 @@ export default function QuizStep({
               />
             ))}
           </div>
-          {idx > 0 && screen?.kind !== 'close' && (
+          {idx > 0 && (
             <button
               onClick={back}
               aria-label="Back"
@@ -321,13 +320,6 @@ export default function QuizStep({
           </div>
         )}
 
-        {screen?.kind === 'close' && (
-          <div className="pt-16 text-center" data-testid="quiz-close">
-            <p className="mx-auto max-w-sm text-[18px] font-medium leading-relaxed text-stone-900">
-              {FRAMING.close}
-            </p>
-          </div>
-        )}
       </div>
     </div>
   )

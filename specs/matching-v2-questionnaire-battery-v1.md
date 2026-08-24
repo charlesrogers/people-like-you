@@ -1,9 +1,9 @@
-# D-QD1 — Reader Instrument, Battery v1.0-rc8
+# D-QD1 — Reader Instrument, Battery v1.0-rc9
 
 **Supersedes** `matching_algo-v2.md` §4.1–§4.3 (items and copy). Structure, storage and envelope from the brief still bind.
 **Voice:** dry stems + warm-sincere framing copy (Charles, 2026-08-22 — Q1 answer **b**).
 **Research basis:** `specs/matching-v2-questionnaire-research.md`. **Three-voice draft it was chosen from:** `specs/matching-v2-questionnaire-batteries.md`.
-**Status:** release candidate 8. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
+**Status:** release candidate 9. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
 
 ---
 
@@ -17,6 +17,19 @@
 | Q4 = a | "At seventeen" kept, with "a completely different person" as a first-class option, item skippable |
 | — | Q19 free text is **text OR ≤30 s audio** (Charles) — transcript templates the voice prompt; audio goes through the T24 moderation path |
 | — | Politics importance is **3-way**, hard filter on the top tier only; middle tier logged, unused at launch (Charles: "save this for the people who really care/testing") |
+
+## 0b. rc9 changes (Charles, 2026-08-24)
+
+1. **Q22 stem now names politics.** "How much does this matter…" had no antecedent once the
+   block-card interstitials were removed and Q21/Q22 became separate screens — "this" pointed at
+   nothing. Now: *"How much does politics matter in someone you'd date?"*
+2. **Emoji reset.** rc8 shipped 89 emoji but only 83 distinct: 🤷 appeared on four separate
+   screens, 💬 on three, 😂 on two. Charles: *"the emojis are not evocative and all look the
+   same."* Every emoji is now unique across the battery, and each depicts the specific behaviour
+   rather than its category (🐇 for the Wikipedia rabbit hole, ⭐ for "I answer for maybe four
+   people", 🎇 for the sparklers, 🛌 for the empty calendar).
+3. **The close screen is gone.** It flashed for 1.2s and vanished, which Charles rejected outright.
+   Its line is now a header on the voice step, with the prompts below it.
 
 ## 1. Envelope
 
@@ -87,29 +100,29 @@ Options listed **low→high on the scored trait** where ordinal; presentation or
 
 **Q1 · `M1` · milieu · `[skip]`**
 > **At seventeen, everyone knew you as:**
-> 🎭 theatre kid · 🏀 jock · 📚 honor-roll grinder · 📋 the one organizing the hang · 🎧 happily unaffiliated · 🦋 a completely different person
+> 🎭 theatre kid · 🏀 jock · 📚 honor-roll grinder · 🗓️ the one organizing the hang · 🎧 happily unaffiliated · 🦋 a completely different person
 
 **Q2 · `M2` · milieu**
 > **The group chat is picking a restaurant. Fourteen messages in.**
-> 👑 I've already picked it · 🔗 I've sent three links and a walking distance · 🤷 I said "I'm easy" and meant it · 😂 I sent a meme about how long this is taking · 🔕 I muted it and I'll go wherever
+> 👑 I've already picked it · 🧭 I've sent three links and a walking distance · 👌 I said "I'm easy" and meant it · 🙃 I sent a meme about how long this is taking · 🔕 I muted it and I'll go wherever
 
 **Q3 · `M3` · milieu**
 > **It's 10pm at the wedding reception. Where are you?**
-> 🏠 already home, shoes off · 💬 at a side table, deep in the actual conversation · ✨ outside, handing out sparklers · 🕺 on the dance floor since the first song
+> 🛋️ already home, shoes off · 🍷 at a side table, deep in the actual conversation · 🎇 outside, handing out sparklers · 🕺 on the dance floor since the first song
 
 ### Block 2 — Wired
 
 **Q4 · `T-O1` · O**
 > **It's 1am. You're still up because:**
-> 📺 the show kept autoplaying · 🕐 I lost track of time · 🌀 I'm down a Wikipedia rabbit hole · 🔨 I'm working on a project I can't put down
+> 📺 the show kept autoplaying · 🌙 I lost track of time · 🐇 I'm down a Wikipedia rabbit hole · 🔨 I'm working on a project I can't put down
 
 **Q5 · `T-O2` · O** — *rebuilt. The old version asked WHAT and its options answered WHEN.*
 > **A friend says "come to this thing with me, I can't really explain it."**
-> ❓ what is it · 📝 I'll come if you tell me what it is · 🕒 what time · 👟 I'm already putting my shoes on
+> 🤨 what is it · 📩 I'll come if you tell me what it is · ⌚ what time · 👟 I'm already putting my shoes on
 
 **Q6 · `T-O3` · O + milieu**
 > **One free day in a city you've never been to.**
-> 📸 I'm not missing the must-see things · 📍 whatever's near where I'm staying · 🚶 I walk until something happens · 🗺️ I ask someone who lives there and go do that
+> 📸 I'm not missing the must-see things · 🛏️ whatever's near where I'm staying · 🚶 I walk until something happens · 🗺️ I ask someone who lives there and go do that
 
 **Q7 · `T-E1` · E**
 > **The party's good. You've been there three hours.**
@@ -117,11 +130,11 @@ Options listed **low→high on the scored trait** where ordinal; presentation or
 
 **Q8 · `T-E2` · E**
 > **Your phone rings. No text first.**
-> 📵 I don't answer the phone. Ever. · 🔢 I answer for maybe four people · 😬 I answer, bracing · ☎️ I'm delighted — it's been ages
+> 📵 I don't answer the phone. Ever. · ⭐ I answer for maybe four people · 😬 I answer, bracing · 🥳 I'm delighted — it's been ages
 
 **Q9 · `T-C1` · C** · **no polarity randomisation**
 > **You're meeting someone at 7.**
-> ⏰ I'm there at 6:50 · 🎯 I'm there at 7 · 💬 7:05, and I texted · 🎪 7:15, but I have a story
+> ⏰ I'm there at 6:50 · 🎯 I'm there at 7 · 📲 7:05, and I texted · 🎪 7:15, but I have a story
 
 **Q10 · `T-A1` · A**
 > **Your closest friend is getting back together with the ex. Again.**
@@ -129,21 +142,21 @@ Options listed **low→high on the scored trait** where ordinal; presentation or
 
 **Q11 · `T-N1` · N**
 > **You sent a text an hour ago. Nothing back.**
-> 🤷 nothing, they're busy · 👀 I've reread what I sent · ✍️ I've reread it and drafted the follow-up · 🔮 I know exactly what it means
+> 😌 nothing, they're busy · 👀 I've reread what I sent · ✍️ I've reread it and drafted the follow-up · 🔮 I know exactly what it means
 
 **Q12 · `T-N2` · N**
 > **Someone says "can I give you some feedback?"**
-> 😰 my stomach drops · 😅 I brace, then I'm fine · 👍 sure, go ahead · 🙋 I asked for it, that's why I'm here
+> 😰 my stomach drops · 😮‍💨 I brace, then I'm fine · 👍 sure, go ahead · 🙋 I asked for it, that's why I'm here
 
 ### Block 3 — Actual life
 
 **Q13 · `M4` · milieu**
 > **Your last three Saturdays, honestly:**
-> 🌄 outside before most people were up · 📖 nothing on the calendar, and that was the point · 🔧 elbow-deep in something I was making or fixing · 🍳 at someone's kitchen table too long · 💻 working, and not entirely mad about it
+> 🌄 outside before most people were up · 🛌 nothing on the calendar, and that was the point · 🔧 elbow-deep in something I was making or fixing · ☕ at someone's kitchen table too long · 💻 working, and not entirely mad about it
 
 **Q14 · `M7` · milieu · story fisher**
 > **The thing in your place a guest always asks about:**
-> 🖼️ the art · 🪑 a chair I overpaid for · 🚲 the gear — bike, skis, clubs · 🎸 an instrument · 🛠️ something I made · 🤷 nothing, and I've never once thought about it
+> 🖼️ the art · 🪑 a chair I overpaid for · 🚲 the gear — bike, skis, clubs · 🎸 an instrument · 🛠️ something I made · 😶 nothing, and I've never once thought about it
 
 **Q15 · `M8` · milieu**
 > **It's their birthday. Your gift:**
@@ -153,7 +166,7 @@ Options listed **low→high on the scored trait** where ordinal; presentation or
 
 **Q16 · `M5` · register (1st indicator)**
 > **The tell that you like someone:**
-> 😏 the teasing starts → *playful* · 🃏 the jokes get weirdly specific → *playful* · 📱 memes. lots of memes. → *playful* · 💬 I say it out loud, probably too early → *earnest* · 🚗 I start showing up for things → *earnest*
+> 😏 the teasing starts → *playful* · 🃏 the jokes get weirdly specific → *playful* · 📱 memes. lots of memes. → *playful* · 💌 I say it out loud, probably too early → *earnest* · 🚗 I start showing up for things → *earnest*
 
 **Q17 · `CS1` · register (2nd indicator)**
 > **Your friend just did something genuinely impressive. What you actually say:**
@@ -171,14 +184,14 @@ Options listed **low→high on the scored trait** where ordinal; presentation or
 
 **Q20 · `H3` · milieu (H3 term)**
 > **The next five years, honestly:**
-> 📈 my work gets serious · 🏡 my life gets full — people, a house, all of it · 🎢 both, and I know how that sounds · 🤷 I've stopped making five-year plans
+> 📈 my work gets serious · 🏡 my life gets full — people, a house, all of it · 🎢 both, and I know how that sounds · 🌊 I've stopped making five-year plans
 
 **Q21 · `H2` · milieu (politics gap) · `[skip]` · no emoji**
 > **Politically, roughly:**
 > progressive · lean progressive · somewhere in the middle · lean conservative · conservative · *rather not say*
 
 **Q22 · `H2b` · importance · hard filter on top tier only · no emoji**
-> **How much does this matter in someone you'd date?**
+> **How much does politics matter in someone you'd date?**
 > not really something I think about · I'd rather be close on it · honestly, I'd struggle with someone far from me
 > <sub>Only the last one narrows who you'll see.</sub>
 
