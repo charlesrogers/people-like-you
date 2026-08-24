@@ -1,9 +1,9 @@
-# D-QD1 — Reader Instrument, Battery v1.0-rc6
+# D-QD1 — Reader Instrument, Battery v1.0-rc7
 
 **Supersedes** `matching_algo-v2.md` §4.1–§4.3 (items and copy). Structure, storage and envelope from the brief still bind.
 **Voice:** dry stems + warm-sincere framing copy (Charles, 2026-08-22 — Q1 answer **b**).
 **Research basis:** `specs/matching-v2-questionnaire-research.md`. **Three-voice draft it was chosen from:** `specs/matching-v2-questionnaire-batteries.md`.
-**Status:** release candidate 6. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
+**Status:** release candidate 7. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
 
 ---
 
@@ -41,15 +41,23 @@
 | 5 · One thing | *(no card — flows from block 4)* | Q19 |
 | 6 · Facts | "A few plain ones, then you're done." | Q20–Q23 |
 
-**Construct budget**
+**Construct budget** — *rc7: double-scoring of milieu items onto traits is REMOVED. See the note below; this was a spec error.*
 
-| trait | dedicated | double-scored | indicators |
+| trait | items | indicators | status |
 |---|---|---|---|
-| O | Q4, Q5, Q6 | — | 3 |
-| E | Q7, Q8 | Q2, Q3 | 4 |
-| C | Q9 | Q13, Q14 | 3 |
-| A | Q10 | Q15 | 2 |
-| N | Q11, Q12 | — | 2 |
+| O | Q4, Q5, Q6 | 3 | measured |
+| E | Q7, Q8 | 2 | measured |
+| C | Q9 | 1 | **exploratory — must not be used for anything** |
+| A | Q10 | 1 | **exploratory — must not be used for anything** |
+| N | Q11, Q12 | 2 | exploratory (no launch consumer) |
+
+> **Why double-scoring was removed (2026-08-23).** The rc1–rc6 budget claimed Q2/Q3/Q13/Q14/Q15 double-scored onto E/C/A. That is incoherent with the way those items are written. Their options are **nominal, not ordinal** — "the art / a chair I overpaid for / an instrument" has no conscientiousness ordering, and any per-option trait value is invented rather than derived.
+>
+> Worse, it contradicts the battery's own trap-2 rule. Those items were deliberately built so that **no option lands worse than its siblings** ("I'm not a gift person — I'll be there, though" is designed to read as warm, not deficient). You cannot simultaneously design an option set to be equally flattering and score it ordinally on a desirable trait: if no answer is worse, no answer scores lower. The two requirements are mutually exclusive, and the equal-desirability requirement is the one that matters — it is what makes the quiz feel like self-expression instead of assessment.
+>
+> Milieu is unaffected: `milieuSimilarity` uses **exact option match**, which is nominal and needs no trait values. Dropping trait double-scoring costs the milieu term nothing.
+>
+> **Consequence, stated honestly:** C and A ship with one indicator each. Neither has a launch consumer (H1/H2 need only O and E; the milieu function uses M-block matches, education, politics and H3; register comes from Q16/Q17). One-item scales cannot be checked for reliability, so **C and A are logged and never reported as measurements** until a future version gives them a second ordinal item. O (3) and E (2) — the two traits the pre-registered hypotheses depend on, and the two best-measured traits in every short form — are unaffected.
 
 ---
 
