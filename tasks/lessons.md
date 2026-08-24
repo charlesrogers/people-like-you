@@ -521,3 +521,9 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** The review exists to gate shipping; running it post-deploy converts a pre-flight check into an incident report. The dedupe key design (bare digits, two normalizers, one unique index) is exactly the kind of cross-population collision a reviewer finds and an author doesn't.
 **Rule:** Always launch the required specialist reviews (correctness for matching/identity/dedupe logic, reliability for migrations) BEFORE the production push and wait for the verdict; push to prod only on pass.
 **Category:** near-miss
+
+### 2026-08-24 — SEO pages shipped article-first; Charles wants WAITLIST FIRST
+**What went wrong:** The 22 organic pages (/lds-singles/*, /es/*, /pt/*) were built as long-form articles in a stone/editorial style with the waitlist CTA as a link card at the very bottom. Charles: "these are horrible... really have it be WAITLIST FIRST."
+**Why it's wrong:** PLY's marketing surfaces exist to convert; the root waitlist page's whole design is form-above-the-fold. Article-first pages bury the one action that matters below 1,500 words, and the stone palette doesn't even look like the brand.
+**Rule:** On any PLY marketing/SEO page, the waitlist capture form is the hero — above the fold, brand-styled, with page-specific headline; the content/data sits below to support conversion and SEO, never the reverse.
+**Category:** mistake
