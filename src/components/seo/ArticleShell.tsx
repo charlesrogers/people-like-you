@@ -3,32 +3,56 @@ import SiteFooter from '@/components/SiteFooter'
 
 /**
  * Shared shell for the organic content pages (/lds-singles/*, /es/*, /pt/*).
- * Follows the /faq idiom: stone palette, narrow reading column, CTA handled by the
- * page itself (US pages link to the waitlist; international pages embed the form).
+ *
+ * WAITLIST FIRST (Charles, 2026-08-24): every page opens with the brand-yellow hero —
+ * wordmark, page headline, and the actual capture form above the fold, exactly like the
+ * landing page. The data/content sits below on white, supporting the conversion.
  */
 export default function ArticleShell({
-  backHref = '/lds-singles',
-  backLabel = 'All cities & countries',
+  hero,
   lang,
+  crumb,
   children,
 }: {
-  backHref?: string
-  backLabel?: string
+  hero: React.ReactNode
   lang?: string
+  crumb?: { href: string; label: string }
   children: React.ReactNode
 }) {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-stone-50 to-white" lang={lang}>
-      <div className="mx-auto max-w-2xl px-6 py-16 sm:py-24">
-        <Link href={backHref} className="text-sm font-medium text-stone-400 transition hover:text-stone-600">
-          &larr; {backLabel}
-        </Link>
+    <div className="min-h-screen bg-white" lang={lang}>
+      <div id="join" className="bg-[var(--cream)] px-6 pb-14 pt-10 text-[var(--dark)] sm:pt-14">
+        <div className="mx-auto w-full max-w-md">
+          <div className="text-center">
+            <Link href="/" className="text-xl font-bold tracking-tight sm:text-2xl">
+              People <span className="italic">Like</span> You
+            </Link>
+          </div>
+          {hero}
+        </div>
+      </div>
+      <div className="mx-auto max-w-2xl px-6 py-12">
+        {crumb && (
+          <Link href={crumb.href} className="text-sm font-medium text-stone-400 transition hover:text-stone-600">
+            &larr; {crumb.label}
+          </Link>
+        )}
         {children}
         <div className="text-stone-900">
           <SiteFooter />
         </div>
       </div>
     </div>
+  )
+}
+
+/** Hero headline + hook, rendered above the capture form inside the yellow block. */
+export function HeroCopy({ h1, hook }: { h1: string; hook: string }) {
+  return (
+    <>
+      <h1 className="mt-8 text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-[2.75rem]">{h1}</h1>
+      <p className="mt-4 text-lg font-medium text-[var(--dark)]/70">{hook}</p>
+    </>
   )
 }
 
@@ -61,7 +85,8 @@ export function StatsTable({ rows, caption }: { rows: [string, string][]; captio
       </table>
       {caption && <p className="border-t border-stone-100 px-5 py-3 text-xs text-stone-400">{caption}</p>}
     </div>
-  )}
+  )
+}
 
 export function FaqBlock({ faq, heading }: { faq: { q: string; a: string }[]; heading: string }) {
   return (
@@ -96,18 +121,18 @@ export function JsonLd({ data }: { data: object }) {
   return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
 }
 
-/** CTA card for US metro pages — links into the waitlist with attribution. */
-export function WaitlistCta({ slug, title, body, button }: { slug: string; title: string; body: string; button: string }) {
+/** Bottom CTA: sends the reader back up to the hero form (the form is the page's #join). */
+export function WaitlistCta({ title, body, button }: { title: string; body: string; button: string }) {
   return (
-    <div className="mt-12 rounded-2xl border border-stone-200 bg-white p-6">
-      <p className="text-lg font-bold text-stone-900">{title}</p>
-      <p className="mt-2 text-base leading-7 text-stone-600">{body}</p>
-      <Link
-        href={`/?utm_source=seo&utm_campaign=${slug}`}
-        className="mt-5 inline-block rounded-full bg-stone-900 px-6 py-3 text-sm font-bold text-white transition hover:scale-[1.02] active:scale-95"
+    <div className="mt-12 rounded-2xl bg-[var(--cream)] p-6 text-[var(--dark)]">
+      <p className="text-lg font-extrabold tracking-tight">{title}</p>
+      <p className="mt-2 text-base leading-7 text-[var(--dark)]/70">{body}</p>
+      <a
+        href="#join"
+        className="mt-5 inline-block rounded-full bg-[var(--dark)] px-6 py-3 text-sm font-bold text-white transition hover:scale-[1.02] active:scale-95"
       >
         {button}
-      </Link>
+      </a>
     </div>
   )
 }

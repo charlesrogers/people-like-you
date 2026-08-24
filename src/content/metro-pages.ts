@@ -15,6 +15,7 @@
 export type MetroContent = {
   slug: string
   h1: string
+  hook: string
   metaTitle: string
   metaDescription: string
   intro: string[]
@@ -43,6 +44,7 @@ const sharedFaq = (place: string) => [
 export const METRO_CONTENT: Record<string, MetroContent> = {
   'provo-orem': {
     slug: 'provo-orem',
+    hook: `Everyone here is a member. That was never the hard part. One real introduction a day, chosen for you, with the reason you two would work — that's the part Provo has always been missing.`,
     h1: 'LDS singles in Provo–Orem',
     metaTitle: 'LDS Singles in Provo & Orem, Utah — The Real Numbers',
     metaDescription:
@@ -77,6 +79,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
 
   'salt-lake-city': {
     slug: 'salt-lake-city',
+    hook: `The biggest LDS community on earth, and you can still go months without meeting anyone right. One real introduction a day, with the reason you two would work.`,
     h1: 'LDS singles in Salt Lake City',
     metaTitle: 'LDS Singles in Salt Lake City — The Real Numbers',
     metaDescription:
@@ -110,6 +113,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
 
   phoenix: {
     slug: 'phoenix',
+    hook: `300,000 members, seventy miles apart. The right person is out there — probably two freeways away. One real introduction a day, with the reason they're worth the drive.`,
     h1: 'LDS singles in Phoenix & Mesa',
     metaTitle: 'LDS Singles in Phoenix, Mesa & Gilbert — The Real Numbers',
     metaDescription:
@@ -143,6 +147,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
 
   boise: {
     slug: 'boise',
+    hook: `You already know the forty faces at every activity. One real introduction a day from beyond that circle, with the reason you two would work.`,
     h1: 'LDS singles in Boise',
     metaTitle: 'LDS Singles in Boise & the Treasure Valley — The Real Numbers',
     metaDescription:
@@ -175,6 +180,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
 
   'washington-dc': {
     slug: 'washington-dc',
+    hook: `The most impressive LDS singles scene in the country — and everyone's on a two-year clock. One real introduction a day, with the reason attached, before the next posting.`,
     h1: 'LDS singles in Washington, DC',
     metaTitle: 'LDS Singles in Washington, DC — The Real Numbers',
     metaDescription:
@@ -208,6 +214,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
 
   'new-york': {
     slug: 'new-york',
+    hook: `62,000 members hidden inside twenty million people. We find the handful who fit you and introduce you — one a day, with the reason you two would work.`,
     h1: 'LDS singles in New York City',
     metaTitle: 'LDS Singles in New York City — The Real Numbers',
     metaDescription:
@@ -241,6 +248,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
 
   rexburg: {
     slug: 'rexburg',
+    hook: `The market resets every fourteen weeks. One real introduction a day, chosen for actual compatibility — before the semester board reshuffles again.`,
     h1: 'LDS singles in Rexburg',
     metaTitle: 'LDS Singles in Rexburg, Idaho — The Real Numbers',
     metaDescription:
@@ -273,6 +281,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
 
   philadelphia: {
     slug: 'philadelphia',
+    hook: `A few hundred singles across the whole metro, and you've met them all. One real introduction a day, chosen on compatibility — not just co-attendance.`,
     h1: 'LDS singles in Philadelphia',
     metaTitle: 'LDS Singles in Philadelphia — The Real Numbers',
     metaDescription:

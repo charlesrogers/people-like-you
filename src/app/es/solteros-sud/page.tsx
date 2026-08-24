@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import ArticleShell, { Paras } from '@/components/seo/ArticleShell'
+import ArticleShell, { HeroCopy, Paras } from '@/components/seo/ArticleShell'
 import { COUNTRY_CONTENT } from '@/content/country-pages'
 import countryData from '@/data/seo-countries.json'
 
@@ -14,11 +14,19 @@ const ES = Object.values(COUNTRY_CONTENT).filter(c => c.lang === 'es')
 
 export default function Page() {
   return (
-    <ArticleShell lang="es" backHref="/lds-singles" backLabel="All cities & countries">
-      <h1 className="mt-8 text-3xl font-bold tracking-tight text-stone-900">Solteros SUD por país</h1>
+    <ArticleShell
+      lang="es"
+      crumb={{ href: '/lds-singles', label: 'All cities & countries' }}
+      hero={
+        <HeroCopy
+          h1="Solteros SUD por país"
+          hook="Un casamentero, no otra app de deslizar: una presentación real al día, con la razón por la que ustedes dos encajarían. Elige tu país para apuntarte."
+        />
+      }
+    >
       <Paras
         paras={[
-          `People Like You es un casamentero — una presentación real al día, con la razón por la que ustedes dos encajarían. Estas páginas cuentan, con cifras oficiales y sin adornos, cómo es ser soltero Santo de los Últimos Días en cada uno de los países hispanohablantes con más miembros de la Iglesia.`,
+          `Estas páginas cuentan, con cifras oficiales y sin adornos, cómo es ser soltero Santo de los Últimos Días en cada uno de los países hispanohablantes con más miembros de la Iglesia — y cada una tiene su lista de espera.`,
         ]}
       />
       <ul className="mt-8 space-y-3">

@@ -10,5 +10,5 @@ export const metadata = {
 }
 
 export default function Page() {
-  return <CountryArticle slug="brasil" backHref="/lds-singles" />
+  return <CountryArticle slug="brasil" />
 }
