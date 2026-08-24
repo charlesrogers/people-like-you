@@ -480,8 +480,9 @@ function OnboardingContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-stone-50 to-white">
-      {/* Progress bar */}
-      <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-stone-100">
+      {/* Progress bar — hidden during the quiz: D-QD5 §2 wants nothing else on
+          screen, and the quiz carries its own per-item progress. */}
+      <div className={`sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-stone-100 ${step === 'quiz' ? 'hidden' : ''}`}>
         <div className="mx-auto max-w-xl px-6 py-3">
           <div className="flex items-center justify-between text-xs text-stone-400">
             {STEPS.map((s, i) => (
