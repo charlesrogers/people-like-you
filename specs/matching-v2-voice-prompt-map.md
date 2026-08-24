@@ -159,6 +159,8 @@ Format: `option → prompt` · *(tier)*. `helpText` in brackets where it isn't o
 "You said you nerd out on {m9}. What pulled you in — and how deep does it go?"
 ```
 - `{m9}` = the typed text, or the transcript if recorded. Transcript longer than 120 chars → truncate at the first sentence boundary, else at 80 chars on a word boundary, no ellipsis.
+- **Lead-in stripping (added 2026-08-23 — spoken answers double the stem).** A spoken answer is a sentence, not a noun phrase: "I nerd out on vintage bicycle restoration" templates to *"You said you nerd out on I nerd out on vintage bicycle restoration."* Before templating, strip a leading first-person lead-in — case-insensitive, one pass: `^(i (really )?(nerd out on|geek out (on|about)|love|like|am into|'m into|obsess over)|honestly,?|probably|um,?|uh,?|it'?s )\s*` — then lowercase the first character.
+- **Malformed output never ships.** If after stripping the value is empty, still begins with `I `, or exceeds the length rule, do **not** emit the template — fall back to the bank prompt `rabbit_hole`. A broken sentence in the one prompt that quotes the user destroys the exact effect the prompt exists to create. Assert this in U27.
 - Transcript not ready at voice-step entry → bank prompt `rabbit_hole`, and the fished slot is re-offered later in the step if the transcript lands.
 - Q19 skipped → `rabbit_hole` from the bank.
 - tier: `self_expansion`.
