@@ -1,5 +1,7 @@
 # Story Elicitation — First Principles
 
+> **Status note 2026-08-24.** §1–§4 (what a usable story is, the elicitation mechanisms, the Labov completeness rubric, the agency/communion coding) stand and are unaffected by the pitch-demand research. What changed: the **eight story assets are a writer's checklist and a set of generation-side logging tags, not a reader classifier.** We do not score readers on asset preference, and `asset_priors` is not built — see `specs/research-pitch-demand-findings.md`. Asset density in a story is still worth maximising, but for craft reasons (a richer story is a better story) rather than targeting ones.
+
 **Why this exists:** D-QD4 shipped 47 prompts written on instinct plus seven rules I asserted. Charles asked for the actual derivation: what makes people tell a good story, what the guidelines should be, how the result gets processed and categorised, how a prompt should be written up, and how all of it ties back to the questionnaire.
 **Companions:** `specs/matching-v2-voice-prompt-map.md` (the prompts) · `specs/matching-v2-questionnaire-battery-v1.md` (the 23 items) · `matching_algo-v2.md` §6 (the angle matrix and tone rules) · live code: `src/lib/prompts.ts`, `src/lib/extraction-v2.ts`.
 **Date:** 2026-08-23. Sources verified this session.
