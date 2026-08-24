@@ -6,7 +6,9 @@ import { apiFetch } from '@/lib/api-client'
 import posthog from 'posthog-js'
 import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
-import { getOnboardingPrompts, getRandomPrompt, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
+import PromptPicker from '@/components/PromptPicker'
+import ProfileCompletion from '@/components/ProfileCompletion'
+import { getProfileCompletion, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
 import { computePersonalityReveal } from '@/lib/personality-reveal'
 import { getSeedNarrativesForGender, ATTRIBUTE_TAGS, type SeedNarrative } from '@/lib/seed-narratives'
 
@@ -79,9 +81,12 @@ function OnboardingContent() {
   const [zipcode, setZipcode] = useState('')
 
   // Step 2: Voice recordings — stores server-confirmed memo IDs (not blobs)
-  const [prompts, setPrompts] = useState<PromptDef[]>(() => getOnboardingPrompts(6))
+  // The user picks which prompt to answer; `activePrompt` is the one open on
+  // the recorder, null when the picker is showing.
   const [recordings, setRecordings] = useState<Map<string, { memoId: string; duration: number }>>(new Map())
-  const [currentVoiceIndex, setCurrentVoiceIndex] = useState(0)
+  const [activePrompt, setActivePrompt] = useState<PromptDef | null>(null)
+  const [passedPromptIds, setPassedPromptIds] = useState<string[]>([])
+  const [justRecorded, setJustRecorded] = useState<PromptDef | null>(null)
 
   // Step 3: Hard prefs (dealbreakers only)
   const [ageMin, setAgeMin] = useState(21)
@@ -172,12 +177,11 @@ function OnboardingContent() {
     })
   }
 
+  // Backing out of a prompt returns to the picker and retires that prompt for
+  // the session, so "show me different ones" never loops the same list.
   const handleSkipPrompt = (promptId: string) => {
-    const currentIds = prompts.map(p => p.id)
-    const replacement = getRandomPrompt(currentIds)
-    if (replacement) {
-      setPrompts(prev => prev.map(p => p.id === promptId ? replacement : p))
-    }
+    setPassedPromptIds(prev => prev.includes(promptId) ? prev : [...prev, promptId])
+    setActivePrompt(null)
   }
 
   const canProceedSignup = agreedToStandards && (useEmail
@@ -186,7 +190,10 @@ function OnboardingContent() {
       ? otpCode.length === 6
       : signupPhone.replace(/\D/g, '').length >= 10)
   const canProceedBasics = firstName && gender && birthYear && zipcode
-  const canProceedVoice = recordings.size >= 2
+  // The voice step is skippable by design — but the profile stays incomplete
+  // until every angle has a story behind it (see getProfileCompletion).
+  const canProceedVoice = true
+  const voiceCompletion = getProfileCompletion(answeredPromptIds)
   const canProceedPrefs = faithImportance && kids
   const canProceedPhotos = photoFiles.length >= 1
 
@@ -620,97 +627,74 @@ function OnboardingContent() {
           </div>
         )}
 
-        {/* Step 2: Voice Recordings — one card at a time */}
+        {/* Step 2: Voice Recordings — pick a prompt, then record it */}
         {step === 'voice' && (
           <div>
             <h1 className="text-2xl font-bold text-stone-900">Tell us about yourself</h1>
             <p className="mt-2 text-sm text-stone-500">
-              Just talk like you&rsquo;re telling a friend. Record at least 2.
+              Pick whichever one you actually have a story for. Just talk like you&rsquo;re telling a friend.
             </p>
 
-            {/* Progress */}
-            <div className="mt-4 flex items-center gap-3">
-              <div className="flex gap-1.5">
-                {prompts.map((p, i) => (
-                  <div
-                    key={p.id}
-                    className={`h-2 w-8 rounded-full transition-all duration-300 ${
-                      recordings.has(p.id) ? 'bg-emerald-500' :
-                      i === currentVoiceIndex ? 'bg-stone-900' :
-                      'bg-stone-200'
-                    }`}
-                  />
-                ))}
-              </div>
-              <span className="text-xs text-stone-400 font-medium">
-                {recordings.size} recorded
-              </span>
+            <div className="mt-4">
+              <ProfileCompletion answeredPromptIds={answeredPromptIds} compact />
             </div>
 
-            {/* Single card with slide animation */}
-            <div className="mt-6 relative overflow-hidden">
-              <div
-                key={prompts[currentVoiceIndex]?.id}
-                className="animate-slide-in"
-              >
-                {prompts[currentVoiceIndex] && !recordings.has(prompts[currentVoiceIndex].id) && (
+            <div className="mt-6">
+              {justRecorded && (
+                <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
+                  <p className="text-base font-medium text-emerald-700">Got it &#10003;</p>
+                  <p className="mt-1 text-sm text-emerald-600">{justRecorded.short}</p>
+                </div>
+              )}
+
+              {activePrompt ? (
+                <div key={activePrompt.id} className="animate-slide-in">
                   <VoiceRecorder
-                    promptId={prompts[currentVoiceIndex].id}
-                    promptText={prompts[currentVoiceIndex].text}
-                    helpText={prompts[currentVoiceIndex].helpText}
-                    exampleAnswer={prompts[currentVoiceIndex].exampleAnswer}
-                    onSkip={() => handleSkipPrompt(prompts[currentVoiceIndex].id)}
+                    promptId={activePrompt.id}
+                    promptText={activePrompt.text}
+                    helpText={activePrompt.helpText}
+                    exampleAnswer={activePrompt.exampleAnswer}
+                    onSkip={() => handleSkipPrompt(activePrompt.id)}
                     onRecordingComplete={async (blob, duration) => {
-                      await handleRecordingComplete(prompts[currentVoiceIndex].id, blob, duration)
-                      // Auto-advance to next unrecorded prompt after a beat
+                      await handleRecordingComplete(activePrompt.id, blob, duration)
+                      setJustRecorded(activePrompt)
                       setTimeout(() => {
-                        const nextUnrecorded = prompts.findIndex((p, i) => i > currentVoiceIndex && !recordings.has(p.id))
-                        if (nextUnrecorded !== -1) {
-                          setCurrentVoiceIndex(nextUnrecorded)
-                        } else {
-                          const firstUnrecorded = prompts.findIndex(p => !recordings.has(p.id) && p.id !== prompts[currentVoiceIndex].id)
-                          if (firstUnrecorded !== -1) {
-                            setCurrentVoiceIndex(firstUnrecorded)
-                          }
-                        }
+                        setActivePrompt(null)
+                        setTimeout(() => setJustRecorded(null), 2500)
                       }, 600)
                     }}
                   />
-                )}
-
-                {prompts[currentVoiceIndex] && recordings.has(prompts[currentVoiceIndex].id) && (
-                  <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
-                    <p className="text-lg font-medium text-emerald-700">Got it! ✓</p>
-                    <p className="mt-1 text-sm text-emerald-600">{prompts[currentVoiceIndex].text}</p>
-                  </div>
-                )}
-              </div>
-
-            </div>
-
-            {/* Navigation dots */}
-            <div className="mt-6 flex items-center justify-center gap-2">
-              {prompts.map((p, i) => (
-                <button
-                  key={p.id}
-                  onClick={() => setCurrentVoiceIndex(i)}
-                  className={`h-3 w-3 rounded-full transition-all ${
-                    recordings.has(p.id) ? 'bg-emerald-500' :
-                    i === currentVoiceIndex ? 'bg-stone-900 scale-125' :
-                    'bg-stone-200 hover:bg-stone-300'
-                  }`}
+                  <button
+                    type="button"
+                    onClick={() => setActivePrompt(null)}
+                    className="mt-3 w-full rounded-lg px-4 py-2 text-sm text-stone-500 transition-colors hover:text-stone-800"
+                  >
+                    Pick a different one
+                  </button>
+                </div>
+              ) : (
+                <PromptPicker
+                  answeredPromptIds={answeredPromptIds}
+                  passedIds={passedPromptIds}
+                  onPick={(p) => { setJustRecorded(null); setActivePrompt(p) }}
+                  onPassAll={(shownIds) =>
+                    setPassedPromptIds(prev => [...prev, ...shownIds.filter(id => !prev.includes(id))])
+                  }
                 />
-              ))}
+              )}
             </div>
 
-            {/* Continue early */}
-            {recordings.size >= 2 && (
-              <p className="mt-4 text-center text-xs text-stone-400">
-                {recordings.size >= 2 && recordings.size < prompts.length && (
-                  <span>You can continue now, or record more for better matches.</span>
-                )}
-              </p>
+            {!activePrompt && (
+              <div className="mt-6">
+                <ProfileCompletion answeredPromptIds={answeredPromptIds} />
+              </div>
             )}
+
+            <p className="mt-4 text-center text-xs text-stone-400">
+              {voiceCompletion.isComplete
+                ? 'All four covered. You can keep going or move on.'
+                : 'You can skip this and finish it later — your profile stays incomplete until you do.'}
+            </p>
           </div>
         )}
 
@@ -1203,15 +1187,14 @@ function OnboardingContent() {
                           <button
                             key={p.id}
                             onClick={() => {
-                              // Go back to voice step with this specific prompt
-                              setPrompts([p])
-                              setCurrentVoiceIndex(0)
+                              // Go back to the voice step with this prompt open
+                              setActivePrompt(p)
                               setShowMoreQuestions(false)
                               setStep('voice')
                             }}
                             className="block w-full text-left rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-700 transition hover:bg-stone-50"
                           >
-                            <span className="font-medium">{p.text}</span>
+                            <span className="font-medium">{p.short}</span>
                             <span className="mt-1 block text-xs text-stone-400">{p.helpText}</span>
                           </button>
                         ))}
@@ -1219,14 +1202,13 @@ function OnboardingContent() {
                           <button
                             key={p.id}
                             onClick={() => {
-                              setPrompts([p])
-                              setCurrentVoiceIndex(0)
+                              setActivePrompt(p)
                               setShowMoreQuestions(false)
                               setStep('voice')
                             }}
                             className="block w-full text-left rounded-xl border border-dashed border-stone-200 px-4 py-3 text-sm text-stone-500 transition hover:bg-stone-50"
                           >
-                            <span>{p.text}</span>
+                            <span>{p.short}</span>
                           </button>
                         ))}
                       </div>

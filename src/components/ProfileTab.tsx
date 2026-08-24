@@ -5,6 +5,7 @@ import ProfileCompleteness from './ProfileCompleteness'
 import VoiceRecorder from './VoiceRecorder'
 import { computePersonalityReveal, type PersonalityReveal } from '@/lib/personality-reveal'
 import { getTargetedPrompts, getPromptText, type PromptDef } from '@/lib/prompts'
+import ProfileCompletion from '@/components/ProfileCompletion'
 
 interface VoiceMemo {
   id: string
@@ -75,6 +76,9 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
     <div className="space-y-6">
       {/* Completeness */}
       <ProfileCompleteness richness={reveal?.richness || 0} memoCount={composite.memo_count || 0} />
+
+      {/* Angle coverage — which ways of introducing you we can't write yet */}
+      <ProfileCompletion answeredPromptIds={memos.map(m => m.prompt_id)} />
 
       {/* Personality card with explanations */}
       {reveal && (
@@ -256,7 +260,7 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
           <div className="mt-4 space-y-3">
             {initialPrompts.targeted.map(p => (
               <div key={p.id} className="rounded-xl bg-white/10 p-4">
-                <p className="text-sm font-medium text-white">{p.text}</p>
+                <p className="text-sm font-medium text-white">{p.short}</p>
                 <p className="mt-1 text-xs text-stone-400">{p.helpText}</p>
                 <button
                   onClick={() => setRecordingPrompt(p)}
@@ -272,7 +276,7 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
                 <p className="text-xs text-stone-500 mt-1">Or try something different:</p>
                 {initialPrompts.others.slice(0, 2).map(p => (
                   <div key={p.id} className="rounded-xl border border-white/10 p-4">
-                    <p className="text-sm text-stone-300">{p.text}</p>
+                    <p className="text-sm text-stone-300">{p.short}</p>
                     <button
                       onClick={() => setRecordingPrompt(p)}
                       className="mt-2 flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-xs font-medium text-white transition hover:bg-white/20"
