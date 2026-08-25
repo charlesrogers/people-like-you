@@ -783,6 +783,7 @@ function OnboardingContent() {
                 >
                   skip for now
                 </button>
+              </div>
             )}
 
             {!activePrompt && recordings.size > 0 && (
