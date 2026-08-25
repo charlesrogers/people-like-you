@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import posthog from 'posthog-js'
+import { getStoredUserId } from '@/lib/session'
 
 interface CalibrateCandidate {
   id: string
@@ -22,7 +23,7 @@ export default function Calibrate() {
   const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    const profileId = localStorage.getItem('ply_profile_id')
+    const profileId = getStoredUserId()
     if (!profileId) {
       router.push('/onboarding')
       return

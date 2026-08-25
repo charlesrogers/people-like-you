@@ -1,6 +1,7 @@
 'use client'
 
 import { createBrowserClient } from '@/lib/supabase'
+import { clearSession, saveSession, getRefreshToken } from '@/lib/session'
 
 let isRefreshing = false
 let refreshPromise: Promise<boolean> | null = null
@@ -11,15 +12,14 @@ async function refreshSession(): Promise<boolean> {
   isRefreshing = true
   refreshPromise = (async () => {
     try {
-      const refreshToken = localStorage.getItem('ply_refresh_token')
+      const refreshToken = getRefreshToken()
       if (!refreshToken) return false
 
       const supabase = createBrowserClient()
       const { data, error } = await supabase.auth.refreshSession()
       if (error || !data.session) return false
 
-      localStorage.setItem('ply_access_token', data.session.access_token)
-      localStorage.setItem('ply_refresh_token', data.session.refresh_token)
+      saveSession({ accessToken: data.session.access_token, refreshToken: data.session.refresh_token })
       return true
     } catch {
       return false
@@ -33,9 +33,7 @@ async function refreshSession(): Promise<boolean> {
 }
 
 function clearSessionAndRedirect() {
-  localStorage.removeItem('ply_access_token')
-  localStorage.removeItem('ply_refresh_token')
-  localStorage.removeItem('ply_profile_id')
+  clearSession()
   window.location.href = '/onboarding'
 }
 

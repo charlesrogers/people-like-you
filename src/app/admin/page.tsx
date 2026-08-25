@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import AdminReports from "@/components/AdminReports";
+import { saveSession } from '@/lib/session'
 
 // ─── Types ───
 
@@ -672,7 +673,7 @@ function UserCard({
   }
 
   function handleExperienceAs() {
-    localStorage.setItem("ply_profile_id", user.id);
+    saveSession({ userId: user.id });
     window.location.href = "/dashboard";
   }
 

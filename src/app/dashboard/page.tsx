@@ -16,6 +16,7 @@ import VoicePromptLoop from '@/components/VoicePromptLoop'
 import ProfileTab from '@/components/ProfileTab'
 import InviteTab from '@/components/InviteTab'
 import SettingsTab from '@/components/SettingsTab'
+import { getStoredUserId, signOut } from '@/lib/session'
 import DailyThree, { type IntroCard } from '@/components/DailyThree'
 import type { CompositeProfile } from '@/lib/types'
 
@@ -132,7 +133,7 @@ export default function Dashboard() {
   const [ghostNudgeDismissed, setGhostNudgeDismissed] = useState(false)
 
   useEffect(() => {
-    const profileId = localStorage.getItem('ply_profile_id')
+    const profileId = getStoredUserId()
     if (!profileId) {
       window.location.href = '/onboarding'
       return
@@ -146,10 +147,7 @@ export default function Dashboard() {
         const profileData = await profileRes.json()
         if (!profileData.profile) {
           // Stored profile ID is invalid — clear and redirect
-          localStorage.removeItem('ply_profile_id')
-          localStorage.removeItem('ply_access_token')
-          localStorage.removeItem('ply_refresh_token')
-          window.location.href = '/onboarding'
+          signOut('/onboarding')
           return
         }
         setFirstName(profileData.profile.first_name)
@@ -482,12 +480,7 @@ export default function Dashboard() {
           <SettingsTab
             userId={userId}
             email={userEmail}
-            onSignOut={() => {
-              localStorage.removeItem('ply_profile_id')
-              localStorage.removeItem('ply_access_token')
-              localStorage.removeItem('ply_refresh_token')
-              window.location.href = '/'
-            }}
+            onSignOut={() => signOut('/')}
           />
         )}
 

@@ -13,6 +13,7 @@ import QuizStep, { type QuizResult } from '@/components/QuizStep'
 import { personalisedPrompts, type SelectedPrompt } from '@/lib/voice-prompt-map'
 import { canonicalIndex } from '@/lib/quiz-scoring'
 import { FRAMING as QUIZ_FRAMING } from '@/lib/quiz-battery'
+import { getStoredUserId, saveSession, signOut } from '@/lib/session'
 import { computePersonalityReveal } from '@/lib/personality-reveal'
 import { getSeedNarrativesForGender, ATTRIBUTE_TAGS, type SeedNarrative } from '@/lib/seed-narratives'
 
@@ -96,6 +97,9 @@ function OnboardingContent() {
   const [activePrompt, setActivePrompt] = useState<PromptDef | null>(null)
   const [passedPromptIds, setPassedPromptIds] = useState<string[]>([])
   const [voiceSkipped, setVoiceSkipped] = useState(false)
+  // True when we picked the session up from localStorage rather than a signup
+  // in this tab — i.e. someone came back, or is testing on a shared browser.
+  const [resumedSession, setResumedSession] = useState(false)
   const [justRecorded, setJustRecorded] = useState<PromptDef | null>(null)
 
   // Step 3: Hard prefs (dealbreakers only)
@@ -143,8 +147,8 @@ function OnboardingContent() {
 
   // Restore state after page refresh — recordings are already on the server
   useEffect(() => {
-    const savedId = localStorage.getItem('ply_profile_id')
-    if (savedId && !userId) setUserId(savedId)
+    const savedId = getStoredUserId()
+    if (savedId && !userId) { setUserId(savedId); setResumedSession(true) }
   }, [])
 
   // Recordings always belong to the CURRENT user. Keying this on userId means a
@@ -266,12 +270,11 @@ function OnboardingContent() {
           if (!res.ok) throw new Error(data.error || 'Signup failed')
 
           if (data.access_token) {
-            localStorage.setItem('ply_access_token', data.access_token)
-            localStorage.setItem('ply_refresh_token', data.refresh_token)
+            saveSession({ accessToken: data.access_token, refreshToken: data.refresh_token })
           }
           if (data.id) {
             setUserId(data.id)
-            localStorage.setItem('ply_profile_id', data.id)
+            saveSession({ userId: data.id })
           }
 
           setEmail(signupEmail)
@@ -298,12 +301,11 @@ function OnboardingContent() {
           if (!res.ok) throw new Error(data.error || 'Invalid code')
 
           if (data.access_token) {
-            localStorage.setItem('ply_access_token', data.access_token)
-            localStorage.setItem('ply_refresh_token', data.refresh_token)
+            saveSession({ accessToken: data.access_token, refreshToken: data.refresh_token })
           }
           if (data.id) {
             setUserId(data.id)
-            localStorage.setItem('ply_profile_id', data.id)
+            saveSession({ userId: data.id })
           }
 
           posthog.capture('onboarding_started', { method: 'phone' })
@@ -345,7 +347,7 @@ function OnboardingContent() {
         if (!res.ok) throw new Error(data.error || 'Failed to create profile')
 
         setUserId(data.id)
-        localStorage.setItem('ply_profile_id', data.id)
+        saveSession({ userId: data.id })
 
         // Recordings already uploaded immediately on record — just advance
         setStep('preferences')
@@ -384,7 +386,7 @@ function OnboardingContent() {
         // Use existing userId if we already have one
         if (!userId && data.id) {
           setUserId(data.id)
-          localStorage.setItem('ply_profile_id', data.id)
+          saveSession({ userId: data.id })
         }
 
         setStep('photos')
@@ -512,6 +514,26 @@ function OnboardingContent() {
           </div>
         </div>
       </div>
+
+      {resumedSession && step !== 'reveal' && (
+        <div className="mx-auto mt-4 flex max-w-xl items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3">
+          <p className="text-[13px] text-stone-600">You&rsquo;re already signed in.</p>
+          <div className="flex shrink-0 items-center gap-3">
+            <button
+              onClick={() => router.push('/dashboard')}
+              className="text-[13px] font-medium text-stone-700 underline underline-offset-4 transition hover:text-stone-900"
+            >
+              Go to your profile
+            </button>
+            <button
+              onClick={() => signOut('/onboarding')}
+              className="text-[13px] text-stone-400 underline underline-offset-4 transition hover:text-stone-600"
+            >
+              Not you? Sign out
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="mx-auto max-w-xl px-6 py-12">
         {/* Step 0: Signup (phone-first) */}
