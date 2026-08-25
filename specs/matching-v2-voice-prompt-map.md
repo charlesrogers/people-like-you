@@ -94,7 +94,7 @@ Format: `option → prompt` · *(tier)*. Renumbered for battery rc10; the five c
 | I'm not missing the must-see things | "What's one must-see that was genuinely worth it, and one that absolutely wasn't?" | self_expansion |
 | whatever's near where I'm staying | "Tell me about a trip where the best part happened within three blocks of where you were staying." | comfort |
 | I walk until something happens | "Tell me about a walk that turned into something. Where were you?" | self_expansion |
-| I ask someone who lives there and go do that | "Tell me about the best thing a local ever sent you to. Did you actually find it?" | self_expansion |
+| I've had places saved on Instagram for months | "What's a place you saved months ago and finally went to? Was it what you pictured?" | self_expansion |
 
 ### Q7 · You're meeting someone at 7.
 | option | prompt | tier |

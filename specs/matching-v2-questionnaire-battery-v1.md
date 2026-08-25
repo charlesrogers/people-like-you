@@ -1,9 +1,9 @@
-# D-QD1 — Reader Instrument, Battery v1.0-rc10
+# D-QD1 — Reader Instrument, Battery v1.0-rc11
 
 **Supersedes** `matching_algo-v2.md` §4.1–§4.3 (items and copy). Structure, storage and envelope from the brief still bind.
 **Voice:** dry stems + warm-sincere framing copy (Charles, 2026-08-22 — Q1 answer **b**).
 **Research basis:** `specs/matching-v2-questionnaire-research.md`. **Three-voice draft it was chosen from:** `specs/matching-v2-questionnaire-batteries.md`.
-**Status:** release candidate 10. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
+**Status:** release candidate 11. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
 
 ---
 
@@ -103,7 +103,7 @@ Options listed **low->high on the scored trait** where ordinal; presentation ord
 > 🎭 theatre kid · 🏀 jock · 📚 honor-roll grinder · 🗓️ the one organizing the hang · 🎧 happily unaffiliated · 🦋 a completely different person
 
 **Q2 · `M3` · milieu**
-> **It's 10pm at the wedding reception. Where are you?**
+> **The wedding reception is winding down. Where are you?**
 > 🏠 already home, shoes off · 🍰 at a side table, deep in the actual conversation · 🎇 outside, handing out sparklers · 🕺 on the dance floor since the first song
 
 ### Block 2 - Wired
@@ -114,11 +114,11 @@ Options listed **low->high on the scored trait** where ordinal; presentation ord
 
 **Q4 · `T-O3` · O + milieu**
 > **One free day in a city you've never been to.**
-> 📸 I'm not missing the must-see things · 🛏️ whatever's near where I'm staying · 🚶 I walk until something happens · 🗺️ I ask someone who lives there and go do that
+> 📸 I'm not missing the must-see things · 🛏️ whatever's near where I'm staying · 🚶 I walk until something happens · 🔖 I've had places saved on Instagram for months
 
-**Q5 · `T-E1` · E** — *rebuilt in rc10: the old party scene asked the same question as Q2.*
-> **It's Friday and nothing's planned.**
-> 🚪 I'm keeping it that way · 👋 I'll see whoever texts first · ⚡ I'm texting three people right now · 🚕 I've already made a plan and invited everyone
+**Q5 · `T-E1` · E** — *rc11: the Friday version was a second free-time question sitting next to Q9's Saturdays.*
+> **You're seated next to a stranger at a work dinner.**
+> 🍽️ I get through it · 🙂 polite, mostly quiet · 💬 I find the one thing we both know about · 🎤 I'm holding court by dessert
 
 **Q6 · `T-E2` · E**
 > **Your phone rings. No text first.**

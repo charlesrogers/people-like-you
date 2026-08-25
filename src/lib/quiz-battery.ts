@@ -69,7 +69,7 @@ export const QUIZ_ITEMS: QuizItem[] = [
   },
   {
     id: "Q2", code: "M3", block: 1,
-    stem: "It's 10pm at the wedding reception. Where are you?",
+    stem: "The wedding reception is winding down. Where are you?",
     options: [
       { emoji: "🏠", label: "already home, shoes off" },
       { emoji: "🍰", label: "at a side table, deep in the actual conversation" },
@@ -98,19 +98,19 @@ export const QUIZ_ITEMS: QuizItem[] = [
       { emoji: "📸", label: "I'm not missing the must-see things" },
       { emoji: "🛏️", label: "whatever's near where I'm staying" },
       { emoji: "🚶", label: "I walk until something happens" },
-      { emoji: "🗺️", label: "I ask someone who lives there and go do that" },
+      { emoji: "🔖", label: "I've had places saved on Instagram for months" },
     ],
     skippable: false, polarityRandomised: true,
     scoring: [{ trait: 'O', values: [1.0, 2.0, 3.0, 4.0] }],  // as listed: low -> high
   },
   {
     id: "Q5", code: "T-E1", block: 2,
-    stem: "It's Friday and nothing's planned.",
+    stem: "You're seated next to a stranger at a work dinner.",
     options: [
-      { emoji: "🚪", label: "I'm keeping it that way" },
-      { emoji: "👋", label: "I'll see whoever texts first" },
-      { emoji: "⚡", label: "I'm texting three people right now" },
-      { emoji: "🚕", label: "I've already made a plan and invited everyone" },
+      { emoji: "🍽️", label: "I get through it" },
+      { emoji: "🙂", label: "polite, mostly quiet" },
+      { emoji: "💬", label: "I find the one thing we both know about" },
+      { emoji: "🎤", label: "I'm holding court by dessert" },
     ],
     skippable: false, polarityRandomised: true,
     scoring: [{ trait: 'E', values: [1.0, 2.0, 3.0, 4.0] }],  // as listed: low -> high

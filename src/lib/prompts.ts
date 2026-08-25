@@ -184,6 +184,21 @@ const shuffle = <T,>(arr: T[]): T[] => {
  * the list never looks like a chore. Excludes anything already answered or
  * explicitly passed over.
  */
+/**
+ * The angle this round should ask about: the first one with no story behind it.
+ * Onboarding asks for three recordings, and asking each from a different angle
+ * is what makes the profile writable from every direction — a shuffled list can
+ * put all three in one tier and leave three angles dead.
+ *
+ * Returns null once every angle is covered.
+ */
+export function getNextAngle(
+  answeredPromptIds: string[],
+  personalised: PromptDef[] = [],
+): AngleTier | null {
+  return getProfileCompletion(answeredPromptIds, personalised).missing[0] ?? null
+}
+
 export function getPromptChoices(
   answeredPromptIds: string[],
   count = 5,
@@ -194,20 +209,31 @@ export function getPromptChoices(
    * buried below five generic ones does not read as "they listened".
    */
   personalised: PromptDef[] = [],
+  /**
+   * Constrain the whole round to one angle. Every option on screen then belongs
+   * to the same bucket, which is what lets the screen be titled and what makes
+   * consecutive rounds visibly different.
+   */
+  angle?: AngleTier | null,
 ): PromptDef[] {
   const taken = new Set([...answeredPromptIds, ...excludeIds])
-  const available = QUESTION_BANK.filter(p => !taken.has(p.id))
+  const inAngle = (p: PromptDef) => !angle || p.tier === angle
+  const available = QUESTION_BANK.filter(p => !taken.has(p.id) && inAngle(p))
   const { missing } = getProfileCompletion(answeredPromptIds, personalised)
 
   // Lead with ONE personalised prompt, not all of them. Leading with the whole
   // set meant that after recording one, the next draw showed the same rows in
   // the same order and read as "nothing happened". One per round also spreads
   // them across the recordings instead of spending them all on screen one.
-  const picked: PromptDef[] = personalised.filter(p => !taken.has(p.id)).slice(0, 1)
-  for (const tier of missing) {
-    if (picked.length >= count) break
-    const candidates = shuffle(available.filter(p => p.tier === tier && !picked.includes(p)))
-    if (candidates.length) picked.push(candidates[0])
+  // A personalised prompt from this round's angle leads it, when the reader's
+  // answers produced one.
+  const picked: PromptDef[] = personalised.filter(p => !taken.has(p.id) && inAngle(p)).slice(0, 1)
+  if (!angle) {
+    for (const tier of missing) {
+      if (picked.length >= count) break
+      const candidates = shuffle(available.filter(p => p.tier === tier && !picked.includes(p)))
+      if (candidates.length) picked.push(candidates[0])
+    }
   }
 
   const rest = shuffle(available.filter(p => !picked.includes(p)))

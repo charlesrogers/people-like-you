@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { getPromptChoices, getProfileCompletion, QUESTION_BANK, ANGLE_TIERS } from '../prompts'
+import { getPromptChoices, getProfileCompletion, getNextAngle, QUESTION_BANK, ANGLE_TIERS } from '../prompts'
 import { personalisedPrompts, NERD_OUT, type QuizAnswers } from '../voice-prompt-map'
 import { SEEDING_ITEMS } from '../quiz-battery'
 
@@ -75,5 +75,49 @@ describe('angle coverage counts fished prompts', () => {
     const perAngle = ANGLE_TIERS.map(t =>
       personalised.find(p => p.tier === t)?.id ?? QUESTION_BANK.find(b => b.tier === t)!.id)
     expect(getProfileCompletion(perAngle, personalised).isComplete).toBe(true)
+  })
+})
+
+describe('rounds are one bucket each (Charles, 2026-08-25)', () => {
+  it('every option in a round belongs to that round\'s angle', () => {
+    const personalised = fished()
+    for (const angle of ANGLE_TIERS) {
+      const choices = getPromptChoices([], 5, [], personalised, angle)
+      expect(choices.length).toBeGreaterThan(0)
+      for (const c of choices) expect(c.tier, `${angle}: ${c.id}`).toBe(angle)
+    }
+  })
+
+  it('the next round targets an angle with no story behind it', () => {
+    const personalised = fished()
+    const first = getNextAngle([], personalised)!
+    expect(ANGLE_TIERS).toContain(first)
+    // Record something in that angle; the next round must move on.
+    const inFirst = getPromptChoices([], 5, [], personalised, first)[0]
+    const second = getNextAngle([inFirst.id], personalised)
+    expect(second).not.toBe(first)
+  })
+
+  it('three recordings driven by the rounds cover three distinct angles', () => {
+    const personalised = fished()
+    const answered: string[] = []
+    const angles: string[] = []
+    for (let round = 0; round < 3; round++) {
+      const a = getNextAngle(answered, personalised)!
+      angles.push(a)
+      answered.push(getPromptChoices(answered, 5, [], personalised, a)[0].id)
+    }
+    expect(new Set(angles).size).toBe(3)
+  })
+
+  it('returns null once every angle is covered, so the flow can stop asking', () => {
+    const personalised = fished()
+    const answered: string[] = []
+    for (let i = 0; i < 4; i++) {
+      const a = getNextAngle(answered, personalised)
+      if (!a) break
+      answered.push(getPromptChoices(answered, 5, [], personalised, a)[0].id)
+    }
+    expect(getNextAngle(answered, personalised)).toBeNull()
   })
 })

@@ -8,7 +8,7 @@ import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
 import PromptPicker from '@/components/PromptPicker'
 import ProfileCompletion from '@/components/ProfileCompletion'
-import { getProfileCompletion, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
+import { getNextAngle, getProfileCompletion, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
 import QuizStep, { type QuizResult } from '@/components/QuizStep'
 import { personalisedPrompts, type SelectedPrompt } from '@/lib/voice-prompt-map'
 import { canonicalIndex } from '@/lib/quiz-scoring'
@@ -245,6 +245,9 @@ function OnboardingContent() {
   const VOICE_MINIMUM = 3
   const canProceedVoice = recordings.size >= VOICE_MINIMUM || voiceSkipped
   const voiceCompletion = getProfileCompletion(answeredPromptIds, fishedPrompts)
+  // Each round asks about a different bucket, so three recordings land in three
+  // angles rather than three in one.
+  const roundAngle = getNextAngle(answeredPromptIds, fishedPrompts)
   const canProceedPrefs = faithImportance && kids
   const canProceedPhotos = photoFiles.length >= 1
 
@@ -712,7 +715,9 @@ function OnboardingContent() {
               {cameFromQuiz ? QUIZ_FRAMING.close : 'Tell us about yourself'}
             </h1>
             <p className="mt-2 text-sm text-stone-500">
-              Pick one to answer out loud &mdash; just talk like you&rsquo;re telling a friend.
+              {roundAngle
+                ? 'Pick one to answer out loud \u2014 just talk like you\u2019re telling a friend.'
+                : 'Every angle is covered. Add more whenever you like.'}
             </p>
 
             {!activePrompt && (
@@ -766,6 +771,7 @@ function OnboardingContent() {
                   answeredPromptIds={answeredPromptIds}
                   passedIds={passedPromptIds}
                   personalised={fishedPrompts}
+                  angle={roundAngle}
                   onPick={(p) => { setJustRecorded(null); setActivePrompt(p) }}
                   onPassAll={(shownIds) =>
                     setPassedPromptIds(prev => [...prev, ...shownIds.filter(id => !prev.includes(id))])

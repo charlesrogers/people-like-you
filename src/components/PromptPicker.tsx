@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { getPromptChoices, type PromptDef } from '@/lib/prompts'
+import { ANGLE_LABELS, getPromptChoices, type AngleTier, type PromptDef } from '@/lib/prompts'
 
 interface PromptPickerProps {
   answeredPromptIds: string[]
@@ -12,6 +12,8 @@ interface PromptPickerProps {
   count?: number
   /** Prompts fished from the reader's quiz answers. They lead the list. */
   personalised?: PromptDef[]
+  /** Restrict this round to one angle, and title it. */
+  angle?: AngleTier | null
 }
 
 /**
@@ -27,6 +29,7 @@ export default function PromptPicker({
   onPassAll,
   count = 5,
   personalised = [],
+  angle = null,
 }: PromptPickerProps) {
   // getPromptChoices shuffles, so it must never run during render: the server
   // and client would draw different lists, React would throw a hydration
@@ -36,21 +39,21 @@ export default function PromptPicker({
   const answeredCount = answeredPromptIds.length
 
   useEffect(() => {
-    setChoices(getPromptChoices(answeredPromptIds, count, passedIds, personalised))
+    setChoices(getPromptChoices(answeredPromptIds, count, passedIds, personalised, angle))
     // Re-draw when the profile advances, not on every parent re-render —
     // reshuffling under the user's cursor would move the option they're
     // reaching for.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [answeredCount, count])
+  }, [answeredCount, count, angle])
 
   const showDifferent = () => {
     if (!choices) return
     const shownIds = choices.map(c => c.id)
     onPassAll(shownIds)
-    const next = getPromptChoices(answeredPromptIds, count, [...passedIds, ...shownIds], personalised)
+    const next = getPromptChoices(answeredPromptIds, count, [...passedIds, ...shownIds], personalised, angle)
     // If we've exhausted the bank, start re-offering what was passed rather
     // than showing an empty list.
-    setChoices(next.length ? next : getPromptChoices(answeredPromptIds, count, [], personalised))
+    setChoices(next.length ? next : getPromptChoices(answeredPromptIds, count, [], personalised, angle))
   }
 
   // Placeholder rows hold the layout for the one frame before the client draw,
@@ -69,6 +72,11 @@ export default function PromptPicker({
 
   return (
     <div>
+      {angle && (
+        <p className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-stone-400">
+          {ANGLE_LABELS[angle]}
+        </p>
+      )}
       <ul className="flex flex-col gap-2">
         {choices.map(prompt => (
           <li key={prompt.id}>
