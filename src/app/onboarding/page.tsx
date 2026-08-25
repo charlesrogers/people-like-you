@@ -143,23 +143,26 @@ function OnboardingContent() {
   // Restore state after page refresh — recordings are already on the server
   useEffect(() => {
     const savedId = localStorage.getItem('ply_profile_id')
-    if (savedId && !userId) {
-      setUserId(savedId)
-      apiFetch(`/api/voice-memo?userId=${savedId}`)
-        .then(r => r.json())
-        .then(data => {
-          if (data.memos?.length > 0) {
-            const restored = new Map<string, { memoId: string; duration: number }>(
-              data.memos.map((m: { id: string; prompt_id: string; duration_seconds: number }) => [
-                m.prompt_id, { memoId: m.id, duration: m.duration_seconds }
-              ])
-            )
-            setRecordings(restored)
-          }
-        })
-        .catch(() => {})
-    }
+    if (savedId && !userId) setUserId(savedId)
   }, [])
+
+  // Recordings always belong to the CURRENT user. Keying this on userId means a
+  // fresh signup re-fetches (and clears) instead of inheriting the previous
+  // session's memos — which was crossing angles off the completion meter for
+  // work the new user had not done.
+  useEffect(() => {
+    if (!userId) { setRecordings(new Map()); return }
+    let cancelled = false
+    apiFetch(`/api/voice-memo?userId=${userId}`)
+      .then(r => r.json())
+      .then(data => {
+        if (cancelled) return
+        const rows: { id: string; prompt_id: string; duration_seconds: number }[] = data.memos ?? []
+        setRecordings(new Map(rows.map(m => [m.prompt_id, { memoId: m.id, duration: m.duration_seconds }])))
+      })
+      .catch(() => {})
+    return () => { cancelled = true }
+  }, [userId])
 
   // N2/D-QD7: which prompt each user actually saw, and whether the quiz aimed it.
   // N2/D-QD7: fires when a prompt is actually opened on the recorder, which
@@ -1041,13 +1044,30 @@ function OnboardingContent() {
         {/* Step 5: Profile Reveal — Personality Quiz Style */}
         {step === 'reveal' && (
           <div>
-            {!composite ? (
+            {!composite && !processingDone ? (
               <div className="text-center py-12">
                 <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-stone-900" />
                 <p className="mt-4 text-sm text-stone-500">Almost ready... building your profile</p>
                 {processingError && (
                   <p className="mt-3 text-xs text-amber-600">{processingError}</p>
                 )}
+              </div>
+            ) : !composite ? (
+              <div className="py-8 text-center">
+                <h1 className="text-2xl font-bold text-stone-900">Your profile needs your voice</h1>
+                <p className="mx-auto mt-3 max-w-sm text-sm text-stone-500">
+                  We build this from the stories you tell out loud, and there aren&rsquo;t any yet.
+                  A couple of recordings is all it takes.
+                </p>
+                {processingError && (
+                  <p className="mt-3 text-xs text-amber-600">{processingError}</p>
+                )}
+                <button
+                  onClick={() => { setActivePrompt(null); setStep('voice') }}
+                  className="mt-8 w-full rounded-2xl bg-stone-900 px-6 py-4 text-[15px] font-semibold text-white transition active:scale-[0.98]"
+                >
+                  Record one now
+                </button>
               </div>
             ) : (() => {
               const reveal = computePersonalityReveal(composite)
