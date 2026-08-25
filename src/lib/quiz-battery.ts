@@ -55,7 +55,7 @@ export interface QuizBlock {
 export const QUIZ_ITEMS: QuizItem[] = [
   {
     id: "Q1", code: "M1", block: 1,
-    stem: "At seventeen, everyone knew you as:",
+    stem: "At seventeen, you were:",
     options: [
       { emoji: "🎭", label: "theatre kid" },
       { emoji: "🏀", label: "jock" },

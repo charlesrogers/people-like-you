@@ -199,7 +199,11 @@ export function getPromptChoices(
   const available = QUESTION_BANK.filter(p => !taken.has(p.id))
   const { missing } = getProfileCompletion(answeredPromptIds, personalised)
 
-  const picked: PromptDef[] = [...personalised.filter(p => !taken.has(p.id))].slice(0, count)
+  // Lead with ONE personalised prompt, not all of them. Leading with the whole
+  // set meant that after recording one, the next draw showed the same rows in
+  // the same order and read as "nothing happened". One per round also spreads
+  // them across the recordings instead of spending them all on screen one.
+  const picked: PromptDef[] = personalised.filter(p => !taken.has(p.id)).slice(0, 1)
   for (const tier of missing) {
     if (picked.length >= count) break
     const candidates = shuffle(available.filter(p => p.tier === tier && !picked.includes(p)))

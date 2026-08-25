@@ -244,7 +244,7 @@ function OnboardingContent() {
   // until every angle has a story behind it (see getProfileCompletion).
   const VOICE_MINIMUM = 3
   const canProceedVoice = recordings.size >= VOICE_MINIMUM || voiceSkipped
-  const voiceCompletion = getProfileCompletion(answeredPromptIds)
+  const voiceCompletion = getProfileCompletion(answeredPromptIds, fishedPrompts)
   const canProceedPrefs = faithImportance && kids
   const canProceedPhotos = photoFiles.length >= 1
 
@@ -715,6 +715,26 @@ function OnboardingContent() {
               Pick one to answer out loud &mdash; just talk like you&rsquo;re telling a friend.
             </p>
 
+            {!activePrompt && (
+              <div className="mt-5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[13px] font-medium text-stone-700">
+                    {recordings.size >= VOICE_MINIMUM
+                      ? `${recordings.size} recorded \u2014 that\u2019s plenty to work with`
+                      : `${recordings.size} of ${VOICE_MINIMUM} recorded`}
+                  </span>
+                </div>
+                <div className="mt-2 flex gap-1">
+                  {Array.from({ length: Math.max(VOICE_MINIMUM, recordings.size) }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={`h-1 flex-1 rounded-full ${i < recordings.size ? 'bg-stone-900' : 'bg-stone-200'}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="mt-6">
               {justRecorded && (
                 <div className="mb-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-center">
@@ -754,46 +774,24 @@ function OnboardingContent() {
               )}
             </div>
 
-            {!activePrompt && (
+            {!activePrompt && !canProceedVoice && (
               <div className="mt-6">
-                <div className="rounded-xl border border-stone-200 bg-white p-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[13px] font-medium text-stone-700">
-                      {recordings.size >= VOICE_MINIMUM
-                        ? 'That\u2019s plenty to work with.'
-                        : `${recordings.size} of ${VOICE_MINIMUM} recorded`}
-                    </span>
-                    <span className="text-[12px] text-stone-400">
-                      {recordings.size >= VOICE_MINIMUM ? '' : 'the more you tell us, the better the intro'}
-                    </span>
-                  </div>
-                  <div className="mt-2 flex gap-1">
-                    {Array.from({ length: VOICE_MINIMUM }).map((_, i) => (
-                      <span
-                        key={i}
-                        className={`h-1 flex-1 rounded-full ${i < recordings.size ? 'bg-stone-900' : 'bg-stone-200'}`}
-                      />
-                    ))}
-                  </div>
-                </div>
-                {!canProceedVoice && (
-                  <button
-                    type="button"
-                    onClick={() => setVoiceSkipped(true)}
-                    className="mx-auto mt-4 block text-[13px] text-stone-400 underline underline-offset-4 transition hover:text-stone-600"
-                  >
-                    skip for now
-                  </button>
-                )}
-                <ProfileCompletion answeredPromptIds={answeredPromptIds} />
-              </div>
+                <button
+                  type="button"
+                  onClick={() => setVoiceSkipped(true)}
+                  className="mx-auto block text-[13px] text-stone-400 underline underline-offset-4 transition hover:text-stone-600"
+                >
+                  skip for now
+                </button>
             )}
 
-            <p className="mt-4 text-center text-xs text-stone-400">
-              {voiceCompletion.isComplete
-                ? 'All four covered. You can keep going or move on.'
-                : 'You can skip this and finish it later — your profile stays incomplete until you do.'}
-            </p>
+            {!activePrompt && recordings.size > 0 && (
+              <p className="mt-4 text-center text-xs text-stone-400">
+                {voiceCompletion.isComplete
+                  ? 'Every angle covered. Keep going if you want to.'
+                  : 'Each one gives us a different angle to introduce you from.'}
+              </p>
+            )}
           </div>
         )}
 

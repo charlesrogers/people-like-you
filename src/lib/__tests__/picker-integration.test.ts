@@ -17,14 +17,26 @@ describe('fished prompts lead the picker', () => {
     }
   })
 
-  it('personalised prompts occupy the top of the list, in order', () => {
+  it('leads with exactly one personalised prompt, not the whole set', () => {
     const personalised = fished()
     for (let n = 0; n < 100; n++) {
       const choices = getPromptChoices([], 5, [], personalised)
       expect(choices).toHaveLength(5)
-      const lead = choices.slice(0, Math.min(5, personalised.length))
-      expect(lead.map(p => p.id)).toEqual(personalised.slice(0, 5).map(p => p.id))
+      expect(choices[0].id).toBe(personalised[0].id)
+      // Leading with all of them made the next round look identical after a
+      // recording — three of five rows unchanged and in the same order.
+      const personalisedIds = new Set(personalised.map(p => p.id))
+      expect(choices.filter(c => personalisedIds.has(c.id))).toHaveLength(1)
     }
+  })
+
+  it('the round after a recording is visibly a different list', () => {
+    const personalised = fished()
+    const first = getPromptChoices([], 5, [], personalised)
+    const answered = [first[0].id]
+    const second = getPromptChoices(answered, 5, [], personalised)
+    expect(second.map(p => p.id)).not.toContain(first[0].id)
+    expect(second[0].id).toBe(personalised[1].id)   // next personalised leads
   })
 
   it('the nerd-out is the first thing a quiz-completer is offered', () => {

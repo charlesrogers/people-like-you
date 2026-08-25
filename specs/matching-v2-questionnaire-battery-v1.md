@@ -99,7 +99,7 @@ Options listed **low->high on the scored trait** where ordinal; presentation ord
 ### Block 1 - Identity
 
 **Q1 · `M1` · milieu · `[skip]`**
-> **At seventeen, everyone knew you as:**
+> **At seventeen, you were:**
 > 🎭 theatre kid · 🏀 jock · 📚 honor-roll grinder · 🗓️ the one organizing the hang · 🎧 happily unaffiliated · 🦋 a completely different person
 
 **Q2 · `M3` · milieu**

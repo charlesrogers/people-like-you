@@ -1,9 +1,14 @@
 'use client'
 
-import { ANGLE_LABELS, ANGLE_TIERS, getProfileCompletion } from '@/lib/prompts'
+import { ANGLE_LABELS, ANGLE_TIERS, getProfileCompletion, type PromptDef } from '@/lib/prompts'
 
 interface ProfileCompletionProps {
   answeredPromptIds: string[]
+  /**
+   * Prompts fished from the quiz. Their ids are not in QUESTION_BANK, so
+   * without them their tiers are invisible and recorded answers do not count.
+   */
+  personalised?: PromptDef[]
   /** Compact single-line form for tight spaces. */
   compact?: boolean
 }
@@ -12,8 +17,8 @@ interface ProfileCompletionProps {
  * Shows the four angles and which of them the person has a story behind.
  * Completion is coverage, not a count — see getProfileCompletion.
  */
-export default function ProfileCompletion({ answeredPromptIds, compact }: ProfileCompletionProps) {
-  const { covered, missing, isComplete } = getProfileCompletion(answeredPromptIds)
+export default function ProfileCompletion({ answeredPromptIds, personalised = [], compact }: ProfileCompletionProps) {
+  const { covered, missing, isComplete } = getProfileCompletion(answeredPromptIds, personalised)
   const isCovered = (t: string) => (covered as readonly string[]).includes(t)
 
   if (compact) {
