@@ -123,12 +123,28 @@ export default function QuizStep({
     goTo(next, 1)
   }, [flush, goTo])
 
+  const poppingRef = useRef(false)
+
   const back = useCallback(() => {
     if (idx > 0) {
       setFilled(f => Math.max(0, f - 1))
       goTo(idx - 1, -1)
     }
   }, [idx, goTo])
+
+  // One history entry per item screen, so the phone's back gesture steps back
+  // through the quiz instead of unloading onboarding entirely.
+  useEffect(() => {
+    if (screen?.kind !== 'item') return
+    if (poppingRef.current) { poppingRef.current = false; return }
+    window.history.pushState({ quizItem: idx }, '')
+  }, [idx, screen])
+
+  useEffect(() => {
+    const onPop = () => { poppingRef.current = true; back() }
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [back])
 
   // ─── Answer → the core interaction (D-QD5 §4) ──────────────────────────────
   const answer = useCallback((itemId: string, displayedIndex: number | null) => {
@@ -245,9 +261,10 @@ export default function QuizStep({
             <button
               onClick={back}
               aria-label="Back"
-              className="-mr-2 flex h-11 w-11 items-center justify-center rounded-full text-stone-400 transition hover:bg-stone-100 hover:text-stone-700"
+              className="-mr-1 flex h-11 shrink-0 items-center gap-1 rounded-full px-2 text-[13px] font-medium text-stone-500 transition hover:bg-stone-100 hover:text-stone-900"
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
+              Back
             </button>
           )}
         </div>
