@@ -118,7 +118,7 @@ export function deriveRegister(responses: QuizResponse[]): Register {
   const byId = new Map(responses.map(r => [r.itemId, r]))
   const votes: Register[] = []
 
-  for (const id of ['Q16', 'Q17']) {
+  for (const id of ['Q12', 'Q13']) {
     const item = getItem(id)
     const r = byId.get(id)
     if (!item?.register || !r || r.optionIndex == null) continue
@@ -136,30 +136,28 @@ export function scoreQuiz(responses: QuizResponse[]): ReaderTraits {
   const byId = new Map(responses.map(r => [r.itemId, r]))
   const cat = (id: string) => categorical(id, byId.get(id))
 
-  const politicsCat = cat('Q21')
-  const importanceCat = cat('Q22')
+  const politicsCat = cat('Q16')
+  const importanceCat = cat('Q17')
 
   return {
     big5: scoreBig5(responses),
     milieu: {
       M1: cat('Q1'),
-      M2: cat('Q2'),
-      M3: cat('Q3'),
-      M4: cat('Q13'),
-      M7: cat('Q14'),
-      M8: cat('Q15'),
-      Q6: cat('Q6'),
+      M3: cat('Q2'),
+      M4: cat('Q9'),
+      M7: cat('Q10'),
+      M8: cat('Q11'),
+      Q6: cat('Q4'),
     },
     homogamy: {
-      education: cat('Q19'),
+      education: cat('Q14'),
       politics_position: politicsCat ? POLITICS_POSITION[politicsCat.index] ?? null : null,
       politics_importance: importanceCat ? POLITICS_IMPORTANCE[importanceCat.index] ?? null : null,
-      five_year: cat('Q20'),
+      five_year: cat('Q15'),
     },
     convo: {
-      M5: cat('Q16'),
-      CS1: cat('Q17'),
-      CS2: cat('Q18'),
+      M5: cat('Q12'),
+      CS1: cat('Q13'),
     },
     register: deriveRegister(responses),
     instrument_version: INSTRUMENT_VERSION,

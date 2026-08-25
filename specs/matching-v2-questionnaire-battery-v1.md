@@ -1,9 +1,9 @@
-# D-QD1 — Reader Instrument, Battery v1.0-rc9
+# D-QD1 — Reader Instrument, Battery v1.0-rc10
 
 **Supersedes** `matching_algo-v2.md` §4.1–§4.3 (items and copy). Structure, storage and envelope from the brief still bind.
 **Voice:** dry stems + warm-sincere framing copy (Charles, 2026-08-22 — Q1 answer **b**).
 **Research basis:** `specs/matching-v2-questionnaire-research.md`. **Three-voice draft it was chosen from:** `specs/matching-v2-questionnaire-batteries.md`.
-**Status:** release candidate 9. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
+**Status:** release candidate 10. Not frozen — freezes as **v1.0** after Charles's inline approval and the D-QD6 pilot revision pass.
 
 ---
 
@@ -90,112 +90,90 @@ Consequences, binding on every item below:
 
 ## 2. The battery
 
-**22 items** (Q19 "what do you nerd out on" moved out of the quiz into the voice step — Charles 2026-08-23: "it's in the wrong place, should be in the story section"). **No block cards** — the five interstitial screens are removed (Charles: "the headers are not necessary… remove those screens"). Progress carries the pacing instead.
+**17 items** (rc10 — five cut). **No block cards.** Every option leads with one emoji; Q16/Q17 (politics) stay plain.
 
-Every option leads with **one emoji**. Two deliberate exceptions: Q21 and Q22 (politics) stay plain — an emoji on a political self-label reads as either trivialising or loaded, and this is the one item where neutrality is doing real work.
+Options listed **low->high on the scored trait** where ordinal; presentation order polarity-randomised on the trait items **except Q7**, whose options are a clock.
 
-Options listed **low→high on the scored trait** where ordinal; presentation order polarity-randomised on the trait items **except Q9**, whose options are a clock.
+> **rc10 cuts (Charles, 2026-08-25).** Dropped rc9's Q2 (group chat), Q5 (come to this thing), Q11 (unanswered text), Q12 (feedback) and Q18 (dinner afterwards). None was a story-fisher, so story yield is unchanged. Q11/Q12 were the only N items and N has no launch consumer; Q18 steered nothing; Q2 and Q5 were rejected on quality. O drops to 2 indicators, matching E.
 
-### Block 1 — Identity
+### Block 1 - Identity
 
 **Q1 · `M1` · milieu · `[skip]`**
 > **At seventeen, everyone knew you as:**
 > 🎭 theatre kid · 🏀 jock · 📚 honor-roll grinder · 🗓️ the one organizing the hang · 🎧 happily unaffiliated · 🦋 a completely different person
 
-**Q2 · `M2` · milieu**
-> **The group chat is picking a restaurant. Fourteen messages in.**
-> 👑 I've already picked it · 🧭 I've sent three links and a walking distance · 👌 I said "I'm easy" and meant it · 🙃 I sent a meme about how long this is taking · 🔕 I muted it and I'll go wherever
-
-**Q3 · `M3` · milieu**
+**Q2 · `M3` · milieu**
 > **It's 10pm at the wedding reception. Where are you?**
-> 🛋️ already home, shoes off · 🍷 at a side table, deep in the actual conversation · 🎇 outside, handing out sparklers · 🕺 on the dance floor since the first song
+> 🏠 already home, shoes off · 🍰 at a side table, deep in the actual conversation · 🎇 outside, handing out sparklers · 🕺 on the dance floor since the first song
 
-### Block 2 — Wired
+### Block 2 - Wired
 
-**Q4 · `T-O1` · O**
+**Q3 · `T-O1` · O**
 > **It's 1am. You're still up because:**
-> 📺 the show kept autoplaying · 🌙 I lost track of time · 🐇 I'm down a Wikipedia rabbit hole · 🔨 I'm working on a project I can't put down
+> 📺 the show kept autoplaying · 🔍 I fell into someone's photos from 2019 · 🐇 I'm down a Wikipedia rabbit hole · 🔨 I'm working on a project I can't put down
 
-**Q5 · `T-O2` · O** — *rebuilt. The old version asked WHAT and its options answered WHEN.*
-> **A friend says "come to this thing with me, I can't really explain it."**
-> 🤨 what is it · 📩 I'll come if you tell me what it is · ⌚ what time · 👟 I'm already putting my shoes on
-
-**Q6 · `T-O3` · O + milieu**
+**Q4 · `T-O3` · O + milieu**
 > **One free day in a city you've never been to.**
 > 📸 I'm not missing the must-see things · 🛏️ whatever's near where I'm staying · 🚶 I walk until something happens · 🗺️ I ask someone who lives there and go do that
 
-**Q7 · `T-E1` · E**
-> **The party's good. You've been there three hours.**
-> 🚪 actually, I left an hour ago · 👋 I'm in the long goodbye · ⚡ second wind · 🚕 I'm deciding where everyone goes next
+**Q5 · `T-E1` · E** — *rebuilt in rc10: the old party scene asked the same question as Q2.*
+> **It's Friday and nothing's planned.**
+> 🚪 I'm keeping it that way · 👋 I'll see whoever texts first · ⚡ I'm texting three people right now · 🚕 I've already made a plan and invited everyone
 
-**Q8 · `T-E2` · E**
+**Q6 · `T-E2` · E**
 > **Your phone rings. No text first.**
-> 📵 I don't answer the phone. Ever. · ⭐ I answer for maybe four people · 😬 I answer, bracing · 🥳 I'm delighted — it's been ages
+> 📵 I don't answer the phone. Ever. · ⭐ I answer for maybe four people · 😬 I answer, but I'm already worried · 📞 I pick up before it rings twice
 
-**Q9 · `T-C1` · C** · **no polarity randomisation**
+**Q7 · `T-C1` · C** · **no polarity randomisation**
 > **You're meeting someone at 7.**
-> ⏰ I'm there at 6:50 · 🎯 I'm there at 7 · 📲 7:05, and I texted · 🎪 7:15, but I have a story
+> ⏰ I'm there at 6:50 · 🎯 I'm there at 7 · 📲 7:05, and I texted · 🎪 7:15, but I have a good excuse
 
-**Q10 · `T-A1` · A**
+**Q8 · `T-A1` · A**
 > **Your closest friend is getting back together with the ex. Again.**
 > 🗣️ I say exactly what I think · 🤐 I say it once, then I'm supportive · 🎣 I ask questions until they hear themselves · 🤝 I keep my mouth shut and stay close
 
-**Q11 · `T-N1` · N**
-> **You sent a text an hour ago. Nothing back.**
-> 😌 nothing, they're busy · 👀 I've reread what I sent · ✍️ I've reread it and drafted the follow-up · 🔮 I know exactly what it means
+### Block 3 - Actual life
 
-**Q12 · `T-N2` · N**
-> **Someone says "can I give you some feedback?"**
-> 😰 my stomach drops · 😮‍💨 I brace, then I'm fine · 👍 sure, go ahead · 🙋 I asked for it, that's why I'm here
-
-### Block 3 — Actual life
-
-**Q13 · `M4` · milieu**
+**Q9 · `M4` · milieu**
 > **Your last three Saturdays, honestly:**
-> 🌄 outside before most people were up · 🛌 nothing on the calendar, and that was the point · 🔧 elbow-deep in something I was making or fixing · ☕ at someone's kitchen table too long · 💻 working, and not entirely mad about it
+> 🌄 outside before most people were up · 🛌 deliberately doing nothing, and it was glorious · 🔧 elbow-deep in something I was making or fixing · 🎉 out with people until late · 💻 working, and not entirely mad about it
 
-**Q14 · `M7` · milieu · story fisher**
+**Q10 · `M7` · milieu · story fisher**
 > **The thing in your place a guest always asks about:**
-> 🖼️ the art · 🪑 a chair I overpaid for · 🚲 the gear — bike, skis, clubs · 🎸 an instrument · 🛠️ something I made · 😶 nothing, and I've never once thought about it
+> 🖼️ the art · 🪑 a chair I overpaid for but I love · 🚲 the gear — bike, skis, clubs · 🎸 an instrument · 🛠️ something I made · 😶 nothing — I just haven't got round to it
 
-**Q15 · `M8` · milieu**
+**Q11 · `M8` · milieu**
 > **It's their birthday. Your gift:**
 > 😂 something that makes them laugh out loud · 🎨 something I made · 🎁 the thing they mentioned once, months ago · 🎟️ a day out, not an object · 🫂 I'm not a gift person — I'll be there, though
 
-### Block 4 — How you talk
+### Block 4 - How you talk
 
-**Q16 · `M5` · register (1st indicator)**
+**Q12 · `M5` · register (1st indicator)**
 > **The tell that you like someone:**
-> 😏 the teasing starts → *playful* · 🃏 the jokes get weirdly specific → *playful* · 📱 memes. lots of memes. → *playful* · 💌 I say it out loud, probably too early → *earnest* · 🚗 I start showing up for things → *earnest*
+> 😏 the teasing starts · 🃏 the jokes get weirdly specific · 📱 memes. lots of memes. · 💌 I say it out loud, probably too early · 🚗 I start showing up for things
 
-**Q17 · `CS1` · register (2nd indicator)**
+**Q13 · `CS1` · register (2nd indicator)**
 > **Your friend just did something genuinely impressive. What you actually say:**
-> 🥊 something that sounds like an insult → *playful* · 🤯 "okay, that's actually incredible" → *playful* · 🫶 I tell them properly, out loud → *earnest* · 📣 I tell everyone except them → *earnest*
+> 🥊 something that sounds like an insult · 🤯 "okay, that's actually incredible" · 🫶 I tell them properly, out loud · 📣 I tell everyone except them
 
-**Q18 · `CS2` · logged**
-> **Dinner with someone you just met goes well. Afterwards:**
-> 🎤 they know more about me · 👂 I know more about them · 🔥 we found one thing we both care about and couldn't stop talking about it · ⚔️ we argued about something for an hour · ⚖️ about even, honestly
+### Block 5 - Facts
 
-### Block 5 — Facts
-
-**Q19 · `H1` · milieu (eduAdjacency)**
+**Q14 · `H1` · milieu (eduAdjacency)**
 > **Education:**
 > 🏫 high school · 📗 some college · 🎓 bachelor's · 🔬 grad school or beyond
 
-**Q20 · `H3` · milieu (H3 term)**
+**Q15 · `H3` · milieu (H3 term)**
 > **The next five years, honestly:**
 > 📈 my work gets serious · 🏡 my life gets full — people, a house, all of it · 🎢 both, and I know how that sounds · 🌊 I've stopped making five-year plans
 
-**Q21 · `H2` · milieu (politics gap) · `[skip]` · no emoji**
+**Q16 · `H2` · milieu (politics gap) · `[skip]` · no emoji**
 > **Politically, roughly:**
-> progressive · lean progressive · somewhere in the middle · lean conservative · conservative · *rather not say*
+> progressive · lean progressive · somewhere in the middle · lean conservative · conservative · rather not say
 
-**Q22 · `H2b` · importance · hard filter on top tier only · no emoji**
+**Q17 · `H2b` · importance · hard filter on top tier only · no emoji**
 > **How much does politics matter in someone you'd date?**
 > not really something I think about · I'd rather be close on it · honestly, I'd struggle with someone far from me
 > <sub>Only the last one narrows who you'll see.</sub>
-
----
 
 ## 2b. Moved out of the quiz: the nerd-out
 
@@ -210,10 +188,10 @@ Consequences: the quiz drops to 22 items and ends on four one-tap facts; D-QD4's
 
 | surface | copy |
 |---|---|
-| intro | "A few questions so we know how to introduce you. Nothing here is graded, and none of it is shown to anyone as a score." |
-| honesty line | "Answer as the person who'll actually be sitting across the table." |
+| intro | "For us to set you up with people, we want to see what really makes you tick." |
+| reassurance | "Nothing here is graded, and none of it is shown to anyone as a score." |
 | skip affordance | "skip this one" |
-| close | "That's it. Next we'll ask you about a couple of things you just told us, and you get to answer out loud." |
+| close | "Next we'll ask you about a couple of things you just told us, and you get to answer out loud." |
 
 ---
 

@@ -9,10 +9,19 @@ const voiceMap = readFileSync('specs/matching-v2-voice-prompt-map.md', 'utf-8')
 // The copy is frozen: six review passes with Charles produced it. These tests fail
 // the build if any shipped string drifts from the spec by a single byte.
 describe('copy freeze — battery', () => {
-  it('ships exactly 22 items — the nerd-out moved to the voice step', () => {
-    expect(QUIZ_ITEMS).toHaveLength(22)
+  it('ships exactly 17 items after the rc10 cuts', () => {
+    expect(QUIZ_ITEMS).toHaveLength(17)
     expect(QUIZ_ITEMS.map(i => i.id)).toEqual(
-      Array.from({ length: 22 }, (_, i) => `Q${i + 1}`))
+      Array.from({ length: 17 }, (_, i) => `Q${i + 1}`))
+  })
+
+  it('carries no alcohol, coffee or tobacco emoji', () => {
+    const banned = ['\u{1F377}', '\u{1F37A}', '\u{1F378}', '\u{1F942}', '\u2615', '\u{1F375}', '\u{1F6AC}']
+    for (const item of QUIZ_ITEMS) {
+      for (const opt of item.options) {
+        if (opt.emoji) expect(banned, `${item.id} ${opt.label}`).not.toContain(opt.emoji)
+      }
+    }
   })
 
   it.each(QUIZ_ITEMS.map(i => [i.id, i] as const))('%s stem, labels and emoji are byte-identical', (_id, item) => {
@@ -25,7 +34,7 @@ describe('copy freeze — battery', () => {
 
   it('every option carries one emoji, except the two politics items by design', () => {
     for (const item of QUIZ_ITEMS) {
-      const expected = item.id === 'Q21' || item.id === 'Q22' ? null : 'string'
+      const expected = item.id === 'Q16' || item.id === 'Q17' ? null : 'string'
       for (const opt of item.options) {
         if (expected === null) expect(opt.emoji).toBeNull()
         else expect(typeof opt.emoji).toBe('string')
@@ -45,18 +54,18 @@ describe('copy freeze — battery', () => {
 
   it('has five blocks and no interstitial cards (removed in rc8)', () => {
     expect(QUIZ_BLOCKS.map(b => b.block)).toEqual([1, 2, 3, 4, 5])
-    expect(QUIZ_BLOCKS.flatMap(b => b.items)).toHaveLength(22)
+    expect(QUIZ_BLOCKS.flatMap(b => b.items)).toHaveLength(17)
     // Facts is the home stretch: plain background, no tint.
     expect(QUIZ_BLOCKS.find(b => b.block === 5)!.tint).toBeNull()
   })
 
-  it('skippable items are exactly Q1 and Q21', () => {
-    expect(QUIZ_ITEMS.filter(i => i.skippable).map(i => i.id)).toEqual(['Q1', 'Q21'])
+  it('skippable items are exactly Q1 and Q16', () => {
+    expect(QUIZ_ITEMS.filter(i => i.skippable).map(i => i.id)).toEqual(['Q1', 'Q16'])
   })
 
-  it('polarity randomisation covers Q4-Q12 except Q9', () => {
+  it('polarity randomisation covers the trait items except the clock item Q7', () => {
     expect(QUIZ_ITEMS.filter(i => i.polarityRandomised).map(i => i.id))
-      .toEqual(['Q4', 'Q5', 'Q6', 'Q7', 'Q8', 'Q10', 'Q11', 'Q12'])
+      .toEqual(['Q3', 'Q4', 'Q5', 'Q6', 'Q8'])
   })
 })
 

@@ -207,7 +207,7 @@ export default function VoiceRecorder({
 
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm" data-prompt-id={promptId}>
-      <p className="text-base font-medium text-stone-800">{promptText}</p>
+      <p className="text-[19px] font-semibold leading-snug text-stone-900">{promptText}</p>
 
       {helpText && (
         <p className="mt-2 text-xs text-stone-400">{helpText}</p>

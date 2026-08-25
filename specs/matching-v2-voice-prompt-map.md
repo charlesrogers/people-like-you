@@ -1,7 +1,7 @@
 # D-QD4 — Voice-Prompt Map
 
 **Charter:** `specs/matching-v2-questionnaire-deep-dive.md` D-QD4. **Supersedes** `matching_algo-v2.md` §4.4.
-**Battery:** `specs/matching-v2-questionnaire-battery-v1.md` (rc6). **Governing principle:** the quiz is hidden data; **the stories are the pitch material.** This file is where the quiz turns into stories, which makes it the highest-value artefact of V2-T0.
+**Battery:** `specs/matching-v2-questionnaire-battery-v1.md` (rc10). **Governing principle:** the quiz is hidden data; **the stories are the pitch material.** This file is where the quiz turns into stories, which makes it the highest-value artefact of V2-T0.
 **Live code it plugs into:** `src/lib/prompts.ts` — `QUESTION_BANK` (56 prompts, tiered `self_expansion | i_sharing | admiration | comfort | fun`), `getOnboardingPrompts(6)`, `PromptDef`. The voice step renders `text` / `helpText` / `exampleAnswer` and already handles skip-and-replace.
 
 ---
@@ -66,23 +66,21 @@ Bank prompts are tagged `source: 'bank'` at selection time. Every `voice_memos` 
 
 ---
 
-## 4. The map — 47 prompts
+## 4. The map — 38 prompts (rc10 numbering)
 
-Format: `option → prompt` · *(tier)*. `helpText` in brackets where it isn't obvious.
+Format: `option → prompt` · *(tier)*. Renumbered for battery rc10; the five cut items took no prompts with them.
 
-### Q1 · At seventeen you were, on the record…
+### Q1 · At seventeen, everyone knew you as:
 | option | prompt | tier |
 |---|---|---|
 | theatre kid | "Tell me about a night on stage that still lands when you think about it. What went right — or what went wrong?" | i_sharing |
-| jock | "Tell me about a team you were on and the thing you were actually good at." | admiration |
+| jock | "What were you actually good at back then? Tell me how you found out." | admiration |
 | honor-roll grinder | "What were you grinding for at seventeen? Tell me whether it turned out to be worth it." | admiration |
 | the one organizing the hang | "Tell me about something you organised at seventeen that actually happened. How many people, and what went wrong?" | admiration |
 | happily unaffiliated | "What were you doing at seventeen while everyone else was doing the school thing?" | i_sharing |
 | a completely different person | **"You said you're a completely different person now. What changed — and when did you notice?"** | admiration |
 
-> The last one is the strongest prompt in the entire map and it exists only because the "out" option was made a real answer.
-
-### Q3 · Wedding reception, 10pm
+### Q2 · It's 10pm at the wedding reception. Where are you?
 | option | prompt | tier |
 |---|---|---|
 | already home, shoes off | "Tell me about the last party you left early and were glad about. Where'd you go instead?" | comfort |
@@ -90,15 +88,7 @@ Format: `option → prompt` · *(tier)*. `helpText` in brackets where it isn't o
 | outside, handing out sparklers | "Tell me about the last thing you ended up running that you never signed up to run." | admiration |
 | on the dance floor since the first song | "Tell me about the last night you closed down. Who else was still there at the end?" | i_sharing |
 
-### Q5 · Last thing you said yes to with no idea what you were doing
-| option | prompt | tier |
-|---|---|---|
-| that was this month | "What did you say yes to this month? Start at the moment you said yes." | self_expansion |
-| sometime this year | "What did you say yes to this year with no idea what you were doing? Start at the yes." | self_expansion |
-| a few years back | "Tell me about the thing you said yes to unqualified. How badly did it go?" | self_expansion |
-| I like knowing what I'm doing | **"What's the thing you know cold — where you're the one people come and ask?"** | admiration |
-
-### Q6 · One free day in a city you've never been to
+### Q4 · One free day in a city you've never been to.
 | option | prompt | tier |
 |---|---|---|
 | I'm not missing the must-see things | "What's one must-see that was genuinely worth it, and one that absolutely wasn't?" | self_expansion |
@@ -106,17 +96,15 @@ Format: `option → prompt` · *(tier)*. `helpText` in brackets where it isn't o
 | I walk until something happens | "Tell me about a walk that turned into something. Where were you?" | self_expansion |
 | I ask someone who lives there and go do that | "Tell me about the best thing a local ever sent you to. Did you actually find it?" | self_expansion |
 
-### Q9 · You're meeting someone at 7
+### Q7 · You're meeting someone at 7.
 | option | prompt | tier |
 |---|---|---|
 | I'm there at 6:50 | "What do you do with the ten minutes when you get somewhere early?" | comfort |
 | I'm there at 7 | "Who taught you to be on time?" | comfort |
 | 7:05, and I texted | "What's the thing that always makes you five minutes late?" | fun |
-| 7:15, but I have a story | **"Okay. Tell me the story."** | fun |
+| 7:15, but I have a good excuse | **"Okay. Tell me the story."** | fun |
 
-> Four words, no help text, no example. The item promised a story and the next screen collects it. This is the single clearest "they were listening" moment in the flow and it came out of Charles's option rewrite.
-
-### Q10 · Your closest friend is getting back together with the ex. Again.
+### Q8 · Your closest friend is getting back together with the ex. Again.
 | option | prompt | tier |
 |---|---|---|
 | I say exactly what I think | "Tell me about a time you said the hard thing to someone you love. How did it land?" | admiration |
@@ -124,28 +112,26 @@ Format: `option → prompt` · *(tier)*. `helpText` in brackets where it isn't o
 | I ask questions until they hear themselves | "Tell me about a time you got someone to figure something out for themselves." | admiration |
 | I keep my mouth shut and stay close | "Tell me about a time you stayed close to someone through something you didn't agree with." | comfort |
 
-### Q13 · Your last three Saturdays, honestly
+### Q9 · Your last three Saturdays, honestly:
 | option | prompt | tier |
 |---|---|---|
 | outside before most people were up | "Tell me about a morning outside that went exactly right. Where were you, and what time did you start?" | self_expansion |
-| nothing on the calendar, and that was the point | "Walk me through your best empty Saturday. What actually ended up happening?" | comfort |
+| deliberately doing nothing, and it was glorious | "Walk me through your best empty Saturday. What actually ended up happening?" | comfort |
 | elbow-deep in something I was making or fixing | **"What are you making or fixing right now? Walk me through where it's at."** | admiration |
-| at someone's kitchen table too long | "Whose kitchen table, and what keeps you there?" | comfort |
+| out with people until late | "Tell me about the last night out you're still glad you said yes to." | i_sharing |
 | working, and not entirely mad about it | "What's the part of your work you'd still do on a Saturday?" | admiration |
 
-### Q14 · The thing in your place a guest always asks about
+### Q10 · The thing in your place a guest always asks about:
 | option | prompt | tier |
 |---|---|---|
 | the art | "Tell me about one thing on your walls. Where did it come from?" | i_sharing |
-| a chair I overpaid for | "Tell me about the thing you overpaid for and would do it again." | i_sharing |
+| a chair I overpaid for but I love | "Tell me about the thing you overpaid for and would do it again." | i_sharing |
 | the gear — bike, skis, clubs | "Tell me about the gear. What's the best day you've ever had on it?" | self_expansion |
 | an instrument | "What do you play when nobody's around?" | i_sharing |
 | something I made | "Tell me about the thing you made. How long did it take, and what went wrong?" | admiration |
-| nothing, and I've never once thought about it | **"Forget the place then — where do you actually spend your time?"** | comfort |
+| nothing — I just haven't got round to it | **"Forget the place then — where do you actually spend your time?"** | comfort |
 
-> Option 6 routes to a **non-object** prompt, per the battery spec. Asking someone who just told us they've never thought about their home to describe their home is the one move the map cannot make.
-
-### Q15 · It's their birthday. Your move
+### Q11 · It's their birthday. Your gift:
 | option | prompt | tier |
 |---|---|---|
 | something that makes them laugh out loud | "Tell me about the gift that got the biggest laugh. What was it?" | fun |
@@ -153,25 +139,6 @@ Format: `option → prompt` · *(tier)*. `helpText` in brackets where it isn't o
 | the thing they mentioned once, months ago | "Tell me about the best gift you ever gave. What did it take to pull off?" | admiration |
 | a day out, not an object | "Tell me about a day you planned for someone else." | admiration |
 | I'm not a gift person — I'll be there, though | **"Tell me about a time you showed up for someone when it was genuinely inconvenient."** | comfort |
-
-### Q19 · What do you nerd out on — **verbatim template**
-```
-"You said you nerd out on {m9}. What pulled you in — and how deep does it go?"
-```
-- `{m9}` = the typed text, or the transcript if recorded. Transcript longer than 120 chars → truncate at the first sentence boundary, else at 80 chars on a word boundary, no ellipsis.
-- **Lead-in stripping (added 2026-08-23 — spoken answers double the stem).** A spoken answer is a sentence, not a noun phrase: "I nerd out on vintage bicycle restoration" templates to *"You said you nerd out on I nerd out on vintage bicycle restoration."* Before templating, strip a leading first-person lead-in — case-insensitive, one pass: `^(i (really )?(nerd out on|geek out (on|about)|love|like|am into|'m into|obsess over)|honestly,?|probably|um,?|uh,?|it'?s )\s*` — then lowercase the first character.
-- **Malformed output never ships.** If after stripping the value is empty, still begins with `I `, or exceeds the length rule, do **not** emit the template — fall back to the bank prompt `rabbit_hole`. A broken sentence in the one prompt that quotes the user destroys the exact effect the prompt exists to create. Assert this in U27.
-- Transcript not ready at voice-step entry → bank prompt `rabbit_hole`, and the fished slot is re-offered later in the step if the transcript lands.
-- Q19 skipped → `rabbit_hole` from the bank.
-- tier: `self_expansion`.
-
-### Q21 · The next five years, honestly
-| option | prompt | tier |
-|---|---|---|
-| my work gets serious | "What are you building at work that you'd be annoyed to leave unfinished?" | admiration |
-| my life gets full — people, a house, all of it | "What does 'full' actually look like on a Tuesday five years from now?" | comfort |
-| both, and I know how that sounds | "How are you actually planning to do both? Asking sincerely." | admiration |
-| I've stopped making five-year plans | **"What made you stop making plans — and what are you doing instead?"** | self_expansion |
 
 ---
 

@@ -95,6 +95,7 @@ function OnboardingContent() {
   const [recordings, setRecordings] = useState<Map<string, { memoId: string; duration: number }>>(new Map())
   const [activePrompt, setActivePrompt] = useState<PromptDef | null>(null)
   const [passedPromptIds, setPassedPromptIds] = useState<string[]>([])
+  const [voiceSkipped, setVoiceSkipped] = useState(false)
   const [justRecorded, setJustRecorded] = useState<PromptDef | null>(null)
 
   // Step 3: Hard prefs (dealbreakers only)
@@ -237,7 +238,8 @@ function OnboardingContent() {
   const canProceedBasics = firstName && gender && birthYear && zipcode
   // The voice step is skippable by design — but the profile stays incomplete
   // until every angle has a story behind it (see getProfileCompletion).
-  const canProceedVoice = true
+  const VOICE_MINIMUM = 3
+  const canProceedVoice = recordings.size >= VOICE_MINIMUM || voiceSkipped
   const voiceCompletion = getProfileCompletion(answeredPromptIds)
   const canProceedPrefs = faithImportance && kids
   const canProceedPhotos = photoFiles.length >= 1
@@ -684,16 +686,12 @@ function OnboardingContent() {
         {/* Step 2: Voice Recordings — pick a prompt, then record it */}
         {step === 'voice' && (
           <div>
-            <h1 className="text-[22px] font-bold leading-snug text-stone-900">
+            <h1 className="text-[17px] font-semibold leading-snug text-stone-800">
               {cameFromQuiz ? QUIZ_FRAMING.close : 'Tell us about yourself'}
             </h1>
             <p className="mt-2 text-sm text-stone-500">
-              Pick whichever one you actually have a story for. Just talk like you&rsquo;re telling a friend.
+              Pick one to answer out loud &mdash; just talk like you&rsquo;re telling a friend.
             </p>
-
-            <div className="mt-4">
-              <ProfileCompletion answeredPromptIds={answeredPromptIds} compact />
-            </div>
 
             <div className="mt-6">
               {justRecorded && (
@@ -720,13 +718,6 @@ function OnboardingContent() {
                       }, 600)
                     }}
                   />
-                  <button
-                    type="button"
-                    onClick={() => setActivePrompt(null)}
-                    className="mt-3 w-full rounded-lg px-4 py-2 text-sm text-stone-500 transition-colors hover:text-stone-800"
-                  >
-                    Pick a different one
-                  </button>
                 </div>
               ) : (
                 <PromptPicker
@@ -743,6 +734,35 @@ function OnboardingContent() {
 
             {!activePrompt && (
               <div className="mt-6">
+                <div className="rounded-xl border border-stone-200 bg-white p-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13px] font-medium text-stone-700">
+                      {recordings.size >= VOICE_MINIMUM
+                        ? 'That\u2019s plenty to work with.'
+                        : `${recordings.size} of ${VOICE_MINIMUM} recorded`}
+                    </span>
+                    <span className="text-[12px] text-stone-400">
+                      {recordings.size >= VOICE_MINIMUM ? '' : 'the more you tell us, the better the intro'}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex gap-1">
+                    {Array.from({ length: VOICE_MINIMUM }).map((_, i) => (
+                      <span
+                        key={i}
+                        className={`h-1 flex-1 rounded-full ${i < recordings.size ? 'bg-stone-900' : 'bg-stone-200'}`}
+                      />
+                    ))}
+                  </div>
+                </div>
+                {!canProceedVoice && (
+                  <button
+                    type="button"
+                    onClick={() => setVoiceSkipped(true)}
+                    className="mx-auto mt-4 block text-[13px] text-stone-400 underline underline-offset-4 transition hover:text-stone-600"
+                  >
+                    skip for now
+                  </button>
+                )}
                 <ProfileCompletion answeredPromptIds={answeredPromptIds} />
               </div>
             )}

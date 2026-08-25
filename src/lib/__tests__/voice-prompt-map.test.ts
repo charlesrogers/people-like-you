@@ -83,7 +83,8 @@ describe('U24 — selection shape', () => {
   })
 
   it('picks the spec-bolded high-yield prompt when one is available', () => {
-    const set = selectVoicePrompts({ Q9: 3, Q1: 0 })
+    // rc10: the clock item is Q7.
+    const set = selectVoicePrompts({ Q7: 3, Q1: 0 })
     expect(set.map(p => p.text)).toContain('Okay. Tell me the story.')
   })
 })
@@ -143,7 +144,7 @@ describe('U28 — skip and replace', () => {
   })
 
   it('falls back to the bank once fished candidates are exhausted', () => {
-    const answers: QuizAnswers = { Q9: 3 }
+    const answers: QuizAnswers = { Q7: 3 }
     const set = selectVoicePrompts(answers)
     const fished = set.find(p => p.source === 'fished')!
     expect(replaceSelectedPrompt(set, fished.id, answers)!.source).toBe('bank')

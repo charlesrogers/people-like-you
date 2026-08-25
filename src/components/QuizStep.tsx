@@ -275,7 +275,7 @@ export default function QuizStep({
           <div className="pt-10 text-center" data-testid="quiz-intro">
             <h1 className="text-[28px] font-bold leading-tight text-stone-900">A few questions</h1>
             <p className="mx-auto mt-4 max-w-sm text-[15px] leading-relaxed text-stone-600">{FRAMING.intro}</p>
-            <p className="mx-auto mt-3 max-w-sm text-[13px] text-stone-400">{FRAMING.honesty}</p>
+            <p className="mx-auto mt-3 max-w-sm text-[13px] text-stone-400">{FRAMING.reassurance}</p>
             <button
               onClick={() => advanceFrom(0)}
               className="mt-10 w-full rounded-2xl bg-stone-900 px-6 py-4 text-[15px] font-semibold text-white transition active:scale-[0.98]"
