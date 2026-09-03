@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import FeedbackBoard from '@/components/FeedbackBoard'
+import { getStoredUserId } from '@/lib/session'
 
 export default function FeedbackPage() {
   const [userId, setUserId] = useState<string | null>(null)
 
   useEffect(() => {
-    const id = localStorage.getItem('ply_profile_id')
+    const id = getStoredUserId()
     if (!id) {
       window.location.href = '/onboarding'
       return

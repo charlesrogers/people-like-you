@@ -120,6 +120,10 @@ export interface VoiceMemo {
   processing_error: string | null
   retry_count: number
   created_at: string
+  /** V2-T4: whether this prompt came from QUESTION_BANK or was fished from a quiz answer. */
+  prompt_source?: 'bank' | 'fished' | null
+  /** V2-T4: the quiz answer that produced a fished prompt, e.g. { itemId: 'Q9', optionIndex: 3 }. */
+  prompt_seed?: { itemId: string; optionIndex: number } | null
 }
 
 // --- Extraction Types (Phase 2: expanded with I-sharing, attachment, admiration) ---
@@ -573,4 +577,36 @@ export interface PlannedDateInfo {
   planned_at: string
   partner_phone: string
   partner_name: string
+}
+
+// --- Matching v2: reader instrument (migration 023) ---
+
+export interface ReaderTraitsRow {
+  user_id: string
+  big5: Record<string, number | null> | null
+  milieu: Record<string, unknown> | null
+  homogamy: {
+    education?: { index: number; label: string } | null
+    politics_position?: number | null
+    politics_importance?: 'none' | 'prefer' | 'strong' | null
+    five_year?: { index: number; label: string } | null
+  } | null
+  convo: Record<string, unknown> | null
+  taste_priors: Record<string, unknown> | null
+  pickiness: number | null
+  scale_use: number | null
+  register: 'playful' | 'earnest' | null
+  instrument_version: string
+  completed_at: string
+}
+
+export interface QuizResponseRow {
+  id: string
+  user_id: string
+  item_id: string
+  option_index: number | null
+  polarity_flipped: boolean
+  response_ms: number | null
+  instrument_version: string
+  created_at: string
 }

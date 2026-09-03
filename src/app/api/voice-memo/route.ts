@@ -10,6 +10,21 @@ export async function POST(req: NextRequest) {
     const promptId = formData.get('promptId') as string | null
     const dayNumber = parseInt(formData.get('dayNumber') as string || '0', 10)
     const durationSeconds = parseInt(formData.get('durationSeconds') as string || '0', 10)
+    // V2-T4: which prompt bank this came from, and the quiz answer that fished it.
+    const rawSource = formData.get('promptSource') as string | null
+    const promptSource = rawSource === 'bank' || rawSource === 'fished' ? rawSource : null
+    let promptSeed: { itemId: string; optionIndex: number } | null = null
+    const rawSeed = formData.get('promptSeed') as string | null
+    if (rawSeed) {
+      try {
+        const parsed = JSON.parse(rawSeed)
+        if (parsed && typeof parsed.itemId === 'string' && typeof parsed.optionIndex === 'number') {
+          promptSeed = { itemId: parsed.itemId, optionIndex: parsed.optionIndex }
+        }
+      } catch {
+        // Provenance is analytics-only — never fail an upload over it.
+      }
+    }
 
     if (!audio || !userId || !promptId) {
       return NextResponse.json({ error: 'Missing required fields: audio, userId, promptId' }, { status: 400 })
@@ -51,6 +66,8 @@ export async function POST(req: NextRequest) {
       transcript: null,
       extraction: null,
       day_number: dayNumber,
+      prompt_source: promptSource,
+      prompt_seed: promptSeed,
     })
 
     return NextResponse.json({ id: memo.id, status: 'uploaded' })

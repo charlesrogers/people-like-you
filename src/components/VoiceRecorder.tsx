@@ -207,7 +207,7 @@ export default function VoiceRecorder({
 
   return (
     <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm" data-prompt-id={promptId}>
-      <p className="text-base font-medium text-stone-800">{promptText}</p>
+      <p className="text-[19px] font-semibold leading-snug text-stone-900">{promptText}</p>
 
       {helpText && (
         <p className="mt-2 text-xs text-stone-400">{helpText}</p>
@@ -263,14 +263,14 @@ export default function VoiceRecorder({
                   cx="50" cy="50" r="45" fill="none"
                   stroke="#10b981"
                   strokeWidth="4"
-                  strokeDasharray={`${progress * 2.83} 283`}
+                  strokeDasharray="283 283"
                   strokeLinecap="round"
-                  className="transition-all duration-1000"
+                  opacity="0.25"
                 />
               </svg>
               <div className="text-center">
-                <span className="text-2xl font-bold text-stone-900 tabular-nums">{formatTime(seconds)}</span>
-                <span className="block text-[10px] text-stone-400">{formatTime(maxSeconds)}</span>
+                {/* Elapsed only, small and muted — never a remaining-time figure. */}
+                <span className="text-[13px] text-stone-400 tabular-nums">{formatTime(seconds)}</span>
               </div>
             </div>
           </div>
@@ -278,7 +278,7 @@ export default function VoiceRecorder({
           <div className="mt-3 flex items-center justify-center gap-2">
             <span className={`h-2 w-2 rounded-full ${hasAudioSignal ? 'animate-pulse bg-red-500' : 'bg-stone-300'}`} />
             <span className="text-xs text-stone-500">
-              {hasAudioSignal ? 'Recording...' : 'Waiting for audio \u2014 speak into your mic'}
+              {hasAudioSignal ? 'Recording...' : 'Listening\u2026'}
             </span>
           </div>
 
