@@ -30,7 +30,7 @@ So the better-founded targeting variable is not *what this reader likes in a pit
 
 > **Does the pitch lead with a point where this pair is actually similar?**
 
-Dane's 8am trailhead leads for a reader whose own last three Saturdays were trailheads. Not because she prefers outdoorsy content — because it is a point of real overlap, and overlap is the mechanism with r ≈ .47 behind it.
+Dane's 8am trailhead leads for a reader whose own last three Saturdays were trailheads. Not because she prefers outdoorsy content — because it is a point of real overlap. (Precision note from the research session: the r ≈ .47–.59 is behind *similarity levels* in lab-attitudinal studies, not behind lead placement — no study tests whether surfacing a true overlap first beats leading with the best material. `similarity_lead` is **mechanism-consistent, not mechanism-demonstrated**; E-CONTENT registers it that way, with a small expected effect.)
 
 Three things recommend this over the withdrawn version:
 1. **No new instrument.** The milieu block is already collected on both sides. The taste step stays a style + pickiness instrument, exactly as `matching_algo-v2.md` §5 originally specced.
@@ -78,6 +78,11 @@ H3 (interest-led beats character-led) and H4 (position-3 drift) are **main effec
 
 ---
 
-## 6. Open — needs the research session, not me
+## 6. RESOLVED by the research session (2026-08-24; merged 2026-09-02)
 
-I derived §2's stated-ideals/actual-similarity distinction from the F2 and Sparks summaries, and I have not read the full findings memo. **Bounce this back to that session before building:** does the memo already address Montoya-style actual similarity as a targeting variable, and does its verdict on unique-fit nulls extend to pair-similarity leads, or only to stated-ideal matching? If it extends, §2 collapses and `similarity_lead` should be randomised anyway under §1 — but as an open question rather than a hypothesis with a mechanism behind it.
+The bounce-back was answered — see `specs/research-pitch-demand-findings.md` F5 amendment and ranked-variable entry 8. Verdict: **§2 stands.** The Sparks unique-fit null is about stated-ideal matching (universally-valued traits, which is why anyone's list predicts equally); pair actual similarity is irreducibly pair-relative and does not fall to it. `similarity_lead` therefore registers as a hypothesis *with* a mechanism — subject to the §2 precision note above, and to two design requirements the evidence forces:
+
+1. **Craft parity between arms.** The aimed cell constrains the lead to overlap material, which may be weaker than the subject's best material. Matching amplifies argument quality in both directions (Teeny et al. 2021), so an aimed lead on weak material underperforms *for craft reasons* and would masquerade as a similarity null. Identical critic threshold in both arms; log critic score per arm; check balance in the readout.
+2. **Log realized overlap in the random arm** (`lead_dimension ∈ overlap_dimensions`). The random arm matches by chance, diluting the assigned contrast; analyze by realized overlap-of-lead with assignment as the instrument to recover the power.
+
+Recognition caveat for the aiming dimensions: Rule 9 bars reader reference, so the reader must recognize the overlap unaided — prefer identity-salient dimensions (Q1 tribe, banter register) over demographically-flavored ones (Q19 education) when choosing which overlap leads.
