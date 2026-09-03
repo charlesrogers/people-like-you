@@ -28,12 +28,16 @@ export type MetroContent = {
 
 const sharedFaq = (place: string) => [
   {
-    q: 'Is People Like You an LDS-only dating app?',
-    a: `No — it's a matchmaker for people who date with marriage in mind, whatever their faith. In ${place} that community is overwhelmingly Latter-day Saint, so that's who you'll mostly meet here. We ask about faith and observance during onboarding and never introduce you to someone whose answer would be a dealbreaker for you.`,
+    q: 'Is People Like You an LDS dating app?',
+    a: `Yes. People Like You is a matchmaker for Latter-day Saint singles who date with marriage in mind — one real introduction a day, chosen on the things that actually matter: faith and observance, life stage, and the stuff that never fits in a profile.`,
   },
   {
     q: 'Is this a Mormon dating site?',
-    a: `People search that word, so: People Like You works for members of The Church of Jesus Christ of Latter-day Saints, but it isn't a members-only site and we don't use the term "Mormon" — the Church has asked people not to. It's a matchmaker that takes marriage-minded dating seriously, which is why it fits this community well.`,
+    a: `Yes — if that's the word you searched, this is what you were looking for: a matchmaker for members of The Church of Jesus Christ of Latter-day Saints. We just say Latter-day Saint.`,
+  },
+  {
+    q: `I'm not in a YSA ward — does this work for me?`,
+    a: `Especially for you. In ${place}, plenty of singles sit quietly in family wards where nobody thinks to set them up anymore. A matchmaker doesn't need you to show up at activities to find you — that's the point.`,
   },
   {
     q: 'What does it cost?',
@@ -50,11 +54,11 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
     metaDescription:
       'Provo–Orem is the most Latter-day Saint metro in America — 82.6% of the population, 1,356 congregations. What that actually means for dating here, honestly.',
     intro: [
-      `Provo–Orem is the most Latter-day Saint place on earth that isn't a temple. 82.6% of the metro belongs to the Church — the highest share of any U.S. metro, by a wide margin. If you're single here, your problem has never been finding members of the Church. It's everything that comes after.`,
+      `Provo–Orem is the most Latter-day Saint place on earth that isn't a temple. 82.6% of the metro belongs to the Church — the highest share of any U.S. metro, by a wide margin. If you're single here, finding members of the Church has never been the challenge. It's everything that comes after.`,
     ],
     meaning: [
-      `Everywhere else in the country, LDS singles say the same thing: "there's nobody here." Provo has the opposite disease. Between BYU, UVU, and the wards stacked three-deep on every hillside, the pool is enormous — tens of thousands of never-married twenty-somethings inside one valley. Scarcity is not your problem.`,
-      `Your problem is velocity and noise. The Provo dating market is possibly the most efficient marriage market in America: everyone is dating, everyone knows someone you've dated, and the cycle from first date to defined relationship runs on a semester clock. In a market this liquid, being a genuinely good match isn't enough — you have to actually get noticed before the semester ends, and a swipe profile is a terrible way to be noticed.`,
+      `Everywhere else in the country, LDS singles say the same thing: "there's nobody here." Provo has the opposite disease. Between BYU, UVU, and the wards stacked three-deep on every hillside, the pool is enormous — tens of thousands of never-married twenty-somethings inside one valley. Scarcity is not your challenge.`,
+      `Your challenge is velocity and noise. The Provo dating market is possibly the most efficient marriage market in America: everyone is dating, everyone knows someone you've dated, and the cycle from first date to defined relationship runs on a semester clock. In a market this liquid, being a genuinely good match isn't enough — you have to actually get noticed before the semester ends, and a swipe profile is a terrible way to be noticed.`,
     ],
     meet: [
       `The honest answer: through proximity, over and over. Wards and FHE groups, BYU and UVU classes, institute, the same four apartment complexes everyone cycles through, line dancing at the Quarry, hikes up Rock Canyon, and an endless circuit of ward activities. Provo doesn't lack meeting places — it lacks filters. You meet two hundred people a semester and go on second dates with three of them.`,
@@ -92,14 +96,14 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
       `That desynchronization is the real difference. In Provo everyone is single at the same time in the same place. In Salt Lake the singles are spread across a huge valley, mixed into a city that's also half not-LDS, working jobs with no semester rhythm. The density is world-class on paper; in practice you can go months without organically meeting someone who fits.`,
     ],
     meet: [
-      `The institutional channels still function — wards for young adults, mid-singles activities for the 31+ crowd, institute downtown, temple-square adjacent firesides. And SLC has what Provo doesn't: an actual city. People meet at climbing gyms and ski resorts, at tech-company happy hours (with soda), on trail runs in Millcreek, at the farmers market. The problem is that none of those venues sort by intention — the person you clicked with at the gym may not share anything else that matters to you.`,
+      `The institutional channels still function — wards for young adults, mid-singles activities for the 31+ crowd, institute downtown, temple-square adjacent firesides. And SLC has what Provo doesn't: an actual city. People meet at climbing gyms and ski resorts, at tech-company happy hours (with soda), on trail runs in Millcreek, at the farmers market. The challenge is that none of those venues sort by intention — the person you clicked with at the gym may not share anything else that matters to you.`,
       `Ask around and you'll hear the same pattern: past about 27, almost everyone in SLC who married met through a specific introduction — a friend, a sibling, a former roommate who "knew someone up in Bountiful." The city runs on brokered introductions; it just does them informally and slowly.`,
     ],
     seasonal: [
       `Salt Lake's calendar is gentler than Provo's but real: January brings ward reshuffles and resolution energy, summer is peak activity season (hikes, lake days, festival circuit), and the holidays send everyone home to their families and their ward friends' pointed questions. Ski season is its own social economy — half the mid-singles scene migrates up the canyons every Saturday from December to April.`,
     ],
     honest: [
-      `The honest problem with Salt Lake: it lives in Provo's shadow, and the scar tissue shows. A lot of SLC singles spent their early twenties in the valley's high-velocity market and came out tired — burned out on activities that feel like repeats, wary of a scene where everyone still knows everyone. The result is a big, capable, slightly guarded pool of people who would genuinely rather meet one right person than another room full of maybes.`,
+      `The honest challenge in Salt Lake: it lives in Provo's shadow, and the scar tissue shows. A lot of SLC singles spent their early twenties in the valley's high-velocity market and came out tired — burned out on activities that feel like repeats, wary of a scene where everyone still knows everyone. The result is a big, capable, slightly guarded pool of people who would genuinely rather meet one right person than another room full of maybes.`,
       `If that's you, you're the exact person a matchmaker model was built for: one vetted introduction a day, with the reasoning attached, and no ward-activity small talk required to get there.`,
     ],
     faq: [
@@ -133,8 +137,8 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
       `Phoenix runs backwards from the rest of the country: winter is the social high season and summer is the desert everyone survives indoors. October through April is packed — activities, hikes, conference watch parties, everything. June through September, plans compress to pools, mountain escapes to Flagstaff, and air conditioning. ASU's calendar adds a modest fall/January pulse, and snowbird season quietly swells the older wards, not the singles.`,
     ],
     honest: [
-      `The honest problem with Phoenix: it's a commuter market wearing a small town's reputation. People assume Mesa works like Provo — that the community will just produce someone. It won't. The density that makes Utah's scene self-serve doesn't survive being spread across seventy miles of freeway, so singles here do the math and quietly give up on everything outside a fifteen-minute radius. The person who'd be right for you probably exists in this metro; the odds you organically collide with them at an activity are terrible.`,
-      `That's precisely the market where a matchmaker beats a feed: the finding-across-distance problem is exactly what an introduction service solves and a swipe app doesn't.`,
+      `The honest challenge in Phoenix: it's a commuter market wearing a small town's reputation. People assume Mesa works like Provo — that the community will just produce someone. It won't. The density that makes Utah's scene self-serve doesn't survive being spread across seventy miles of freeway, so singles here do the math and quietly give up on everything outside a fifteen-minute radius. The person who'd be right for you probably exists in this metro; the odds you organically collide with them at an activity are terrible.`,
+      `That's precisely the market where a matchmaker beats a feed: finding-across-distance is exactly what an introduction service solves and a swipe app doesn't.`,
     ],
     faq: [
       {
@@ -167,7 +171,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
       `Boise's rhythm is mild: a September surge when BSU comes back, January reshuffles, and a summer that's the opposite of Utah's exodus — everyone's here, out on the water and the trails, and activity attendance peaks. The quiet season is the dead of winter, when the valley socializes in living rooms and everyone's planning spring.`,
     ],
     honest: [
-      `The honest problem with Boise: it's a marriage-minded culture with a thin singles market past the mid-twenties, and everyone in it knows everyone. Three months into the scene, you've met the people you're going to meet, and the valley's polite smallness means dating someone's ex-roommate's ex is less an anecdote than a certainty. What Boise singles need isn't another activity — it's reach: introductions from outside the forty faces they already know, chosen for actual compatibility rather than adjacency.`,
+      `The honest challenge in Boise: it's a marriage-minded culture with a thin singles market past the mid-twenties, and everyone in it knows everyone. Three months into the scene, you've met the people you're going to meet, and the valley's polite smallness means dating someone's ex-roommate's ex is less an anecdote than a certainty. What Boise singles need isn't another activity — it's reach: introductions from outside the forty faces they already know, chosen for actual compatibility rather than adjacency.`,
     ],
     faq: [
       {
@@ -200,7 +204,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
       `The city's rhythm is the government's: a huge late-summer arrival wave (new hires, new clerks, new students), a January infusion with each new Congress and program cohort, and a steady outflow every spring. August recess and the holidays empty the group houses. Every arrival wave reshuffles the wards — which means the market genuinely resets twice a year, whether you were mid-something or not.`,
     ],
     honest: [
-      `The honest problem with DC: ambition crowds out follow-through. The scene is full of people who'd be extraordinary partners and who treat dating like the eighth priority after work, church calling, marathon training, and a security clearance. Combine that with constant turnover and you get the DC pattern everyone recognizes — six months of promising almosts that end with someone's posting to Geneva. The people are exceptional; the system wastes them.`,
+      `The honest challenge in DC: ambition crowds out follow-through. The scene is full of people who'd be extraordinary partners and who treat dating like the eighth priority after work, church calling, marathon training, and a security clearance. Combine that with constant turnover and you get the DC pattern everyone recognizes — six months of promising almosts that end with someone's posting to Geneva. The people are exceptional; the system wastes them.`,
       `A matchmaker flips that math: when the introduction comes pre-reasoned and both people opted into marriage-minded dating, the six months actually go somewhere.`,
     ],
     faq: [
@@ -224,7 +228,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
     ],
     meaning: [
       `At 0.3%, nothing about meeting members happens by accident. The person next to you on the L train is not in your ward. The city's LDS singles gather instead — into the young single adult wards that meet above the Manhattan temple across from Lincoln Center, into Brooklyn's congregations, into the wards scattered from Westchester to Jersey City. Inside those rooms the community is intense and tight; outside them it doesn't exist.`,
-      `The pool itself is distinctive: transplants who came for finance, publishing, medicine, art, grad school — people who chose the hardest city on purpose. It's a small pool of very deliberate people, which is both its charm and its math problem.`,
+      `The pool itself is distinctive: transplants who came for finance, publishing, medicine, art, grad school — people who chose the hardest city on purpose. It's a small pool of very deliberate people, which is both its charm and its challenge.`,
     ],
     meet: [
       `Ward activities, institute in the temple building, Sunday linger-longers that run long because nobody wants to go back to a studio apartment in Queens. Beyond the official calendar: group brunches, Central Park picnics, rooftop things in the summer, friends-of-friends dinner parties that are the city's real introduction engine. NYC members are unusually good at community because they have to be.`,
@@ -234,7 +238,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
       `The city's LDS rhythm follows its industries: a big late-summer wave of arrivals (analysts, residents, students), a January trickle, and a slow leak of departures each spring as leases end and people concede to Boston, DC, or a house near family. Summer scatters everyone to the Hamptons-adjacent versions of their own budgets; autumn is the season everything actually happens.`,
     ],
     honest: [
-      `The honest problem with New York: the pool is small, the city is enormous, and the clock is loud. A lot of LDS singles give the city a window — through school, through the first job — and the window has an end date. Meanwhile the scene is compact enough that within a year you know everyone your age in your borough, and the swipe apps are worse than useless at 0.3% density. NYC members don't need more ways to browse; they need the handful of genuinely compatible people in this metro found and brought to them before the window closes.`,
+      `The honest challenge in New York: the pool is small, the city is enormous, and the clock is loud. A lot of LDS singles give the city a window — through school, through the first job — and the window has an end date. Meanwhile the scene is compact enough that within a year you know everyone your age in your borough, and the swipe apps are worse than useless at 0.3% density. NYC members don't need more ways to browse; they need the handful of genuinely compatible people in this metro found and brought to them before the window closes.`,
       `That is, literally, the product.`,
     ],
     faq: [
@@ -268,7 +272,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
       `Three semesters, three resets: April, July, and December each end a track and shuffle the town. Summers run smaller and looser; winters are long, dark, and social in the huddled way of a town at 4,800 feet. And every semester break, Rexburg does its famous vanishing act — the town's population visibly halves in a week. Timing isn't part of dating here; it is dating here.`,
     ],
     honest: [
-      `The honest problem with Rexburg: fourteen-week relationships in a fourteen-week town. The track system means the market resets faster than most relationships can mature, so couples either sprint or dissolve — and everyone feels the sprint. Meanwhile if you're a local, a young professional, or anyone past about 26, the town's total orientation toward student life makes you nearly invisible. Rexburg is simultaneously the easiest place in the world to meet LDS singles and one of the hardest places to get past a third date with one.`,
+      `The honest challenge in Rexburg: fourteen-week relationships in a fourteen-week town. The track system means the market resets faster than most relationships can mature, so couples either sprint or dissolve — and everyone feels the sprint. Meanwhile if you're a local, a young professional, or anyone past about 26, the town's total orientation toward student life makes you nearly invisible. Rexburg is simultaneously the easiest place in the world to meet LDS singles and one of the hardest places to get past a third date with one.`,
     ],
     faq: [
       {
@@ -287,7 +291,7 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
     metaDescription:
       'The Philadelphia metro has 18,600 Latter-day Saints across 37 congregations — a small, tight community anchored by a downtown temple. Dating here, honestly.',
     intro: [
-      `Philadelphia's Latter-day Saint community is small — 18,600 members in a metro of six million, 0.3% — and it is prouder of itself than communities ten times its size, because since 2016 it has had something most small communities never get: a temple, right on the Benjamin Franklin Parkway, holding the community's center of gravity downtown.`,
+      `Philadelphia's Latter-day Saint community is small — 18,600 members in a metro of six million, 0.3% — with a temple on the Benjamin Franklin Parkway since 2016 and congregations running from Center City out through the Main Line, Bucks County, and South Jersey. Small doesn't mean stuck: Philadelphia sits ninety minutes from two of the biggest LDS singles scenes on the East Coast, and that changes the math completely.`,
     ],
     meaning: [
       `Do the honest math and Philadelphia's active young-single pool is a few hundred people across the whole metro — Center City through the Main Line, up to Bucks County, across the bridge into South Jersey. That's not a market you browse; it's a community you join. Every activity has the same faces within a season, everyone's dating history is common knowledge, and a bad breakup ripples through three wards.`,
@@ -301,12 +305,13 @@ export const METRO_CONTENT: Record<string, MetroContent> = {
       `A modest September wave when the universities return, a January blip, and a summer that scatters to the Jersey Shore. The bigger rhythm is the young-professional churn: Philadelphia keeps its natives and its med students but loses a steady trickle of members to DC and New York — the price of sitting between the two biggest East Coast scenes.`,
     ],
     honest: [
-      `The honest problem with Philadelphia: the pool is genuinely, unavoidably small, and everyone in it has already met. Six months in the scene and you can name every eligible member within an hour's drive; two years in and the activities feel like reunions. The standard advice — "get out there more" — is useless when you've already been everywhere the community gathers. What a market this size actually needs is better use of the pool it has (matches chosen on real compatibility, not just co-attendance) and honest reach across its edges, where Wilmington, Allentown, and South Jersey singles face the same wall.`,
+      `The honest challenge in Philadelphia: the visible pool is small, and everyone in it has already met. Six months in the scene and you can name every face at every activity; the standard advice — "get out there more" — is useless when you've already been everywhere the community gathers. But the visible pool isn't the whole pool. Plenty of Philadelphia singles sit in family wards from Valley Forge to Cherry Hill, outside the YSA circuit entirely, invisible to it — and no activity calendar will ever surface them.`,
+      `And then there's the corridor. New York and Washington — two of the largest LDS singles scenes in the country — are each about ninety minutes away. Close enough to actually date. People Like You matches across that whole stretch when the fit is right: Philadelphia doesn't have to be a small market once the introductions can reach Trenton, Manhattan, and Arlington.`,
     ],
     faq: [
       {
-        q: 'Does this include South Jersey and Delaware?',
-        a: `Yes — the metro runs Philadelphia–Camden–Wilmington, and the community genuinely spans it. At this size, drawing the line tighter would just make everyone's pool smaller for no reason.`,
+        q: 'Will I only be matched inside Philadelphia?',
+        a: `No — we introduce you to people close enough to actually date, and for Philadelphia that unlocks New York and Washington, DC when the fit is right. Both are about ninety minutes away, and both have far bigger pools. South Jersey and Delaware are of course included too.`,
       },
       ...sharedFaq('the Philadelphia area'),
     ],

@@ -72,7 +72,7 @@ function MetroPage({ slug }: { slug: string }) {
       <Paras paras={c.meet} />
       <SectionHeading>The rhythm of the year</SectionHeading>
       <Paras paras={c.seasonal} />
-      <SectionHeading>The honest problem with this market</SectionHeading>
+      <SectionHeading>The honest challenge in this market</SectionHeading>
       <Paras paras={c.honest} />
       <FaqBlock faq={c.faq} heading="Common questions" />
       <WaitlistCta

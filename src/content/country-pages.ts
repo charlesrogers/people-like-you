@@ -35,7 +35,7 @@ const ES_LABELS = {
   numbers: 'La Iglesia en números',
   meaning: 'Qué significa esto para los solteros',
   meet: 'Cómo se conocen los solteros SUD aquí',
-  honest: 'El problema honesto de este mercado',
+  honest: 'El desafío honesto de este mercado',
   faq: 'Preguntas frecuentes',
 }
 const ES_STATS = { members: 'Miembros', congregations: 'Congregaciones (barrios y ramas)', missions: 'Misiones', temples: 'Templos' }
@@ -60,7 +60,7 @@ const esForm = (pais: string, placeholder: string): IntlFormStrings => ({
 const esFaq = (pais: string) => [
   {
     q: '¿People Like You es solo para miembros de la Iglesia?',
-    a: `No — es un servicio de presentaciones para personas que salen con el matrimonio en mente, sea cual sea su fe. Preguntamos por tu fe y tu nivel de observancia al crear tu perfil, y nunca te presentamos a alguien incompatible con lo que no es negociable para ti.`,
+    a: `Sí — es un casamentero para solteros Santos de los Últimos Días que salen con el matrimonio en mente. Cada presentación se elige por compatibilidad real: fe y observancia, etapa de vida, y todo lo que nunca cabe en un perfil.`,
   },
   {
     q: `¿Cuándo llega a ${pais}?`,
@@ -98,7 +98,7 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       `Porque el patrón que todo JAS mexicano conoce es conocer a alguien increíble en la convención… que vive a cinco horas de camión. La comunidad ya funciona a escala regional; las presentaciones, no.`,
     ],
     honest: [
-      `El problema honesto de México: la distancia entre la cifra oficial y tu vida real. El país tiene una membresía enorme, pero para un soltero practicante de 25 o 30 años, el pool efectivo de su ciudad es pequeño, se conoce de memoria, y se renueva despacio. Las convenciones dan esperanza dos veces al año; el resto del año, el mercado es tu barrio y el de junto. Lo que este mercado necesita no es otra actividad — es que alguien encuentre, entre toda esa membresía dispersa, a la persona compatible contigo y te la presente con razones.`,
+      `El desafío honesto de México: la distancia entre la cifra oficial y tu vida real. El país tiene una membresía enorme, pero para un soltero practicante de 25 o 30 años, el pool efectivo de su ciudad es pequeño, se conoce de memoria, y se renueva despacio. Las convenciones dan esperanza dos veces al año; el resto del año, el mercado es tu barrio y el de junto. Lo que este mercado necesita no es otra actividad — es que alguien encuentre, entre toda esa membresía dispersa, a la persona compatible contigo y te la presente con razones.`,
     ],
     faq: esFaq('México'),
     form: esForm('México', '+52 55 1234 5678'),
@@ -127,7 +127,7 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       `Después de la convención, el patrón conocido: los grupos de WhatsApp se enfrían, cada quien vuelve a su estaca, y la persona que te interesó vive al otro lado de la ciudad — o en otra región. El encuentro existe; el seguimiento es el hueco.`,
     ],
     honest: [
-      `El problema honesto del Perú: la comunidad es grande pero el mecanismo de presentación sigue siendo el azar — quién te tocó en el grupo de la convención, quién llegó nuevo a tu barrio, a quién conoce tu hermana. Con cientos de miles de miembros, la persona compatible contigo casi seguro existe en el país; lo que no existe es la manera de encontrarla sin que el azar coopere. Eso es exactamente lo que un casamentero hace y una app de deslizar no.`,
+      `El desafío honesto del Perú: la comunidad es grande pero el mecanismo de presentación sigue siendo el azar — quién te tocó en el grupo de la convención, quién llegó nuevo a tu barrio, a quién conoce tu hermana. Con cientos de miles de miembros, la persona compatible contigo casi seguro existe en el país; lo que no existe es la manera de encontrarla sin que el azar coopere. Eso es exactamente lo que un casamentero hace y una app de deslizar no.`,
     ],
     faq: esFaq('el Perú'),
     form: esForm('el Perú', '+51 987 654 321'),
@@ -148,14 +148,14 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       `En proporción a su población, Chile es uno de los países más Santos de los Últimos Días del planeta: más de 620,000 miembros en un país de veinte millones. Santiago es una de las grandes capitales de la Iglesia en el mundo hispano. Y aun así, ser soltero SUD en Chile tiene una geografía que ningún otro país impone.`,
     ],
     meaning: [
-      `Chile mide 4,300 kilómetros de largo. La membresía se concentra en Santiago y el centro, pero hay estacas de Arica a Punta Arenas — y para un soltero de Antofagasta o de Temuco, el "pool nacional" es una abstracción: lo real es su estaca, las dos de al lado, y lo que aparezca en la convención anual. En Santiago el problema se invierte: la comunidad es grande, pero la ciudad también, y las comunas dispersan a los JAS en burbujas que apenas se cruzan.`,
+      `Chile mide 4,300 kilómetros de largo. La membresía se concentra en Santiago y el centro, pero hay estacas de Arica a Punta Arenas — y para un soltero de Antofagasta o de Temuco, el "pool nacional" es una abstracción: lo real es su estaca, las dos de al lado, y lo que aparezca en la convención anual. En Santiago el desafío se invierte: la comunidad es grande, pero la ciudad también, y las comunas dispersan a los JAS en burbujas que apenas se cruzan.`,
     ],
     meet: [
       `Chile hace bien lo institucional: convenciones de JAS con historia, instituto, bailes, actividades multiestaca, y una cultura de barrio fuerte donde los hermanos mayores y las mamás del barrio ejercen de casamenteros no oficiales con entusiasmo variable. El viaje al templo de Santiago — y ahora Concepción — sigue siendo el gran evento social del año para media membresía.`,
       `Pero el mecanismo de fondo es el mismo de siempre: proximidad más suerte. Y en un país con la geografía de Chile, la proximidad es un filtro brutal que deja fuera a casi todos.`,
     ],
     honest: [
-      `El problema honesto de Chile: la proporción alta esconde pools locales chicos. Ser el país "más SUD" del cono sur no cambia que, a los 28 años y en una estaca de regiones, las opciones que no saliste ya a conocer se cuentan con una mano. Los JAS chilenos no necesitan que les digan que asistan a más actividades — ya fueron a todas. Necesitan alcance: que la búsqueda cubra el país entero y que las presentaciones lleguen con la razón de por qué esta persona, aunque viva a tres regiones de distancia, vale la pena.`,
+      `El desafío honesto de Chile: la proporción alta esconde pools locales chicos. Ser el país "más SUD" del cono sur no cambia que, a los 28 años y en una estaca de regiones, las opciones que no saliste ya a conocer se cuentan con una mano. Los JAS chilenos no necesitan que les digan que asistan a más actividades — ya fueron a todas. Necesitan alcance: que la búsqueda cubra el país entero y que las presentaciones lleguen con la razón de por qué esta persona, aunque viva a tres regiones de distancia, vale la pena.`,
     ],
     faq: esFaq('Chile'),
     form: esForm('Chile', '+56 9 8765 4321'),
@@ -184,7 +184,7 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       `El patrón, sin embargo, es conocido: la convención abre una ventana de dos días sobre un pool nacional, y después cada quien vuelve a los treinta rostros de siempre de su estaca. El país tiene el pool; lo que falta es el puente entre convención y convención.`,
     ],
     honest: [
-      `El problema honesto de la Argentina: el desgaste. Entre pools locales chicos, distancias grandes y la sangría constante de la emigración, muchos JAS argentinos llegan a los treinta habiendo hecho todo bien — instituto, convenciones, actividades — y sintiendo que el sistema les quedó chico. No es falta de fe ni de esfuerzo; es un mecanismo de encuentro que depende del azar en un país donde el azar tiene medio millón de miembros para repartir. Un casamentero que busque en serio, a escala nacional y con razones, es exactamente la pieza que falta.`,
+      `El desafío honesto de la Argentina: el desgaste. Entre pools locales chicos, distancias grandes y la sangría constante de la emigración, muchos JAS argentinos llegan a los treinta habiendo hecho todo bien — instituto, convenciones, actividades — y sintiendo que el sistema les quedó chico. No es falta de fe ni de esfuerzo; es un mecanismo de encuentro que depende del azar en un país donde el azar tiene medio millón de miembros para repartir. Un casamentero que busque en serio, a escala nacional y con razones, es exactamente la pieza que falta.`,
     ],
     faq: esFaq('la Argentina'),
     form: esForm('la Argentina', '+54 9 11 2345 6789'),
@@ -212,7 +212,7 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       `Y como en toda comunidad chica y fiel, la emigración pega directo: cada año, parte de la generación JAS se va al norte, y el que se queda ve su pool encogerse sin que ninguna actividad lo compense.`,
     ],
     honest: [
-      `El problema honesto de Guatemala: la comunidad es densa pero el mercado es chico y cerrado. Todo el mundo conoce el historial de todo el mundo, las segundas oportunidades son incómodas en un círculo así, y el soltero que no encontró pareja en su generación de estaca carga con esa etiqueta en cada actividad. Lo que un mercado así necesita no es más exposición — es presentaciones frescas, elegidas por compatibilidad real, que crucen las líneas de estaca y de región que el círculo social nunca cruza solo.`,
+      `El desafío honesto de Guatemala: la comunidad es densa pero el mercado es chico y cerrado. Todo el mundo conoce el historial de todo el mundo, las segundas oportunidades son incómodas en un círculo así, y el soltero que no encontró pareja en su generación de estaca carga con esa etiqueta en cada actividad. Lo que un mercado así necesita no es más exposición — es presentaciones frescas, elegidas por compatibilidad real, que crucen las líneas de estaca y de región que el círculo social nunca cruza solo.`,
     ],
     faq: esFaq('Guatemala'),
     form: esForm('Guatemala', '+502 5123 4567'),
@@ -241,7 +241,7 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       `El límite es estructural: entre convención y convención, tu mercado real es tu ciudad. Y para la mitad del país, esa ciudad tiene un pool que ya conoces entero.`,
     ],
     honest: [
-      `El problema honesto del Ecuador: dos ciudades con masa crítica y un país entero sin ella. El soltero de provincia hace todo lo que el sistema sugiere y aun así su pool efectivo son las mismas veinte personas — y la emigración se lleva a varias cada año. Lo que falta no es comunidad ni compromiso: es un mecanismo que busque a escala nacional, encuentre a la persona compatible esté donde esté, y la presente con razones que justifiquen la distancia.`,
+      `El desafío honesto del Ecuador: dos ciudades con masa crítica y un país entero sin ella. El soltero de provincia hace todo lo que el sistema sugiere y aun así su pool efectivo son las mismas veinte personas — y la emigración se lleva a varias cada año. Lo que falta no es comunidad ni compromiso: es un mecanismo que busque a escala nacional, encuentre a la persona compatible esté donde esté, y la presente con razones que justifiquen la distancia.`,
     ],
     faq: esFaq('el Ecuador'),
     form: esForm('el Ecuador', '+593 99 123 4567'),
@@ -259,7 +259,7 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       numbers: 'A Igreja em números',
       meaning: 'O que isso significa para os solteiros',
       meet: 'Como os solteiros SUD se conhecem aqui',
-      honest: 'O problema honesto deste mercado',
+      honest: 'O desafio honesto deste mercado',
       faq: 'Perguntas frequentes',
     },
     statLabels: { members: 'Membros', congregations: 'Congregações (alas e ramos)', missions: 'Missões', temples: 'Templos' },
@@ -276,12 +276,12 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       `Mas o padrão que todo JAS brasileiro reconhece: o evento acaba, o grupo do WhatsApp esfria, e a pessoa interessante mora a seiscentos quilômetros. O encontro em escala nacional já existe duas vezes por ano; o que não existe é a ponte no meio.`,
     ],
     honest: [
-      `O problema honesto do Brasil: ser o segundo país da Igreja no mundo e continuar dependendo da sorte para casar. O pool nacional é gigantesco; o mecanismo de apresentação continua sendo a proximidade — quem chegou na sua ala, quem sua irmã conhece, quem sentou do seu lado na conferência. Com uma membresia deste tamanho, a pessoa certa para você quase certamente existe no país. O que nunca existiu foi alguém cujo trabalho seja encontrá-la — e apresentar vocês dois com as razões pelas quais funcionaria. É exatamente isso que um casamenteiro faz e que nenhum aplicativo de deslizar jamais fez.`,
+      `O desafio honesto do Brasil: ser o segundo país da Igreja no mundo e continuar dependendo da sorte para casar. O pool nacional é gigantesco; o mecanismo de apresentação continua sendo a proximidade — quem chegou na sua ala, quem sua irmã conhece, quem sentou do seu lado na conferência. Com uma membresia deste tamanho, a pessoa certa para você quase certamente existe no país. O que nunca existiu foi alguém cujo trabalho seja encontrá-la — e apresentar vocês dois com as razões pelas quais funcionaria. É exatamente isso que um casamenteiro faz e que nenhum aplicativo de deslizar jamais fez.`,
     ],
     faq: [
       {
         q: 'O People Like You é só para membros da Igreja?',
-        a: `Não — é um serviço de apresentações para pessoas que namoram pensando em casamento, seja qual for a fé. Perguntamos sobre sua fé e sua observância ao criar o perfil, e nunca apresentamos você a alguém incompatível com o que é inegociável para você.`,
+        a: `Sim — é um casamenteiro para solteiros santos dos últimos dias que namoram pensando em casamento. Cada apresentação é escolhida por compatibilidade real: fé e observância, fase da vida, e tudo o que nunca cabe num perfil.`,
       },
       {
         q: 'Quando chega ao Brasil?',
@@ -321,7 +321,7 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       numbers: 'The Church in numbers',
       meaning: 'What that means for singles',
       meet: 'How LDS singles actually meet here',
-      honest: 'The honest problem with this market',
+      honest: 'The honest challenge in this market',
       faq: 'Common questions',
     },
     statLabels: { members: 'Members', congregations: 'Congregations (wards & branches)', missions: 'Missions', temples: 'Temples' },
@@ -338,12 +338,12 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       `And beneath all of it, the pattern every Filipino member knows: someone finally clicks with someone — and then a work contract comes through, and one of them is in Dubai or Riyadh or Singapore within the year. The OFW reality shapes this market more than any activity calendar does.`,
     ],
     honest: [
-      `The honest problem with the Philippines: the community's timeline and the economy's timeline don't cooperate. The membership is young, sincere, and marriage-minded, but the years when people most want to find someone are exactly the years work scatters them — across islands, across the Gulf, across the world. A market like that can't rely on slow proximity; by the time proximity works, someone's visa came through. What it needs is search that covers the whole national pool and introductions that come with real reasons — fast enough to matter before the next contract does.`,
+      `The honest challenge in the Philippines: the community's timeline and the economy's timeline don't cooperate. The membership is young, sincere, and marriage-minded, but the years when people most want to find someone are exactly the years work scatters them — across islands, across the Gulf, across the world. A market like that can't rely on slow proximity; by the time proximity works, someone's visa came through. What it needs is search that covers the whole national pool and introductions that come with real reasons — fast enough to matter before the next contract does.`,
     ],
     faq: [
       {
-        q: 'Is People Like You an LDS-only app?',
-        a: `No — it's a matchmaker for people who date with marriage in mind, whatever their faith. We ask about faith and observance during onboarding and never introduce you to someone whose answers would be a dealbreaker for you.`,
+        q: 'Is People Like You an LDS dating app?',
+        a: `Yes — a matchmaker for Latter-day Saint singles who date with marriage in mind. Every introduction is chosen on real compatibility: faith and observance, life stage, and the things that never fit in a profile.`,
       },
       {
         q: 'When does it reach the Philippines?',
@@ -383,7 +383,7 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       numbers: 'The Church in numbers',
       meaning: 'What that means for singles',
       meet: 'How LDS singles actually meet here',
-      honest: 'The honest problem with this market',
+      honest: 'The honest challenge in this market',
       faq: 'Common questions',
     },
     statLabels: { members: 'Members', congregations: 'Congregations (wards & branches)', missions: 'Missions', temples: 'Temples' },
@@ -399,12 +399,12 @@ export const COUNTRY_CONTENT: Record<string, CountryContent> = {
       `The limits are practical: distances are long, travel is expensive, and a single member in Lagos and one in Port Harcourt might as well be in different countries. The community's warmth doesn't yet have reach to match.`,
     ],
     honest: [
-      `The honest problem with Nigeria: the pool is growing faster than the ways to search it. Every year brings thousands of new members — including, statistically, people who'd be right for you — but the mechanisms for finding them remain the ward you attend and the conventions you can afford to reach. First-generation members carry the extra weight of finding someone who shares a faith their own families may not. A community this young, this committed, and this scattered is exactly where introductions chosen on real compatibility — with the reasons attached — matter most.`,
+      `The honest challenge in Nigeria: the pool is growing faster than the ways to search it. Every year brings thousands of new members — including, statistically, people who'd be right for you — but the mechanisms for finding them remain the ward you attend and the conventions you can afford to reach. First-generation members carry the extra weight of finding someone who shares a faith their own families may not. A community this young, this committed, and this scattered is exactly where introductions chosen on real compatibility — with the reasons attached — matter most.`,
     ],
     faq: [
       {
-        q: 'Is People Like You an LDS-only app?',
-        a: `No — it's a matchmaker for people who date with marriage in mind, whatever their faith. We ask about faith and observance during onboarding and never introduce you to someone whose answers would be a dealbreaker for you.`,
+        q: 'Is People Like You an LDS dating app?',
+        a: `Yes — a matchmaker for Latter-day Saint singles who date with marriage in mind. Every introduction is chosen on real compatibility: faith and observance, life stage, and the things that never fit in a profile.`,
       },
       {
         q: 'When does it reach Nigeria?',

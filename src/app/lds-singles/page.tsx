@@ -60,7 +60,7 @@ export default function Page() {
     >
       <Paras
         paras={[
-          `These are our honest, sourced guides to the Latter-day Saint dating market: what the community actually looks like where you live, how people actually meet there, and the problem with each market that nobody says out loud.`,
+          `These are our honest, sourced guides to the Latter-day Saint dating market: what the community actually looks like where you live, how people actually meet there, and the challenge in each market that nobody says out loud.`,
         ]}
       />
       <SectionHeading>United States, by metro</SectionHeading>
