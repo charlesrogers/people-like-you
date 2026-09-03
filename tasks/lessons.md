@@ -677,3 +677,9 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** the house rule is to run the build before pushing, and I did run it — I just did not read the answer. A gate whose failure mode is a silent `0` in a wall of output is not a gate. Worse, I had spent the previous turn removing a JSX block and should have treated any structural edit to a 1,300-line component as build-critical.
 **Rule:** never pipe the pre-push build through `grep -c` or any counter. Run `npx next build` and read the tail, or assert explicitly — `npx next build 2>&1 | tail -5` and require the literal string, failing loudly (`|| exit 1`) when it is absent. Never put the build check and the push in the same compound command where an early non-zero exit can be swallowed.
 **Category:** mistake
+
+### 2026-09-02 — Provenance `inputs` must record what the model SAW, not the source objects
+**What went wrong:** `pitch_rationales.inputs` (src/lib/intro-engine-v2.ts) first stored the composite-profile fields as structured arrays. The prompt renders them as `values.join(', ')`, so the model quoted spans crossing several array elements — "Authenticity in expressing unpopular views, Ideological consistency" is verbatim in the prompt but in no single array element. The spec's own check ("every claim's source_excerpt appears verbatim in inputs") failed 4 of 9 claims that were all actually correctly sourced.
+**Why it's wrong:** an audit log that records a *different representation* than the one the model was shown manufactures false positives, and false hallucination flags are worse than none — they train you to ignore the flag.
+**Rule:** when logging provenance for an LLM call, store the inputs AS RENDERED into the prompt, byte for byte, alongside any structured form. Never audit a model's quotation against a representation it never saw.
+**Category:** near-miss
