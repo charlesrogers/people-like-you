@@ -74,7 +74,7 @@ export default function Page() {
       <Paras
         paras={[
           `Share and size are different questions. Salt Lake City ranks seventh by share but first by raw membership — more than 650,000 Latter-day Saints, the most of any metro on earth. And the biggest LDS populations outside this list aren't small: Phoenix has over 300,000 members and Los Angeles nearly 200,000, more than Boise — they just sit inside metros so large the percentage disappears.`,
-          `For singles, the share number matters in a specific way: above roughly 50%, the problem isn't finding members of the Church, it's standing out among them. Below about 5%, it flips — the community is real but you will not stumble into it. Both problems are why People Like You exists.`,
+          `For singles, the share number matters in a specific way: above roughly 50%, the challenge isn't finding members of the Church, it's standing out among them. Below about 5%, it flips — the community is real but you will not stumble into it. Both challenges are why People Like You exists.`,
         ]}
       />
       <SectionHeading>More</SectionHeading>

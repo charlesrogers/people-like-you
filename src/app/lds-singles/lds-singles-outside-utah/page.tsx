@@ -72,7 +72,7 @@ export default function Page() {
       <Paras
         paras={[
           `Look at the share column. Phoenix's 300,000 members are 6.2% of the metro. In Los Angeles it's 1.5%; in Dallas, Houston, and the East Coast metros, under 2%. A community that size is real — big enough that the right person for you almost certainly lives there — but it's dissolved into a metro of millions, spread across an hour of freeway in any direction.`,
-          `That's the specific way diaspora dating breaks: your ward has four singles your age, the community's activities pull from a fifty-mile radius, and no app sorts twenty million people by the things that actually matter to you. Utah's problem is too many candidates; the diaspora's problem is that the candidates exist and cannot find each other. The second problem is the one a matchmaker was built for.`,
+          `That's the specific way diaspora dating breaks: your ward has four singles your age, the community's activities pull from a fifty-mile radius, and no app sorts twenty million people by the things that actually matter to you. Utah's challenge is too many candidates; the diaspora's challenge is that the candidates exist and cannot find each other. The second one is exactly what a matchmaker was built for.`,
         ]}
       />
       <SectionHeading>More</SectionHeading>
