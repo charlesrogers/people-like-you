@@ -527,3 +527,20 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** PLY's marketing surfaces exist to convert; the root waitlist page's whole design is form-above-the-fold. Article-first pages bury the one action that matters below 1,500 words, and the stone palette doesn't even look like the brand.
 **Rule:** On any PLY marketing/SEO page, the waitlist capture form is the hero — above the fold, brand-styled, with page-specific headline; the content/data sits below to support conversion and SEO, never the reverse.
 **Category:** mistake
+
+### 2026-09-02 — Positioning: PLY IS an LDS dating site; copy hedged it into a generic product
+**What went wrong:** sharedFaq on every organic page answered "Is People Like You an LDS-only dating app?" with "No — whatever their faith," and the Mormon FAQ lectured about Church style guidance ("the Church has asked people not to"). Charles: "this is a lds only dating site."
+**Why it's wrong:** The audience arrived from an LDS-intent search; telling them it's not really for them kills the conversion, and style-guide lecturing is preachy filler nobody asked for.
+**Rule:** On PLY marketing surfaces, say plainly it's a matchmaker for Latter-day Saint singles. Never hedge to "whatever their faith"; never lecture about terminology. (The Meta ad landing page still never names the community — launch-plan §5 — that rule is about the ad page only.)
+**Category:** mistake
+
+### 2026-09-02 — "Challenges," never "problems"; no editorializing about the community
+**What went wrong:** Section headers said "The honest problem with this market," and the Philadelphia intro editorialized ("prouder of itself than communities ten times its size... temple holding the community's center of gravity").
+**Why it's wrong:** "Problem" frames the reader's own community negatively; clever color commentary about how a community feels about itself reads condescending to the people who live there.
+**Rule:** Frame market difficulties as "challenges." Describe what a community has and does — never characterize its self-regard or emotional life.
+**Category:** mistake
+
+### 2026-09-02 — Sell the reach: "close enough to date," adjacent-metro unlock, family-ward singles
+**What went wrong:** Pages diagnosed small pools but under-sold PLY's actual answer: introductions to people close enough to actually date — including unlocking adjacent metros (Philly→NYC/DC) — and finding the singles sitting invisibly in family wards.
+**Rule:** Every metro page's pitch must include (a) introductions within real dating distance, naming adjacent metros where relevant, and (b) that PLY reaches singles in family wards, not just the YSA activity circuit.
+**Category:** mistake
