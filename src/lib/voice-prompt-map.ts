@@ -6,7 +6,7 @@
 // recorded. The old `q19Prompt()` quote-back template and its lead-in-stripping
 // fix are gone entirely — the answer is a story now, not a string to quote back.
 
-import { QUESTION_BANK, getOnboardingPrompts, type PromptDef } from './prompts'
+import { QUESTION_BANK, getOnboardingPrompts, getPromptText, type PromptDef } from './prompts'
 import { getItem, NERD_OUT_PROMPT } from './quiz-battery'
 
 export type Tier = PromptDef['tier']
@@ -254,3 +254,17 @@ export function personalisedPrompts(answers: QuizAnswers, excludeIds: string[] =
 
 /** 38 fished prompts across the 8 seeding items, plus the nerd-out. */
 export const MAP_PROMPT_COUNT = Object.keys(FISHED_PROMPTS).length + 1
+
+const FISHED_TEXT_BY_ID = new Map(Object.values(FISHED_PROMPTS).map(p => [p.id, p.text]))
+
+/**
+ * Question text for ANY prompt id a voice memo can carry: the nerd-out, a fished
+ * prompt, a bank prompt, or a retired one. `getPromptText` in prompts.ts cannot
+ * see fished prompts (this module imports it, not the reverse), so anything that
+ * reads memos by prompt_id must resolve through here — resolving from the bank
+ * alone told the extractor the person had answered "fished_Q11_4".
+ */
+export function resolvePromptText(id: string): string | undefined {
+  if (id === NERD_OUT.id) return NERD_OUT.text
+  return FISHED_TEXT_BY_ID.get(id) ?? getPromptText(id)
+}

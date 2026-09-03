@@ -496,9 +496,8 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
   // Step 3: Run v2 Pass 1 (story extraction) on this memo
   console.log(`[v2] Pass 1: extracting story from memo ${memoId}...`)
   const { extractStory } = await import('./extraction-v2')
-  const { QUESTION_BANK } = await import('./prompts')
-  const promptTextMap = new Map(QUESTION_BANK.map(q => [q.id, q.text]))
-  const promptText = promptTextMap.get(memo.prompt_id) || memo.prompt_id
+  const { resolvePromptText } = await import('./voice-prompt-map')
+  const promptText = resolvePromptText(memo.prompt_id) || memo.prompt_id
 
   const storyExtraction = await extractStory(transcript, memo.prompt_id, promptText)
   // Store Pass 1 output in the extraction field (replaces old format)

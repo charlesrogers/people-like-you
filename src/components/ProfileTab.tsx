@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import ProfileCompleteness from './ProfileCompleteness'
 import VoiceRecorder from './VoiceRecorder'
 import { computePersonalityReveal, type PersonalityReveal } from '@/lib/personality-reveal'
-import { getTargetedPrompts, getPromptText, type PromptDef } from '@/lib/prompts'
+import { getTargetedPrompts, type PromptDef } from '@/lib/prompts'
+import { resolvePromptText } from '@/lib/voice-prompt-map'
 import ProfileCompletion from '@/components/ProfileCompletion'
 
 interface VoiceMemo {
@@ -225,7 +226,7 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
             >
               <div className="flex items-center justify-between">
                 <span className="text-xs font-medium text-stone-700">
-                  {getPromptText(memo.prompt_id)?.slice(0, 60) || memo.prompt_id}...
+                  {resolvePromptText(memo.prompt_id)?.slice(0, 60) || memo.prompt_id}...
                 </span>
                 <span className="text-[10px] text-stone-400">
                   {memo.transcript?.split(/\s+/).filter(Boolean).length || 0} words

@@ -164,3 +164,17 @@ describe('U28 — skip and replace', () => {
     expect(skipped.length).toBeGreaterThan(0)
   })
 })
+
+describe('resolvePromptText — every prompt id a memo can carry resolves to its question', () => {
+  it('resolves the nerd-out, a fished prompt, a bank prompt and a retired prompt', async () => {
+    const { resolvePromptText, NERD_OUT, FISHED_PROMPTS } = await import('../voice-prompt-map')
+    const { QUESTION_BANK, RETIRED_PROMPT_TEXT } = await import('../prompts')
+    expect(resolvePromptText(NERD_OUT.id)).toBe(NERD_OUT.text)
+    const fished = Object.values(FISHED_PROMPTS)[0]
+    expect(resolvePromptText(fished.id)).toBe(fished.text)
+    expect(resolvePromptText(QUESTION_BANK[0].id)).toBe(QUESTION_BANK[0].text)
+    const [retiredId, retiredText] = Object.entries(RETIRED_PROMPT_TEXT)[0]
+    expect(resolvePromptText(retiredId)).toBe(retiredText)
+    expect(resolvePromptText('no_such_prompt')).toBeUndefined()
+  })
+})

@@ -662,3 +662,9 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** the house rule is to run the build before pushing, and I did run it — I just did not read the answer. A gate whose failure mode is a silent `0` in a wall of output is not a gate. Worse, I had spent the previous turn removing a JSX block and should have treated any structural edit to a 1,300-line component as build-critical.
 **Rule:** never pipe the pre-push build through `grep -c` or any counter. Run `npx next build` and read the tail, or assert explicitly — `npx next build 2>&1 | tail -5` and require the literal string, failing loudly (`|| exit 1`) when it is absent. Never put the build check and the push in the same compound command where an early non-zero exit can be swallowed.
 **Category:** mistake
+
+### 2026-09-02 — Recommended shrinking the prompt bank; breadth is a product requirement
+**What went wrong:** In the prompt-work review I recommended cutting the bank from 94 prompts to about 20 "proven" ones. Charles: *"i think we want like 100 questions in our bank so we can show different ones so people aren't all answering the same thing... and we can drop the ones that keep getting ignored."*
+**Why it's wrong:** the pitch pool has to sound like different people. If everyone answers the same 20 prompts, every pitch has the same spine, which is the "one device fifty times" failure in another form. Breadth is what keeps pitches distinct; quality control is pruning by observed ignore-rate, not shrinking the menu up front on taste.
+**Rule:** Never propose reducing the prompt bank below ~100. Keep breadth, make the constructs diverse (cap each construct family), instrument shown/picked/skipped/words per prompt, and prune the ones users ignore. Prune by data, never by taste.
+**Category:** mistake
