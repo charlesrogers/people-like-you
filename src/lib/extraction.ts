@@ -488,6 +488,10 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
     word_count: wordCount,
     sentence_count: sentenceCount,
     duration_seconds: memo.duration_seconds || 0,
+    prompt_source: memo.prompt_source ?? null,
+    example_shown: memo.example_shown ?? null,
+    seconds_to_record: memo.seconds_to_record ?? null,
+    rerecord_count: memo.rerecord_count ?? null,
     created_at: new Date().toISOString(),
   }, { onConflict: 'prompt_id,user_id' }).then(({ error }) => {
     if (error) console.warn('prompt_metrics upsert failed (table may not exist yet):', error.message)

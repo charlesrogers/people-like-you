@@ -2,12 +2,20 @@
 
 import { useState, useRef, useCallback, useEffect } from 'react'
 
+/** Test instrumentation that travels with the memo (migration 025). */
+export interface RecordingMeta {
+  /** Seconds the prompt sat open before the first take. */
+  secondsToRecord: number
+  /** Takes thrown away before this one, by cancel or re-record. */
+  rerecordCount: number
+}
+
 interface VoiceRecorderProps {
   promptText: string
   promptId: string
   helpText?: string
   exampleAnswer?: string
-  onRecordingComplete: (blob: Blob, durationSeconds: number) => Promise<void>
+  onRecordingComplete: (blob: Blob, durationSeconds: number, meta: RecordingMeta) => Promise<void>
   onSkip?: () => void
   maxSeconds?: number
 }
@@ -37,6 +45,11 @@ export default function VoiceRecorder({
   const audioCtxRef = useRef<AudioContext | null>(null)
   const levelCheckRef = useRef<NodeJS.Timeout | null>(null)
   const hasSignalRef = useRef(false)
+  // When the prompt opened, when the first take started, how many takes were
+  // discarded. Stall time and re-records are the "ignored" signal per prompt.
+  const openedAtRef = useRef(Date.now())
+  const firstTakeAtRef = useRef<number | null>(null)
+  const discardedTakesRef = useRef(0)
 
   useEffect(() => {
     return () => {
@@ -58,6 +71,7 @@ export default function VoiceRecorder({
 
   const startRecording = useCallback(async () => {
     setError(null)
+    if (firstTakeAtRef.current === null) firstTakeAtRef.current = Date.now()
     setHasAudioSignal(false)
     hasSignalRef.current = false
     try {
@@ -117,7 +131,10 @@ export default function VoiceRecorder({
         // Upload immediately
         setState('uploading')
         try {
-          await onRecordingComplete(blob, secondsRef.current)
+          await onRecordingComplete(blob, secondsRef.current, {
+            secondsToRecord: Math.max(0, Math.round(((firstTakeAtRef.current ?? Date.now()) - openedAtRef.current) / 1000)),
+            rerecordCount: discardedTakesRef.current,
+          })
           setState('submitted')
         } catch (err) {
           setError(err instanceof Error ? err.message : 'Failed to save recording. Tap to try again.')
@@ -163,6 +180,7 @@ export default function VoiceRecorder({
     if (audioCtxRef.current?.state !== 'closed') audioCtxRef.current?.close()
     chunksRef.current = []
     blobRef.current = null
+    discardedTakesRef.current += 1
     setSeconds(0)
     setHasAudioSignal(false)
     hasSignalRef.current = false
@@ -170,6 +188,7 @@ export default function VoiceRecorder({
   }, [])
 
   const handleReRecord = () => {
+    discardedTakesRef.current += 1
     if (audioUrl) URL.revokeObjectURL(audioUrl)
     setAudioUrl(null)
     blobRef.current = null

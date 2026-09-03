@@ -2,9 +2,11 @@ import { describe, it, expect } from 'vitest'
 import { readFileSync } from 'node:fs'
 import { QUIZ_ITEMS, QUIZ_BLOCKS, FRAMING, SEEDING_ITEMS, NERD_OUT_PROMPT } from '../quiz-battery'
 import { FISHED_PROMPTS, MAP_PROMPT_COUNT } from '../voice-prompt-map'
+import { QUESTION_BANK } from '../prompts'
 
 const battery = readFileSync('specs/matching-v2-questionnaire-battery-v1.md', 'utf-8')
-const voiceMap = readFileSync('specs/matching-v2-voice-prompt-map.md', 'utf-8')
+// v4 (2026-09-02): the copy for every voice prompt, bank and fished, lives in one file.
+const promptSet = readFileSync('specs/prompt-set-v4.md', 'utf-8')
 
 // The copy is frozen: six review passes with Charles produced it. These tests fail
 // the build if any shipped string drifts from the spec by a single byte.
@@ -75,11 +77,33 @@ describe('copy freeze — voice prompt map', () => {
     expect(MAP_PROMPT_COUNT).toBe(39)
   })
 
-  it.each(Object.entries(FISHED_PROMPTS))('%s prompt text is byte-identical', (_key, prompt) => {
-    expect(voiceMap).toContain(prompt.text)
+  it.each(Object.entries(FISHED_PROMPTS))('%s prompt text and label are byte-identical', (_key, prompt) => {
+    expect(promptSet).toContain(`**Text:** ${prompt.text}`)
+    expect(promptSet).toContain(`**Short:** ${prompt.short}`)
   })
 
   it('8 items seed a prompt', () => {
     expect(SEEDING_ITEMS).toHaveLength(8)
+  })
+})
+
+describe('copy freeze — voice prompt bank (v4)', () => {
+  it('ships 60 bank prompts: 13 / 13 / 13 / 11 / 10', () => {
+    const count = (tier: string) => QUESTION_BANK.filter(p => p.tier === tier).length
+    expect(QUESTION_BANK).toHaveLength(60)
+    expect([count('self_expansion'), count('i_sharing'), count('admiration'), count('comfort'), count('fun')])
+      .toEqual([13, 13, 13, 11, 10])
+  })
+
+  it.each(QUESTION_BANK.map(p => [p.id, p] as const))('%s text, label and example are byte-identical', (_id, prompt) => {
+    expect(promptSet).toContain(`**Text:** ${prompt.text}`)
+    expect(promptSet).toContain(`**Short:** ${prompt.short}`)
+    expect(promptSet).toContain(`**Example:** ${prompt.exampleAnswer}`)
+  })
+
+  it('no bank or fished prompt carries a superlative or asks for a feeling', () => {
+    const banned = /\b(best|worst|biggest|most (?!people)|favou?rite|farthest|hardest|funniest|feel|feels|feeling|ritual)\b/i
+    for (const p of QUESTION_BANK) expect(p.text, p.id).not.toMatch(banned)
+    for (const p of Object.values(FISHED_PROMPTS)) expect(p.text, p.id).not.toMatch(banned)
   })
 })

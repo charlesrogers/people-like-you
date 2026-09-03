@@ -24,7 +24,8 @@ const B: QuizAnswers = {
 describe('Persona A — the storyteller', () => {
   it('unlocks the reinvention prompt and the story invitation', () => {
     const texts = fishedCandidates(A).map(p => p.text)
-    expect(texts).toContain("You said you're a completely different person now. What changed — and when did you notice?")
+    // v4 copy (specs/prompt-set-v4.md); the construct is the reinvention prompt, Q1:5.
+    expect(texts).toContain("You said you're a completely different person now. What changed, and when did you notice?")
     expect(texts).toContain('Okay. Tell me the story.')
   })
 
@@ -53,7 +54,7 @@ describe('Persona A — the storyteller', () => {
 describe('Persona B — the quiet one', () => {
   it('routes the "never got round to it" option to the non-object prompt', () => {
     const texts = fishedCandidates(B).map(p => p.text)
-    expect(texts).toContain('Forget the place then — where do you actually spend your time?')
+    expect(texts).toContain("Forget the place. Where do you show up every week, and who's expecting you?")
     expect(personalisedPrompts(B).map(p => p.text).join(' ')).not.toMatch(/your place/i)
   })
 

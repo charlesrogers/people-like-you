@@ -26,6 +26,18 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Migration 025: test instrumentation. Optional, never fails an upload.
+    const rawExample = formData.get('exampleShown') as string | null
+    const exampleShown = rawExample === 'true' ? true : rawExample === 'false' ? false : null
+    const toInt = (key: string): number | null => {
+      const raw = formData.get(key)
+      if (typeof raw !== 'string') return null
+      const n = parseInt(raw, 10)
+      return Number.isFinite(n) ? n : null
+    }
+    const secondsToRecord = toInt('secondsToRecord')
+    const rerecordCount = toInt('rerecordCount')
+
     if (!audio || !userId || !promptId) {
       return NextResponse.json({ error: 'Missing required fields: audio, userId, promptId' }, { status: 400 })
     }
@@ -68,6 +80,9 @@ export async function POST(req: NextRequest) {
       day_number: dayNumber,
       prompt_source: promptSource,
       prompt_seed: promptSeed,
+      example_shown: exampleShown,
+      seconds_to_record: secondsToRecord,
+      rerecord_count: rerecordCount,
     })
 
     return NextResponse.json({ id: memo.id, status: 'uploaded' })

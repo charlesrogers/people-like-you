@@ -14,6 +14,8 @@ interface PromptPickerProps {
   personalised?: PromptDef[]
   /** Restrict this round to one angle, and title it. */
   angle?: AngleTier | null
+  /** Called with every list the user actually saw, in row order. */
+  onShown?: (prompts: PromptDef[]) => void
 }
 
 /**
@@ -30,6 +32,7 @@ export default function PromptPicker({
   count = 5,
   personalised = [],
   angle = null,
+  onShown,
 }: PromptPickerProps) {
   // getPromptChoices shuffles, so it must never run during render: the server
   // and client would draw different lists, React would throw a hydration
@@ -39,7 +42,9 @@ export default function PromptPicker({
   const answeredCount = answeredPromptIds.length
 
   useEffect(() => {
-    setChoices(getPromptChoices(answeredPromptIds, count, passedIds, personalised, angle))
+    const drawn = getPromptChoices(answeredPromptIds, count, passedIds, personalised, angle)
+    setChoices(drawn)
+    onShown?.(drawn)
     // Re-draw when the profile advances, not on every parent re-render —
     // reshuffling under the user's cursor would move the option they're
     // reaching for.
@@ -53,7 +58,9 @@ export default function PromptPicker({
     const next = getPromptChoices(answeredPromptIds, count, [...passedIds, ...shownIds], personalised, angle)
     // If we've exhausted the bank, start re-offering what was passed rather
     // than showing an empty list.
-    setChoices(next.length ? next : getPromptChoices(answeredPromptIds, count, [], personalised, angle))
+    const shown = next.length ? next : getPromptChoices(answeredPromptIds, count, [], personalised, angle)
+    setChoices(shown)
+    onShown?.(shown)
   }
 
   // Placeholder rows hold the layout for the one frame before the client draw,

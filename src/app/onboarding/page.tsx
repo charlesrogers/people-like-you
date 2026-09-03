@@ -8,9 +8,11 @@ import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
 import PromptPicker from '@/components/PromptPicker'
 import ProfileCompletion from '@/components/ProfileCompletion'
-import { getNextAngle, getProfileCompletion, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
+import { getNextAngle, getProfileCompletion, getTargetedPrompts, QUESTION_BANK, type PromptDef } from '@/lib/prompts'
 import QuizStep, { type QuizResult } from '@/components/QuizStep'
 import { personalisedPrompts, type SelectedPrompt } from '@/lib/voice-prompt-map'
+import { exampleArm, logPromptEvent, type PromptEventName } from '@/lib/prompt-events'
+import type { RecordingMeta } from '@/components/VoiceRecorder'
 import { canonicalIndex } from '@/lib/quiz-scoring'
 import { FRAMING as QUIZ_FRAMING } from '@/lib/quiz-battery'
 import { getStoredUserId, saveSession, signOut } from '@/lib/session'
@@ -186,7 +188,7 @@ function OnboardingContent() {
   const stepIndex = STEPS.indexOf(step)
   const progress = ((stepIndex + 1) / STEPS.length) * 100
 
-  const handleRecordingComplete = async (prompt: PromptDef, blob: Blob, duration: number) => {
+  const handleRecordingComplete = async (prompt: PromptDef, blob: Blob, duration: number, meta?: RecordingMeta) => {
     if (!userId) throw new Error('Session expired. Please refresh and try again.')
 
     const promptId = prompt.id
@@ -201,6 +203,11 @@ function OnboardingContent() {
     formData.append('durationSeconds', String(duration))
     formData.append('promptSource', fished?.source ?? 'bank')
     if (fished?.seed) formData.append('promptSeed', JSON.stringify(fished.seed))
+    formData.append('exampleShown', String(showExamples && !!prompt.exampleAnswer))
+    if (meta) {
+      formData.append('secondsToRecord', String(meta.secondsToRecord))
+      formData.append('rerecordCount', String(meta.rerecordCount))
+    }
 
     const res = await apiFetch('/api/voice-memo', { method: 'POST', body: formData })
     const data = await res.json()
@@ -211,12 +218,14 @@ function OnboardingContent() {
       next.set(promptId, { memoId: data.id, duration })
       return next
     })
+    logVoiceEvent('recorded', prompt)
   }
 
   // Backing out of a prompt returns to the picker and retires that prompt for
   // the session, so "show me different ones" never loops the same list.
-  const handleSkipPrompt = (promptId: string) => {
-    setPassedPromptIds(prev => prev.includes(promptId) ? prev : [...prev, promptId])
+  const handleSkipPrompt = (prompt: PromptDef) => {
+    logVoiceEvent('skipped', prompt)
+    setPassedPromptIds(prev => prev.includes(prompt.id) ? prev : [...prev, prompt.id])
     setActivePrompt(null)
   }
 
@@ -245,6 +254,23 @@ function OnboardingContent() {
   const VOICE_MINIMUM = 3
   const canProceedVoice = recordings.size >= VOICE_MINIMUM || voiceSkipped
   const voiceCompletion = getProfileCompletion(answeredPromptIds, fishedPrompts)
+  // v4 prompt test: half of accounts see the example answer under the prompt,
+  // half don't. Arm is fixed per account (see exampleArm).
+  const showExamples = userId ? exampleArm(userId) === 'on' : true
+  const promptSourceOf = (id: string): 'bank' | 'fished' =>
+    fishedPrompts.some(f => f.id === id && f.source === 'fished') ? 'fished' : 'bank'
+  const logVoiceEvent = (event: PromptEventName, prompt: PromptDef, position?: number) => {
+    if (!userId) return
+    logPromptEvent({
+      userId,
+      promptId: prompt.id,
+      promptSource: promptSourceOf(prompt.id),
+      event,
+      angle: prompt.tier,
+      position: position ?? null,
+      exampleShown: showExamples && !!prompt.exampleAnswer,
+    })
+  }
   // Each round asks about a different bucket, so three recordings land in three
   // angles rather than three in one.
   const roundAngle = getNextAngle(answeredPromptIds, fishedPrompts)
@@ -754,10 +780,10 @@ function OnboardingContent() {
                     promptId={activePrompt.id}
                     promptText={activePrompt.text}
                     helpText={activePrompt.helpText}
-                    exampleAnswer={activePrompt.exampleAnswer}
-                    onSkip={() => handleSkipPrompt(activePrompt.id)}
-                    onRecordingComplete={async (blob, duration) => {
-                      await handleRecordingComplete(activePrompt, blob, duration)
+                    exampleAnswer={showExamples ? activePrompt.exampleAnswer : undefined}
+                    onSkip={() => handleSkipPrompt(activePrompt)}
+                    onRecordingComplete={async (blob, duration, meta) => {
+                      await handleRecordingComplete(activePrompt, blob, duration, meta)
                       setJustRecorded(activePrompt)
                       setTimeout(() => {
                         setActivePrompt(null)
@@ -772,10 +798,15 @@ function OnboardingContent() {
                   passedIds={passedPromptIds}
                   personalised={fishedPrompts}
                   angle={roundAngle}
-                  onPick={(p) => { setJustRecorded(null); setActivePrompt(p) }}
-                  onPassAll={(shownIds) =>
+                  onShown={(ps) => ps.forEach((p, i) => logVoiceEvent('shown', p, i + 1))}
+                  onPick={(p) => { logVoiceEvent('picked', p); setJustRecorded(null); setActivePrompt(p) }}
+                  onPassAll={(shownIds) => {
+                    for (const id of shownIds) {
+                      const p = fishedPrompts.find(f => f.id === id) ?? QUESTION_BANK.find(b => b.id === id)
+                      if (p) logVoiceEvent('passed', p)
+                    }
                     setPassedPromptIds(prev => [...prev, ...shownIds.filter(id => !prev.includes(id))])
-                  }
+                  }}
                 />
               )}
             </div>

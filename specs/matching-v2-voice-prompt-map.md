@@ -1,5 +1,7 @@
 # D-QD4 — Voice-Prompt Map
 
+> **Copy superseded 2026-09-02.** The prompt TEXT and short labels in this file are v2 and no longer ship. `specs/prompt-set-v4.md` is the frozen source of every string in `src/lib/voice-prompt-map.ts`. This file still governs the structure: which item and option seeds which prompt, tiers, yield flags, and the selection rules.
+
 **Charter:** `specs/matching-v2-questionnaire-deep-dive.md` D-QD4. **Supersedes** `matching_algo-v2.md` §4.4.
 **Battery:** `specs/matching-v2-questionnaire-battery-v1.md` (rc10). **Governing principle:** the quiz is hidden data; **the stories are the pitch material.** This file is where the quiz turns into stories, which makes it the highest-value artefact of V2-T0.
 **Live code it plugs into:** `src/lib/prompts.ts` — `QUESTION_BANK` (56 prompts, tiered `self_expansion | i_sharing | admiration | comfort | fun`), `getOnboardingPrompts(6)`, `PromptDef`. The voice step renders `text` / `helpText` / `exampleAnswer` and already handles skip-and-replace.

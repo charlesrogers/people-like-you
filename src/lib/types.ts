@@ -124,6 +124,12 @@ export interface VoiceMemo {
   prompt_source?: 'bank' | 'fished' | null
   /** V2-T4: the quiz answer that produced a fished prompt, e.g. { itemId: 'Q9', optionIndex: 3 }. */
   prompt_seed?: { itemId: string; optionIndex: number } | null
+  /** Migration 025: whether the example answer was on screen for this take. */
+  example_shown?: boolean | null
+  /** Migration 025: seconds the prompt sat open before the first take. */
+  seconds_to_record?: number | null
+  /** Migration 025: takes discarded before this one. */
+  rerecord_count?: number | null
 }
 
 // --- Extraction Types (Phase 2: expanded with I-sharing, attachment, admiration) ---

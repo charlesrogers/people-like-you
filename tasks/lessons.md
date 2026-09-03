@@ -668,3 +668,9 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** the pitch pool has to sound like different people. If everyone answers the same 20 prompts, every pitch has the same spine, which is the "one device fifty times" failure in another form. Breadth is what keeps pitches distinct; quality control is pruning by observed ignore-rate, not shrinking the menu up front on taste.
 **Rule:** Never propose reducing the prompt bank below ~100. Keep breadth, make the constructs diverse (cap each construct family), instrument shown/picked/skipped/words per prompt, and prune the ones users ignore. Prune by data, never by taste.
 **Category:** mistake
+
+### 2026-09-02 — Wrote prompts men won't answer (interiority-coded copy)
+**What went wrong:** My plain-voice samples included "Where's a place that feels like yours even though it isn't?" and "What do you do to come back to yourself after a hard week?" Charles: *"a lot of these seem written for women and are touchy feely... what about questions for men?"* The one he held up as right was "What's something you taught yourself with nobody to ask? How did the first try go?"
+**Why it's wrong:** "feels like yours", "come back to yourself", "ritual", "showing you care" ask for an inner state. Women will answer an action prompt; most men will not answer an interiority prompt, so interiority-coded copy silently loses half the pool and the comfort tier loses it worst. The pitch needs nouns and verbs anyway, so action framing costs nothing.
+**Rule:** Every prompt asks what the person DID, MADE, FIXED, SAID, DROVE, BUILT or KEEPS RUNNING, never what they feel or sense. Apply the guy test to each one: would a 30-year-old man read it out loud to a friend without cringing? If it reads like a journaling prompt, rewrite it. Comfort = reliability, routine, and people who count on you, not feelings.
+**Category:** mistake

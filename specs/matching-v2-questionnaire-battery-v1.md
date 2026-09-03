@@ -179,7 +179,8 @@ Options listed **low->high on the scored trait** where ordinal; presentation ord
 
 **Was Q19. It is now the first prompt of the voice step**, recorded, with a text fallback for anyone who won't talk yet.
 
-> **What do you nerd out on?**
+> **What do you nerd out on? How far has it gone?**
+> *(v4, 2026-09-02: second clause added so the answer is a story, not a category; see `specs/prompt-set-v4.md`)*
 > help: *The small stuff is the good stuff — the more specific, the better.*
 
 Consequences: the quiz drops to 22 items and ends on four one-tap facts; D-QD4's `q19Prompt()` verbatim template **disappears entirely** (the answer is now itself a story, not a string to quote back), and the lead-in-stripping fix becomes unnecessary. The "seen" payoff now rests on the other fished prompts — the reinvention prompt and "Okay. Tell me the story." — which is where it was always strongest.
