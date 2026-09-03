@@ -1,9 +1,11 @@
+import * as Sentry from '@sentry/nextjs'
 import { createServerClient } from './supabase'
 import type {
   User, HardPreferences, SoftPreferences, Photo, VoiceMemo, CompositeProfile, Match,
   MutualMatch, DisclosureExchange, UserAvailability, ScheduledDate, DateFeedback,
   TrustScore, TrustTier, ExitSurvey, FriendVouch, ChatMessage, MeetDecision, DatePlanningPrefs,
-  Block, Report, ReportReason, ModerationEvent, ReaderTraitsRow, QuizResponseRow
+  Block, Report, ReportReason, ModerationEvent, ReaderTraitsRow, QuizResponseRow,
+  PitchProvenance
 } from './types'
 import { blockedIdsFromRows } from './safety-logic'
 
@@ -604,6 +606,55 @@ export async function saveDailyIntro(intro: Omit<DailyIntro, 'id' | 'created_at'
     .single()
   if (error) throw error
   return data
+}
+
+/**
+ * Writes the provenance record for one pitch (migration 025, specs/pitch-rationales.md).
+ *
+ * NEVER THROWS. A pitch rationale is an audit artifact; failing to log one must
+ * never cost a user their intro. Failures go to console.error + Sentry and the
+ * caller carries on.
+ */
+export async function savePitchRationale(
+  provenance: PitchProvenance,
+  dailyIntroId: string | null,
+): Promise<void> {
+  try {
+    const { error } = await db()
+      .from('pitch_rationales')
+      .insert({
+        kind: provenance.kind,
+        daily_intro_id: dailyIntroId,
+        sample_ref: provenance.sample_ref,
+        subject_user_id: provenance.subject_user_id,
+        reader_user_id: provenance.reader_user_id,
+        engine_version: provenance.engine_version,
+        model: provenance.model,
+        prompt_text: provenance.prompt_text,
+        hook_type: provenance.hook_type,
+        approach_variant: provenance.approach_variant,
+        quote_used: provenance.quote_used,
+        generation_attempts: provenance.generation_attempts,
+        inputs: provenance.inputs,
+        inputs_omitted: provenance.inputs_omitted,
+        drafts: provenance.drafts,
+        critic_feedback: provenance.critic_feedback,
+        rationale: provenance.rationale,
+        claims: provenance.claims,
+      })
+    if (error) throw error
+  } catch (err) {
+    console.error('savePitchRationale: failed to log pitch provenance', {
+      dailyIntroId,
+      subjectUserId: provenance.subject_user_id,
+      readerUserId: provenance.reader_user_id,
+      err,
+    })
+    Sentry.captureException(err, {
+      tags: { area: 'pitch_rationales' },
+      extra: { dailyIntroId, subjectUserId: provenance.subject_user_id },
+    })
+  }
 }
 
 export async function getDailyIntro(userId: string, status?: string): Promise<DailyIntro | null> {

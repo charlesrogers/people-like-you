@@ -8,6 +8,7 @@ import {
   updateUserCadence,
   ensureUserCadence,
   saveDailyIntro,
+  savePitchRationale,
   saveMatch,
   getUserPhotos,
   getCompositeProfile,
@@ -17,6 +18,7 @@ import {
 import { updateRatings } from '@/lib/elo'
 import { selectNextCandidate } from '@/lib/matchmaker'
 import { generateTrailer } from '@/lib/intro-engine-v2'
+import type { PitchProvenance } from '@/lib/types'
 import { getLocationTier, getTierMultiplier, userToLocation, haversineDistance } from '@/lib/geo'
 
 export async function POST(req: NextRequest) {
@@ -88,11 +90,13 @@ export async function POST(req: NextRequest) {
 
         let narrative = "There's someone here you should meet. Trust us on this one."
         let hookType: 'quote' | 'contradiction' | 'scene' | null = null
+        let trailerProvenance: PitchProvenance | null = null
         if (userComposite && candidateComposite) {
           try {
             const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
             narrative = trailer.narrative
             hookType = trailer.hookType
+            trailerProvenance = trailer.provenance
           } catch {
             // use fallback
           }
@@ -137,6 +141,9 @@ export async function POST(req: NextRequest) {
           voice_message_path: null,
           hook_type: hookType,
         })
+
+        // Provenance log (specs/pitch-rationales.md). Never blocks delivery.
+        if (trailerProvenance) await savePitchRationale(trailerProvenance, bonusIntro.id)
 
         const photos = await getUserPhotos(candidate.id)
         return NextResponse.json({

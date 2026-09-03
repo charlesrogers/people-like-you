@@ -610,3 +610,70 @@ export interface QuizResponseRow {
   instrument_version: string
   created_at: string
 }
+
+// --- Pitch rationales: per-pitch provenance (migration 025) ---
+// Spec: specs/pitch-rationales.md. Two halves: mechanical provenance written by
+// the engine (factual by construction) and the model's own same-call self-report.
+
+export interface PitchClaim {
+  /** the pitch sentence verbatim */
+  sentence: string
+  /** the factual assertion in it */
+  claim: string
+  source_type: 'quote' | 'memo' | 'vouch' | 'profile_field' | 'inference' | 'none'
+  /** field/quote identifier from inputs */
+  source_ref: string | null
+  /** the verbatim input text supporting it */
+  source_excerpt: string | null
+  /** phase 2 verifier — always null in v1 */
+  verdict: 'supported' | 'stretch' | 'unsupported' | null
+  verifier_note: string | null
+}
+
+export interface PitchRationaleSelfReport {
+  why_this_hook: string | null
+  why_this_lead: string | null
+  tone_choices: string | null
+}
+
+export interface PitchDraftRecord {
+  approach: string
+  text: string
+  critic_score: number | null
+  critic_subscores: { hookPower: number; intrigue: number; specificity: number; mystery: number } | null
+  critic_feedback: string | null
+  selected: boolean
+}
+
+export interface PitchProvenance {
+  kind: 'generated' | 'sample'
+  sample_ref: string | null
+  subject_user_id: string | null
+  reader_user_id: string | null
+  engine_version: string
+  model: string
+  /** full prompt sent for the winning draft */
+  prompt_text: string
+  hook_type: string | null
+  approach_variant: string | null
+  quote_used: boolean
+  generation_attempts: number
+  /** exact composite_profile fields fed into the prompt, verbatim (same truncation) */
+  inputs: Record<string, unknown>
+  /** what the model was NOT given — the bias-audit anchor */
+  inputs_omitted: string[]
+  drafts: PitchDraftRecord[]
+  critic_feedback: string | null
+  rationale: PitchRationaleSelfReport | null
+  claims: PitchClaim[]
+}
+
+export interface PitchRationaleRow extends PitchProvenance {
+  id: string
+  created_at: string
+  daily_intro_id: string | null
+  covariates: Record<string, unknown> | null
+  verified_at: string | null
+  verifier_model: string | null
+  flag_count: number | null
+}

@@ -101,7 +101,48 @@ interface TestsData {
   userCount: number;
 }
 
-type Tab = "overview" | "users" | "matches" | "matrix" | "tests" | "pool-health" | "matching-health" | "reports";
+type Tab = "overview" | "users" | "matches" | "matrix" | "tests" | "pool-health" | "matching-health" | "pitch-rationales" | "reports";
+
+// Pitch provenance log (migration 025, specs/pitch-rationales.md)
+interface PitchClaim {
+  sentence: string;
+  claim: string;
+  source_type: "quote" | "memo" | "vouch" | "profile_field" | "inference" | "none";
+  source_ref: string | null;
+  source_excerpt: string | null;
+  verdict: string | null;
+  verifier_note: string | null;
+}
+
+interface PitchRationaleRow {
+  id: string;
+  created_at: string;
+  kind: string;
+  daily_intro_id: string | null;
+  sample_ref: string | null;
+  subject_name: string | null;
+  reader_name: string | null;
+  engine_version: string;
+  model: string;
+  hook_type: string | null;
+  approach_variant: string | null;
+  quote_used: boolean | null;
+  generation_attempts: number | null;
+  inputs_omitted: string[];
+  drafts: Array<{ approach: string; text: string; critic_score: number | null; critic_feedback: string | null; selected: boolean }> | null;
+  critic_feedback: string | null;
+  rationale: { why_this_hook: string | null; why_this_lead: string | null; tone_choices: string | null } | null;
+  claims: PitchClaim[];
+  narrative: string | null;
+  claimCount: number;
+  unsourcedCount: number;
+  inferenceCount: number;
+}
+
+interface PitchRationalesData {
+  rationales: PitchRationaleRow[];
+  totals: { rows: number; claims: number; unsourced: number; inference: number; withNoClaims: number } | null;
+}
 
 interface MatchingHealthData {
   proximity: {
@@ -230,6 +271,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
   const [testsData, setTestsData] = useState<TestsData | null>(null);
   const [poolHealth, setPoolHealth] = useState<PoolHealthData | null>(null);
   const [matchingHealth, setMatchingHealth] = useState<MatchingHealthData | null>(null);
+  const [pitchRationales, setPitchRationales] = useState<PitchRationalesData | null>(null);
   const [loading, setLoading] = useState(true);
 
   const load = useCallback(async () => {
@@ -293,6 +335,14 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
     }
   }, [tab, matchingHealth, secret]);
 
+  useEffect(() => {
+    if (tab === "pitch-rationales" && !pitchRationales) {
+      adminFetch("/api/admin/pitch-rationales?limit=50", secret).then(async (r) => {
+        if (r.ok) setPitchRationales(await r.json());
+      });
+    }
+  }, [tab, pitchRationales, secret]);
+
   const tabs: { id: Tab; label: string }[] = [
     { id: "overview", label: "Overview" },
     { id: "users", label: "Users" },
@@ -301,6 +351,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
     { id: "tests", label: "Tests" },
     { id: "pool-health", label: "Pool Health" },
     { id: "matching-health", label: "Matching Health" },
+    { id: "pitch-rationales", label: "Pitch Rationales" },
     { id: "reports", label: "Reports" },
   ];
 
@@ -351,6 +402,7 @@ function AdminPanel({ secret, onAuthError }: { secret: string; onAuthError: () =
         {tab === "tests" && <TestsTab data={testsData} />}
         {tab === "pool-health" && <PoolHealthTab data={poolHealth} />}
         {tab === "matching-health" && <MatchingHealthTab data={matchingHealth} />}
+        {tab === "pitch-rationales" && <PitchRationalesTab data={pitchRationales} />}
         {loading && !stats && (
           <p className="text-center text-stone-400 py-12">Loading...</p>
         )}
@@ -1429,6 +1481,213 @@ function PoolHealthTab({ data }: { data: PoolHealthData | null }) {
 }
 
 // ─── Matching Health Tab ───
+
+// ─── Pitch Rationales (migration 025, specs/pitch-rationales.md) ───
+
+const SOURCE_TYPE_STYLE: Record<string, string> = {
+  quote: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  memo: "bg-emerald-50 text-emerald-700 border-emerald-200",
+  vouch: "bg-blue-50 text-blue-700 border-blue-200",
+  profile_field: "bg-stone-50 text-stone-600 border-stone-200",
+  inference: "bg-amber-50 text-amber-800 border-amber-300",
+  none: "bg-red-50 text-red-700 border-red-300",
+};
+
+function PitchRationaleCard({ row }: { row: PitchRationaleRow }) {
+  const [open, setOpen] = useState(false);
+  const flagged = row.unsourcedCount > 0;
+
+  return (
+    <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
+      <button
+        onClick={() => setOpen((o) => !o)}
+        className="w-full text-left px-5 py-3 hover:bg-stone-50 transition"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[13px] font-medium text-stone-900 truncate">
+              {row.subject_name ?? row.sample_ref ?? "unknown"}
+              <span className="text-stone-400 font-normal"> → {row.reader_name ?? "—"}</span>
+            </p>
+            <p className="text-[11px] text-stone-400 mt-0.5">
+              {new Date(row.created_at).toLocaleString()} · {row.engine_version} · {row.hook_type ?? "—"} · approach {row.approach_variant ?? "—"}
+              {row.generation_attempts && row.generation_attempts > 1 ? ` · ${row.generation_attempts} attempts` : ""}
+            </p>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <span className="rounded-4xl border border-stone-200 bg-stone-50 px-2 py-0.5 text-[10px] font-medium text-stone-600">
+              {row.claimCount} claims
+            </span>
+            {row.inferenceCount > 0 && (
+              <span className="rounded-4xl border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] font-medium text-amber-800">
+                {row.inferenceCount} inferred
+              </span>
+            )}
+            {flagged && (
+              <span className="rounded-4xl border border-red-300 bg-red-50 px-2 py-0.5 text-[10px] font-bold text-red-700">
+                {row.unsourcedCount} unsourced
+              </span>
+            )}
+            <span className="text-stone-300 text-xs">{open ? "▲" : "▼"}</span>
+          </div>
+        </div>
+      </button>
+
+      {open && (
+        <div className="border-t border-stone-100 px-5 py-4 space-y-4">
+          {row.narrative && (
+            <div>
+              <p className="text-[10px] font-medium text-stone-400 uppercase mb-1">Pitch as delivered</p>
+              <p className="text-[13px] text-stone-800 leading-relaxed whitespace-pre-wrap">{row.narrative}</p>
+            </div>
+          )}
+
+          <div>
+            <p className="text-[10px] font-medium text-stone-400 uppercase mb-1.5">
+              Claims — sentence vs. the input that supports it
+            </p>
+            {row.claims.length === 0 ? (
+              <p className="text-[12px] text-red-600">
+                No claims recorded. The model returned no rationale block for this pitch — nothing to audit.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {row.claims.map((c, i) => (
+                  <div
+                    key={i}
+                    className={`rounded-lg border p-2.5 ${SOURCE_TYPE_STYLE[c.source_type] ?? SOURCE_TYPE_STYLE.profile_field}`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[12px] font-medium leading-snug">{c.sentence}</p>
+                        <p className="text-[11px] opacity-70 mt-0.5">asserts: {c.claim}</p>
+                      </div>
+                      <div className="flex-1 min-w-0 border-l border-current/20 pl-3">
+                        <p className="text-[10px] font-bold uppercase tracking-wide">
+                          {c.source_type}
+                          {c.source_ref ? <span className="font-normal opacity-70"> · {c.source_ref}</span> : null}
+                        </p>
+                        <p className="text-[11px] mt-0.5 leading-snug">
+                          {c.source_excerpt ?? <span className="opacity-60">— no excerpt —</span>}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {row.rationale && (
+            <div className="grid grid-cols-3 gap-3">
+              {([
+                ["Why this hook", row.rationale.why_this_hook],
+                ["Why this lead", row.rationale.why_this_lead],
+                ["Tone choices", row.rationale.tone_choices],
+              ] as const).map(([label, value]) => (
+                <div key={label} className="rounded-lg bg-stone-50 p-2.5">
+                  <p className="text-[10px] font-medium text-stone-400 uppercase">{label}</p>
+                  <p className="text-[11px] text-stone-700 mt-1 leading-snug">{value ?? "—"}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="text-[10px] font-medium text-stone-400 uppercase mb-1.5">Drafts</p>
+              <div className="space-y-1.5">
+                {(row.drafts ?? []).map((d, i) => (
+                  <div
+                    key={i}
+                    className={`rounded-lg p-2 text-[11px] ${d.selected ? "bg-emerald-50 border border-emerald-200" : "bg-stone-50 border border-stone-100"}`}
+                  >
+                    <p className="font-medium text-stone-600">
+                      {d.selected ? "✓ " : ""}Approach {d.approach} · score {d.critic_score ?? "—"}
+                    </p>
+                    {d.critic_feedback && <p className="text-stone-500 mt-0.5">{d.critic_feedback}</p>}
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              <p className="text-[10px] font-medium text-stone-400 uppercase mb-1.5">
+                Not given to the model
+              </p>
+              <div className="flex flex-wrap gap-1">
+                {(row.inputs_omitted ?? []).map((f) => (
+                  <span key={f} className="rounded-4xl border border-stone-200 bg-stone-50 px-2 py-0.5 text-[10px] text-stone-500">
+                    {f}
+                  </span>
+                ))}
+              </div>
+              <p className="text-[10px] text-stone-400 mt-2">
+                model {row.model} · quote used: {row.quote_used ? "yes" : "no"}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function PitchRationalesTab({ data }: { data: PitchRationalesData | null }) {
+  if (!data) return <p className="text-center text-stone-400 py-12">Loading pitch rationales...</p>;
+
+  const t = data.totals;
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-xl border border-stone-200 bg-white overflow-hidden">
+        <div className="px-5 py-4 border-b border-stone-100">
+          <h2 className="text-base font-bold text-stone-900">Pitch Rationales</h2>
+          <p className="text-xs text-stone-500 mt-0.5">
+            Why each pitch was written, claim by claim. A claim with source_type <strong>none</strong> is a
+            hallucination candidate; <strong>inference</strong> means the model connected dots the inputs
+            never stated. Capture-only — no verifier yet.
+          </p>
+        </div>
+        {t && (
+          <div className="grid grid-cols-5 gap-3 p-5">
+            <div className="rounded-lg bg-stone-50 p-3">
+              <p className="text-[10px] font-medium text-stone-400 uppercase">Pitches logged</p>
+              <p className="text-xl font-bold text-stone-900">{t.rows}</p>
+            </div>
+            <div className="rounded-lg bg-stone-50 p-3">
+              <p className="text-[10px] font-medium text-stone-400 uppercase">Claims</p>
+              <p className="text-xl font-bold text-stone-900">{t.claims}</p>
+            </div>
+            <div className="rounded-lg bg-amber-50 p-3">
+              <p className="text-[10px] font-medium text-amber-700 uppercase">Inferred</p>
+              <p className="text-xl font-bold text-amber-700">{t.inference}</p>
+            </div>
+            <div className="rounded-lg bg-red-50 p-3">
+              <p className="text-[10px] font-medium text-red-600 uppercase">Unsourced</p>
+              <p className="text-xl font-bold text-red-600">{t.unsourced}</p>
+            </div>
+            <div className="rounded-lg bg-stone-50 p-3">
+              <p className="text-[10px] font-medium text-stone-400 uppercase">No rationale</p>
+              <p className="text-xl font-bold text-stone-900">{t.withNoClaims}</p>
+            </div>
+          </div>
+        )}
+      </div>
+
+      {data.rationales.length === 0 ? (
+        <p className="text-center text-stone-400 text-sm py-12">
+          No pitch rationales yet. Rows appear as intros are generated.
+        </p>
+      ) : (
+        <div className="space-y-2">
+          {data.rationales.map((r) => (
+            <PitchRationaleCard key={r.id} row={r} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function MatchingHealthTab({ data }: { data: MatchingHealthData | null }) {
   if (!data) return <p className="text-center text-stone-400 py-12">Loading matching health data...</p>;

@@ -6,6 +6,7 @@ import {
   getCompatibleUsers,
   expirePendingIntros,
   saveDailyIntro,
+  savePitchRationale,
   saveMatch,
   updateUserCadence,
   getCurrentDailyIntro,
@@ -14,7 +15,7 @@ import {
 } from '@/lib/db'
 import { selectNextCandidate } from '@/lib/matchmaker'
 import { generateTrailer } from '@/lib/intro-engine-v2'
-import type { CompositeProfile } from '@/lib/types'
+import type { CompositeProfile, PitchProvenance } from '@/lib/types'
 
 /** Classify profile richness: thin / adequate / rich */
 function computeRichnessTier(profile: CompositeProfile | null): string {
@@ -121,6 +122,7 @@ export async function GET(req: NextRequest) {
       let criticSubscores: { hookPower: number; intrigue: number; specificity: number; mystery: number } | null = null
       let generationAttempts = 1
       let quoteUsed = false
+      let trailerProvenance: PitchProvenance | null = null
       if (userComposite && candidateComposite) {
         try {
           const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
@@ -130,6 +132,7 @@ export async function GET(req: NextRequest) {
           criticSubscores = trailer.criticSubscores
           generationAttempts = trailer.generationAttempts
           quoteUsed = trailer.quoteUsed
+          trailerProvenance = trailer.provenance
         } catch (err) {
           console.error(`Cron: Failed to generate trailer for ${user.id} <> ${candidate.id}`, err)
         }
@@ -177,7 +180,7 @@ export async function GET(req: NextRequest) {
       expiresAt.setDate(expiresAt.getDate() + 1)
 
       // Create daily intro with quality tracking metadata
-      await saveDailyIntro({
+      const intro = await saveDailyIntro({
         user_id: user.id,
         match_id: match.id,
         matched_user_id: candidate.id,
@@ -203,6 +206,9 @@ export async function GET(req: NextRequest) {
         repitch_attempt: 0,
         slot_position: 1,
       })
+
+      // Provenance log (specs/pitch-rationales.md). Never blocks delivery.
+      if (trailerProvenance) await savePitchRationale(trailerProvenance, intro.id)
 
       await updatePoolState(cadence.user_id, 'normal')
 

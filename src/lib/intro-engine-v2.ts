@@ -10,19 +10,79 @@
  */
 
 import Anthropic from '@anthropic-ai/sdk'
-import type { CompositeProfile, User } from './types'
+import type {
+  CompositeProfile, User,
+  PitchClaim, PitchProvenance, PitchRationaleSelfReport,
+} from './types'
 
 const anthropic = new Anthropic()
 
 export const INTRO_ENGINE_CONFIG = {
   version: 'v2.0',
   model: 'claude-sonnet-4-6' as const,
-  maxTokens: 1024,
+  // 2048, not 1024: the same call now returns the pitch AND its rationale +
+  // per-claim source map (specs/pitch-rationales.md). Roughly doubles output.
+  maxTokens: 2048,
   draftsPerIntro: 3,
   criticModel: 'claude-sonnet-4-6' as const,
   criticMaxTokens: 512,
   minCriticScore: 30,
 }
+
+/**
+ * What the pitch prompt is NOT given. Hard-coded truth, updated whenever
+ * buildTrailerPrompt's input set changes — this is the bias-audit anchor: it
+ * records what the model could not possibly have used. See specs/pitch-rationales.md.
+ */
+export const INPUTS_OMITTED = [
+  'personality_quiz',
+  'physical_attributes',
+  'photos',
+  'reader_identity_beyond_taste_bias',
+] as const
+
+const RATIONALE_DELIMITER = '---RATIONALE---'
+
+const VALID_SOURCE_TYPES: PitchClaim['source_type'][] = [
+  'quote', 'memo', 'vouch', 'profile_field', 'inference', 'none',
+]
+
+/**
+ * Appended last to every generation call. The rationale is written in the SAME
+ * call as the pitch — a post-hoc "explain this intro" call would confabulate a
+ * reasoning it never had.
+ */
+const RATIONALE_OUTPUT_INSTRUCTION = `
+
+OUTPUT FORMAT — two parts, in this order:
+
+PART 1: the intro itself, plain text, nothing else. No preamble, no title, no surrounding quotation marks.
+
+PART 2: on its own line, the delimiter ${RATIONALE_DELIMITER}, then one JSON object (no code fence, no commentary after it):
+
+{
+  "rationale": {
+    "why_this_hook": "why you opened the way you did",
+    "why_this_lead": "why you led with this quality of theirs rather than another",
+    "tone_choices": "the deliberate tone and word choices you made, and why"
+  },
+  "claims": [
+    {
+      "sentence": "the sentence from the intro, verbatim",
+      "claim": "the factual assertion that sentence makes",
+      "source_type": "quote | memo | vouch | profile_field | inference | none",
+      "source_ref": "which input it came from, e.g. 'their own words #2' or 'Values'",
+      "source_excerpt": "the verbatim text from the input above that supports it"
+    }
+  ]
+}
+
+RULES FOR claims (this is an audit record, not marketing — accuracy over flattery):
+- One entry per factual sentence in the intro. A sentence asserting nothing factual can be skipped.
+- "source_excerpt" MUST be copied verbatim from the input given above — character for character, including its original capitalization. Do not paraphrase it, do not tidy it up, do not re-punctuate it, do not capitalize a lowercase first letter.
+- If you cannot copy an exact excerpt, then it is not a sourced claim: use "inference" (you connected dots the inputs support but do not state — name what you inferred from) or "none" (you have no source).
+- Marking a claim "none" is honest and useful. Dressing an unsourced claim up as "profile_field" is not.
+- Writing this JSON must not change the intro. Write the best intro you can, then report on it truthfully.`
 
 // ─── The 3 Hook Types ───
 
@@ -62,8 +122,9 @@ export async function generateTrailer(
   generationAttempts: number
   quoteUsed: boolean
   version: string
+  provenance: PitchProvenance
 }> {
-  const prompt = buildTrailerPrompt(reader, subject, readerProfile, subjectProfile)
+  const { prompt, inputs } = buildTrailerPrompt(reader, subject, readerProfile, subjectProfile)
 
   // If specific hook type requested, generate 3 drafts with that hook
   // Otherwise, generate 1 draft per hook type (for Daily Three)
@@ -75,52 +136,97 @@ export async function generateTrailer(
 
   // Generate 3 drafts with the same hook type but different creative approaches
   const variations = [
-    'Approach A: Lead with the single most vivid detail you can find.',
-    'Approach B: Build momentum — each sentence should raise the stakes.',
-    'Approach C: Surprise the reader — subvert their expectation in the first two sentences.',
+    { id: 'A', instruction: 'Approach A: Lead with the single most vivid detail you can find.' },
+    { id: 'B', instruction: 'Approach B: Build momentum — each sentence should raise the stakes.' },
+    { id: 'C', instruction: 'Approach C: Surprise the reader — subvert their expectation in the first two sentences.' },
   ]
 
-  const drafts = await Promise.all(
-    variations.map(variation =>
-      anthropic.messages.create({
+  const generated = await Promise.all(
+    variations.map(variation => {
+      const promptText = `${prompt}${hookInstruction}\n\n${variation.instruction}${RATIONALE_OUTPUT_INSTRUCTION}`
+      return anthropic.messages.create({
         model: INTRO_ENGINE_CONFIG.model,
         max_tokens: INTRO_ENGINE_CONFIG.maxTokens,
-        messages: [{ role: 'user', content: `${prompt}${hookInstruction}\n\n${variation}` }],
+        messages: [{ role: 'user', content: promptText }],
       }).then(msg => {
-        const text = msg.content[0].type === 'text' ? msg.content[0].text : ''
-        return text.trim()
+        const raw = msg.content[0].type === 'text' ? msg.content[0].text : ''
+        return { approach: variation.id, promptText, ...splitTrailerResponse(raw) }
       })
-    )
+    })
   )
 
-  // Score all drafts
-  const scored = await scoreDrafts(drafts, reader, subject, readerProfile)
+  // Score all drafts (on the pitch text only — the rationale block is stripped first)
+  const scored = await scoreDrafts(generated.map(g => g.text), reader, subject, readerProfile)
+  const candidates = generated.map((g, i) => ({ ...g, ...scored[i] }))
 
   // Pick the best
-  let best = scored.reduce((a, b) => a.score > b.score ? a : b)
+  let best = candidates.reduce((a, b) => a.score > b.score ? a : b)
   let generationAttempts = 1
 
   // If best is below threshold, regenerate with feedback
   if (best.score < INTRO_ENGINE_CONFIG.minCriticScore) {
     generationAttempts = 2
+    const regenPrompt = `${prompt}\n\nA previous draft scored poorly. The critic said: "${best.feedback}"\n\nFix these issues. Write a better version that specifically addresses the feedback.${RATIONALE_OUTPUT_INSTRUCTION}`
     const regen = await anthropic.messages.create({
       model: INTRO_ENGINE_CONFIG.model,
       max_tokens: INTRO_ENGINE_CONFIG.maxTokens,
-      messages: [{
-        role: 'user',
-        content: `${prompt}\n\nA previous draft scored poorly. The critic said: "${best.feedback}"\n\nFix these issues. Write a better version that specifically addresses the feedback.`,
-      }],
+      messages: [{ role: 'user', content: regenPrompt }],
     })
-    const regenText = regen.content[0].type === 'text' ? regen.content[0].text.trim() : best.text
+    const regenRaw = regen.content[0].type === 'text' ? regen.content[0].text : ''
+    const regenParsed = splitTrailerResponse(regenRaw)
+    const regenText = regenParsed.text || best.text
     const regenScored = await scoreDrafts([regenText], reader, subject, readerProfile)
-    if (regenScored[0].score > best.score) {
-      best = regenScored[0]
+    const regenCandidate = {
+      approach: 'regen',
+      promptText: regenPrompt,
+      rationale: regenParsed.rationale,
+      claims: regenParsed.claims,
+      // scoreDrafts echoes the text it scored, so this carries regenText
+      ...regenScored[0],
+    }
+    candidates.push(regenCandidate)
+    if (regenCandidate.score > best.score) {
+      best = regenCandidate
     }
   }
 
   // Check if a quote was used in the final narrative
   const subjectQuotes = subjectProfile.notable_quotes ?? []
   const quoteUsed = subjectQuotes.some(q => q.length > 10 && best.text.includes(q))
+
+  const provenance: PitchProvenance = {
+    kind: 'generated',
+    sample_ref: null,
+    subject_user_id: subject.id,
+    reader_user_id: reader.id,
+    engine_version: INTRO_ENGINE_CONFIG.version,
+    model: INTRO_ENGINE_CONFIG.model,
+    prompt_text: best.promptText,
+    hook_type: hook.id,
+    approach_variant: best.approach,
+    quote_used: quoteUsed,
+    generation_attempts: generationAttempts,
+    inputs,
+    inputs_omitted: [...INPUTS_OMITTED],
+    // Every draft, winner and losers. Losers keep text + critic scores only —
+    // their rationale/claims are discarded (cost control, spec §Implementation).
+    drafts: candidates.map(c => ({
+      approach: c.approach,
+      text: c.text,
+      critic_score: c.score,
+      critic_subscores: {
+        hookPower: c.hookPower,
+        intrigue: c.personalization,
+        specificity: c.specificity,
+        mystery: c.mystery,
+      },
+      critic_feedback: c.feedback || null,
+      selected: c === best,
+    })),
+    critic_feedback: best.feedback || null,
+    rationale: best.rationale,
+    claims: best.claims,
+  }
 
   return {
     narrative: best.text,
@@ -135,6 +241,61 @@ export async function generateTrailer(
     generationAttempts,
     quoteUsed,
     version: INTRO_ENGINE_CONFIG.version,
+    provenance,
+  }
+}
+
+// ─── Same-call rationale parsing ───
+
+/**
+ * Splits a generation response into the pitch and its self-reported rationale.
+ * A malformed or missing rationale block must never cost us the pitch — the
+ * text is returned regardless and the rationale comes back empty.
+ */
+export function splitTrailerResponse(raw: string): {
+  text: string
+  rationale: PitchRationaleSelfReport | null
+  claims: PitchClaim[]
+} {
+  const idx = raw.indexOf(RATIONALE_DELIMITER)
+  if (idx === -1) return { text: raw.trim(), rationale: null, claims: [] }
+
+  const text = raw.slice(0, idx).trim()
+  const tail = raw.slice(idx + RATIONALE_DELIMITER.length)
+  const jsonMatch = tail.match(/\{[\s\S]*\}/)
+  if (!jsonMatch) return { text, rationale: null, claims: [] }
+
+  try {
+    const parsed = JSON.parse(jsonMatch[0]) as {
+      rationale?: Partial<PitchRationaleSelfReport>
+      claims?: Array<Record<string, unknown>>
+    }
+    const rationale: PitchRationaleSelfReport | null = parsed.rationale
+      ? {
+          why_this_hook: parsed.rationale.why_this_hook ?? null,
+          why_this_lead: parsed.rationale.why_this_lead ?? null,
+          tone_choices: parsed.rationale.tone_choices ?? null,
+        }
+      : null
+
+    const claims: PitchClaim[] = (parsed.claims ?? []).map((c) => {
+      const rawType = String(c.source_type ?? '').trim() as PitchClaim['source_type']
+      return {
+        sentence: String(c.sentence ?? ''),
+        claim: String(c.claim ?? ''),
+        // An unrecognised source_type is treated as unsourced: over-flagging is
+        // the safe direction for an audit log.
+        source_type: VALID_SOURCE_TYPES.includes(rawType) ? rawType : 'none',
+        source_ref: c.source_ref != null ? String(c.source_ref) : null,
+        source_excerpt: c.source_excerpt != null ? String(c.source_excerpt) : null,
+        verdict: null,
+        verifier_note: null,
+      }
+    })
+
+    return { text, rationale, claims }
+  } catch {
+    return { text, rationale: null, claims: [] }
   }
 }
 
@@ -184,7 +345,7 @@ function buildTrailerPrompt(
   subject: User,
   readerProfile: CompositeProfile,
   subjectProfile: CompositeProfile,
-): string {
+): { prompt: string; inputs: Record<string, unknown> } {
   // Gather reader data
   const readerInterests = readerProfile.interest_tags?.join(', ') || 'unknown'
   const readerValues = readerProfile.values?.join(', ') || 'unknown'
@@ -195,19 +356,63 @@ function buildTrailerPrompt(
   const subjectPassions = subjectProfile.passion_indicators?.join(', ') || 'unknown'
   const subjectValues = subjectProfile.values?.join(', ') || 'unknown'
   const subjectInterests = subjectProfile.interest_tags?.join(', ') || 'unknown'
-  const subjectQuotes = subjectProfile.notable_quotes?.slice(0, 4).map(q => `"${q}"`).join('\n  ') || 'none'
+  const subjectQuoteList = subjectProfile.notable_quotes?.slice(0, 4) ?? []
+  const subjectQuotes = subjectQuoteList.map(q => `"${q}"`).join('\n  ') || 'none'
   const subjectHumor = subjectProfile.humor_signature?.humor_examples?.join(', ')
     || subjectProfile.humor_style || 'unknown'
   const subjectKindness = subjectProfile.kindness_markers?.join(', ') || 'unknown'
-  const subjectVIA = (subjectProfile.values_in_action ?? []).slice(0, 2).join('; ') || 'none'
-  const subjectVouches = (subjectProfile.friend_vouch_quotes ?? []).slice(0, 2).map(q => `"${q}"`).join(' | ') || 'none'
+  const subjectVIAList = (subjectProfile.values_in_action ?? []).slice(0, 2)
+  const subjectVIA = subjectVIAList.join('; ') || 'none'
+  const subjectVouchList = (subjectProfile.friend_vouch_quotes ?? []).slice(0, 2)
+  const subjectVouches = subjectVouchList.map(q => `"${q}"`).join(' | ') || 'none'
 
   // Try to extract v2 profile data if available
   const profileAny = subjectProfile as unknown as Record<string, unknown>
   const primaryEnergy = (profileAny.primary_energy as string) || ''
   const hiddenDepth = (profileAny.hidden_depth as string) || ''
 
-  return `You are writing an introduction that makes ${subject.first_name} sound like the most fascinating person someone hasn't met yet. This is a trailer, not a profile summary. Your job is to make ${subject.first_name} irresistible.
+  // The provenance record of what actually went into the prompt — same fields,
+  // same truncation. Claims are audited against this, so it must not be a
+  // superset of what the model saw. Note `readerInterests` / `readerQuotes` are
+  // computed above but never reach the prompt, so they are not inputs.
+  const inputs: Record<string, unknown> = {
+    subject: {
+      first_name: subject.first_name,
+      passion_indicators: subjectProfile.passion_indicators ?? [],
+      values: subjectProfile.values ?? [],
+      interest_tags: subjectProfile.interest_tags ?? [],
+      notable_quotes: subjectQuoteList,
+      humor: subjectHumor,
+      kindness_markers: subjectProfile.kindness_markers ?? [],
+      values_in_action: subjectVIAList,
+      friend_vouch_quotes: subjectVouchList,
+      primary_energy: primaryEnergy || null,
+      hidden_depth: hiddenDepth || null,
+    },
+    reader: {
+      passion_indicators: readerProfile.passion_indicators ?? [],
+      values: readerProfile.values ?? [],
+    },
+    // The same content AS RENDERED into the prompt. Required for the verbatim
+    // claim audit: the model sees `values.join(', ')` as one line and quotes
+    // spans that cross array elements, which no single element contains.
+    rendered: {
+      passions: subjectPassions,
+      values: subjectValues,
+      interests: subjectInterests,
+      notable_quotes: subjectQuotes,
+      humor: subjectHumor,
+      kindness_markers: subjectKindness,
+      values_in_action: subjectVIA,
+      friend_vouch_quotes: subjectVouches,
+      primary_energy: primaryEnergy,
+      hidden_depth: hiddenDepth,
+      reader_passions: readerPassions,
+      reader_values: readerValues,
+    },
+  }
+
+  const prompt = `You are writing an introduction that makes ${subject.first_name} sound like the most fascinating person someone hasn't met yet. This is a trailer, not a profile summary. Your job is to make ${subject.first_name} irresistible.
 
 YOUR GOAL: The reader should finish this and think "I need to know more about this person." They should feel like they've been let in on a secret about someone remarkable.
 
@@ -253,6 +458,8 @@ FORMAT:
 - Use ${subject.first_name}'s ACTUAL WORDS when possible.
 - Do NOT start with "Meet" or "Imagine someone."
 - Do NOT mention the reader's name.`
+
+  return { prompt, inputs }
 }
 
 // ─── Critic scoring ───

@@ -6,6 +6,7 @@ import {
   updateUser,
   expirePendingIntros,
   saveDailyIntro,
+  savePitchRationale,
   saveMatch,
   getUser,
   getCompositeProfile,
@@ -13,6 +14,7 @@ import {
 } from '@/lib/db'
 import { selectNextCandidate } from '@/lib/matchmaker'
 import { generateTrailer } from '@/lib/intro-engine-v2'
+import type { PitchProvenance } from '@/lib/types'
 
 export async function GET(req: NextRequest) {
   try {
@@ -92,11 +94,13 @@ export async function POST(req: NextRequest) {
 
       let narrative = "There's someone here you should meet. Trust us on this one."
       let hookType: 'quote' | 'contradiction' | 'scene' | null = null
+      let trailerProvenance: PitchProvenance | null = null
       if (userComposite && candidateComposite) {
         try {
           const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
           narrative = trailer.narrative
           hookType = trailer.hookType
+          trailerProvenance = trailer.provenance
         } catch (err) {
           console.error('Resume: Failed to generate trailer', err)
         }
@@ -117,7 +121,7 @@ export async function POST(req: NextRequest) {
       const expiresAt = new Date(now)
       expiresAt.setDate(expiresAt.getDate() + 1)
 
-      await saveDailyIntro({
+      const intro = await saveDailyIntro({
         user_id: userId,
         match_id: match.id,
         matched_user_id: candidate.id,
@@ -132,6 +136,9 @@ export async function POST(req: NextRequest) {
         voice_message_path: null,
         hook_type: hookType,
       })
+
+      // Provenance log (specs/pitch-rationales.md). Never blocks delivery.
+      if (trailerProvenance) await savePitchRationale(trailerProvenance, intro.id)
 
       introsGenerated++
     }
