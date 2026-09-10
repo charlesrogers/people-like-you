@@ -20,7 +20,8 @@ export async function preparePhoto(file: File): Promise<File> {
     if (blob.size > 10 * 1024 * 1024) throw new Error('Image is still too large')
     return new File([blob], `${file.name.replace(/\.[^.]+$/, '')}.jpg`, { type: 'image/jpeg' })
   } catch {
-    // Some browsers cannot decode HEIC. Never silently send an unreadable image.
+    // The upload route converts HEIC on the server if this browser cannot decode it.
+    if ((/image\/hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name)) && file.size <= 25 * 1024 * 1024) return file
     if (/^image\/(jpeg|png|webp)$/.test(file.type) && file.size <= 10 * 1024 * 1024) return file
     throw new Error('This photo couldn’t be prepared. Try a JPG, PNG or a screenshot. You can also add photos later.')
   } finally { URL.revokeObjectURL(url) }
