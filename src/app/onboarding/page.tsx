@@ -8,12 +8,11 @@ import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
 import PromptPicker from '@/components/PromptPicker'
 import ProfileCompletion from '@/components/ProfileCompletion'
-import { getNextAngle, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
+import { getNextAngle, getTargetedPrompts, getProfileCompletion, ANGLE_TIERS, ANGLE_LABELS, type PromptDef } from '@/lib/prompts'
 import QuizStep, { type QuizResult } from '@/components/QuizStep'
 import { personalisedPrompts, FISHED_PROMPTS, NERD_OUT, type SelectedPrompt } from '@/lib/voice-prompt-map'
 import { isQualifyingRecording, meetsRecordingMinimum, REQUIRED_ONBOARDING_RECORDINGS } from '@/lib/recording-requirements'
 import { canonicalIndex } from '@/lib/quiz-scoring'
-import { FRAMING as QUIZ_FRAMING } from '@/lib/quiz-battery'
 import { getStoredUserId, saveSession, signOut } from '@/lib/session'
 import { computePersonalityReveal } from '@/lib/personality-reveal'
 import { getSeedNarrativesForGender, ATTRIBUTE_TAGS, type SeedNarrative } from '@/lib/seed-narratives'
@@ -93,7 +92,6 @@ function OnboardingContent() {
   // Prompts fished from this reader's quiz answers. They lead the picker's list.
   const [fishedPrompts, setFishedPrompts] = useState<SelectedPrompt[]>([])
   const [quizAnswers, setQuizAnswers] = useState<Record<string, number | null>>({})
-  const [cameFromQuiz, setCameFromQuiz] = useState(false)
   const [recordings, setRecordings] = useState<Map<string, { memoId: string; duration: number }>>(new Map())
   const [activePrompt, setActivePrompt] = useState<PromptDef | null>(null)
   const [passedPromptIds, setPassedPromptIds] = useState<string[]>([])
@@ -118,6 +116,8 @@ function OnboardingContent() {
 
   // Step 4: Photos
   const [photoFiles, setPhotoFiles] = useState<File[]>([])
+  const [photosPreparing, setPhotosPreparing] = useState(false)
+  const uploadedPhotos = useRef(new Map<File, string>())
 
   // Step 5: Taste calibration
   const [tasteNarratives, setTasteNarratives] = useState<SeedNarrative[]>([])
@@ -231,7 +231,6 @@ function OnboardingContent() {
         : canonicalIndex(itemId, a.optionIndex, a.polarityFlipped)
     }
     setQuizAnswers(canonical)
-    setCameFromQuiz(true)
     setFishedPrompts(personalisedPrompts(canonical))
     setStep('voice')
   }
@@ -248,10 +247,11 @@ function OnboardingContent() {
   // Static metadata also resolves previously recorded fished IDs after a reload.
   const knownVoicePrompts = [...Object.values(FISHED_PROMPTS), NERD_OUT]
   const roundAngle = getNextAngle(answeredPromptIds, knownVoicePrompts)
+  const voiceCoverage = getProfileCompletion(answeredPromptIds, knownVoicePrompts)
   const canProceedPrefs = faithImportance && kids
-  const canProceedPhotos = photoFiles.length >= 1
+  const canProceedPhotos = !photosPreparing
 
-  const handleNext = async () => {
+  const handleNext = async (options?: { skipPhotos: boolean }) => {
     setError(null)
 
     if (step === 'signup') {
@@ -403,14 +403,20 @@ function OnboardingContent() {
 
       setSubmitting(true)
       try {
-        for (let i = 0; i < photoFiles.length; i++) {
+        for (let i = 0; i < (options?.skipPhotos ? 0 : photoFiles.length); i++) {
+          if (uploadedPhotos.current.has(photoFiles[i])) continue
           const formData = new FormData()
           formData.append('photo', photoFiles[i])
           formData.append('userId', userId)
           formData.append('sortOrder', String(i + 1))
 
           const res = await apiFetch('/api/upload-photo', { method: 'POST', body: formData })
-          if (!res.ok) throw new Error('Failed to upload photo')
+          if (!res.ok) {
+            const detail = await res.json().catch(() => null)
+            throw new Error(detail?.error || 'This photo couldn’t be uploaded. Try again or choose Add photos later.')
+          }
+          const uploaded = await res.json()
+          uploadedPhotos.current.set(photoFiles[i], uploaded.id)
           console.log(`Uploaded photo ${i + 1}`)
         }
 
@@ -505,11 +511,8 @@ function OnboardingContent() {
       <div className={`sticky top-0 z-50 bg-white/80 backdrop-blur-lg border-b border-stone-100 ${step === 'quiz' ? 'hidden' : ''}`}>
         <div className="mx-auto max-w-xl px-6 py-3">
           <div className="flex items-center justify-between text-xs text-stone-400">
-            {STEPS.map((s, i) => (
-              <span key={s} className={i <= stepIndex ? 'font-medium text-stone-700' : ''}>
-                {STEP_LABELS[s]}
-              </span>
-            ))}
+            <span className="font-medium text-stone-700">{STEP_LABELS[step]}</span>
+            <span>{step === 'voice' ? `${Math.min(recordings.size, 4)} of 4 answers saved` : 'Your introduction starts here'}</span>
           </div>
           <div className="mt-2 h-1.5 rounded-full bg-stone-100">
             <div
@@ -520,10 +523,13 @@ function OnboardingContent() {
         </div>
       </div>
 
-      {resumedSession && step !== 'reveal' && (
+      {resumedSession && step === 'signup' && (
         <div className="mx-auto mt-4 flex max-w-xl items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white px-4 py-3">
           <p className="text-[13px] text-stone-600">You&rsquo;re already signed in.</p>
           <div className="flex shrink-0 items-center gap-3">
+            {recordings.size > 0 && (
+              <button onClick={() => setStep('voice')} className="text-[13px] font-medium text-stone-700 underline">Resume saved stories</button>
+            )}
             <button
               onClick={() => router.push('/dashboard')}
               className="text-[13px] font-medium text-stone-700 underline underline-offset-4 transition hover:text-stone-900"
@@ -540,7 +546,7 @@ function OnboardingContent() {
         </div>
       )}
 
-      <div className="mx-auto max-w-xl px-6 py-12">
+      <div className="mx-auto max-w-xl px-6 py-8">
         {/* Step 0: Signup (phone-first) */}
         {step === 'signup' && (
           <div>
@@ -714,15 +720,22 @@ function OnboardingContent() {
         {step === 'voice' && (
           <div>
             <h1 className="text-[17px] font-semibold leading-snug text-stone-800">
-              {cameFromQuiz ? QUIZ_FRAMING.close : 'Tell us about yourself'}
+              Four stories. Four sides of you.
             </h1>
             <p className="mt-2 text-sm text-stone-500">
               {canProceedVoice
                 ? 'Your four stories are saved. You’re ready for the next step.'
-                : 'Pick four stories to tell us. Record at least 20 seconds for each—just talk like you’re telling a friend.'}
+                : 'Four answers total—pick ONE question from each group. They help us get to know different sides of you. Speak for at least 20 seconds; stop when you’re finished.'}
             </p>
+            <ul className="mt-4 grid grid-cols-2 gap-2 text-xs text-stone-600" aria-label="Your four story groups">
+              {ANGLE_TIERS.map((angle, i) => (
+                <li key={angle} className={`rounded-lg px-3 py-2 ${voiceCoverage.covered.includes(angle) ? 'bg-emerald-50 text-emerald-800' : angle === roundAngle ? 'bg-stone-900 text-white' : 'bg-stone-100'}`}>
+                  {voiceCoverage.covered.includes(angle) ? '✓' : i + 1} {ANGLE_LABELS[angle]}
+                </li>
+              ))}
+            </ul>
 
-            {!activePrompt && (
+            {!activePrompt && canProceedVoice && (
               <div className="mt-5">
                 <div className="flex items-center justify-between">
                   <span className="text-[13px] font-medium text-stone-700">
@@ -1066,12 +1079,19 @@ function OnboardingContent() {
           <div>
             <h1 className="text-2xl font-bold text-stone-900">Add your photos</h1>
             <p className="mt-2 text-sm text-stone-500">
-              1-3 photos. These are shown to other members during calibration. Pick ones that actually look like you.
+              Add up to 3 photos, or do this later. Your stories are already saved. Pick photos that actually look like you.
             </p>
 
             <div className="mt-8">
-              <PhotoUploader onPhotosChange={setPhotoFiles} />
+              <PhotoUploader initialFiles={photoFiles} onPhotosChange={setPhotoFiles} minPhotos={0} onBusyChange={setPhotosPreparing} disabled={submitting} onRemove={async file => {
+                const id = uploadedPhotos.current.get(file)
+                if (!id) return
+                const result = await apiFetch('/api/photos', {method:'DELETE',headers:{'Content-Type':'application/json'},body:JSON.stringify({userId,photoId:id})})
+                if (!result.ok) throw new Error('Could not remove this photo. Please try again.')
+                uploadedPhotos.current.delete(file)
+              }} />
             </div>
+            <button type="button" disabled={submitting || photosPreparing} onClick={() => void handleNext({ skipPhotos: true })} className="mt-6 w-full rounded-xl border border-stone-300 px-4 py-3 text-sm font-medium text-stone-700 disabled:opacity-40">Add photos later</button>
           </div>
         )}
 
@@ -1089,10 +1109,11 @@ function OnboardingContent() {
               </div>
             ) : !composite ? (
               <div className="py-8 text-center">
-                <h1 className="text-2xl font-bold text-stone-900">Your profile needs your voice</h1>
+                <h1 className="text-2xl font-bold text-stone-900">{recordings.size ? 'Your stories are saved' : 'Your profile needs your voice'}</h1>
                 <p className="mx-auto mt-3 max-w-sm text-sm text-stone-500">
-                  We build this from the stories you tell out loud, and there aren&rsquo;t any yet.
-                  A couple of recordings is all it takes.
+                  {recordings.size
+                    ? 'We haven’t finished building your profile from them yet. You do not need to re-record. You can continue to your profile.'
+                    : 'Choose one question from each of the four story groups to help us get to know you.'}
                 </p>
                 {processingError && (
                   <p className="mt-3 text-xs text-amber-600">{processingError}</p>
@@ -1101,7 +1122,7 @@ function OnboardingContent() {
                   onClick={() => { setActivePrompt(null); setStep('voice') }}
                   className="mt-8 w-full rounded-2xl bg-stone-900 px-6 py-4 text-[15px] font-semibold text-white transition active:scale-[0.98]"
                 >
-                  Record one now
+                  {recordings.size ? 'Back to saved stories' : 'Choose your stories'}
                 </button>
               </div>
             ) : (() => {
@@ -1348,7 +1369,7 @@ function OnboardingContent() {
           {/* Hide Continue during active taste card voting — the vote buttons handle progression */}
           {(
             <button
-              onClick={handleNext}
+              onClick={() => void handleNext()}
               disabled={!canProceed || submitting}
               className="flex-1 rounded-lg bg-stone-900 px-6 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 disabled:opacity-40 disabled:cursor-not-allowed active:translate-y-px"
             >
@@ -1356,7 +1377,7 @@ function OnboardingContent() {
                 ? 'Saving...'
                 : step === 'reveal'
                   ? "I'm ready — show me my matches"
-                  : 'Continue'
+                  : step === 'photos' && photoFiles.length === 0 ? 'Continue without photos' : 'Continue'
               }
             </button>
           )}

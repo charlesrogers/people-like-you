@@ -3,6 +3,7 @@ import { createServerClient } from '@/lib/supabase'
 import { savePhoto } from '@/lib/db'
 import { signPhotoUrl } from '@/lib/photos'
 import { moderateImageDataUrl, screenAndLog } from '@/lib/moderation'
+import { captureActorAllowed } from '@/lib/model-data/auth'
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,9 +15,13 @@ export async function POST(req: NextRequest) {
     if (!photo || !userId) {
       return NextResponse.json({ error: 'Missing required fields: photo, userId' }, { status: 400 })
     }
+    if (!await captureActorAllowed(req.headers, userId)) {
+      return NextResponse.json({ error: 'Please sign in again before uploading your photo. Your recordings are saved.' }, { status: 401 })
+    }
 
     if (photo.size > 10 * 1024 * 1024) {
-      return NextResponse.json({ error: 'File too large (max 10MB)' }, { status: 400 })
+      console.warn('Photo upload rejected', { reason: 'size', bytes: photo.size })
+      return NextResponse.json({ error: 'This photo is larger than 10 MB. Choose a smaller image or add photos later.' }, { status: 413 })
     }
 
     // Content moderation (Apple 1.2 filter pillar): screen the image BEFORE it is stored
@@ -41,6 +46,7 @@ export async function POST(req: NextRequest) {
       .upload(fileName, photo, { contentType: photo.type })
 
     if (uploadError) {
+      console.error('Photo storage upload failed', { message: uploadError.message })
       return NextResponse.json({ error: 'Failed to upload photo: ' + uploadError.message }, { status: 500 })
     }
 

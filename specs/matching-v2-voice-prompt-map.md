@@ -73,10 +73,10 @@ Format: `option → prompt` · *(tier)*. Renumbered for battery rc10; the five c
 ### Q1 · At seventeen, everyone knew you as:
 | option | prompt | tier |
 |---|---|---|
-| theatre kid | "Tell me about a night on stage that still lands when you think about it. What went right — or what went wrong?" | i_sharing |
+| theatre kid | "Tell me about a night on stage that still lands when you think about it. What happened that night?" | i_sharing |
 | jock | "What were you actually good at back then? Tell me how you found out." | admiration |
 | honor-roll grinder | "What were you grinding for at seventeen? Tell me whether it turned out to be worth it." | admiration |
-| the one organizing the hang | "Tell me about something you organised at seventeen that actually happened. How many people, and what went wrong?" | admiration |
+| the one organizing the hang | "Tell me about something you organised at seventeen that actually happened. Who came, and what did you put together?" | admiration |
 | happily unaffiliated | "What were you doing at seventeen while everyone else was doing the school thing?" | i_sharing |
 | a completely different person | **"You said you're a completely different person now. What changed — and when did you notice?"** | admiration |
 
@@ -128,7 +128,7 @@ Format: `option → prompt` · *(tier)*. Renumbered for battery rc10; the five c
 | a chair I overpaid for but I love | "Tell me about the thing you overpaid for and would do it again." | i_sharing |
 | the gear — bike, skis, clubs | "Tell me about the gear. What's the best day you've ever had on it?" | self_expansion |
 | an instrument | "What do you play when nobody's around?" | i_sharing |
-| something I made | "Tell me about the thing you made. How long did it take, and what went wrong?" | admiration |
+| something I made | "Tell me about the thing you made. What went into making it, and how did it turn out?" | admiration |
 | nothing — I just haven't got round to it | **"Forget the place then — where do you actually spend your time?"** | comfort |
 
 ### Q11 · It's their birthday. Your gift:

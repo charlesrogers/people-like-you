@@ -5,7 +5,7 @@ import { meetsRecordingMinimum } from '../recording-requirements'
 
 function fixture(seconds: number, format: 'wav' | 'webm' | 'mp4') {
   const codec = format === 'webm' ? ['-c:a', 'libopus'] : format === 'mp4'
-    ? ['-c:a', 'aac', '-movflags', 'frag_keyframe+empty_moov+default_base_moof'] : ['-c:a', 'pcm_s16le']
+    ? ['-c:a', 'aac', '-movflags', 'frag_keyframe+empty_moov+default_base_moof', '-frag_duration', '1000000'] : ['-c:a', 'pcm_s16le']
   const data = execFileSync('ffmpeg', ['-v', 'error', '-f', 'lavfi', '-i', `sine=frequency=440:duration=${seconds}`,
     ...codec, '-f', format, 'pipe:1'], { maxBuffer: 5 * 1024 * 1024 })
   return new File([new Uint8Array(data)], `recording.${format}`, { type: `audio/${format}` })
@@ -23,5 +23,8 @@ describe('actual uploaded audio duration', () => {
   })
   it('rejects invalid audio', async () => {
     await expect(measureAudioDuration(new File(['not audio'], 'fake.m4a'))).rejects.toThrow()
+  })
+  it('preserves the full length of a story beyond the former 90-second and five-minute limits', async () => {
+    expect(await measureAudioDuration(fixture(312, 'mp4'))).toBeCloseTo(312, 0)
   })
 })

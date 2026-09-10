@@ -7,6 +7,7 @@ export async function GET() {
   return NextResponse.json({
     version: 'recordings-v1-20s',
     captureContractVersion: 'capture-v1.1',
+    onboardingExperienceVersion: 'stories-v1.2',
     minimumRecordingSeconds: MIN_RECORDING_SECONDS,
     requiredRecordings: REQUIRED_ONBOARDING_RECORDINGS,
     angles: ANGLE_TIERS,

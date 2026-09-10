@@ -8,6 +8,7 @@ import VoiceRecorder from './VoiceRecorder'
 import { computePersonalityReveal, type PersonalityReveal } from '@/lib/personality-reveal'
 import { getTargetedPrompts, getPromptText, type PromptDef } from '@/lib/prompts'
 import ProfileCompletion from '@/components/ProfileCompletion'
+import ProfilePhotos from '@/components/ProfilePhotos'
 
 interface VoiceMemo {
   id: string
@@ -69,7 +70,8 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
 
   if (!composite) {
     return (
-      <div className="py-12 text-center">
+      <div className="space-y-6 py-12 text-center">
+        <ProfilePhotos userId={userId} />
         <div className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-stone-900" />
         <p className="mt-4 text-sm text-stone-500">Building your profile...</p>
       </div>
@@ -78,6 +80,7 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
 
   return (
     <div className="space-y-6">
+      <ProfilePhotos userId={userId} />
       {/* Completeness */}
       <ProfileCompleteness richness={reveal?.richness || 0} memoCount={composite.memo_count || 0} />
 

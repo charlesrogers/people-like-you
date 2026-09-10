@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { ANGLE_LABELS, getPromptChoices, type AngleTier, type PromptDef } from '@/lib/prompts'
+import { ANGLE_LABELS, ANGLE_CONTEXT, getPromptChoices, type AngleTier, type PromptDef } from '@/lib/prompts'
 
 interface PromptPickerProps {
   answeredPromptIds: string[]
@@ -18,9 +18,7 @@ interface PromptPickerProps {
 
 /**
  * Choose-your-own prompt list. Shows `count` short labels so the whole set is
- * scannable at a glance; the full question only appears once they've picked,
- * on the recording screen, because the second clause of each prompt is what
- * actually produces a usable story and would be unreadable in a list.
+ * scannable at a glance, with the full question underneath for context.
  */
 export default function PromptPicker({
   answeredPromptIds,
@@ -73,9 +71,13 @@ export default function PromptPicker({
   return (
     <div>
       {angle && (
-        <p className="mb-3 text-[13px] font-semibold uppercase tracking-wide text-stone-400">
-          {ANGLE_LABELS[angle]}
+        <div className="mb-4">
+        <p className="text-[13px] font-semibold uppercase tracking-wide text-stone-600">
+          {ANGLE_LABELS[angle]} · Choose one
         </p>
+        <p className="mt-1 text-sm text-stone-500">{ANGLE_CONTEXT[angle]}</p>
+        <p className="mt-2 text-sm font-medium text-stone-700">Pick whichever question brings a story to mind. You only answer one.</p>
+        </div>
       )}
       <ul className="flex flex-col gap-2">
         {choices.map(prompt => (
@@ -86,6 +88,7 @@ export default function PromptPicker({
               className="w-full rounded-xl border border-stone-200 bg-white px-4 py-3.5 text-left transition-colors hover:border-stone-900 hover:bg-stone-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-stone-900 focus-visible:ring-offset-2 active:translate-y-px"
             >
               <span className="text-[15px] font-medium text-stone-800">{prompt.short}</span>
+              <span className="mt-1 block text-sm leading-relaxed text-stone-500">{prompt.text}</span>
             </button>
           </li>
         ))}
