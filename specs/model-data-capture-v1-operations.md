@@ -44,7 +44,13 @@ Migrations: `025_model_data_capture.sql`, `026_model_data_source_erasure.sql`. A
 
 Validation at authoring: fixture suite passes; full test suite passes; production build and TypeScript pass. Full lint has the same nine pre-existing errors as main (React effects and two prefer-const findings); no new lint errors. Native simulator build passes. No paid end-to-end provider run or real-member generation was used for verification.
 
-## Native client
+## Live verification — 2026-09-10
+
+Production runtime `488b660830ffc1992d371bfa83e059587e021361` and staging runtime `97964c7ba98f014bc913781e82030330466625cd` serve `capture-v1.1`. Both migrations are applied. Production CI [34533006179](https://github.com/charlesrogers/people-like-you/actions/runs/34533006179) and staging CI [34532488376](https://github.com/charlesrogers/people-like-you/actions/runs/34532488376) passed. The shared capture switch is ON; private production status verified enabled at approximately 21:45 UTC. Initial inventory is empty, with zero training-eligible records and zero approved examples. This confirms readiness to capture new activity, not collection of a dataset.
+
+Validation: 180 tests passed, including 27 fixture-only model-data checks; TypeScript, production build and native simulator build passed. `npm run lint` was run and retains nine pre-existing errors, verified against the prior main baseline, with no new lint errors. Live database transaction tests verified immutability, attempt completion, recursive invalidation, purge and access restrictions, then rolled back without retained test records. Unauthorized private status and matches requests return 401. No paid provider call or real-member generation was triggered for testing.
+
+## Native client status
 
 Five surgical edits in the separate existing native checkout preserve unrelated work: `Services/VoiceService.swift`, `Views/Onboarding/VoiceRecordingView.swift`, `Views/Profile/VoicePromptView.swift`, `Models/Match.swift`, `Views/Discovery/DashboardView.swift`. Question snapshots and exact feedback revisions are included in the next build. Simulator build is verified; this is not a TestFlight upload. Existing app versions still produce labeled legacy question provenance/unlinked feedback.
 
