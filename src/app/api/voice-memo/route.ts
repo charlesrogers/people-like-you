@@ -1,4 +1,4 @@
-import { captureActorAllowed } from '@/lib/model-data/auth'
+import { authenticatedProfileOwner,captureActorAllowed } from '@/lib/model-data/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { saveVoiceMemo, getUserVoiceMemos, markReplacedMemosForPrompt } from '@/lib/db'
@@ -143,11 +143,12 @@ export async function PATCH(req: NextRequest) {
   if(!auth?.data.user)return NextResponse.json({error:'Authentication required'},{status:401})
   const body=await req.json()
   if(typeof body.memoId!=='string' || typeof body.transcript!=='string' || !body.transcript.trim() || body.transcript.length>50000)return NextResponse.json({error:'Invalid correction'},{status:400})
-  const {data:memo,error}=await db.from('voice_memos').select('*').eq('id',body.memoId).eq('user_id',auth.data.user.id).single()
+  const {data:memo,error}=await db.from('voice_memos').select('*').eq('id',body.memoId).single()
   if(error || !memo || memo.processing_status==='replaced')return NextResponse.json({error:'Answer not found'},{status:404})
+  if(!await authenticatedProfileOwner(req.headers,memo.user_id))return NextResponse.json({error:'Answer not found'},{status:404})
   if(!await captureStore().enabled())return NextResponse.json({error:'Correction capture is not enabled yet'},{status:503})
   const record=await snapshotTranscript(memo,body.transcript)
-  const {error:saveError}=await db.rpc('model_data_set_transcript',{p_memo:memo.id,p_person:auth.data.user.id,p_text:body.transcript,p_record:record})
+  const {error:saveError}=await db.rpc('model_data_set_transcript',{p_memo:memo.id,p_person:memo.user_id,p_text:body.transcript,p_record:record})
   if(saveError)return NextResponse.json({error:'Could not save correction; please retry'},{status:500})
   return NextResponse.json({ok:true,transcriptRecordId:record,status:'pending'})
 }

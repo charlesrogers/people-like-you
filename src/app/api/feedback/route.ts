@@ -1,4 +1,4 @@
-import { captureActorAllowed } from '@/lib/model-data/auth'
+import { authenticatedProfileOwner,captureActorAllowed } from '@/lib/model-data/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { randomUUID } from 'node:crypto'
 import { createServerClient } from '@/lib/supabase'
@@ -44,9 +44,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({error:'Feedback does not belong to this introduction'},{status:403})
     }
     if(body.pitchRevisionId) {
-      const token=req.headers.get('authorization')?.replace(/^Bearer /,'')
-      const auth=token?await db.auth.getUser(token):null
-      if(!auth?.data.user || auth.data.user.id!==userId)return NextResponse.json({error:'Authentication required'},{status:401})
+      if(!await authenticatedProfileOwner(req.headers,userId))return NextResponse.json({error:'Authentication required'},{status:401})
       if(body.pitchRevisionId!==intro.pitch_revision_id)return NextResponse.json({error:'Pitch revision mismatch'},{status:409})
     }
     await recordProductFeedback(intro,userId,body.pitchRevisionId,{action,reason,details,photoRevealedBeforeDecision},typeof body.eventId==='string'?body.eventId:randomUUID())
