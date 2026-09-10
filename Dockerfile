@@ -12,6 +12,7 @@ RUN npm run build
 
 FROM base AS runner
 ENV NODE_ENV=production
+RUN apk add --no-cache ffmpeg
 COPY --from=build /app/public ./public
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/node_modules ./node_modules

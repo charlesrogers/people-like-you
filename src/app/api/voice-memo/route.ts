@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { saveVoiceMemo, getUserVoiceMemos, markReplacedMemosForPrompt } from '@/lib/db'
+import { measureAudioDuration } from '@/lib/audio-duration'
+import { meetsRecordingMinimum, MIN_RECORDING_SECONDS } from '@/lib/recording-requirements'
+import { QUESTION_BANK } from '@/lib/prompts'
+import { FISHED_PROMPTS, NERD_OUT } from '@/lib/voice-prompt-map'
+
+export const runtime = 'nodejs'
 
 export async function POST(req: NextRequest) {
   try {
@@ -9,7 +15,6 @@ export async function POST(req: NextRequest) {
     const userId = formData.get('userId') as string | null
     const promptId = formData.get('promptId') as string | null
     const dayNumber = parseInt(formData.get('dayNumber') as string || '0', 10)
-    const durationSeconds = parseInt(formData.get('durationSeconds') as string || '0', 10)
     // V2-T4: which prompt bank this came from, and the quiz answer that fished it.
     const rawSource = formData.get('promptSource') as string | null
     const promptSource = rawSource === 'bank' || rawSource === 'fished' ? rawSource : null
@@ -26,13 +31,34 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    if (!audio || !userId || !promptId) {
+    if (!(audio instanceof File) || !userId || !promptId) {
       return NextResponse.json({ error: 'Missing required fields: audio, userId, promptId' }, { status: 400 })
     }
 
     if (audio.size > 25 * 1024 * 1024) {
       return NextResponse.json({ error: 'File too large (max 25MB)' }, { status: 400 })
     }
+
+    // Validate before uploading or replacing an existing answer. Client-supplied
+    // durationSeconds is deliberately ignored, including from older app builds.
+    let measuredSeconds: number
+    try {
+      measuredSeconds = await measureAudioDuration(audio)
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === 'ENOENT') {
+        console.error('Audio duration validator is unavailable')
+        return NextResponse.json({ error: 'Recording validation is temporarily unavailable. Please try saving again.' }, { status: 503 })
+      }
+      return NextResponse.json({ error: 'We could not read this recording. Please record it again.' }, { status: 422 })
+    }
+    if (!meetsRecordingMinimum(measuredSeconds)) {
+      return NextResponse.json({
+        error: `Record at least ${MIN_RECORDING_SECONDS} seconds before saving.`,
+        minimum_seconds: MIN_RECORDING_SECONDS,
+        duration_seconds: measuredSeconds,
+      }, { status: 422 })
+    }
+    const durationSeconds = Math.floor(measuredSeconds)
 
     const supabase = createServerClient()
 
@@ -44,7 +70,7 @@ export async function POST(req: NextRequest) {
       'audio/mpeg': 'mp3',
       'audio/ogg': 'ogg',
     }
-    const ext = extMap[audio.type] || 'webm'
+    const ext = extMap[audio.type.split(';')[0]] || 'webm'
 
     const fileName = `${userId}/${promptId}_${Date.now()}.${ext}`
     const { error: uploadError } = await supabase.storage
@@ -70,7 +96,7 @@ export async function POST(req: NextRequest) {
       prompt_seed: promptSeed,
     })
 
-    return NextResponse.json({ id: memo.id, status: 'uploaded' })
+    return NextResponse.json({ id: memo.id, status: 'uploaded', duration_seconds: durationSeconds })
   } catch (err) {
     console.error('Voice memo upload error:', err)
     const message = err instanceof Error ? err.message : 'Upload failed'
@@ -86,12 +112,14 @@ export async function GET(req: NextRequest) {
   }
 
   const memos = await getUserVoiceMemos(userId)
+  const tiers = new Map([...QUESTION_BANK, ...Object.values(FISHED_PROMPTS), NERD_OUT].map(p => [p.id, p.tier]))
   return NextResponse.json({
-    memos: memos.map(m => ({
+    memos: memos.filter(m => m.processing_status !== 'replaced').map(m => ({
       id: m.id,
       prompt_id: m.prompt_id,
       duration_seconds: m.duration_seconds,
       processing_status: m.processing_status,
+      tier: tiers.get(m.prompt_id) ?? null,
     })),
   })
 }

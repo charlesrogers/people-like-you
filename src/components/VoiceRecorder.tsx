@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { MIN_RECORDING_SECONDS, meetsRecordingMinimum } from '@/lib/recording-requirements'
 
 interface VoiceRecorderProps {
   promptText: string
@@ -12,292 +13,211 @@ interface VoiceRecorderProps {
   maxSeconds?: number
 }
 
+type RecorderState = 'idle' | 'starting' | 'recording' | 'finishing' | 'review' | 'uploading' | 'submitted'
+const formatTime = (s: number) => `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}`
+
 export default function VoiceRecorder({
-  promptText,
-  promptId,
-  helpText,
-  exampleAnswer,
-  onRecordingComplete,
-  onSkip,
-  maxSeconds = 90,
+  promptText, promptId, helpText, exampleAnswer, onRecordingComplete, onSkip, maxSeconds = 90,
 }: VoiceRecorderProps) {
-  const [state, setState] = useState<'idle' | 'recording' | 'uploading' | 'submitted'>('idle')
+  const [state, setState] = useState<RecorderState>('idle')
   const [seconds, setSeconds] = useState(0)
   const [audioUrl, setAudioUrl] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [hasAudioSignal, setHasAudioSignal] = useState(false)
-
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null)
-  const chunksRef = useRef<Blob[]>([])
-  const timerRef = useRef<NodeJS.Timeout | null>(null)
-  const blobRef = useRef<Blob | null>(null)
+  const recorderRef = useRef<MediaRecorder | null>(null)
   const streamRef = useRef<MediaStream | null>(null)
-  const secondsRef = useRef(0)
-  const analyserRef = useRef<AnalyserNode | null>(null)
-  const audioCtxRef = useRef<AudioContext | null>(null)
-  const levelCheckRef = useRef<NodeJS.Timeout | null>(null)
-  const hasSignalRef = useRef(false)
+  const contextRef = useRef<AudioContext | null>(null)
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const blobRef = useRef<Blob | null>(null)
+  const durationRef = useRef(0)
+  const startedAtRef = useRef(0)
+  const attemptRef = useRef(0)
+  const savingRef = useRef(false)
 
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-      if (levelCheckRef.current) clearInterval(levelCheckRef.current)
-      if (audioUrl) URL.revokeObjectURL(audioUrl)
-      if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop())
-      if (audioCtxRef.current?.state !== 'closed') audioCtxRef.current?.close()
-    }
-  }, [audioUrl])
+  const release = useCallback(() => {
+    if (timerRef.current) clearInterval(timerRef.current)
+    timerRef.current = null
+    streamRef.current?.getTracks().forEach(track => track.stop())
+    streamRef.current = null
+    const context = contextRef.current
+    contextRef.current = null
+    if (context && context.state !== 'closed') void context.close().catch(() => {})
+  }, [])
 
-  const getMimeType = () => {
-    if (typeof MediaRecorder === 'undefined') return null
-    if (MediaRecorder.isTypeSupported('audio/mp4')) return 'audio/mp4'
-    if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) return 'audio/webm;codecs=opus'
-    if (MediaRecorder.isTypeSupported('audio/webm')) return 'audio/webm'
-    return null
-  }
-
-  const startRecording = useCallback(async () => {
-    setError(null)
-    setHasAudioSignal(false)
-    hasSignalRef.current = false
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-      streamRef.current = stream
-      const mimeType = getMimeType()
-      if (!mimeType) {
-        setError('Your browser does not support audio recording.')
-        return
-      }
-
-      // Audio level monitoring via AnalyserNode
-      const audioCtx = new AudioContext()
-      audioCtxRef.current = audioCtx
-      const source = audioCtx.createMediaStreamSource(stream)
-      const analyser = audioCtx.createAnalyser()
-      analyser.fftSize = 256
-      source.connect(analyser)
-      analyserRef.current = analyser
-
-      const dataArray = new Uint8Array(analyser.frequencyBinCount)
-      levelCheckRef.current = setInterval(() => {
-        analyser.getByteFrequencyData(dataArray)
-        const avg = dataArray.reduce((sum, v) => sum + v, 0) / dataArray.length
-        if (avg > 5) {
-          hasSignalRef.current = true
-          setHasAudioSignal(true)
-        }
-      }, 200)
-
-      const recorder = new MediaRecorder(stream, { mimeType })
-      mediaRecorderRef.current = recorder
-      chunksRef.current = []
-
-      recorder.ondataavailable = (e) => {
-        if (e.data.size > 0) chunksRef.current.push(e.data)
-      }
-
-      recorder.onstop = async () => {
-        if (levelCheckRef.current) clearInterval(levelCheckRef.current)
-        if (audioCtxRef.current?.state !== 'closed') audioCtxRef.current?.close()
-
-        const blob = new Blob(chunksRef.current, { type: mimeType })
-        blobRef.current = blob
-        const url = URL.createObjectURL(blob)
-        setAudioUrl(url)
-        stream.getTracks().forEach(t => t.stop())
-
-        // Reject silent recordings
-        const bytesPerSec = blob.size / Math.max(secondsRef.current, 1)
-        if (!hasSignalRef.current || bytesPerSec < 500) {
-          setError("We didn't pick up any audio. Check that your microphone is working and try again.")
-          setState('idle')
-          return
-        }
-
-        // Upload immediately
-        setState('uploading')
-        try {
-          await onRecordingComplete(blob, secondsRef.current)
-          setState('submitted')
-        } catch (err) {
-          setError(err instanceof Error ? err.message : 'Failed to save recording. Tap to try again.')
-          setState('idle')
-        }
-      }
-
-      recorder.start(1000)
-      setState('recording')
-      setSeconds(0)
-      secondsRef.current = 0
-
-      timerRef.current = setInterval(() => {
-        setSeconds(prev => {
-          const next = prev + 1
-          secondsRef.current = next
-          if (next >= maxSeconds) {
-            recorder.stop()
-            if (timerRef.current) clearInterval(timerRef.current)
-          }
-          return next
-        })
-      }, 1000)
-    } catch {
-      setError('Microphone access denied. Please allow microphone access to record.')
-    }
-  }, [maxSeconds, onRecordingComplete])
+  useEffect(() => () => {
+    // Invalidate pending microphone requests and onstop work before releasing resources.
+    attemptRef.current++
+    const recorder = recorderRef.current
+    if (recorder && recorder.state !== 'inactive') recorder.stop()
+    release()
+  }, [release])
+  useEffect(() => () => { if (audioUrl) URL.revokeObjectURL(audioUrl) }, [audioUrl])
 
   const stopRecording = useCallback(() => {
-    if (mediaRecorderRef.current?.state === 'recording') {
-      mediaRecorderRef.current.stop()
-    }
+    const recorder = recorderRef.current
+    if (!recorder || recorder.state === 'inactive') return
+    durationRef.current = Math.max(0, (contextRef.current?.currentTime ?? startedAtRef.current) - startedAtRef.current)
     if (timerRef.current) clearInterval(timerRef.current)
+    timerRef.current = null
+    setState('finishing')
+    recorder.stop()
   }, [])
 
-  const cancelRecording = useCallback(() => {
-    if (mediaRecorderRef.current?.state === 'recording') {
-      mediaRecorderRef.current.stop()
-    }
-    if (timerRef.current) clearInterval(timerRef.current)
-    if (levelCheckRef.current) clearInterval(levelCheckRef.current)
-    if (streamRef.current) streamRef.current.getTracks().forEach(t => t.stop())
-    if (audioCtxRef.current?.state !== 'closed') audioCtxRef.current?.close()
-    chunksRef.current = []
+  useEffect(() => {
+    // Backgrounding must not turn wall-clock time into recorded audio time.
+    const onVisibility = () => { if (document.hidden) stopRecording() }
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [stopRecording])
+
+  const reset = useCallback(() => {
+    attemptRef.current++
+    const recorder = recorderRef.current
+    if (recorder && recorder.state !== 'inactive') recorder.stop()
+    release()
+    recorderRef.current = null
     blobRef.current = null
-    setSeconds(0)
-    setHasAudioSignal(false)
-    hasSignalRef.current = false
-    setState('idle')
-  }, [])
-
-  const handleReRecord = () => {
-    if (audioUrl) URL.revokeObjectURL(audioUrl)
+    durationRef.current = 0
     setAudioUrl(null)
-    blobRef.current = null
     setSeconds(0)
     setError(null)
     setState('idle')
+  }, [release])
+
+  const startRecording = async () => {
+    const attempt = ++attemptRef.current
+    setState('starting')
+    setError(null)
+    setAudioUrl(null)
+    blobRef.current = null
+    durationRef.current = 0
+    setSeconds(0)
+    try {
+      const mimeType = typeof MediaRecorder === 'undefined' ? undefined :
+        ['audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'].find(type => MediaRecorder.isTypeSupported(type))
+      if (!mimeType) throw new Error('Your browser does not support audio recording.')
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      if (attempt !== attemptRef.current) { stream.getTracks().forEach(t => t.stop()); return }
+      streamRef.current = stream
+      const context = new AudioContext()
+      contextRef.current = context
+      await context.resume()
+      if (attempt !== attemptRef.current) return
+      // Use the audio clock, not an interval counter, for live progress.
+      context.createMediaStreamSource(stream).connect(context.createAnalyser())
+      const recorder = new MediaRecorder(stream, { mimeType })
+      recorderRef.current = recorder
+      const chunks: Blob[] = []
+      recorder.ondataavailable = e => { if (e.data.size) chunks.push(e.data) }
+      recorder.onerror = () => {
+        if (attempt !== attemptRef.current) return
+        reset()
+        setError('Recording was interrupted. Please try again.')
+      }
+      recorder.onstop = async () => {
+        if (attempt !== attemptRef.current) return
+        if (timerRef.current) clearInterval(timerRef.current)
+        timerRef.current = null
+        setState('finishing')
+        const blob = new Blob(chunks, { type: mimeType })
+        // Decode when supported so review uses actual media length. The server
+        // independently decodes every upload, including when this browser cannot.
+        let duration = durationRef.current || Math.max(0, context.currentTime - startedAtRef.current)
+        stream.getTracks().forEach(t => t.stop())
+        try { duration = (await context.decodeAudioData(await blob.arrayBuffer())).duration } catch { /* Server validates. */ }
+        if (attempt !== attemptRef.current) return
+        release()
+        durationRef.current = duration
+        blobRef.current = blob
+        setSeconds(duration)
+        setAudioUrl(URL.createObjectURL(blob))
+        setError(meetsRecordingMinimum(duration) ? null : 'This recording is under 20 seconds. Record again to continue.')
+        setState('review')
+      }
+      stream.getAudioTracks().forEach(track => {
+        track.onended = stopRecording
+        track.onmute = stopRecording
+      })
+      recorder.start(1000)
+      startedAtRef.current = context.currentTime
+      setState('recording')
+      timerRef.current = setInterval(() => {
+        const elapsed = Math.max(0, context.currentTime - startedAtRef.current)
+        durationRef.current = elapsed
+        setSeconds(elapsed)
+        if (elapsed >= maxSeconds) stopRecording()
+      }, 100)
+    } catch (err) {
+      if (attempt !== attemptRef.current) return
+      release()
+      setState('idle')
+      setError(err instanceof DOMException && err.name === 'NotAllowedError'
+        ? 'Please allow microphone access to record.'
+        : err instanceof Error ? err.message : 'Could not start recording. Please try again.')
+    }
   }
 
-  const formatTime = (s: number) => {
-    const m = Math.floor(s / 60)
-    const sec = s % 60
-    return `${m}:${sec.toString().padStart(2, '0')}`
+  const saveRecording = async () => {
+    if (savingRef.current || !blobRef.current || !meetsRecordingMinimum(durationRef.current)) return
+    savingRef.current = true
+    setError(null)
+    setState('uploading')
+    try {
+      await onRecordingComplete(blobRef.current, durationRef.current)
+      setState('submitted')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not save. Your recording is still here—try saving again.')
+      setState('review')
+    } finally { savingRef.current = false }
   }
 
-  const progress = (seconds / maxSeconds) * 100
-
-  if (state === 'submitted') {
-    return (
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-emerald-700">Got it!</p>
-            <p className="mt-1 text-xs text-emerald-600">{promptText}</p>
-          </div>
-          <button
-            onClick={handleReRecord}
-            className="text-xs text-emerald-600 underline decoration-dotted underline-offset-2 hover:text-emerald-800"
-          >
-            Re-record
-          </button>
-        </div>
-      </div>
-    )
-  }
+  const qualified = meetsRecordingMinimum(seconds)
+  const progress = Math.min(100, seconds / MIN_RECORDING_SECONDS * 100)
+  if (state === 'submitted') return (
+    <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6" role="status">
+      <p className="font-medium text-emerald-700">Recording saved ✓</p>
+      <p className="mt-1 text-sm text-emerald-600">{promptText}</p>
+      <button onClick={reset} className="mt-3 text-sm text-emerald-700 underline">Re-record</button>
+    </div>
+  )
 
   return (
-    <div className="rounded-xl border border-stone-200 bg-white p-6 shadow-sm" data-prompt-id={promptId}>
+    <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm" data-prompt-id={promptId}>
       <p className="text-[19px] font-semibold leading-snug text-stone-900">{promptText}</p>
+      {helpText && <p className="mt-2 text-sm text-stone-500">{helpText}</p>}
+      <p className="mt-3 text-sm font-medium text-stone-700">Record at least 20 seconds.</p>
+      {exampleAnswer && state === 'idle' && <p className="mt-2 text-xs italic text-stone-400">e.g. &ldquo;{exampleAnswer}&rdquo;</p>}
+      {error && <p role="alert" className="mt-3 text-sm text-red-600">{error}</p>}
 
-      {helpText && (
-        <p className="mt-2 text-xs text-stone-400">{helpText}</p>
-      )}
-
-      {exampleAnswer && state === 'idle' && (
-        <p className="mt-2 text-xs italic text-stone-400">
-          e.g. &ldquo;{exampleAnswer}&rdquo;
-        </p>
-      )}
-
-      {error && (
-        <p className="mt-3 text-sm text-red-600">{error}</p>
-      )}
-
-      {state === 'idle' && (
-        <div className="mt-5 flex items-center gap-3">
-          {onSkip && (
-            <button
-              onClick={onSkip}
-              className="flex items-center gap-1.5 text-xs text-stone-400 transition hover:text-stone-600"
-            >
-              <svg className="h-3.5 w-3.5" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-                <path d="M2 8h12M10 4l4 4-4 4" />
-              </svg>
-              Ask me a different question
-            </button>
-          )}
-          <button
-            onClick={startRecording}
-            className="flex flex-1 items-center justify-center gap-3 rounded-lg bg-stone-900 px-5 py-3.5 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
-          >
-            <span className="h-3 w-3 rounded-full bg-red-500" />
-            Tap to record
-          </button>
-        </div>
-      )}
-
-      {state === 'uploading' && (
-        <div className="mt-5 flex items-center justify-center gap-3 py-4">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-stone-300 border-t-stone-900" />
-          <span className="text-sm text-stone-500">Saving your recording...</span>
-        </div>
-      )}
-
-      {state === 'recording' && (
+      {(state === 'recording' || state === 'review') && (
         <div className="mt-5">
-          <div className="flex items-center justify-center">
-            <div className="relative flex h-28 w-28 items-center justify-center">
-              <svg className="absolute h-full w-full -rotate-90" viewBox="0 0 100 100">
-                <circle cx="50" cy="50" r="45" fill="none" stroke="#e7e5e4" strokeWidth="4" />
-                <circle
-                  cx="50" cy="50" r="45" fill="none"
-                  stroke="#10b981"
-                  strokeWidth="4"
-                  strokeDasharray="283 283"
-                  strokeLinecap="round"
-                  opacity="0.25"
-                />
-              </svg>
-              <div className="text-center">
-                {/* Elapsed only, small and muted — never a remaining-time figure. */}
-                <span className="text-[13px] text-stone-400 tabular-nums">{formatTime(seconds)}</span>
-              </div>
-            </div>
+          <div className="flex items-baseline justify-between gap-3">
+            <span className="text-3xl font-semibold tabular-nums text-stone-900">{formatTime(seconds)}</span>
+            <span className="text-sm text-stone-500">0:20 minimum</span>
           </div>
-
-          <div className="mt-3 flex items-center justify-center gap-2">
-            <span className={`h-2 w-2 rounded-full ${hasAudioSignal ? 'animate-pulse bg-red-500' : 'bg-stone-300'}`} />
-            <span className="text-xs text-stone-500">
-              {hasAudioSignal ? 'Recording...' : 'Listening\u2026'}
-            </span>
+          <div role="progressbar" aria-label="Recording minimum" aria-valuemin={0} aria-valuemax={20}
+            aria-valuenow={Math.min(20, Math.floor(seconds))} className="mt-3 h-2 overflow-hidden rounded-full bg-stone-100">
+            <div className={`h-full transition-[width] ${qualified ? 'bg-emerald-500' : 'bg-amber-400'}`} style={{ width: `${progress}%` }} />
           </div>
-
-          <div className="mt-4 flex gap-3">
-            <button
-              onClick={cancelRecording}
-              className="flex-1 rounded-lg border border-stone-200 px-4 py-3 text-sm font-medium text-stone-500 transition hover:bg-stone-50 active:translate-y-px"
-            >
-              Start over
-            </button>
-            <button
-              onClick={stopRecording}
-              className="flex-1 rounded-lg bg-stone-900 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-800 active:translate-y-px"
-            >
-              Done
-            </button>
-          </div>
+          <p className={`mt-2 text-sm ${qualified ? 'text-emerald-700' : 'text-stone-600'}`}>
+            {qualified ? 'Minimum reached—finish whenever you’re ready.' : `${Math.ceil(MIN_RECORDING_SECONDS - seconds)} seconds to go.`}
+          </p>
         </div>
       )}
+      {state === 'idle' && <div className="mt-5 space-y-3">
+        <button onClick={startRecording} className="w-full rounded-xl bg-stone-900 px-5 py-4 font-medium text-white">🎙️ Tap to record</button>
+        {onSkip && <button onClick={onSkip} className="w-full py-2 text-sm text-stone-500">Ask me a different question</button>}
+      </div>}
+      {state === 'starting' && <div className="mt-5"><p role="status" className="text-sm text-stone-500">Opening your microphone…</p><button onClick={reset} className="mt-3 text-sm underline">Cancel</button></div>}
+      {state === 'recording' && <div className="mt-5 flex gap-3">
+        <button onClick={reset} className="flex-1 rounded-xl border border-stone-200 px-4 py-3 text-sm text-stone-600">Start over</button>
+        <button onClick={stopRecording} className="flex-1 rounded-xl bg-stone-900 px-4 py-3 text-sm font-medium text-white">Stop recording</button>
+      </div>}
+      {state === 'review' && <div className="mt-5 space-y-3">
+        {audioUrl && <audio controls src={audioUrl} className="w-full" aria-label="Listen to your recording" />}
+        <button onClick={saveRecording} disabled={!qualified} className="w-full rounded-xl bg-stone-900 px-5 py-4 font-medium text-white disabled:cursor-not-allowed disabled:bg-stone-200 disabled:text-stone-500">Save recording</button>
+        <button onClick={reset} className="w-full py-2 text-sm text-stone-500">Record again</button>
+      </div>}
+      {(state === 'finishing' || state === 'uploading') && <p role="status" className="mt-5 py-4 text-center text-sm text-stone-500">{state === 'finishing' ? 'Preparing your recording…' : 'Saving your recording…'}</p>}
     </div>
   )
 }

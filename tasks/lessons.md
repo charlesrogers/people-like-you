@@ -683,3 +683,6 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** an audit log that records a *different representation* than the one the model was shown manufactures false positives, and false hallucination flags are worse than none — they train you to ignore the flag.
 **Rule:** when logging provenance for an LLM call, store the inputs AS RENDERED into the prompt, byte for byte, alongside any structured form. Never audit a model's quotation against a representation it never saw.
 **Category:** near-miss
+
+### 2026-09-10 — Four 20-second recordings; personalized follow-ups are v2
+Charles explicitly scoped v1 to four main recordings of at least 20 seconds, with the requirement and progress visible. Do not add AI content-completeness gating or a personalized second round to this release. Apply the same contract on web and native. Never count timer ticks or client duration metadata as authoritative media length; cancel/unmount must invalidate recording callbacks before stopping. Verify upload retry retains the recording. Website walkthrough with Charles and his wife comes before TestFlight for friends.
