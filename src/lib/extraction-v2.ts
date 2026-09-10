@@ -7,9 +7,9 @@
  * Prompts are versioned and externalized so we can iterate, A/B test, and backtest.
  */
 
-import Anthropic from '@anthropic-ai/sdk'
+import { capturedMessage } from './model-data/provider'
 
-const anthropic = new Anthropic()
+
 
 // ─── Prompt versioning ───
 // Every extraction prompt is versioned. When we change a prompt, bump the version.
@@ -18,12 +18,12 @@ const anthropic = new Anthropic()
 
 export const EXTRACTION_CONFIG = {
   pass1: {
-    version: 'v2.0',
+    version: 'v2.1-evidence',
     model: 'claude-haiku-4-5-20251001' as const,
     maxTokens: 1024,
   },
   pass2: {
-    version: 'v2.0',
+    version: 'v2.1-evidence',
     model: 'claude-sonnet-4-6' as const,
     maxTokens: 2048,
   },
@@ -42,6 +42,8 @@ export interface StoryExtraction {
   response_depth: 'shallow' | 'medium' | 'deep'
   word_count: number
   extraction_version: string
+  claims?: Record<string, unknown>[]
+  quote_candidates?: string[]
 }
 
 export interface PersonalityProfile {
@@ -122,7 +124,7 @@ export async function extractStory(
     }
   }
 
-  const message = await anthropic.messages.create({
+  const message = await capturedMessage('answer_analysis',EXTRACTION_CONFIG.pass1.version,{
     model: EXTRACTION_CONFIG.pass1.model,
     max_tokens: EXTRACTION_CONFIG.pass1.maxTokens,
     messages: [
@@ -140,16 +142,20 @@ Extract and return ONLY a JSON object:
   "story_summary": "1-2 sentence summary of what they actually talked about",
   "concrete_details": ["specific names, places, numbers, objects, activities mentioned"],
   "people_mentioned": ["who they talked about and their relationship — e.g. 'sister', 'college roommate Jake', 'their dog Max'"],
-  "emotions_expressed": ["feelings that came through — not stated, DEMONSTRATED through tone and word choice"],
-  "notable_quotes": ["2-3 most vivid, specific phrases — direct quotes or close paraphrases that reveal personality"],
-  "response_depth": "shallow | medium | deep"
+  "emotions_expressed": ["feelings supported by transcript wording; explicitly interpretive, never inferred from unheard audio"],
+  "notable_quotes": ["2-3 most vivid, specific phrases — EXACT, unedited substrings of the transcript; never paraphrases"],
+  "response_depth": "shallow | medium | deep",
+  "claims": [{"claim_text":"one atomic claim", "person":"speaker or named third party", "source_text":"exact supporting transcript substring, or empty when unknown", "epistemic_status":"observed | interpreted | unknown | contradicted", "quote_kind":"exact_quote | paraphrase | none", "confidence":0.0}]
+
 }
 
 Rules:
 - Only extract what was ACTUALLY SAID. Do not infer topics not discussed.
 - Notable quotes must be specific and vivid. "I like hiking" is NOT notable. "I named my sourdough starter Gerald" IS notable.
 - concrete_details: real specifics only. Names, places, dollar amounts, time frames, objects.
-- emotions_expressed: what you can HEAR in how they talk, not what they claim to feel.
+- emotions_expressed: text-supported interpretations only. You cannot hear audio; do not infer vocal tone.
+- If quote_kind is exact_quote, claim_text and source_text must be the same exact transcript substring. Otherwise use paraphrase or none.
+- Claims about the speaker and other people must be distinguished. Observed means the speaker reported it, not that it was independently verified. Unsupported claims are unknown, never neutral numeric guesses.
 - response_depth: "shallow" = generic, could be anyone. "medium" = some specifics. "deep" = unique, vivid, personal story.
 - If the response is shallow/generic, say so honestly. Don't inflate.`,
       },
@@ -174,6 +180,9 @@ Rules:
   }
 
   const parsed = JSON.parse(jsonMatch[0])
+  // Preserve the full teacher result in capture, but pass only verified verbatims downstream.
+  parsed.quote_candidates = parsed.notable_quotes ?? []
+  parsed.notable_quotes = (parsed.notable_quotes ?? []).filter((q: unknown) => typeof q === 'string' && transcript.includes(q))
   return {
     prompt_id: promptId,
     prompt_text: promptText,
@@ -206,7 +215,7 @@ export async function buildPersonalityProfile(
   Depth: ${s.response_depth} (${s.word_count} words)`
   ).join('\n\n')
 
-  const message = await anthropic.messages.create({
+  const message = await capturedMessage('profile_synthesis',EXTRACTION_CONFIG.pass2.version,{
     model: EXTRACTION_CONFIG.pass2.model,
     max_tokens: EXTRACTION_CONFIG.pass2.maxTokens,
     messages: [
@@ -265,6 +274,8 @@ CRITICAL RULES:
 - "Charismatic" is not a data point. "Every story involves him drawing other people in — he talks about welcoming strangers, teaching friends, building things for his community" IS a data point.
 - Be HONEST about gaps. A thin profile with honest confidence scores is more useful than a fabricated rich one.
 
+Unsupported life-stage fields must be null, never a neutral 0.5. The entire life_stage may be null when evidence is absent.
+
 Return ONLY a JSON object with this structure:
 {
   "explorer": { "data_points": [...], "confidence": 0.0-1.0, "best_quote": "..." },
@@ -278,10 +289,10 @@ Return ONLY a JSON object with this structure:
   "conversation_fuel": [...],
   "all_quotes": [...],
   "life_stage": {
-    "rootedness": 0.0-1.0,
-    "life_pace": 0.0-1.0,
+    "rootedness": 0.0-1.0 or null,
+    "life_pace": 0.0-1.0 or null,
     "life_chapter": "launching" | "building" | "established" | "reinventing" | null,
-    "trajectory_momentum": 0.0-1.0,
+    "trajectory_momentum": 0.0-1.0 or null,
     "trajectory_directions": ["specific directions from their stories"],
     "confidence": 0.0-1.0
   }
@@ -298,6 +309,12 @@ Return ONLY a JSON object with this structure:
   }
 
   const parsed = JSON.parse(jsonMatch[0])
+  const allowedQuotes=new Set(stories.flatMap(story=>story.notable_quotes))
+  parsed.quote_checks=(parsed.all_quotes ?? []).map((text:string)=>({text,valid:allowedQuotes.has(text)}))
+  parsed.all_quotes=(parsed.all_quotes ?? []).filter((text:string)=>allowedQuotes.has(text))
+  for(const key of ['explorer','connector','builder','nurturer','wildcard']) {
+    if(parsed[key]?.best_quote && !allowedQuotes.has(parsed[key].best_quote))parsed[key].best_quote=null
+  }
   return {
     ...parsed,
     pass1_version: EXTRACTION_CONFIG.pass1.version,

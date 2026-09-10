@@ -1,5 +1,9 @@
-import Anthropic from '@anthropic-ai/sdk'
+import { capturedMessage } from './model-data/provider'
 import OpenAI from 'openai'
+import { captureCall,withModelContext } from './model-data/provider'
+import { captureStore } from './model-data/store'
+import { snapshotTranscript,captureAnalysis } from './model-data/sources'
+import { hash,bytesHash,CaptureError } from './model-data/core'
 import { createServerClient } from './supabase'
 import { getUserVoiceMemos, updateVoiceMemo, saveCompositeProfile, getSoftPreferences } from './db'
 import type {
@@ -11,7 +15,7 @@ import type {
   AttachmentProxy,
 } from './types'
 
-const anthropic = new Anthropic()
+
 
 // --- Transcription with retry + model fallback ---
 
@@ -36,7 +40,7 @@ export async function transcribeAudio(storagePath: string): Promise<string> {
   }
   const file = new File([audioData], `audio.${ext}`, { type: mime })
 
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, maxRetries: 0 })
 
   // Try primary model twice, then fallback model twice
   const models: Array<'gpt-4o-mini-transcribe' | 'whisper-1'> = ['gpt-4o-mini-transcribe', 'whisper-1']
@@ -45,7 +49,10 @@ export async function transcribeAudio(storagePath: string): Promise<string> {
   for (const model of models) {
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        const transcription = await openai.audio.transcriptions.create({ model, file })
+        const transcription = await captureCall('transcription','transcribe-v1','openai',model,{model,audioSha256:bytesHash(new Uint8Array(await file.arrayBuffer())),format:mime},async()=>{
+          const {data,request_id}=await openai.audio.transcriptions.create({model,file}).withResponse()
+          return {data,requestId:request_id,usage:(data as unknown as {usage?:unknown}).usage}
+        })
         const text = transcription.text?.trim()
 
         if (!text || text.length < 5) {
@@ -56,6 +63,7 @@ export async function transcribeAudio(storagePath: string): Promise<string> {
         console.log(`transcribeAudio: ${model} attempt ${attempt + 1} succeeded (${text.length} chars)`)
         return text
       } catch (err) {
+        if(err instanceof CaptureError)throw err
         lastError = err instanceof Error ? err : new Error(String(err))
         console.warn(`transcribeAudio: ${model} attempt ${attempt + 1} failed:`, lastError.message)
         if (attempt === 0) await new Promise(r => setTimeout(r, 1000))
@@ -72,7 +80,8 @@ export async function extractFromTranscript(
   transcript: string,
   promptCategory: string
 ): Promise<MemoExtraction> {
-  const message = await anthropic.messages.create({
+  if(await captureStore().enabled())throw new CaptureError('Legacy scalar analysis disabled; use processVoiceMemo')
+  const message = await capturedMessage('answer_analysis','capture-v1',{
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 2048,
     messages: [
@@ -164,7 +173,8 @@ export async function extractFromVouch(
   humor_endorsement: number
   overall_sentiment: string
 }> {
-  const message = await anthropic.messages.create({
+  if(await captureStore().enabled())throw new CaptureError('Vouch analysis requires a source-owner capture workflow')
+  const message = await capturedMessage('vouch_analysis','capture-v1',{
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 1024,
     messages: [
@@ -453,16 +463,25 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
   const { getVoiceMemo } = await import('./db')
   const memo = await getVoiceMemo(memoId)
   if (!memo) throw new Error(`Memo ${memoId} not found`)
+  if(memo.processing_status==='replaced')return
 
   try {
+  const capture = await captureStore().enabled()
+  const transcriptionOutputs: string[] = []
   // Step 1: Transcribe if needed
   let transcript = memo.transcript
   if (!transcript) {
     console.log(`Transcribing memo ${memoId}...`)
-    transcript = await transcribeAudio(memo.audio_storage_path)
-    await updateVoiceMemo(memoId, { transcript, processing_status: 'transcribed' as const })
-    console.log(`Transcribed memo ${memoId}: ${transcript.substring(0, 80)}...`)
+    transcript = await withModelContext({people:[memo.user_id],parents:memo.question_record_id?[memo.question_record_id]:[],outputs:transcriptionOutputs},()=>transcribeAudio(memo.audio_storage_path))
+    console.log(`Transcribed memo ${memoId}`)
   }
+
+  const transcriptRecordId = capture ? await snapshotTranscript(memo,transcript,transcriptionOutputs) : null
+  if(transcriptRecordId && !memo.transcript) {
+    const {error}=await createServerClient().rpc('model_data_set_transcript',{p_memo:memoId,p_person:memo.user_id,p_text:transcript,p_record:transcriptRecordId})
+    if(error)throw new CaptureError('Could not link captured transcription')
+  } else if(transcriptRecordId)await updateVoiceMemo(memoId,{transcript_record_id:transcriptRecordId})
+  else if(!memo.transcript)await updateVoiceMemo(memoId,{transcript,processing_status:'transcribed'})
 
   // Step 2: Track transcript quality metrics
   const wordCount = transcript.split(/\s+/).filter(Boolean).length
@@ -472,9 +491,9 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
   // Check transcript coherence before extraction
   const coherence = isTranscriptCoherent(transcript)
   if (!coherence.coherent) {
-    console.warn(`Memo ${memoId}: transcript incoherent (${coherence.reason}): "${transcript.substring(0, 100)}"`)
-    await updateVoiceMemo(memoId, {
-      processing_status: 'failed' as const,
+    console.warn(`Memo ${memoId}: transcript insufficient (${coherence.reason})`)
+    await createServerClient().from('voice_memos').update({
+      processing_status: 'failed',
       processing_error: `Transcript too ${coherence.reason === 'too_short' ? 'short' : 'repetitive'} for meaningful extraction. Try re-recording with a clearer answer.`,
     })
     return
@@ -497,28 +516,55 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
   console.log(`[v2] Pass 1: extracting story from memo ${memoId}...`)
   const { extractStory } = await import('./extraction-v2')
   const { QUESTION_BANK } = await import('./prompts')
-  const promptTextMap = new Map(QUESTION_BANK.map(q => [q.id, q.text]))
-  const promptText = promptTextMap.get(memo.prompt_id) || memo.prompt_id
+  const { FISHED_PROMPTS,NERD_OUT } = await import('./voice-prompt-map')
+  let promptText = [...QUESTION_BANK,...Object.values(FISHED_PROMPTS),NERD_OUT].find(p=>p.id===memo.prompt_id)?.text ?? memo.prompt_id
+  if(memo.question_record_id) {
+    const question=await captureStore().get(memo.question_record_id)
+    promptText=String((question.payload.displayed as {text:string}).text)
+  }
 
-  const storyExtraction = await extractStory(transcript, memo.prompt_id, promptText)
+  const analysisOutputs: string[]=[]
+  const storyExtraction = await withModelContext({people:[memo.user_id],parents:transcriptRecordId?[transcriptRecordId]:[],outputs:analysisOutputs},()=>extractStory(transcript,memo.prompt_id,promptText))
+  const analysisRecordId=transcriptRecordId?await captureAnalysis(memo.user_id,transcriptRecordId,transcript,storyExtraction as unknown as Record<string,unknown>,analysisOutputs):null
   // Store Pass 1 output in the extraction field (replaces old format)
-  await updateVoiceMemo(memoId, { extraction: storyExtraction as unknown as MemoExtraction })
+  if(analysisRecordId && transcriptRecordId) {
+    const {data:written,error:writeError}=await supabase.from('voice_memos').update({extraction:storyExtraction,analysis_record_id:analysisRecordId}).eq('id',memoId).eq('transcript_record_id',transcriptRecordId).neq('processing_status','replaced').select('id').maybeSingle()
+    if(writeError || !written)throw new CaptureError('Answer changed during analysis')
+  } else await updateVoiceMemo(memoId,{extraction:storyExtraction as unknown as MemoExtraction})
   console.log(`[v2] Pass 1 done for memo ${memoId}: depth=${storyExtraction.response_depth}, ${storyExtraction.notable_quotes.length} quotes`)
 
   // Step 4: Run v2 Pass 2 (personality profile) across ALL user's memos
   console.log(`[v2] Pass 2: building personality profile for user ${memo.user_id}...`)
   const allMemos = await getUserVoiceMemos(memo.user_id)
+  if(capture) {
+    for(const source of allMemos.filter(m=>m.processing_status!=='replaced' && m.transcript && m.extraction)) {
+      if(!source.transcript_record_id) {
+        source.transcript_record_id=await snapshotTranscript(source,source.transcript!)
+        await updateVoiceMemo(source.id,{transcript_record_id:source.transcript_record_id})
+      }
+      if(!source.analysis_record_id && source.transcript_record_id) {
+        source.analysis_record_id=await captureStore().append('legacy_analysis',`legacy-analysis:${source.transcript_record_id}:${hash(source.extraction)}`,{
+          completeCoding:source.extraction,provenance:'legacy_snapshot_no_teacher_call',reviewStatus:'unreviewed',
+        },[source.user_id],[source.transcript_record_id])
+        await updateVoiceMemo(source.id,{analysis_record_id:source.analysis_record_id})
+      }
+    }
+  }
   const allStories = allMemos
-    .filter(m => m.extraction && typeof m.extraction === 'object' && 'story_summary' in (m.extraction as unknown as Record<string, unknown>))
+    .filter(m => m.processing_status !== 'replaced' && m.extraction && typeof m.extraction === 'object' && 'story_summary' in (m.extraction as unknown as Record<string, unknown>))
     .map(m => m.extraction as unknown as import('./extraction-v2').StoryExtraction)
 
   if (allStories.length > 0) {
     const { buildPersonalityProfile } = await import('./extraction-v2')
-    const profile = await buildPersonalityProfile(allStories)
-    console.log(`[v2] Pass 2 done: primary=${profile.primary_energy?.slice(0, 60)}`)
+    const synthesisOutputs:string[]=[]
+    const synthesisParents=allMemos.filter(m=>m.processing_status!=='replaced').flatMap(m=>m.analysis_record_id?[m.analysis_record_id]:[])
+    const profile=await withModelContext({people:[memo.user_id],parents:synthesisParents,outputs:synthesisOutputs},()=>buildPersonalityProfile(allStories))
+    const synthesisRecordId=capture?await captureStore().append('synthesis',hash({parents:synthesisParents,outputs:synthesisOutputs,profile}),{completeProfile:profile,quoteChecks:(profile as unknown as {quote_checks?:unknown[]}).quote_checks??[],reviewStatus:'unreviewed',answerCount:allStories.length},[memo.user_id],[...synthesisParents,...synthesisOutputs]):null
+    console.log('[v2] Synthesis captured')
 
     // Save as composite profile (map v2 output to composite format)
     await saveCompositeProfile({
+      ...(synthesisRecordId?{synthesis_record_id:synthesisRecordId}:{}),
       user_id: memo.user_id,
       big_five_proxy: {},
       humor_style: profile.humor_signature || null,
@@ -550,7 +596,7 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
       primary_energy: profile.primary_energy,
       hidden_depth: profile.hidden_depth,
       // Life-stage signals (Rule 9)
-      life_stage: profile.life_stage ?? null,
+      life_stage: profile.life_stage && [profile.life_stage.rootedness,profile.life_stage.life_pace,profile.life_stage.trajectory_momentum].every(v=>typeof v==='number' && Number.isFinite(v)) ? profile.life_stage : null,
     } as unknown as Parameters<typeof saveCompositeProfile>[0])
     console.log(`[v2] Composite profile saved for user ${memo.user_id}`)
   } else {
@@ -559,14 +605,15 @@ export async function processVoiceMemo(memoId: string): Promise<void> {
     await aggregateCompositeProfile(memo.user_id)
   }
 
-  await updateVoiceMemo(memoId, { processing_status: 'extracted' as const, processing_error: null })
+  const finished=await supabase.from('voice_memos').update({processing_status:'extracted',processing_error:null}).eq('id',memoId).neq('processing_status','replaced')
+  if(finished.error)throw new CaptureError()
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err)
-    await updateVoiceMemo(memoId, {
-      processing_status: 'failed' as const,
+    const msg = 'Processing failed; retry is available. Details retained in private capture.'
+    await createServerClient().from('voice_memos').update({
+      processing_status: 'failed',
       processing_error: msg,
       retry_count: (memo.retry_count || 0) + 1,
-    }).catch(() => {}) // don't let status update failure mask the real error
+    }).eq('id',memoId).neq('processing_status','replaced').then(()=>{},()=>{}) // preserve replaced status
     throw err
   }
 }

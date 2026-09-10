@@ -1,7 +1,7 @@
 'use client'
 
 import { createBrowserClient } from '@/lib/supabase'
-import { clearSession, saveSession, getRefreshToken } from '@/lib/session'
+import { clearSession, saveSession, getRefreshToken, getAccessToken } from '@/lib/session'
 
 let isRefreshing = false
 let refreshPromise: Promise<boolean> | null = null
@@ -16,7 +16,7 @@ async function refreshSession(): Promise<boolean> {
       if (!refreshToken) return false
 
       const supabase = createBrowserClient()
-      const { data, error } = await supabase.auth.refreshSession()
+      const { data, error } = await supabase.auth.refreshSession({refresh_token:refreshToken})
       if (error || !data.session) return false
 
       saveSession({ accessToken: data.session.access_token, refreshToken: data.session.refresh_token })
@@ -38,12 +38,18 @@ function clearSessionAndRedirect() {
 }
 
 export async function apiFetch(url: string, options?: RequestInit): Promise<Response> {
-  const response = await fetch(url, options)
+  const authenticatedOptions = () => {
+    const headers = new Headers(options?.headers)
+    const token = getAccessToken()
+    if (token && url.startsWith('/api/')) headers.set('Authorization',`Bearer ${token}`)
+    return {...options,headers}
+  }
+  const response = await fetch(url, authenticatedOptions())
 
   if (response.status === 401) {
     const refreshed = await refreshSession()
     if (refreshed) {
-      return fetch(url, options)
+      return fetch(url, authenticatedOptions())
     } else {
       clearSessionAndRedirect()
       return response

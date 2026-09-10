@@ -1,3 +1,4 @@
+import { recordDelivery } from './model-data/pitches'
 import { createServerClient } from './supabase'
 import type {
   User, HardPreferences, SoftPreferences, Photo, VoiceMemo, CompositeProfile, Match,
@@ -543,6 +544,7 @@ export async function getPromptsByDay(dayNumber: number): Promise<{ id: string; 
 // ─── Daily Intros ───
 
 export interface DailyIntro {
+  pitch_revision_id?: string | null
   id: string
   user_id: string
   match_id: string
@@ -597,6 +599,7 @@ export interface UserCadence {
 }
 
 export async function saveDailyIntro(intro: Omit<DailyIntro, 'id' | 'created_at'>): Promise<DailyIntro> {
+  intro = await recordDelivery(intro)
   const { data, error } = await db()
     .from('daily_intros')
     .insert(intro)

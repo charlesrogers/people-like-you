@@ -21,6 +21,10 @@ export function getStoredUserId(): string | null {
   return safe(() => localStorage.getItem(PROFILE), null)
 }
 
+export function getAccessToken(): string | null {
+  return safe(() => localStorage.getItem(ACCESS), null)
+}
+
 export function getRefreshToken(): string | null {
   return safe(() => localStorage.getItem(REFRESH), null)
 }

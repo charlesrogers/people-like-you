@@ -108,6 +108,9 @@ export interface Photo {
 }
 
 export interface VoiceMemo {
+  question_record_id?: string | null
+  transcript_record_id?: string | null
+  analysis_record_id?: string | null
   id: string
   user_id: string
   prompt_id: string
@@ -192,6 +195,7 @@ export interface MemoExtraction {
 }
 
 export interface CompositeProfile {
+  synthesis_record_id?: string | null
   id: string
   user_id: string
   big_five_proxy: Record<string, number>

@@ -1,5 +1,7 @@
 'use client'
 
+import { apiFetch } from '@/lib/api-client'
+
 import { useState, useEffect } from 'react'
 import ProfileCompleteness from './ProfileCompleteness'
 import VoiceRecorder from './VoiceRecorder'
@@ -55,10 +57,12 @@ export default function ProfileTab({ userId, composite, memos, onMemoRecorded }:
     formData.append('audio', blob, `${promptId}.webm`)
     formData.append('userId', userId)
     formData.append('promptId', promptId)
+    formData.append('promptSnapshot', JSON.stringify({text:recordingPrompt?.text,helpText:recordingPrompt?.helpText,exampleAnswer:recordingPrompt?.exampleAnswer ?? null,client:'web-profile-v1'}))
     formData.append('dayNumber', '0')
     formData.append('durationSeconds', String(duration))
 
-    await fetch('/api/voice-memo', { method: 'POST', body: formData })
+    const res = await apiFetch('/api/voice-memo', { method: 'POST', body: formData })
+    if (!res.ok) throw new Error('Recording could not be saved. Please retry.')
     setRecordingPrompt(null)
     onMemoRecorded()
   }

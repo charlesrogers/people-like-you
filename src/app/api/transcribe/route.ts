@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server'
 import OpenAI from 'openai'
+import { captureStore } from '@/lib/model-data/store'
+import { captureCall,withModelContext } from '@/lib/model-data/provider'
+import { captureQuestion } from '@/lib/model-data/sources'
+import { bytesHash,textHash,hash } from '@/lib/model-data/core'
+import { createServerClient } from '@/lib/supabase'
 import { moderateText, screenAndLog } from '@/lib/moderation'
 
 export async function POST(req: NextRequest) {
-  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY })
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY,maxRetries:0 })
   const formData = await req.formData()
   const audio = formData.get('audio') as File | null
   const userId = (formData.get('userId') as string | null) || null
@@ -17,10 +22,27 @@ export async function POST(req: NextRequest) {
   }
 
   try {
-    const transcription = await openai.audio.transcriptions.create({
-      model: 'gpt-4o-mini-transcribe',
-      file: audio,
-    })
+    const store=captureStore();const capture=await store.enabled()
+    if(capture) {
+      const token=req.headers.get('authorization')?.replace(/^Bearer /,'')
+      const auth=token?await createServerClient().auth.getUser(token):null
+      if(!userId || auth?.data.user?.id!==userId)return NextResponse.json({error:'Authentication required'},{status:401})
+    }
+    let displayed:unknown=null
+    try {displayed=JSON.parse(String(formData.get('promptSnapshot')||'null'))}catch{}
+    const question=capture?await captureQuestion(userId!,String(formData.get('promptId')||'standalone_unspecified'),displayed):null
+    const outputs:string[]=[]
+    const audioSha256=bytesHash(new Uint8Array(await audio.arrayBuffer()))
+    const transcription=await withModelContext({people:userId?[userId]:[],parents:question?[question]:[],outputs},()=>captureCall('transcription','standalone-v1','openai','gpt-4o-mini-transcribe',{
+      model:'gpt-4o-mini-transcribe',audioSha256,format:audio.type,
+    },async()=>{
+      const {data,request_id}=await openai.audio.transcriptions.create({model:'gpt-4o-mini-transcribe',file:audio}).withResponse()
+      return {data,requestId:request_id,usage:(data as unknown as {usage?:unknown}).usage}
+    }))
+    if(capture)await store.append('transcript',hash({question,outputs,text:transcription.text}),{
+      text:transcription.text,textSha256:textHash(transcription.text),questionId:question,
+      provenance:'standalone_transcription_no_answer_row',personId:userId,
+    },[userId!],[...(question?[question]:[]),...outputs])
 
     // Content moderation (Apple 1.2): profile voice memos become member-visible narratives.
     const modResult = await moderateText(transcription.text)

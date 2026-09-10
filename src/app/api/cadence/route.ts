@@ -1,3 +1,4 @@
+import { CaptureError } from '@/lib/model-data/core'
 import { NextRequest, NextResponse } from 'next/server'
 import {
   getUserCadence,
@@ -90,14 +91,17 @@ export async function POST(req: NextRequest) {
       const { candidate, score, lifeStageScore } = result
       const candidateComposite = await getCompositeProfile(candidate.id)
 
+      let pitchRevisionId: string | null = null
       let narrative = "There's someone here you should meet. Trust us on this one."
       let hookType: 'quote' | 'contradiction' | 'scene' | null = null
       if (userComposite && candidateComposite) {
         try {
           const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
+        pitchRevisionId = trailer.pitchRevisionId ?? null
           narrative = trailer.narrative
           hookType = trailer.hookType
         } catch (err) {
+          if(err instanceof CaptureError)throw err
           console.error('Resume: Failed to generate trailer', err)
         }
       }
@@ -122,6 +126,7 @@ export async function POST(req: NextRequest) {
         match_id: match.id,
         matched_user_id: candidate.id,
         narrative,
+        pitch_revision_id: pitchRevisionId,
         status: 'pending',
         intro_type: i === 0 ? 'daily' : 'bonus',
         scheduled_at: now.toISOString(),

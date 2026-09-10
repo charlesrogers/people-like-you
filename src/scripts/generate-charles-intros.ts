@@ -5,10 +5,10 @@
 
 import fs from 'fs'
 import path from 'path'
-import Anthropic from '@anthropic-ai/sdk'
+import { capturedMessage } from '../lib/model-data/provider'
 import { getUser, getCompositeProfile } from '../lib/db'
 
-const anthropic = new Anthropic()
+
 const CHARLES_ID = 'f4de7e33-17d0-4be2-be97-bb4fb76bf8e9'
 
 const hookTypes = [
@@ -76,7 +76,7 @@ RAW VOICE MEMO TRANSCRIPTS (use these as primary source):
 
   for (const hook of hookTypes) {
     console.log(`  Generating: ${hook.name}...`)
-    const msg = await anthropic.messages.create({
+    const msg = await capturedMessage('pitch_generation','legacy-demo-capture-v1',{
       model: 'claude-sonnet-4-6',
       max_tokens: 1024,
       messages: [{

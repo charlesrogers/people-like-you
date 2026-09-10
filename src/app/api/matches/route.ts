@@ -1,4 +1,6 @@
+import { captureActorAllowed } from '@/lib/model-data/auth'
 import { NextRequest, NextResponse } from 'next/server'
+import { recordExposure,recordDelivery } from '@/lib/model-data/pitches'
 import { signPhotoUrl } from '@/lib/photos'
 import {
   getUser,
@@ -21,6 +23,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
     }
 
+    if(!await captureActorAllowed(req.headers,userId))return NextResponse.json({error:'Authentication required'},{status:401})
     const user = await getUser(userId)
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
@@ -49,6 +52,14 @@ export async function GET(req: NextRequest) {
         await updateDailyIntro(intro.id, { status: 'expired' })
         return null
       }
+      if(!intro.pitch_revision_id) {
+        const captured=await recordDelivery(intro)
+        if(captured.pitch_revision_id) {
+          await updateDailyIntro(intro.id,{pitch_revision_id:captured.pitch_revision_id})
+          intro.pitch_revision_id=captured.pitch_revision_id
+        }
+      }
+      await recordExposure(intro,'matches_api')
       const photos = await getUserPhotos(intro.matched_user_id)
 
       // Compute proximity
@@ -67,6 +78,7 @@ export async function GET(req: NextRequest) {
 
       return {
         id: intro.id,
+        pitchRevisionId: intro.pitch_revision_id,
         matchId: intro.match_id,
         matchedUserId: intro.matched_user_id,
         name: matchedUser.first_name || 'Someone',
