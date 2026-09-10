@@ -16,6 +16,9 @@ export async function fixture() {
  const migration=await readFile('migrations/025_model_data_capture.sql','utf8')
  await db.exec(migration)
  await db.exec(migration) // deploy retry must be safe
+ const erasure=await readFile('migrations/026_model_data_source_erasure.sql','utf8')
+ await db.exec(erasure)
+ await db.exec(erasure)
  const store:CaptureStore={
   enabled:async()=>true,
   async append(kind,key,payload,people,parents) {

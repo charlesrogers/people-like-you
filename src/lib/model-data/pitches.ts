@@ -29,7 +29,10 @@ export async function beginPitch(reader:User,subject:User,readerProfile:Composit
  }
  for(const p of [readerProfile,subjectProfile]) {
   const id=(p as CompositeProfile & {synthesis_record_id?:string}).synthesis_record_id
-  if(id)parents.push(id)
+  if(id) {
+   if(await store.isStale(id))throw new CaptureError('Profile evidence changed; reprocess answers before pitching')
+   parents.push(id)
+  }
  }
  const packetId=await store.append('pitch_packet',`packet:${randomUUID()}`,{
   subjectId:subject.id,readerId:reader.id,
