@@ -13,3 +13,5 @@ Approved by Charles on September 9, 2026; implemented September 10.
 - Sequence: staging engineering checks → production website for Charles and his wife → corrections → native TestFlight for friends. Native implementation in the separate local Xcode project is prepared and simulator-build verified, not distributed yet.
 
 Verification: 153 unit/integration tests including actual WAV/MP4/WebM decoding and forged duration; production Next build; isolated real-browser recorder test with generated microphone audio at phone viewport; native simulator build. Browser harness is outside the repo and never deployed. Full real-member onboarding and real-iPhone microphone testing remain the human walkthrough.
+
+Release verification: `35ae0ca` is live at https://people-like-you.com/onboarding. Staging CI 34444106005 and production CI 34519017208 passed. Both deployed servers reject a one-second clip claiming 90 seconds with 422 and actual duration 1; production JS contains the four-saved and 20-second-progress UI. Production health checks database/auth/storage OK. Native remains local and simulator-build verified, awaiting the website walkthrough before TestFlight.
