@@ -17,7 +17,7 @@ type RecorderState = 'idle' | 'starting' | 'recording' | 'finishing' | 'review' 
 const formatTime = (s: number) => `${Math.floor(s / 60)}:${Math.floor(s % 60).toString().padStart(2, '0')}`
 
 export default function VoiceRecorder({
-  promptText, promptId, helpText, exampleAnswer, onRecordingComplete, onSkip, maxSeconds = 90,
+  promptText, promptId, helpText, exampleAnswer, onRecordingComplete, onSkip, maxSeconds,
 }: VoiceRecorderProps) {
   const [state, setState] = useState<RecorderState>('idle')
   const [seconds, setSeconds] = useState(0)
@@ -144,7 +144,7 @@ export default function VoiceRecorder({
         const elapsed = Math.max(0, context.currentTime - startedAtRef.current)
         durationRef.current = elapsed
         setSeconds(elapsed)
-        if (elapsed >= maxSeconds) stopRecording()
+        if (maxSeconds !== undefined && elapsed >= maxSeconds) stopRecording()
       }, 100)
     } catch (err) {
       if (attempt !== attemptRef.current) return
@@ -184,7 +184,7 @@ export default function VoiceRecorder({
     <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-sm" data-prompt-id={promptId}>
       <p className="text-[19px] font-semibold leading-snug text-stone-900">{promptText}</p>
       {helpText && <p className="mt-2 text-sm text-stone-500">{helpText}</p>}
-      <p className="mt-3 text-sm font-medium text-stone-700">Record at least 20 seconds.</p>
+      <p className="mt-3 text-sm font-medium text-stone-700">At least 20 seconds. Take your time—tap Stop when you’re finished.</p>
       {exampleAnswer && state === 'idle' && <p className="mt-2 text-xs italic text-stone-400">e.g. &ldquo;{exampleAnswer}&rdquo;</p>}
       {error && <p role="alert" className="mt-3 text-sm text-red-600">{error}</p>}
 

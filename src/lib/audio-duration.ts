@@ -9,7 +9,7 @@ const SAMPLE_RATE = 8000
 const BYTES_PER_SAMPLE = 2
 
 /** Decode actual audio samples: client fields and container duration tags are not authoritative.
- * Limit decoding to five minutes to bound resources; this does not auto-stop the recorder.
+ * Decode the full recording. Input size, execution time and output buffer bound resources.
  */
 export async function measureAudioDuration(audio: File): Promise<number> {
   const dir = await mkdtemp(join(tmpdir(), 'ply-audio-'))
@@ -18,9 +18,9 @@ export async function measureAudioDuration(audio: File): Promise<number> {
     await writeFile(path, Buffer.from(await audio.arrayBuffer()))
     const { stdout } = await execFileAsync('ffmpeg', [
       '-v', 'error', '-nostdin', '-protocol_whitelist', 'file,pipe',
-      '-i', path, '-map', '0:a:0', '-vn', '-sn', '-t', '300',
+      '-i', path, '-map', '0:a:0', '-vn', '-sn',
       '-ac', '1', '-ar', String(SAMPLE_RATE), '-f', 's16le', 'pipe:1',
-    ], { encoding: 'buffer', timeout: 30_000, maxBuffer: 5 * 1024 * 1024 })
+    ], { encoding: 'buffer', timeout: 30_000, maxBuffer: 64 * 1024 * 1024 })
     const seconds = stdout.length / (SAMPLE_RATE * BYTES_PER_SAMPLE)
     if (!Number.isFinite(seconds) || seconds <= 0) throw new Error('No decodable audio')
     return seconds

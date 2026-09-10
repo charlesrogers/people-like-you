@@ -289,7 +289,7 @@ export const FRAMING = {
 /** The nerd-out, moved out of the quiz into the voice step (battery §2b). */
 export const NERD_OUT_PROMPT = {
   id: 'nerd_out',
-  text: 'What do you nerd out on?',
+  text: 'What do you nerd out on? How far has it gone?',
   help: 'The small stuff is the good stuff — the more specific, the better.',
 } as const
 
