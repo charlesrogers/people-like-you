@@ -4,7 +4,7 @@ import { captureStore } from '@/lib/model-data/store'
 import { captureCall,withModelContext } from '@/lib/model-data/provider'
 import { captureQuestion } from '@/lib/model-data/sources'
 import { bytesHash,textHash,hash } from '@/lib/model-data/core'
-import { createServerClient } from '@/lib/supabase'
+import { authenticatedProfileOwner } from '@/lib/model-data/auth'
 import { moderateText, screenAndLog } from '@/lib/moderation'
 
 export async function POST(req: NextRequest) {
@@ -24,9 +24,7 @@ export async function POST(req: NextRequest) {
   try {
     const store=captureStore();const capture=await store.enabled()
     if(capture) {
-      const token=req.headers.get('authorization')?.replace(/^Bearer /,'')
-      const auth=token?await createServerClient().auth.getUser(token):null
-      if(!userId || auth?.data.user?.id!==userId)return NextResponse.json({error:'Authentication required'},{status:401})
+      if(!userId || !await authenticatedProfileOwner(req.headers,userId))return NextResponse.json({error:'Authentication required'},{status:401})
     }
     let displayed:unknown=null
     try {displayed=JSON.parse(String(formData.get('promptSnapshot')||'null'))}catch{}
