@@ -4,6 +4,7 @@ import { savePhoto } from '@/lib/db'
 import { signPhotoUrl } from '@/lib/photos'
 import { moderateImageDataUrl, screenAndLog } from '@/lib/moderation'
 import { captureActorAllowed } from '@/lib/model-data/auth'
+import { convertHeicToJpeg, isHeicPhoto } from '@/lib/heic-photo'
 
 export async function POST(req: NextRequest) {
   try {
@@ -19,15 +20,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Please sign in again before uploading your photo. Your recordings are saved.' }, { status: 401 })
     }
 
-    if (photo.size > 10 * 1024 * 1024) {
+    if (photo.size > 25 * 1024 * 1024) {
       console.warn('Photo upload rejected', { reason: 'size', bytes: photo.size })
-      return NextResponse.json({ error: 'This photo is larger than 10 MB. Choose a smaller image or add photos later.' }, { status: 413 })
+      return NextResponse.json({ error: 'This photo is larger than 25 MB. Choose a smaller image or add photos later.' }, { status: 413 })
     }
 
     // Content moderation (Apple 1.2 filter pillar): screen the image BEFORE it is stored
     // or ever shown to another member. Rejected content never reaches the bucket.
-    const buf = Buffer.from(await photo.arrayBuffer())
-    const dataUrl = `data:${photo.type || 'image/jpeg'};base64,${buf.toString('base64')}`
+    let buf: Buffer = Buffer.from(await photo.arrayBuffer())
+    const heic = isHeicPhoto(photo, buf)
+    if (heic) {
+      try { buf = await convertHeicToJpeg(buf) }
+      catch (error) { return NextResponse.json({error:error instanceof Error ? error.message : 'Could not convert this photo.'},{status:422}) }
+    }
+    const contentType = heic ? 'image/jpeg' : photo.type || 'image/jpeg'
+    const dataUrl = `data:${contentType};base64,${buf.toString('base64')}`
     const mod = await screenAndLog(userId, 'photo', `${userId}/${sortOrder}`, await moderateImageDataUrl(dataUrl))
     if (mod.rejected) {
       return NextResponse.json(
@@ -39,11 +46,11 @@ export async function POST(req: NextRequest) {
     const supabase = createServerClient()
 
     // Upload to Supabase Storage
-    const ext = photo.name.split('.').pop() || 'jpg'
+    const ext = heic ? 'jpg' : photo.name.split('.').pop() || 'jpg'
     const fileName = `${userId}/${sortOrder}_${Date.now()}.${ext}`
     const { error: uploadError } = await supabase.storage
       .from('photos')
-      .upload(fileName, photo, { contentType: photo.type })
+      .upload(fileName, buf, { contentType })
 
     if (uploadError) {
       console.error('Photo storage upload failed', { message: uploadError.message })
