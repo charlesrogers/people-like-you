@@ -677,3 +677,7 @@ Rules derived from mistakes in this project. Claude MUST review this file at the
 **Why it's wrong:** the house rule is to run the build before pushing, and I did run it — I just did not read the answer. A gate whose failure mode is a silent `0` in a wall of output is not a gate. Worse, I had spent the previous turn removing a JSX block and should have treated any structural edit to a 1,300-line component as build-critical.
 **Rule:** never pipe the pre-push build through `grep -c` or any counter. Run `npx next build` and read the tail, or assert explicitly — `npx next build 2>&1 | tail -5` and require the literal string, failing loudly (`|| exit 1`) when it is absent. Never put the build check and the push in the same compound command where an early non-zero exit can be swallowed.
 **Category:** mistake
+
+
+### 2026-09-10 — Four 20-second recordings; personalized follow-ups are v2
+Charles explicitly scoped v1 to four main recordings of at least 20 seconds, with the requirement and progress visible. Do not add AI content-completeness gating or a personalized second round to this release. Apply the same contract on web and native. Never count timer ticks or client duration metadata as authoritative media length; cancel/unmount must invalidate recording callbacks before stopping. Verify upload retry retains the recording. Website walkthrough with Charles and his wife comes before TestFlight for friends.

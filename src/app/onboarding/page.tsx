@@ -8,9 +8,10 @@ import VoiceRecorder from '@/components/VoiceRecorder'
 import PhotoUploader from '@/components/PhotoUploader'
 import PromptPicker from '@/components/PromptPicker'
 import ProfileCompletion from '@/components/ProfileCompletion'
-import { getNextAngle, getProfileCompletion, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
+import { getNextAngle, getTargetedPrompts, type PromptDef } from '@/lib/prompts'
 import QuizStep, { type QuizResult } from '@/components/QuizStep'
-import { personalisedPrompts, type SelectedPrompt } from '@/lib/voice-prompt-map'
+import { personalisedPrompts, FISHED_PROMPTS, NERD_OUT, type SelectedPrompt } from '@/lib/voice-prompt-map'
+import { isQualifyingRecording, meetsRecordingMinimum, REQUIRED_ONBOARDING_RECORDINGS } from '@/lib/recording-requirements'
 import { canonicalIndex } from '@/lib/quiz-scoring'
 import { FRAMING as QUIZ_FRAMING } from '@/lib/quiz-battery'
 import { getStoredUserId, saveSession, signOut } from '@/lib/session'
@@ -96,7 +97,6 @@ function OnboardingContent() {
   const [recordings, setRecordings] = useState<Map<string, { memoId: string; duration: number }>>(new Map())
   const [activePrompt, setActivePrompt] = useState<PromptDef | null>(null)
   const [passedPromptIds, setPassedPromptIds] = useState<string[]>([])
-  const [voiceSkipped, setVoiceSkipped] = useState(false)
   // True when we picked the session up from localStorage rather than a signup
   // in this tab — i.e. someone came back, or is testing on a shared browser.
   const [resumedSession, setResumedSession] = useState(false)
@@ -162,8 +162,8 @@ function OnboardingContent() {
       .then(r => r.json())
       .then(data => {
         if (cancelled) return
-        const rows: { id: string; prompt_id: string; duration_seconds: number }[] = data.memos ?? []
-        setRecordings(new Map(rows.map(m => [m.prompt_id, { memoId: m.id, duration: m.duration_seconds }])))
+        const rows: { id: string; prompt_id: string; duration_seconds: number; processing_status?: string }[] = data.memos ?? []
+        setRecordings(new Map(rows.filter(isQualifyingRecording).map(m => [m.prompt_id, { memoId: m.id, duration: m.duration_seconds }])))
       })
       .catch(() => {})
     return () => { cancelled = true }
@@ -188,6 +188,7 @@ function OnboardingContent() {
 
   const handleRecordingComplete = async (prompt: PromptDef, blob: Blob, duration: number) => {
     if (!userId) throw new Error('Session expired. Please refresh and try again.')
+    if (!meetsRecordingMinimum(duration)) throw new Error('Record at least 20 seconds before saving.')
 
     const promptId = prompt.id
     // Bank prompts carry no seed; fished ones do (D-QD7 per-item story yield).
@@ -208,7 +209,7 @@ function OnboardingContent() {
 
     setRecordings(prev => {
       const next = new Map(prev)
-      next.set(promptId, { memoId: data.id, duration })
+      next.set(promptId, { memoId: data.id, duration: data.duration_seconds ?? duration })
       return next
     })
   }
@@ -240,14 +241,12 @@ function OnboardingContent() {
       ? otpCode.length === 6
       : signupPhone.replace(/\D/g, '').length >= 10)
   const canProceedBasics = firstName && gender && birthYear && zipcode
-  // The voice step is skippable by design — but the profile stays incomplete
-  // until every angle has a story behind it (see getProfileCompletion).
-  const VOICE_MINIMUM = 3
-  const canProceedVoice = recordings.size >= VOICE_MINIMUM || voiceSkipped
-  const voiceCompletion = getProfileCompletion(answeredPromptIds, fishedPrompts)
-  // Each round asks about a different bucket, so three recordings land in three
-  // angles rather than three in one.
-  const roundAngle = getNextAngle(answeredPromptIds, fishedPrompts)
+  // V1: four saved recordings, each >=20 seconds. Follow-ups are deferred to v2.
+  const VOICE_MINIMUM = REQUIRED_ONBOARDING_RECORDINGS
+  const canProceedVoice = recordings.size >= VOICE_MINIMUM
+  // Static metadata also resolves previously recorded fished IDs after a reload.
+  const knownVoicePrompts = [...Object.values(FISHED_PROMPTS), NERD_OUT]
+  const roundAngle = getNextAngle(answeredPromptIds, knownVoicePrompts)
   const canProceedPrefs = faithImportance && kids
   const canProceedPhotos = photoFiles.length >= 1
 
@@ -715,9 +714,9 @@ function OnboardingContent() {
               {cameFromQuiz ? QUIZ_FRAMING.close : 'Tell us about yourself'}
             </h1>
             <p className="mt-2 text-sm text-stone-500">
-              {roundAngle
-                ? 'Pick one to answer out loud \u2014 just talk like you\u2019re telling a friend.'
-                : 'Every angle is covered. Add more whenever you like.'}
+              {canProceedVoice
+                ? 'Your four stories are saved. You’re ready for the next step.'
+                : 'Pick four stories to tell us. Record at least 20 seconds for each—just talk like you’re telling a friend.'}
             </p>
 
             {!activePrompt && (
@@ -766,7 +765,7 @@ function OnboardingContent() {
                     }}
                   />
                 </div>
-              ) : (
+              ) : !canProceedVoice ? (
                 <PromptPicker
                   answeredPromptIds={answeredPromptIds}
                   passedIds={passedPromptIds}
@@ -777,26 +776,12 @@ function OnboardingContent() {
                     setPassedPromptIds(prev => [...prev, ...shownIds.filter(id => !prev.includes(id))])
                   }
                 />
-              )}
+              ) : null}
             </div>
-
-            {!activePrompt && !canProceedVoice && (
-              <div className="mt-6">
-                <button
-                  type="button"
-                  onClick={() => setVoiceSkipped(true)}
-                  className="mx-auto block text-[13px] text-stone-400 underline underline-offset-4 transition hover:text-stone-600"
-                >
-                  skip for now
-                </button>
-              </div>
-            )}
 
             {!activePrompt && recordings.size > 0 && (
               <p className="mt-4 text-center text-xs text-stone-400">
-                {voiceCompletion.isComplete
-                  ? 'Every angle covered. Keep going if you want to.'
-                  : 'Each one gives us a different angle to introduce you from.'}
+                {canProceedVoice ? 'Four stories, saved ✓' : 'Each story shows a different side of you.'}
               </p>
             )}
           </div>
