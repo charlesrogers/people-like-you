@@ -72,6 +72,13 @@ describe('immutable capture using the actual SQL migration',()=>{
   const audit=JSON.stringify((await f.db.query('SELECT * FROM model_data_erasure_events')).rows)
   expect(audit).not.toContain(third)
  })
+ it('removes cached synthesis on erasure so deleted evidence cannot be pitched again',async()=>{
+  const source=await append('transcript',{})
+  const synthesis=await append('synthesis',{},[source])
+  await f.db.query('INSERT INTO composite_profiles(user_id,synthesis_record_id) VALUES($1,$2) ON CONFLICT(user_id) DO UPDATE SET synthesis_record_id=EXCLUDED.synthesis_record_id',[SUBJECT,synthesis])
+  await f.db.query("SELECT model_data_purge($1,'fixture_erasure')",[[source]])
+  expect((await f.db.query('SELECT * FROM composite_profiles WHERE user_id=$1',[SUBJECT])).rows).toHaveLength(0)
+ })
  it('reports capture counts separately from dataset readiness',async()=>{
   const {rows}=await f.db.query<{status:{approvedExamples:number,trainingEligible:number,datasetReadiness:string}}>('SELECT model_data_status() status')
   expect(rows[0].status.approvedExamples).toBe(0)

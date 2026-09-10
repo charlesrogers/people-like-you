@@ -28,13 +28,13 @@ All captured records are service-role-only (RLS and revoked anon/authenticated p
 
 `training_eligible` is constrained to false in the database. Permissions, teacher-output training clearance, human factual/disclosure review and partition assignment remain unresolved by design. No export or training code is shipped. Later opt-in alone does not automatically make these captures a clean training dataset. In particular, later partition assignment must exclude or regenerate cross-partition reader/subject packets. Existing sources remain labeled when capture began after their original analysis.
 
-Transcript change/replacement invalidates downstream analysis, synthesis, packets, drafts and revisions recursively. A stale revision cannot be newly delivered. Account deletion removes records involving that person as reader or subject and their descendants, including linked introductions. Answer deletion purges its descendants. Service-role `model_data_purge_person(person_id, 'revocation')` supports erasure; it does not implement a consent-management UI. Erasure audit keeps only reason, time and count, not identifying tombstones.
+Transcript change/replacement invalidates downstream analysis, synthesis, packets, drafts and revisions recursively. A stale revision cannot be newly delivered. Account deletion removes records involving that person as reader or subject and their descendants, including linked introductions. Answer deletion purges its descendants and cached synthesis, including legacy profiles without a synthesis pointer. Stale profiles cannot seed a new pitch. Service-role `model_data_purge_person(person_id, 'revocation')` supports erasure; it does not implement a consent-management UI. Erasure audit keeps only reason, time and count, not identifying tombstones.
 
 The existing product intake stays four recordings of at least 20 seconds. This is not the proposed six-answer / 150-person / 1,500-approved-example beta. There are no approved examples merely because capture works.
 
 ## Rollout and verification
 
-Migration: `025_model_data_capture.sql`. Additive schema; capture starts OFF. Staging and production share the database. Dry-run in a rollback transaction with `ON_ERROR_STOP=1` before deployment. Do not enable the shared switch while an old production container is serving: its unrecorded writes would be rejected by the delivery guard.
+Migrations: `025_model_data_capture.sql`, `026_model_data_source_erasure.sql`. Additive schema; capture starts OFF. Staging and production share the database. Dry-run in a rollback transaction with `ON_ERROR_STOP=1` before deployment. Do not enable the shared switch while an old production container is serving: its unrecorded writes would be rejected by the delivery guard.
 
 1. Run `npm run verify:model-data`, `npm test`, `npx tsc --noEmit`, `npm run lint`, `npm run build`. Verification uses embedded PostgreSQL and fixture-only provider stubs; no real participants or paid calls.
 2. Deploy the capture commit to staging, verify `/api/onboarding-prompts` includes `captureContractVersion: capture-v1`, and unauthorized `/api/admin/model-data/status` returns 401. Verify migration objects and RLS in the shared database.
@@ -49,6 +49,8 @@ Validation at authoring: fixture suite passes; full test suite passes; productio
 Five surgical edits in the separate existing native checkout preserve unrelated work: `Services/VoiceService.swift`, `Views/Onboarding/VoiceRecordingView.swift`, `Views/Profile/VoicePromptView.swift`, `Models/Match.swift`, `Views/Discovery/DashboardView.swift`. Question snapshots and exact feedback revisions are included in the next build. Simulator build is verified; this is not a TestFlight upload. Existing app versions still produce labeled legacy question provenance/unlinked feedback.
 
 ## Changed web files
+
+- `migrations/026_model_data_source_erasure.sql`
 
 - `migrations/025_model_data_capture.sql`
 - `package-lock.json`
