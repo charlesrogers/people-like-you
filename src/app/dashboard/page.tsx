@@ -27,6 +27,7 @@ interface Intro {
   matchId: string
   matchedUserId: string
   name: string
+  pitchRevisionId?: string | null
   narrative: string
   photoUrl: string | null
   status: string
@@ -267,7 +268,7 @@ export default function Dashboard() {
       const res = await apiFetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ introId, matchId, matchedUserId: resolvedMatchedUserId, userId, action: 'interested' }),
+        body: JSON.stringify({ introId, matchId, pitchRevisionId:(currentIntro?.id===introId?currentIntro:bonusIntro)?.pitchRevisionId, eventId:crypto.randomUUID(), matchedUserId: resolvedMatchedUserId, userId, action: 'interested' }),
       })
       const data = await res.json()
 
@@ -347,6 +348,8 @@ export default function Dashboard() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           introId: feedbackIntroId,
+          pitchRevisionId:(currentIntro?.id===feedbackIntroId?currentIntro:bonusIntro)?.pitchRevisionId,
+          eventId:crypto.randomUUID(),
           matchId: feedbackMatchId,
           matchedUserId: feedbackMatchedUserId,
           userId,
@@ -656,6 +659,7 @@ export default function Dashboard() {
           if (activeIntro) {
             dailyCards.push({
               id: activeIntro.id,
+              pitchRevisionId:activeIntro.pitchRevisionId,
               matchId: activeIntro.matchId,
               matchedUserId: activeIntro.matchedUserId,
               name: activeIntro.name,
@@ -671,6 +675,7 @@ export default function Dashboard() {
           if (activeBonus) {
             dailyCards.push({
               id: activeBonus.id,
+              pitchRevisionId:activeBonus.pitchRevisionId,
               matchId: activeBonus.matchId,
               matchedUserId: activeBonus.matchedUserId,
               name: activeBonus.name,
@@ -715,6 +720,8 @@ export default function Dashboard() {
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
                     introId: card.id,
+                    pitchRevisionId:card.pitchRevisionId,
+                    eventId:crypto.randomUUID(),
                     matchId: card.matchId,
                     userId,
                     action: 'not_interested',
@@ -821,10 +828,11 @@ export default function Dashboard() {
 
         {/* Voice-to-Unlock Loop (State 3: pool exhausted) */}
         {showVoiceLoop && userId && (
-          <VoicePromptLoop userId={userId} onIntroUnlocked={(intro: { id: string; matchId: string; matchedUserId: string; name: string; narrative: string; photoUrl: string | null }) => {
+          <VoicePromptLoop userId={userId} onIntroUnlocked={(intro: { id: string; pitchRevisionId?: string | null; matchId: string; matchedUserId: string; name: string; narrative: string; photoUrl: string | null }) => {
             // Add the unlocked intro as a new card
             setCurrentIntro({
               id: intro.id,
+              pitchRevisionId:intro.pitchRevisionId,
               matchId: intro.matchId,
               matchedUserId: intro.matchedUserId,
               name: intro.name,

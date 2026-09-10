@@ -1,5 +1,7 @@
 'use client'
 
+import { apiFetch } from '@/lib/api-client'
+
 import { useState, useEffect, useCallback } from 'react'
 import VoiceRecorder from './VoiceRecorder'
 
@@ -14,6 +16,7 @@ interface UnlockedIntro {
   matchId: string
   matchedUserId: string
   name: string
+  pitchRevisionId?: string | null
   narrative: string
   photoUrl: string | null
 }
@@ -78,10 +81,11 @@ export default function VoicePromptLoop({ userId, onIntroUnlocked, onDone }: Pro
     formData.append('audio', blob, `recording.${ext}`)
     formData.append('userId', userId)
     formData.append('promptId', currentPrompt.id)
+    formData.append('promptSnapshot', JSON.stringify({text:currentPrompt.text,helpText:null,exampleAnswer:null,client:'web-voice-loop-v1'}))
     formData.append('dayNumber', '0')
     formData.append('durationSeconds', String(Math.round(durationSeconds)))
 
-    const res = await fetch('/api/voice-memo', { method: 'POST', body: formData })
+    const res = await apiFetch('/api/voice-memo', { method: 'POST', body: formData })
     if (!res.ok) {
       const data = await res.json().catch(() => ({}))
       throw new Error(data.error || 'Failed to save recording')

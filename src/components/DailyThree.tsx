@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { emitPitchEvent,usePitchViews } from '@/lib/pitch-events'
 import RadarChart, { getDimensionInsight, type DimensionScores } from './RadarChart'
 import { computePersonalityReveal } from '@/lib/personality-reveal'
 import type { CompositeProfile } from '@/lib/types'
@@ -10,6 +11,7 @@ export interface IntroCard {
   matchId: string
   matchedUserId: string
   name: string
+  pitchRevisionId?: string | null
   narrative: string
   photoUrl: string | null
   tier: string
@@ -59,6 +61,7 @@ export default function DailyThree({
   onStartDisclosure,
   onStartVoiceLoop,
 }: DailyThreeProps) {
+  usePitchViews(cards)
   const [firedCard, setFiredCard] = useState<IntroCard | null>(null)
   const [cardStates, setCardStates] = useState<Record<string, CardState>>({})
   const [passedIds, setPassedIds] = useState<Set<string>>(new Set())
@@ -96,12 +99,14 @@ export default function DailyThree({
 
   const handleFire = (card: IntroCard) => {
     if (firesAvailable <= 0) return
+    emitPitchEvent(card.id,card.pitchRevisionId,'photo_revealed')
     setFiredCard(card)
     setCardState(card.id, 'photo_revealed')
     onFire(card)
   }
 
   const handleSave = (card: IntroCard) => {
+    emitPitchEvent(card.id,card.pitchRevisionId,'saved')
     setSavedIds(prev => new Set(prev).add(card.id))
     if (expandedId === card.id) setExpandedId(null)
     onSave(card)
@@ -391,7 +396,7 @@ export default function DailyThree({
 
     if (!isExpanded) {
       return (
-        <div key={card.id} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition-shadow">
+        <div key={card.id} data-intro-id={card.id} data-pitch-revision={card.pitchRevisionId??undefined} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden hover:shadow-md transition-shadow">
           <button
             onClick={() => setExpandedId(expandedId === card.id ? null : card.id)}
             className="w-full px-5 py-4 text-left flex items-center justify-between"
@@ -420,7 +425,7 @@ export default function DailyThree({
 
     // Expanded browsing card
     return (
-      <div key={card.id} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+      <div key={card.id} data-intro-id={card.id} data-pitch-revision={card.pitchRevisionId??undefined} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-2">
             <p className="text-[10px] font-medium uppercase tracking-wider text-stone-400">Someone we think you should meet</p>
@@ -494,7 +499,7 @@ export default function DailyThree({
     const insight = userDims && matchDims ? getDimensionInsight(userDims, matchDims) : null
 
     return (
-      <div key={card.id} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+      <div key={card.id} data-intro-id={card.id} data-pitch-revision={card.pitchRevisionId??undefined} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
         <div className="px-5 pt-5 pb-2">
           <p className="text-[10px] font-medium uppercase tracking-wider text-stone-400">Here&rsquo;s why we think you&rsquo;d click</p>
         </div>
@@ -570,7 +575,7 @@ export default function DailyThree({
           <p className="text-[11px] text-stone-400 mt-0.5">Come back when you have reveals</p>
         </div>
         {savedCards.map(card => (
-          <div key={card.id} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
+          <div key={card.id} data-intro-id={card.id} data-pitch-revision={card.pitchRevisionId??undefined} className="rounded-xl border border-stone-200 bg-white shadow-sm overflow-hidden">
             <div className="px-5 py-4">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-[10px] font-medium uppercase tracking-wider text-primary/70">Saved</span>

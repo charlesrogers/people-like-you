@@ -1,3 +1,4 @@
+import { captureStore } from './model-data/store'
 import Anthropic from '@anthropic-ai/sdk'
 import type { CompositeProfile, User, NarrativeStrategy, NarrativeDraft, HardPreferences } from './types'
 import { selectStrategy } from './narrative-strategy'
@@ -16,6 +17,8 @@ export async function generateMatchAngle(
 ): Promise<{
   narrativeForA: string
   narrativeForB: string
+  pitchRevisionForA?: string | null
+  pitchRevisionForB?: string | null
   strategyForA: NarrativeStrategy | null
   strategyForB: NarrativeStrategy | null
   criticScoreA: number | null
@@ -35,6 +38,8 @@ export async function generateMatchAngle(
   ])
 
   return {
+    pitchRevisionForA:resultA.pitchRevisionId,
+    pitchRevisionForB:resultB.pitchRevisionId,
     narrativeForA: resultA.narrative,
     narrativeForB: resultB.narrative,
     strategyForA: resultA.strategy,
@@ -56,12 +61,18 @@ export async function generateNarrativeWithPipeline(
   compatibilityBreakdown: Record<string, number>,
 ): Promise<{
   narrative: string
+  pitchRevisionId?: string | null
   strategy: NarrativeStrategy | null
   criticScore: number | null
   criticSubscores: { specificity: number; emotional_arc: number; authenticity: number; brevity: number; connection: number } | null
   generationAttempts: number
   usedQuote: boolean
 }> {
+  if(await captureStore().enabled()) {
+    const { generateTrailer }=await import('./intro-engine-v2')
+    const result=await generateTrailer(recipient,subject,recipientProfile,subjectProfile)
+    return {narrative:result.narrative,strategy:null,criticScore:result.criticScore,criticSubscores:null,generationAttempts:result.generationAttempts,usedQuote:result.narrative.includes('“') || result.narrative.includes('"'),pitchRevisionId:result.pitchRevisionId}
+  }
   try {
     // Stage 1: Select strategy
     const strategy = selectStrategy(recipientProfile, subjectProfile, compatibilityBreakdown)

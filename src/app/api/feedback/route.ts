@@ -1,4 +1,9 @@
+import { captureActorAllowed } from '@/lib/model-data/auth'
 import { NextRequest, NextResponse } from 'next/server'
+import { randomUUID } from 'node:crypto'
+import { createServerClient } from '@/lib/supabase'
+import { recordProductFeedback } from '@/lib/model-data/pitches'
+import { CaptureError } from '@/lib/model-data/core'
 import { signPhotoUrl } from '@/lib/photos'
 import {
   getUser,
@@ -27,6 +32,26 @@ export async function POST(req: NextRequest) {
 
   if (!userId || !action) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
+  }
+
+  if(!await captureActorAllowed(req.headers,userId))return NextResponse.json({error:'Authentication required'},{status:401})
+
+  // Validate the exact intro, match, actor, and revision before any feedback side effects.
+  if (introId) {
+    const db=createServerClient()
+    const {data:intro,error}=await db.from('daily_intros').select('*').eq('id',introId).single()
+    if(error || !intro || intro.user_id!==userId || (matchId && intro.match_id!==matchId) || (body.matchedUserId && intro.matched_user_id!==body.matchedUserId)) {
+      return NextResponse.json({error:'Feedback does not belong to this introduction'},{status:403})
+    }
+    if(body.pitchRevisionId) {
+      const token=req.headers.get('authorization')?.replace(/^Bearer /,'')
+      const auth=token?await db.auth.getUser(token):null
+      if(!auth?.data.user || auth.data.user.id!==userId)return NextResponse.json({error:'Authentication required'},{status:401})
+      if(body.pitchRevisionId!==intro.pitch_revision_id)return NextResponse.json({error:'Pitch revision mismatch'},{status:409})
+    }
+    await recordProductFeedback(intro,userId,body.pitchRevisionId,{action,reason,details,photoRevealedBeforeDecision},typeof body.eventId==='string'?body.eventId:randomUUID())
+  } else if (body.pitchRevisionId) {
+    return NextResponse.json({error:'introId required for revision feedback'},{status:400})
   }
 
   // Compute location tier between user and matched user
@@ -88,16 +113,19 @@ export async function POST(req: NextRequest) {
         const userComposite = await getCompositeProfile(userId)
         const candidateComposite = await getCompositeProfile(candidate.id)
 
+        let pitchRevisionId: string | null = null
         let narrative = "There's someone here you should meet. Trust us on this one."
         let hookType: 'quote' | 'contradiction' | 'scene' | null = null
         let trailerProvenance: PitchProvenance | null = null
         if (userComposite && candidateComposite) {
           try {
             const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
+          pitchRevisionId = trailer.pitchRevisionId ?? null
             narrative = trailer.narrative
             hookType = trailer.hookType
             trailerProvenance = trailer.provenance
-          } catch {
+          } catch (err) {
+            if(err instanceof CaptureError)throw err
             // use fallback
           }
         }
@@ -131,6 +159,7 @@ export async function POST(req: NextRequest) {
           match_id: match.id,
           matched_user_id: candidate.id,
           narrative,
+          pitch_revision_id: pitchRevisionId,
           status: 'pending',
           intro_type: 'bonus',
           scheduled_at: now,
@@ -150,6 +179,7 @@ export async function POST(req: NextRequest) {
           ok: true,
           bonusIntro: {
             id: bonusIntro.id,
+            pitchRevisionId: bonusIntro.pitch_revision_id,
             matchId: match.id,
             matchedUserId: candidate.id,
             name: candidate.first_name,

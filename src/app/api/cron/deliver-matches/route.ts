@@ -1,3 +1,4 @@
+import { CaptureError } from '@/lib/model-data/core'
 import { NextRequest, NextResponse } from 'next/server'
 import {
   getEligibleUsersForDelivery,
@@ -116,6 +117,7 @@ export async function GET(req: NextRequest) {
       const candidateComposite = await getCompositeProfile(candidate.id)
 
       // Generate intro trailer with hook type
+      let pitchRevisionId: string | null = null
       let narrativeForUser = "There's someone here you should meet. Trust us on this one."
       let hookType: 'quote' | 'contradiction' | 'scene' | null = null
       let criticScore: number | null = null
@@ -126,6 +128,7 @@ export async function GET(req: NextRequest) {
       if (userComposite && candidateComposite) {
         try {
           const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
+        pitchRevisionId = trailer.pitchRevisionId ?? null
           narrativeForUser = trailer.narrative
           hookType = trailer.hookType
           criticScore = trailer.criticScore
@@ -134,6 +137,7 @@ export async function GET(req: NextRequest) {
           quoteUsed = trailer.quoteUsed
           trailerProvenance = trailer.provenance
         } catch (err) {
+          if(err instanceof CaptureError)throw err
           console.error(`Cron: Failed to generate trailer for ${user.id} <> ${candidate.id}`, err)
         }
       }
@@ -185,6 +189,7 @@ export async function GET(req: NextRequest) {
         match_id: match.id,
         matched_user_id: candidate.id,
         narrative: narrativeForUser,
+        pitch_revision_id: pitchRevisionId,
         status: 'pending',
         intro_type: 'daily',
         scheduled_at: now.toISOString(),

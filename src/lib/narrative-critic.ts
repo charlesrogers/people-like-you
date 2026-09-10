@@ -1,3 +1,5 @@
+import { captureStore } from './model-data/store'
+import { CaptureError } from './model-data/core'
 import Anthropic from '@anthropic-ai/sdk'
 import type {
   CompositeProfile,
@@ -34,6 +36,7 @@ export async function scoreDrafts(
   winnerIndex: number
   shouldRegenerate: boolean
 }> {
+  if(await captureStore().enabled())throw new CaptureError('Legacy standalone critic is disabled; use the evidence-backed trailer pipeline')
   // Score all drafts in parallel
   const scores = await Promise.all(
     drafts.map((draft, i) =>

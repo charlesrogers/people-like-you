@@ -1,3 +1,4 @@
+import { CaptureError } from '@/lib/model-data/core'
 import { NextRequest, NextResponse } from 'next/server'
 import { signPhotoUrl } from '@/lib/photos'
 import {
@@ -62,16 +63,19 @@ export async function POST(req: NextRequest) {
         const userComposite = await getCompositeProfile(userId)
         const candidateComposite = await getCompositeProfile(candidate.id)
 
+        let pitchRevisionId: string | null = null
         let narrative = "Based on your stories, we found someone you should meet."
         let hookType: 'quote' | 'contradiction' | 'scene' | null = null
         let trailerProvenance: PitchProvenance | null = null
         if (userComposite && candidateComposite) {
           try {
             const trailer = await generateTrailer(user, candidate, userComposite, candidateComposite)
+          pitchRevisionId = trailer.pitchRevisionId ?? null
             narrative = trailer.narrative
             hookType = trailer.hookType
             trailerProvenance = trailer.provenance
-          } catch {
+          } catch (err) {
+            if(err instanceof CaptureError)throw err
             // Use fallback narrative
           }
         }
@@ -95,6 +99,7 @@ export async function POST(req: NextRequest) {
           match_id: match.id,
           matched_user_id: candidate.id,
           narrative,
+          pitch_revision_id: pitchRevisionId,
           status: 'pending',
           intro_type: 'bonus',
           scheduled_at: new Date().toISOString(),
@@ -113,6 +118,7 @@ export async function POST(req: NextRequest) {
 
         unlockedIntro = {
           id: intro.id,
+          pitchRevisionId: intro.pitch_revision_id,
           matchId: match.id,
           matchedUserId: candidate.id,
           name: candidate.first_name,

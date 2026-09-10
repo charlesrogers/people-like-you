@@ -198,6 +198,7 @@ function OnboardingContent() {
     formData.append('audio', blob, `${promptId}.${ext}`)
     formData.append('userId', userId)
     formData.append('promptId', promptId)
+    formData.append('promptSnapshot', JSON.stringify({text:prompt.text,helpText:prompt.helpText,exampleAnswer:prompt.exampleAnswer ?? null,client:'web-onboarding-v1'}))
     formData.append('dayNumber', '0')
     formData.append('durationSeconds', String(duration))
     formData.append('promptSource', fished?.source ?? 'bank')
@@ -446,7 +447,7 @@ function OnboardingContent() {
         apiFetch('/api/profile-feedback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ userId, feedback: profileFeedback }),
+          body: JSON.stringify({ userId, feedback: profileFeedback,profileRevisionId:composite?.synthesis_record_id,eventId:crypto.randomUUID() }),
         }).catch(() => {})
       }
 
@@ -479,6 +480,8 @@ function OnboardingContent() {
       body: JSON.stringify({
         userId,
         narrativeId: narrative.id,
+        displayedNarrative:narrative.narrative,
+        eventId:crypto.randomUUID(),
         vote,
         attributesSelected: vote ? tasteSelectedAttrs : [],
         narrativeStyle: narrative.style,

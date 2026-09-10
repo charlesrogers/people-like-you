@@ -1,14 +1,18 @@
+import { captureActorAllowed } from '@/lib/model-data/auth'
+import { captureMemberFeedback } from '@/lib/model-data/member-feedback'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 
 export async function POST(req: NextRequest) {
   try {
-    const { userId, feedback } = await req.json()
+    const { userId, feedback,struckItems,profileRevisionId,eventId } = await req.json()
 
     if (!userId || !feedback) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    if(!await captureActorAllowed(req.headers,userId))return NextResponse.json({error:'Authentication required'},{status:401})
+    await captureMemberFeedback(userId,'profile_feedback',{feedback,struckItems},profileRevisionId,eventId)
     const db = createServerClient()
     const { error } = await db
       .from('composite_profiles')

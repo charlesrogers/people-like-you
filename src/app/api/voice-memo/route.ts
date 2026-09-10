@@ -1,3 +1,4 @@
+import { captureActorAllowed } from '@/lib/model-data/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@/lib/supabase'
 import { saveVoiceMemo, getUserVoiceMemos, markReplacedMemosForPrompt } from '@/lib/db'
@@ -5,6 +6,10 @@ import { measureAudioDuration } from '@/lib/audio-duration'
 import { meetsRecordingMinimum, MIN_RECORDING_SECONDS } from '@/lib/recording-requirements'
 import { QUESTION_BANK } from '@/lib/prompts'
 import { FISHED_PROMPTS, NERD_OUT } from '@/lib/voice-prompt-map'
+
+import { snapshotTranscript,captureQuestion } from '@/lib/model-data/sources'
+
+import { captureStore } from '@/lib/model-data/store'
 
 export const runtime = 'nodejs'
 
@@ -35,6 +40,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields: audio, userId, promptId' }, { status: 400 })
     }
 
+    if(!await captureActorAllowed(req.headers,userId))return NextResponse.json({error:'Authentication required'},{status:401})
+
     if (audio.size > 25 * 1024 * 1024) {
       return NextResponse.json({ error: 'File too large (max 25MB)' }, { status: 400 })
     }
@@ -60,6 +67,9 @@ export async function POST(req: NextRequest) {
     }
     const durationSeconds = Math.floor(measuredSeconds)
 
+    let displayed: unknown = null
+    try { displayed = JSON.parse(String(formData.get('promptSnapshot') || 'null')) } catch { /* legacy client */ }
+    const questionRecordId = await captureQuestion(userId,promptId,displayed,{source:promptSource,seed:promptSeed})
     const supabase = createServerClient()
 
     const extMap: Record<string, string> = {
@@ -85,6 +95,7 @@ export async function POST(req: NextRequest) {
     await markReplacedMemosForPrompt(userId, promptId)
 
     const memo = await saveVoiceMemo({
+      ...(questionRecordId ? {question_record_id:questionRecordId} : {}),
       user_id: userId,
       prompt_id: promptId,
       audio_storage_path: fileName,
@@ -122,4 +133,21 @@ export async function GET(req: NextRequest) {
       tier: tiers.get(m.prompt_id) ?? null,
     })),
   })
+}
+
+// Corrections create a new immutable transcript and invalidate the old analysis tree.
+export async function PATCH(req: NextRequest) {
+  const db=createServerClient()
+  const token=req.headers.get('authorization')?.replace(/^Bearer /,'')
+  const auth=token?await db.auth.getUser(token):null
+  if(!auth?.data.user)return NextResponse.json({error:'Authentication required'},{status:401})
+  const body=await req.json()
+  if(typeof body.memoId!=='string' || typeof body.transcript!=='string' || !body.transcript.trim() || body.transcript.length>50000)return NextResponse.json({error:'Invalid correction'},{status:400})
+  const {data:memo,error}=await db.from('voice_memos').select('*').eq('id',body.memoId).eq('user_id',auth.data.user.id).single()
+  if(error || !memo || memo.processing_status==='replaced')return NextResponse.json({error:'Answer not found'},{status:404})
+  if(!await captureStore().enabled())return NextResponse.json({error:'Correction capture is not enabled yet'},{status:503})
+  const record=await snapshotTranscript(memo,body.transcript)
+  const {error:saveError}=await db.rpc('model_data_set_transcript',{p_memo:memo.id,p_person:auth.data.user.id,p_text:body.transcript,p_record:record})
+  if(saveError)return NextResponse.json({error:'Could not save correction; please retry'},{status:500})
+  return NextResponse.json({ok:true,transcriptRecordId:record,status:'pending'})
 }

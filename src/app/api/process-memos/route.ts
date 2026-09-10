@@ -1,3 +1,4 @@
+import { captureActorAllowed } from '@/lib/model-data/auth'
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserVoiceMemos } from '@/lib/db'
 import { processVoiceMemo } from '@/lib/extraction'
@@ -10,6 +11,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
   }
 
+  if(!await captureActorAllowed(req.headers,userId))return NextResponse.json({error:'Authentication required'},{status:401})
   const memos = await getUserVoiceMemos(userId)
   const unprocessed = memos.filter(m =>
     m.processing_status === 'pending' ||
