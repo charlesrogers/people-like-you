@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { getPromptChoices, getProfileCompletion, getNextAngle, QUESTION_BANK, ANGLE_TIERS } from '../prompts'
-import { personalisedPrompts, NERD_OUT, type QuizAnswers } from '../voice-prompt-map'
+import { personalisedPrompts, FISHED_PROMPTS, NERD_OUT, type QuizAnswers } from '../voice-prompt-map'
 import { SEEDING_ITEMS } from '../quiz-battery'
 
 // V2-T4 reconciled onto the prompt picker: fished prompts feed getPromptChoices
@@ -10,6 +10,9 @@ const answers: QuizAnswers = Object.fromEntries(SEEDING_ITEMS.map(id => [id, 0])
 const fished = () => personalisedPrompts(answers)
 
 describe('fished prompts lead the picker', () => {
+  it('restores the completed four-group intake including personalised and nerd-out IDs', () => {
+    expect(getProfileCompletion(['nerd_out', 'fished_Q10_1', 'bet_on_yourself', 'recharge'], [NERD_OUT, ...Object.values(FISHED_PROMPTS)]).isComplete).toBe(true)
+  })
   it('every fished prompt carries a scannable short label', () => {
     for (const p of fished()) {
       expect(p.short, p.id).toBeTruthy()

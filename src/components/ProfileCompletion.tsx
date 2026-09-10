@@ -1,6 +1,7 @@
 'use client'
 
 import { ANGLE_LABELS, ANGLE_TIERS, getProfileCompletion, type PromptDef } from '@/lib/prompts'
+import { FISHED_PROMPTS, NERD_OUT } from '@/lib/voice-prompt-map'
 
 interface ProfileCompletionProps {
   answeredPromptIds: string[]
@@ -18,7 +19,7 @@ interface ProfileCompletionProps {
  * Completion is coverage, not a count — see getProfileCompletion.
  */
 export default function ProfileCompletion({ answeredPromptIds, personalised = [], compact }: ProfileCompletionProps) {
-  const { covered, missing, isComplete } = getProfileCompletion(answeredPromptIds, personalised)
+  const { covered, missing, isComplete } = getProfileCompletion(answeredPromptIds, [NERD_OUT, ...Object.values(FISHED_PROMPTS), ...personalised])
   const isCovered = (t: string) => (covered as readonly string[]).includes(t)
 
   if (compact) {
