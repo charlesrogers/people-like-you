@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Missing userId' }, { status: 400 })
     }
 
-    const memos = await getUserVoiceMemos(userId)
+    const memos = (await getUserVoiceMemos(userId)).filter(m => m.processing_status !== 'replaced')
     const composite = await getCompositeProfile(userId)
 
     const total = memos.length
